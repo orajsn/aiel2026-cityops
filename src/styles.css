@@ -122,6 +122,17 @@ code,
 .strip__title { color: var(--ink); font-weight: 600; font-size: 26px; }
 .logo-slot { position: absolute; top: 40px; right: 48px; width: 150px; height: 34px; background: url('/art/logo.svg') right center / contain no-repeat; }
 .counter { position: absolute; left: 48px; bottom: 28px; font-size: 15px; color: var(--ink-dim); letter-spacing: 0.06em; }
+/* 84px on the 1920 stage is still a finger-sized target when scaled down to an iPad */
+.stepper { position: absolute; right: 48px; bottom: 28px; display: flex; gap: 14px; }
+.stepper__btn {
+  width: 84px; height: 84px; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  font: 300 52px/1 var(--font-body); padding: 0 0 8px;
+  cursor: pointer; backdrop-filter: blur(6px); -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+.stepper__btn:active { transform: scale(0.94); }
+.stepper__btn:disabled { opacity: 0.25; cursor: default; }
 
 .overlay-layer { position: absolute; inset: 0; pointer-events: none; }
 .overlay-layer * { pointer-events: none; }

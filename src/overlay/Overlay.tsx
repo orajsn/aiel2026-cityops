@@ -48,6 +48,16 @@ export function Overlay() {
 
       {scene.card && settled && <HandoffCard card={scene.card} />}
 
+      {/* touch navigation: the iPad has no arrow keys */}
+      <nav className="stepper" aria-label="Scene navigation">
+        <button type="button" className="stepper__btn" aria-label="Back" disabled={index === 0} onClick={() => useSceneStore.getState().prev()}>
+          ‹
+        </button>
+        <button type="button" className="stepper__btn" aria-label="Next" disabled={index >= total - 1} onClick={() => useSceneStore.getState().next()}>
+          ›
+        </button>
+      </nav>
+
       <div className="progress">
         <div className="progress__bar" style={{ width: `${((index + 1) / Math.max(1, total)) * 100}%` }} />
       </div>

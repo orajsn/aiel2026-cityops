@@ -18,3 +18,20 @@ test('Overlay shows the chapter and scene title strip', () => {
   render(<Overlay />);
   expect(screen.getByText('Mystery')).toBeInTheDocument();
 });
+
+test('on-screen Next and Back buttons step through the scenes (iPad has no arrow keys)', async () => {
+  const { fireEvent } = await import('@testing-library/react');
+  useSceneStore.getState().setScenes([
+    { id: 'a', chapter: 0, title: 'A', shot: 'city-high' },
+    { id: 'b', chapter: 0, title: 'B', shot: 'city-high' },
+  ]);
+  render(<Overlay />);
+  const back = screen.getByRole('button', { name: 'Back' });
+  const next = screen.getByRole('button', { name: 'Next' });
+  expect(back).toBeDisabled();
+  fireEvent.click(next);
+  expect(useSceneStore.getState().index).toBe(1);
+  expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
+  fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+  expect(useSceneStore.getState().index).toBe(0);
+});
