@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { useUiStore } from '../engine/ui';
 import { HALF_WIDTH, ELEVATION, ribbonGeometry, roadRibbons, type RoadClass } from './roads';
-import { inBridgeCorridor } from './bridgeFrame';
 
 const ROAD_CLASSES: RoadClass[] = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'link'];
 const BRIDGE_LIFT = 1.4;
@@ -15,7 +14,7 @@ const BRIDGE_LIFT = 1.4;
 export function Roads() {
   const theme = useUiStore((s) => s.theme);
   const built = useMemo(() => {
-    const ribbons = roadRibbons().filter((r) => !r.pts.some((p) => inBridgeCorridor(p.x, p.z, 3)) || r.c === 'skytrain');
+    const ribbons = roadRibbons();
     const kerb: THREE.BufferGeometry[] = [];
     const road: THREE.BufferGeometry[] = [];
     const rail: THREE.BufferGeometry[] = [];

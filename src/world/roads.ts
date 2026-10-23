@@ -116,6 +116,35 @@ export function nearestRoad(x: number, z: number, radius = 8): { gap: number; se
   return best;
 }
 
+let crossingsCache: { x: number; z: number }[][] | null = null;
+
+/** Runs of main roads that cross the river (elevated over water), longest first. */
+export function riverCrossings(): { x: number; z: number }[][] {
+  if (crossingsCache) return crossingsCache;
+  crossingsCache = roadRibbons()
+    .filter((r) => r.elevated && r.c !== 'rail' && r.c !== 'skytrain' && r.pts.some((p) => isWater(p.x, p.z, 0)))
+    .map((r) => r.pts.map((p) => ({ x: p.x, z: p.z })))
+    .filter((run) => Math.hypot(run[0].x - run[run.length - 1].x, run[0].z - run[run.length - 1].z) > 5)
+    .sort((a, b) => Math.hypot(b[0].x - b[b.length - 1].x, b[0].z - b[b.length - 1].z) - Math.hypot(a[0].x - a[a.length - 1].x, a[0].z - a[a.length - 1].z));
+  return crossingsCache;
+}
+
+/** The river crossing whose midpoint is nearest (x, z). */
+export function nearestCrossing(x: number, z: number): { x: number; z: number }[] | null {
+  let best: { x: number; z: number }[] | null = null;
+  let bd = Infinity;
+  for (const run of riverCrossings()) {
+    const mx = (run[0].x + run[run.length - 1].x) / 2;
+    const mz = (run[0].z + run[run.length - 1].z) / 2;
+    const d = Math.hypot(x - mx, z - mz);
+    if (d < bd) {
+      bd = d;
+      best = run;
+    }
+  }
+  return best;
+}
+
 export interface Ribbon {
   c: RoadClass;
   pts: THREE.Vector3[];

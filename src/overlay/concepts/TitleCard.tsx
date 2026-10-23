@@ -12,9 +12,6 @@ export function TitleCard() {
         CityOps
       </motion.h1>
       <motion.div className="title__rule" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.9, ease: EASE, delay: 0.6 }} />
-      <motion.div className="title__sub" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 1.0 }}>
-        One city. One database. Two labs.
-      </motion.div>
       <motion.div className="title__org" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 1.4 }}>
         Oracle Cloud Engineering Thailand
       </motion.div>

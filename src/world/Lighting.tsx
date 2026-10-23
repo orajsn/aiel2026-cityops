@@ -24,7 +24,7 @@ export function Lighting() {
       <ambientLight intensity={theme.ambient} />
       <hemisphereLight args={[theme.hemiSky, theme.hemiGround, theme.hemi]} />
       <directionalLight
-        position={[160, 260, 120]}
+        position={[-180, 90, 120]}
         intensity={theme.sunIntensity}
         color={theme.sun}
         castShadow={theme.shadows}

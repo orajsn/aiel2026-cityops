@@ -1,4 +1,5 @@
 import type { ShotId } from '../engine/types';
+import { harborBridgeFrame } from './bridgeFrame';
 
 export type Vec3 = [number, number, number];
 
@@ -12,14 +13,25 @@ export interface Shot {
 // Landmarks in scene units (see content/geo.ts): Harbor Bridge (23, 36), Ops Center (5, -67), CBD (-12, -29).
 export const CORE_POS: Vec3 = [-5, -58, 2];
 
+/** A shot expressed in Harbor Bridge local space (x along the deck, z across it). */
+function bridgeShot(pos: Vec3, target: Vec3, durationMs: number): Shot {
+  const f = harborBridgeFrame();
+  const toWorld = ([x, y, z]: Vec3): Vec3 => [
+    f.x + x * Math.cos(f.yaw) + z * Math.sin(f.yaw),
+    y,
+    f.z - x * Math.sin(f.yaw) + z * Math.cos(f.yaw),
+  ];
+  return { position: toWorld(pos), target: toWorld(target), durationMs, ease: 'inOut' };
+}
+
 export const SHOTS: Record<ShotId, Shot> = {
-  'gulf-approach': { position: [50, 90, 300], target: [20, 0, 60], durationMs: 0 },
-  'city-high': { position: [6, 72, 92], target: [-6, 0, -14], durationMs: 2500, ease: 'inOut' },
-  'city-wide': { position: [26, 100, 118], target: [-2, 0, -18], durationMs: 2000, ease: 'inOut' },
-  'ops-center': { position: [30, 40, -10], target: [5, 3, -67], durationMs: 2000, ease: 'inOut' },
-  'bridge-pier3': { position: [52, 14, 40], target: [35, 1.5, 17], durationMs: 2200, ease: 'inOut' },
-  'bridge-pier2': { position: [20, 10, 38], target: [34, 1.5, 19], durationMs: 1600, ease: 'inOut' },
-  'bridge-overview': { position: [66, 34, 58], target: [33, 1, 14], durationMs: 2200, ease: 'inOut' },
+  'gulf-approach': { position: [-30, 34, 160], target: [0, 4, 0], durationMs: 0 },
+  'city-high': { position: [-34, 24, 72], target: [6, 4, -30], durationMs: 2500, ease: 'inOut' },
+  'city-wide': { position: [-20, 40, 70], target: [4, 2, -26], durationMs: 2000, ease: 'inOut' },
+  'ops-center': { position: [26, 22, -30], target: [5, 3, -67], durationMs: 2000, ease: 'inOut' },
+  'bridge-pier3': bridgeShot([6, 3.2, 14], [1, 1.6, 0], 2200),
+  'bridge-pier2': bridgeShot([-8, 3, 12], [-2, 1.6, 0], 1600),
+  'bridge-overview': bridgeShot([14, 12, 30], [0, 2, 0], 2200),
   'core-dive': { position: [10, 22, 205], target: [-5, -36, -3], durationMs: 2500, ease: 'inOut' },
   'core-face-tables': { position: [-86, -40, 94], target: [-90, -62, 2], durationMs: 1400, ease: 'inOut' },
   'core-face-json': { position: [-46, -40, 94], target: [-54, -62, 2], durationMs: 1400, ease: 'inOut' },

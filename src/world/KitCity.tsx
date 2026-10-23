@@ -8,6 +8,7 @@ import { River } from './RiverMesh';
 import { Ground } from './Ground';
 import { Roads } from './RoadsMesh';
 import { Landmarks } from './LandmarksMesh';
+import { Boats } from './Boats';
 
 /** One merged geometry + material per kit model, so each model is a single InstancedMesh. */
 function useKitModels() {
@@ -98,6 +99,7 @@ export function KitCity() {
       <River />
       <Roads />
       <Landmarks />
+      <Boats />
       {groups.map(([model, items]) => {
         const m = models.get(model);
         if (!m) return null;

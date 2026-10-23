@@ -7,6 +7,8 @@ export type ThemeName = 'light' | 'night';
 export interface Theme {
   name: ThemeName;
   bg: string;
+  skyTop: string;
+  skyHorizon: string;
   fogDensity: number;
   ground: string;
   /** side faces of the city slab */
@@ -38,22 +40,24 @@ export interface Theme {
 export const THEMES: Record<ThemeName, Theme> = {
   light: {
     name: 'light',
-    bg: '#EEF2F4',
-    fogDensity: 0.0016,
-    ground: '#E3E7E3',
-    slabEdge: '#D3CCBD',
+    bg: '#F2DCC8',
+    skyTop: '#D9E2EA',
+    skyHorizon: '#F2DCC8',
+    fogDensity: 0.0036,
+    ground: '#E9E1D2',
+    slabEdge: '#D8CDBB',
     base: '#E9E3D6',
     grid: false,
-    waterBase: '#9CC5D4',
-    waterGlow: '#C9E6EE',
-    buildingTint: '#ffffff',
+    waterBase: '#86B4CC',
+    waterGlow: '#EBD6BE',
+    buildingTint: '#FFF0DF',
     buildingEdges: false,
-    ambient: 0.55,
-    hemiSky: '#ffffff',
-    hemiGround: '#b9c4c9',
-    hemi: 0.7,
-    sun: '#fff4e0',
-    sunIntensity: 1.6,
+    ambient: 0.45,
+    hemiSky: '#FFE6CC',
+    hemiGround: '#B8AFA6',
+    hemi: 0.75,
+    sun: '#FFD2A0',
+    sunIntensity: 2.0,
     shadows: true,
     bloom: false,
     toneMapped: false,
@@ -66,6 +70,8 @@ export const THEMES: Record<ThemeName, Theme> = {
   night: {
     name: 'night',
     bg: '#0B0E14',
+    skyTop: '#0B0E14',
+    skyHorizon: '#141b27',
     fogDensity: 0.005,
     ground: '#0c1119',
     slabEdge: '#141b27',

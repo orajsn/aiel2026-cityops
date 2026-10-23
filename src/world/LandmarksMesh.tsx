@@ -46,6 +46,14 @@ function LandmarkMesh({ l }: { l: Landmark }) {
       return <Crane />;
     case 'park':
       return <Park />;
+    case 'wheel':
+      return <Wheel />;
+    case 'dome':
+      return <DomeTower />;
+    case 'twin':
+      return <TwinTowers />;
+    case 'hotel':
+      return <Hotel />;
   }
 }
 
@@ -256,7 +264,7 @@ function Pylon() {
 /** A port gantry crane: two legs, a beam, a boom over the water. */
 function Crane() {
   return (
-    <group>
+    <group scale={1.5}>
       <Box p={[-1.0, 1.6, 0]} s={[0.25, 3.2, 0.25]} c={STEEL} />
       <Box p={[1.0, 1.6, 0]} s={[0.25, 3.2, 0.25]} c={STEEL} />
       <Box p={[-1.0, 1.6, 0.9]} s={[0.25, 3.2, 0.25]} c={STEEL} />
@@ -296,6 +304,81 @@ function Park() {
           </mesh>
         </group>
       ))}
+    </group>
+  );
+}
+
+/** Asiatique: a Ferris wheel on the riverbank. */
+function Wheel() {
+  const spokes = Array.from({ length: 12 }, (_, i) => (i / 12) * Math.PI * 2);
+  return (
+    <group position={[0, 0, 0]}>
+      {[-0.6, 0.6].map((z) => (
+        <mesh key={z} position={[0, 1.4, z]} rotation={[0, 0, 0]} castShadow>
+          <coneGeometry args={[0.5, 2.8, 4]} />
+          <meshStandardMaterial color={CONCRETE} roughness={0.9} />
+        </mesh>
+      ))}
+      <group position={[0, 3.0, 0]}>
+        <mesh castShadow>
+          <torusGeometry args={[2.6, 0.08, 8, 48]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.8} />
+        </mesh>
+        {spokes.map((a, i) => (
+          <mesh key={i} rotation={[0, 0, a]} position={[Math.cos(a) * 1.3, Math.sin(a) * 1.3, 0]}>
+            <boxGeometry args={[2.6, 0.05, 0.05]} />
+            <meshStandardMaterial color="#ffffff" roughness={0.8} />
+          </mesh>
+        ))}
+        {spokes.map((a, i) => (
+          <mesh key={`c${i}`} position={[Math.cos(a) * 2.6, Math.sin(a) * 2.6, 0]} castShadow>
+            <boxGeometry args={[0.32, 0.32, 0.32]} />
+            <meshStandardMaterial color={i % 2 ? ROOF : GOLD} roughness={0.8} />
+          </mesh>
+        ))}
+      </group>
+    </group>
+  );
+}
+
+/** State Tower: a tower with a gold dome on top. */
+function DomeTower() {
+  return (
+    <group>
+      <Box p={[0, 4.2, 0]} s={[2.2, 8.4, 2.2]} c={CREAM} />
+      <mesh position={[0, 8.6, 0]} castShadow>
+        <cylinderGeometry args={[1.0, 1.0, 0.5, 20]} />
+        <meshStandardMaterial color={CREAM} roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 8.85, 0]} castShadow>
+        <sphereGeometry args={[1.0, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial color={GOLD} roughness={0.4} metalness={0.4} />
+      </mesh>
+    </group>
+  );
+}
+
+/** ICONSIAM: two slab towers on a long podium by the river. */
+function TwinTowers() {
+  return (
+    <group>
+      <Box p={[0, 0.6, 0]} s={[6.5, 1.2, 2.6]} c={CREAM} />
+      <Box p={[-1.8, 5.0, 0]} s={[1.6, 8.8, 1.6]} c={GLASS} />
+      <Box p={[1.8, 4.2, 0]} s={[1.6, 7.2, 1.6]} c={GLASS} />
+    </group>
+  );
+}
+
+/** A big riverside hotel: a curved tower with a wide base. */
+function Hotel() {
+  return (
+    <group>
+      <Box p={[0, 0.5, 0]} s={[4, 1, 2.2]} c={CREAM} />
+      <mesh position={[0, 4.2, 0]} castShadow>
+        <cylinderGeometry args={[1.6, 1.6, 7.4, 24, 1, false, 0, Math.PI]} />
+        <meshStandardMaterial color={'#e8d6c2'} roughness={0.9} side={2} />
+      </mesh>
+      <Box p={[0, 4.2, -0.05]} s={[3.2, 7.4, 0.3]} c={'#e8d6c2'} />
     </group>
   );
 }

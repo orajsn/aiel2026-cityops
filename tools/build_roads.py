@@ -15,19 +15,13 @@ import sys
 from collections import defaultdict
 
 BBOX = (13.60, 100.46, 13.80, 100.63)  # south, west, north, east
-TOL_DEG = 0.00012  # ~13 m simplification tolerance
+TOL_DEG = 0.00028  # ~30 m simplification tolerance
+# main network only: the page wants a city that reads, not a street atlas
 KEEP = {
     "motorway": "motorway",
     "trunk": "trunk",
     "primary": "primary",
     "secondary": "secondary",
-    "tertiary": "tertiary",
-    "motorway_link": "link",
-    "trunk_link": "link",
-    "primary_link": "link",
-    "rail": "rail",
-    "subway": "skytrain",
-    "light_rail": "skytrain",
 }
 
 

@@ -56,7 +56,7 @@ export function kitLayout(seed = 11): Placement[] {
       const jx = x + (r() - 0.5) * SPACING * 0.7;
       const jz = z + (r() - 0.5) * SPACING * 0.7;
       if (isWater(jx, jz, 1.2)) continue;
-      if (inBridgeCorridor(jx, jz, 4)) continue;
+      if (inBridgeCorridor(jx, jz, 2.2)) continue;
       if (nearLandmark(jx, jz)) continue;
       const near = nearestRoad(jx, jz, 10);
       if (near && near.gap < 0.6) continue;

@@ -4,8 +4,8 @@
   "type": "bridge",
   "district": "Harbor District",
   "criticality": 5,
-  "lat": 13.683,
-  "lon": 100.585,
+  "lat": 13.67043,
+  "lon": 100.54414,
   "specs": {
    "span_length_m": 485,
    "load_capacity_t": 120,
@@ -19,8 +19,8 @@
   "type": "sensor",
   "district": "Harbor District",
   "criticality": 3,
-  "lat": 13.686,
-  "lon": 100.583,
+  "lat": 13.681,
+  "lon": 100.538,
   "specs": {
    "sensor_type": "strain_gauge",
    "channels": 24,
@@ -33,8 +33,8 @@
   "type": "sensor",
   "district": "Harbor District",
   "criticality": 3,
-  "lat": 13.68,
-  "lon": 100.587,
+  "lat": 13.676,
+  "lon": 100.542,
   "specs": {
    "sensor_type": "accelerometer",
    "channels": 16,
@@ -48,7 +48,7 @@
   "district": "Harbor District",
   "criticality": 4,
   "lat": 13.69,
-  "lon": 100.595,
+  "lon": 100.59,
   "specs": {
    "length_m": 1200,
    "crest_height_m": 3.2,
@@ -60,8 +60,8 @@
   "type": "civil",
   "district": "Harbor District",
   "criticality": 4,
-  "lat": 13.698,
-  "lon": 100.56,
+  "lat": 13.69,
+  "lon": 100.535,
   "specs": {
    "length_m": 950,
    "crest_height_m": 3.0,

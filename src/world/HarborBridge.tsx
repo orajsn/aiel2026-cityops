@@ -1,88 +1,121 @@
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { Html, useGLTF } from '@react-three/drei';
+import { Html, Line } from '@react-three/drei';
 import { useUiStore } from '../engine/ui';
 import { harborBridgeFrame } from './bridgeFrame';
-import { KIT } from './kitLayout';
 
-const DECK_TILE = 2.6; // road-bridge tile is 1 unit
-const DECK_Y = 1.3;
+const DECK_Y = 1.4; // matches the elevated road ribbon
 
 /**
- * Harbor Bridge: Kenney road-bridge tiles on bridge-pillar piers across the river,
- * an inspector with a torch at Pier 3, and the two incident markers.
+ * Harbor Bridge: a cable-stayed bridge built on the real river crossing the roads already draw.
+ * Two pylons, fans of cables, piers under the deck, a maintenance platform with the inspector
+ * at Pier 3, and the two incident markers.
  */
 export function HarborBridge({ inspector = false, markers = false }: { inspector?: boolean; markers?: boolean }) {
   const frame = useMemo(() => harborBridgeFrame(), []);
-  const [deck, pillar] = useGLTF([`${KIT}/roads/road-bridge.glb`, `${KIT}/roads/bridge-pillar.glb`]);
-
-  const tiles = useMemo(() => {
-    const n = Math.ceil((frame.half * 2) / DECK_TILE);
-    return Array.from({ length: n }, (_, i) => -frame.half + DECK_TILE / 2 + i * DECK_TILE);
-  }, [frame.half]);
-  const deckClones = useMemo(() => tiles.map(() => deck.scene.clone()), [tiles, deck]);
-  const pillarClones = useMemo(() => Array.from({ length: 8 }, () => pillar.scene.clone()), [pillar]);
-
-  // piers numbered 1..4 from the north bank (local -x) to the south bank (+x)
-  const piers = [-0.6, -0.2, 0.2, 0.6].map((k) => k * frame.half);
-  const pier3 = piers[2];
-  const pier2 = piers[1];
   const theme = useUiStore((s) => s.theme);
+
+  const piers = [-0.7, -0.42, -0.14, 0.14, 0.42, 0.7].map((k) => k * frame.half);
+  const pylons = [-0.3, 0.3].map((k) => k * frame.half);
+  const pier3 = piers[3];
+  const pier2 = piers[2];
+  const pylonH = 12;
+
+  const cables = useMemo(() => {
+    const out: [number, number, number][][] = [];
+    for (const px of pylons) {
+      for (let i = 1; i <= 6; i++) {
+        const dx = (i * (frame.half * 0.3)) / 6 + 0.6;
+        for (const sgn of [-1, 1]) {
+          out.push([
+            [px, DECK_Y + pylonH - i * 0.8, 0],
+            [px + sgn * dx, DECK_Y + 0.1, 0],
+          ]);
+        }
+      }
+    }
+    return out;
+  }, [frame.half]);
 
   return (
     <group position={[frame.x, 0, frame.z]} rotation={[0, frame.yaw, 0]} name="harbor-bridge">
-      {tiles.map((x, i) => (
-        <primitive key={x} object={deckClones[i]} position={[x, DECK_Y - 0.5, 0]} rotation={[0, Math.PI / 2, 0]} scale={DECK_TILE} />
+      {piers.map((x, i) => (
+        <mesh key={i} position={[x, DECK_Y / 2, 0]} castShadow>
+          <boxGeometry args={[0.5, DECK_Y, 1.3]} />
+          <meshStandardMaterial color="#cfcac0" roughness={1} />
+        </mesh>
       ))}
-      {piers.map((x, i) =>
-        [-0.9, 0.9].map((z, j) => (
-          <primitive key={`${i}-${j}`} object={pillarClones[i * 2 + j]} position={[x, -0.2, z]} scale={[9, (DECK_Y + 0.2) * 2, 9]} />
-        )),
-      )}
-      {inspector && <Inspector x={pier3} y={DECK_Y + 0.3} />}
+      {pylons.map((x, i) => (
+        <group key={`p${i}`} position={[x, 0, 0]}>
+          {[-0.7, 0.7].map((z) => (
+            <mesh key={z} position={[0, (DECK_Y + pylonH) / 2, z]} castShadow>
+              <boxGeometry args={[0.45, DECK_Y + pylonH, 0.3]} />
+              <meshStandardMaterial color="#e9e2d2" roughness={0.9} />
+            </mesh>
+          ))}
+          <mesh position={[0, DECK_Y + pylonH - 0.3, 0]} castShadow>
+            <boxGeometry args={[0.5, 0.5, 1.7]} />
+            <meshStandardMaterial color="#e9e2d2" roughness={0.9} />
+          </mesh>
+        </group>
+      ))}
+      {cables.map((pts, i) => (
+        <Line key={i} points={pts} color="#f0e6d2" lineWidth={1} />
+      ))}
+      {/* maintenance platform on Pier 3, as in the reference frame */}
+      <group position={[pier3, DECK_Y * 0.45, 0.95]}>
+        <mesh castShadow>
+          <boxGeometry args={[1.3, 0.08, 0.7]} />
+          <meshStandardMaterial color="#b9bcc4" roughness={1} />
+        </mesh>
+        {[-0.62, 0.62].map((x) => (
+          <mesh key={x} position={[x, 0.2, 0]}>
+            <boxGeometry args={[0.03, 0.4, 0.7]} />
+            <meshStandardMaterial color="#8a8f98" roughness={1} />
+          </mesh>
+        ))}
+      </group>
+      {inspector && <Inspector x={pier3} y={DECK_Y * 0.45 + 0.04} />}
       {markers && (
         <>
-          <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={16} />
-          <Marker x={pier2} y={DECK_Y} label="Pier 2" sub="corrosion · next session" color={theme.data} delayMs={3000} labelY={10} />
+          <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={14} />
+          <Marker x={pier2} y={DECK_Y} label="Pier 2" sub="corrosion · next session" color={theme.data} delayMs={3000} labelY={8} />
         </>
       )}
     </group>
   );
 }
 
-useGLTF.preload?.([`${KIT}/roads/road-bridge.glb`, `${KIT}/roads/bridge-pillar.glb`]);
-
-/** A simple figure with a torch: body, head, and a soft cone of light on the pier. */
+/** A simple figure in hi-vis with a torch on the platform. */
 function Inspector({ x, y }: { x: number; y: number }) {
   const cone = useRef<THREE.Mesh>(null);
-  const light = useRef<THREE.SpotLight>(null);
   useFrame(({ clock }) => {
-    // the torch sweeps slowly across the bearing: the scene's one ambient motion
-    const s = Math.sin(clock.elapsedTime * 0.5) * 0.25;
-    if (cone.current) cone.current.rotation.z = -0.9 + s;
-    if (light.current) light.current.target.position.set(x + 2.5 + s * 3, y - 4, 0);
+    if (cone.current) cone.current.rotation.z = -0.9 + Math.sin(clock.elapsedTime * 0.5) * 0.25;
   });
   return (
-    <group position={[x - 0.8, y, 1.1]} scale={0.6}>
+    <group position={[x + 0.2, y, 1.0]} scale={0.32}>
       <mesh position={[0, 0.9, 0]} castShadow>
         <capsuleGeometry args={[0.35, 1.0, 4, 8]} />
-        <meshStandardMaterial color="#f0a24a" roughness={0.8} />
+        <meshStandardMaterial color="#d6e24a" roughness={0.8} />
       </mesh>
       <mesh position={[0, 1.95, 0]} castShadow>
         <sphereGeometry args={[0.3, 12, 12]} />
         <meshStandardMaterial color="#ffd9b0" roughness={0.8} />
       </mesh>
-      <mesh ref={cone} position={[0.4, 1.3, 0]} rotation={[0, 0, -0.9]}>
-        <coneGeometry args={[1.6, 5, 24, 1, true]} />
-        <meshBasicMaterial color="#ffe6b0" transparent opacity={0.07} side={THREE.DoubleSide} depthWrite={false} />
+      <mesh position={[0, 2.2, 0]} castShadow>
+        <sphereGeometry args={[0.32, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.8} />
       </mesh>
-      <spotLight ref={light} position={[0.4, 1.3, 0]} angle={0.45} penumbra={0.6} intensity={60} distance={14} color="#ffe6b0" />
+      <mesh ref={cone} position={[-0.5, 1.3, 0]} rotation={[0, 0, 0.9]}>
+        <coneGeometry args={[1.4, 4, 24, 1, true]} />
+        <meshBasicMaterial color="#ffe6b0" transparent opacity={0.08} side={THREE.DoubleSide} depthWrite={false} />
+      </mesh>
     </group>
   );
 }
 
-function Marker({ x, y, label, sub, color, delayMs, labelY = 26 }: { x: number; y: number; label: string; sub: string; color: string; delayMs: number; labelY?: number }) {
+function Marker({ x, y, label, sub, color, delayMs, labelY = 10 }: { x: number; y: number; label: string; sub: string; color: string; delayMs: number; labelY?: number }) {
   const beam = useRef<THREE.Mesh>(null);
   const ring = useRef<THREE.Mesh>(null);
   const ringMat = useRef<THREE.MeshBasicMaterial>(null);
@@ -107,11 +140,11 @@ function Marker({ x, y, label, sub, color, delayMs, labelY = 26 }: { x: number; 
   return (
     <group position={[x, y, 0]}>
       <mesh ref={beam} visible={false} scale={[1, 0, 1]}>
-        <cylinderGeometry args={[0.12, 0.12, 22, 8]} />
+        <cylinderGeometry args={[0.08, 0.08, 14, 8]} />
         <meshBasicMaterial color={color} transparent opacity={0.6} toneMapped={false} />
       </mesh>
-      <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.6, 0]} visible={false}>
-        <ringGeometry args={[1.0, 1.3, 40]} />
+      <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.3, 0]} visible={false}>
+        <ringGeometry args={[0.7, 0.95, 40]} />
         <meshBasicMaterial ref={ringMat} color={color} transparent opacity={0.8} depthWrite={false} toneMapped={false} />
       </mesh>
       <Html position={[0, labelY, 0]} center zIndexRange={[30, 0]} style={{ pointerEvents: 'none' }}>

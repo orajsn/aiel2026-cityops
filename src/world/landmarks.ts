@@ -1,6 +1,6 @@
 import { project } from '../content/geo';
 
-export type LandmarkKind = 'prang' | 'palace' | 'pixelTower' | 'spireTower' | 'obelisk' | 'goldMount' | 'pylon' | 'crane' | 'park';
+export type LandmarkKind = 'prang' | 'palace' | 'pixelTower' | 'spireTower' | 'obelisk' | 'goldMount' | 'pylon' | 'crane' | 'park' | 'wheel' | 'dome' | 'twin' | 'hotel';
 
 export interface Landmark {
   id: string;
@@ -23,9 +23,13 @@ export const LANDMARKS: Landmark[] = [
   { id: 'Victory Monument', kind: 'obelisk', lat: 13.7649, lon: 100.5382, clear: 2.2 },
   { id: 'Rama VIII Bridge', kind: 'pylon', lat: 13.7695, lon: 100.499, clear: 2.0 },
   { id: 'Lumphini Park', kind: 'park', lat: 13.7308, lon: 100.5417, clear: 6.0 },
-  { id: 'Port crane 1', kind: 'crane', lat: 13.7025, lon: 100.573, clear: 1.6, yaw: 0.9 },
-  { id: 'Port crane 2', kind: 'crane', lat: 13.7005, lon: 100.578, clear: 1.6, yaw: 0.9 },
-  { id: 'Port crane 3', kind: 'crane', lat: 13.6985, lon: 100.583, clear: 1.6, yaw: 0.9 },
+  { id: 'Asiatique wheel', kind: 'wheel', lat: 13.7046, lon: 100.5027, clear: 2.4, yaw: 0.6 },
+  { id: 'State Tower', kind: 'dome', lat: 13.7217, lon: 100.5155, clear: 1.8 },
+  { id: 'ICONSIAM', kind: 'twin', lat: 13.7265, lon: 100.51, clear: 3.2, yaw: 0.4 },
+  { id: 'Riverside hotel', kind: 'hotel', lat: 13.7196, lon: 100.5134, clear: 2.0, yaw: 0.5 },
+  { id: 'Port crane 1', kind: 'crane', lat: 13.7025, lon: 100.573, clear: 2.2, yaw: 0.9 },
+  { id: 'Port crane 2', kind: 'crane', lat: 13.7005, lon: 100.578, clear: 2.2, yaw: 0.9 },
+  { id: 'Port crane 3', kind: 'crane', lat: 13.6985, lon: 100.583, clear: 2.2, yaw: 0.9 },
 ];
 
 const placed = LANDMARKS.map((l) => ({ ...project(l.lat, l.lon), clear: l.clear }));
