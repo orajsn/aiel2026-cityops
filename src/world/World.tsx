@@ -6,11 +6,17 @@ import { Effects } from './Effects';
 import { AssetPins } from './AssetPins';
 import { CameraRig } from './CameraRig';
 import { DataStream } from './DataStream';
+import { OracleCore, type Face } from './OracleCore';
+import { GraphLines, edgesFor } from './GraphLines';
+import { VectorField, type VectorFieldProps } from './VectorField';
 
 export interface WorldProps {
   pins?: AssetType[] | 'all';
   highlight?: string[];
   dataStream?: boolean;
+  core?: Face;
+  graph?: boolean | string;
+  vectors?: Omit<VectorFieldProps, 'position'>;
 }
 
 export function World() {
@@ -24,6 +30,14 @@ export function World() {
       <City />
       {w.pins && <AssetPins visible={w.pins} highlight={w.highlight} />}
       <DataStream running={!!w.dataStream} />
+      {w.core && <OracleCore face={w.core} />}
+      {(w.graph || w.core === 'graph') && (
+        <GraphLines
+          edges={edgesFor(typeof w.graph === 'string' ? w.graph : undefined)}
+          highlight={typeof w.graph === 'string' ? w.graph : undefined}
+        />
+      )}
+      {w.vectors && <VectorField {...w.vectors} position={[0, -80, 40]} />}
       <Effects />
     </>
   );
