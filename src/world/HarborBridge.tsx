@@ -1,70 +1,57 @@
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
-import { assetPosition } from '../content/geo';
-import { RIVER_CURVE, distanceToRiver, riverHalfWidth } from './river';
+import { Html, useGLTF } from '@react-three/drei';
+import { useUiStore } from '../engine/ui';
+import { harborBridgeFrame } from './bridgeFrame';
+import { KIT } from './kitLayout';
+
+const DECK_TILE = 6; // road-bridge tile is 1 unit, scaled to the city cell
+const DECK_Y = 7;
 
 /**
- * Diorama placeholder for Harbor Bridge: a deck across the river on four piers,
- * an inspector figure with a torch at Pier 3, and the two incident markers.
- * Replaced by the hand-built diorama with Kenney/Quaternius characters later.
+ * Harbor Bridge: Kenney road-bridge tiles on bridge-pillar piers across the river,
+ * an inspector with a torch at Pier 3, and the two incident markers.
  */
 export function HarborBridge({ inspector = false, markers = false }: { inspector?: boolean; markers?: boolean }) {
-  const frame = useMemo(() => {
-    const p = assetPosition('Harbor Bridge');
-    const { t } = distanceToRiver(p.x, p.z);
-    const c = RIVER_CURVE.getPointAt(t);
-    const tan = RIVER_CURVE.getTangentAt(t);
-    const half = riverHalfWidth(t) + 12;
-    const yaw = Math.atan2(tan.x, tan.z); // deck runs across the river: rotate so local x is the river normal
-    return { x: c.x, z: c.z, half, yaw: yaw + Math.PI / 2 };
-  }, []);
+  const frame = useMemo(() => harborBridgeFrame(), []);
+  const [deck, pillar] = useGLTF([`${KIT}/roads/road-bridge.glb`, `${KIT}/roads/bridge-pillar.glb`]);
+
+  const tiles = useMemo(() => {
+    const n = Math.ceil((frame.half * 2) / DECK_TILE);
+    return Array.from({ length: n }, (_, i) => -frame.half + DECK_TILE / 2 + i * DECK_TILE);
+  }, [frame.half]);
+  const deckClones = useMemo(() => tiles.map(() => deck.scene.clone()), [tiles, deck]);
+  const pillarClones = useMemo(() => Array.from({ length: 8 }, () => pillar.scene.clone()), [pillar]);
 
   // piers numbered 1..4 from the north bank (local -x) to the south bank (+x)
   const piers = [-0.6, -0.2, 0.2, 0.6].map((k) => k * frame.half);
   const pier3 = piers[2];
   const pier2 = piers[1];
-  const deckY = 7;
+  const theme = useUiStore((s) => s.theme);
 
   return (
     <group position={[frame.x, 0, frame.z]} rotation={[0, frame.yaw, 0]} name="harbor-bridge">
-      {/* deck */}
-      <mesh position={[0, deckY, 0]}>
-        <boxGeometry args={[frame.half * 2 + 8, 0.8, 7]} />
-        <meshStandardMaterial color="#1a2432" roughness={0.9} />
-      </mesh>
-      {/* deck edge lights */}
-      {[-3.3, 3.3].map((z) => (
-        <mesh key={z} position={[0, deckY + 0.5, z]}>
-          <boxGeometry args={[frame.half * 2 + 8, 0.12, 0.12]} />
-          <meshBasicMaterial color="#2fb3c7" toneMapped={false} />
-        </mesh>
+      {tiles.map((x, i) => (
+        <primitive key={x} object={deckClones[i]} position={[x, DECK_Y - 0.5, 0]} rotation={[0, Math.PI / 2, 0]} scale={DECK_TILE} />
       ))}
-      {/* piers */}
-      {piers.map((x, i) => (
-        <mesh key={i} position={[x, deckY / 2, 0]}>
-          <cylinderGeometry args={[1.4, 1.8, deckY, 10]} />
-          <meshStandardMaterial color="#141c28" roughness={1} />
-        </mesh>
-      ))}
-      {/* towers */}
-      {[pier2, pier3].map((x, i) => (
-        <mesh key={`t${i}`} position={[x, deckY + 9, 0]}>
-          <boxGeometry args={[1.2, 18, 1.2]} />
-          <meshStandardMaterial color="#1c2736" roughness={0.9} />
-        </mesh>
-      ))}
-      {inspector && <Inspector x={pier3} y={deckY + 0.4} />}
+      {piers.map((x, i) =>
+        [-2, 2].map((z, j) => (
+          <primitive key={`${i}-${j}`} object={pillarClones[i * 2 + j]} position={[x, 0, z]} scale={[16, DECK_Y * 2, 16]} />
+        )),
+      )}
+      {inspector && <Inspector x={pier3} y={DECK_Y + 0.3} />}
       {markers && (
         <>
-          <Marker x={pier3} y={deckY} label="Pier 3" sub="crack · this afternoon" color="#C74634" delayMs={1800} labelY={34} />
-          <Marker x={pier2} y={deckY} label="Pier 2" sub="corrosion · next session" color="#8fd3de" delayMs={3000} labelY={20} />
+          <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={34} />
+          <Marker x={pier2} y={DECK_Y} label="Pier 2" sub="corrosion · next session" color={theme.data} delayMs={3000} labelY={20} />
         </>
       )}
     </group>
   );
 }
+
+useGLTF.preload?.([`${KIT}/roads/road-bridge.glb`, `${KIT}/roads/bridge-pillar.glb`]);
 
 /** A simple figure with a torch: body, head, and a soft cone of light on the pier. */
 function Inspector({ x, y }: { x: number; y: number }) {
@@ -78,15 +65,14 @@ function Inspector({ x, y }: { x: number; y: number }) {
   });
   return (
     <group position={[x - 1.6, y, 2.2]}>
-      <mesh position={[0, 0.9, 0]}>
+      <mesh position={[0, 0.9, 0]} castShadow>
         <capsuleGeometry args={[0.35, 1.0, 4, 8]} />
         <meshStandardMaterial color="#f0a24a" roughness={0.8} />
       </mesh>
-      <mesh position={[0, 1.95, 0]}>
+      <mesh position={[0, 1.95, 0]} castShadow>
         <sphereGeometry args={[0.3, 12, 12]} />
         <meshStandardMaterial color="#ffd9b0" roughness={0.8} />
       </mesh>
-      {/* torch cone */}
       <mesh ref={cone} position={[0.4, 1.3, 0]} rotation={[0, 0, -0.9]}>
         <coneGeometry args={[1.6, 5, 24, 1, true]} />
         <meshBasicMaterial color="#ffe6b0" transparent opacity={0.07} side={THREE.DoubleSide} depthWrite={false} />
@@ -120,7 +106,7 @@ function Marker({ x, y, label, sub, color, delayMs, labelY = 26 }: { x: number; 
   });
   return (
     <group position={[x, y, 0]}>
-      <mesh ref={beam} position={[0, 0, 0]} visible={false} scale={[1, 0, 1]}>
+      <mesh ref={beam} visible={false} scale={[1, 0, 1]}>
         <cylinderGeometry args={[0.15, 0.15, 44, 8]} />
         <meshBasicMaterial color={color} transparent opacity={0.6} toneMapped={false} />
       </mesh>

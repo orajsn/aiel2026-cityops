@@ -1,4 +1,5 @@
 import { useSceneStore } from '../engine/store';
+import { useUiStore } from '../engine/ui';
 import type { AssetType } from '../content/geo';
 import { City } from './City';
 import { Lighting } from './Lighting';
@@ -26,9 +27,11 @@ export interface WorldProps {
 export function World() {
   const scene = useSceneStore((s) => s.scenes[s.index]);
   const w = (scene?.world ?? {}) as WorldProps;
+  const theme = useUiStore((s) => s.theme);
   return (
     <>
-      <fogExp2 attach="fog" args={['#0B0E14', 0.0024]} />
+      <color attach="background" args={[theme.bg]} />
+      <fogExp2 attach="fog" args={[theme.bg, theme.fogDensity]} />
       <CameraRig />
       <Lighting />
       <City />

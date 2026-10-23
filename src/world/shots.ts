@@ -17,7 +17,7 @@ export const SHOTS: Record<ShotId, Shot> = {
   'city-high': { position: [10, 150, 170], target: [-5, 0, -30], durationMs: 2500, ease: 'inOut' },
   'city-wide': { position: [60, 200, 230], target: [0, 0, -40], durationMs: 2000, ease: 'inOut' },
   'ops-center': { position: [40, 60, -10], target: [5, 6, -67], durationMs: 2000, ease: 'inOut' },
-  'bridge-pier3': { position: [50, 16, 66], target: [23, 4, 36], durationMs: 2200, ease: 'inOut' },
+  'bridge-pier3': { position: [56, 30, 74], target: [23, 6, 36], durationMs: 2200, ease: 'inOut' },
   'bridge-pier2': { position: [0, 14, 62], target: [20, 4, 38], durationMs: 1600, ease: 'inOut' },
   'bridge-overview': { position: [78, 62, 112], target: [18, 6, 28], durationMs: 2200, ease: 'inOut' },
   'core-dive': { position: [0, -30, 215], target: CORE_POS, durationMs: 2500, ease: 'inOut' },

@@ -4,6 +4,7 @@ export interface KeyHandlers {
   jump(): void;
   notes(): void;
   lang(): void;
+  theme?(): void;
 }
 
 export function bindKeys(store: SceneStore, handlers: KeyHandlers): () => void {
@@ -33,6 +34,10 @@ export function bindKeys(store: SceneStore, handlers: KeyHandlers): () => void {
       case 'l':
       case 'L':
         handlers.lang();
+        break;
+      case 't':
+      case 'T':
+        handlers.theme?.();
         break;
     }
   };

@@ -1,9 +1,8 @@
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
-import { Grid } from '@react-three/drei';
+import { Ground } from './Ground';
+import { River } from './RiverMesh';
 import { buildingLayout } from './cityLayout';
-import { riverGeometry } from './river';
 
 const BUILDING_VERT = /* glsl */ `
   #include <fog_pars_vertex>
@@ -40,38 +39,6 @@ const BUILDING_FRAG = /* glsl */ `
     float rim = pow(1.0 - max(0.0, dot(n, v)), 3.0);
     col += uGlow * rim * 0.32 * (1.0 - top);
     col += uGlow * 0.08 * vH;
-    gl_FragColor = vec4(col, 1.0);
-    #include <fog_fragment>
-  }
-`;
-
-const WATER_VERT = /* glsl */ `
-  #include <fog_pars_vertex>
-  varying vec2 vUv;
-  varying vec3 vPos;
-  void main() {
-    vUv = uv;
-    vPos = position;
-    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-    gl_Position = projectionMatrix * mvPosition;
-    #include <fog_vertex>
-  }
-`;
-
-const WATER_FRAG = /* glsl */ `
-  #include <fog_pars_fragment>
-  uniform float uTime;
-  uniform vec3 uBase;
-  uniform vec3 uGlow;
-  varying vec2 vUv;
-  varying vec3 vPos;
-  void main() {
-    float n = sin(vPos.x * 0.35 + uTime * 0.5) * sin(vPos.z * 0.21 - uTime * 0.33);
-    float lines = smoothstep(0.90, 1.0, sin((vPos.z * 0.9 + vPos.x * 0.35) + uTime * 0.9 + n * 2.5));
-    float across = abs(vUv.x - 0.5) * 2.0;
-    float shore = smoothstep(0.55, 1.0, across);
-    vec3 col = uBase + uGlow * (0.10 + 0.10 * lines);
-    col += uGlow * shore * 0.45;
     gl_FragColor = vec4(col, 1.0);
     #include <fog_fragment>
   }
@@ -136,50 +103,11 @@ export function ProceduralCity() {
     [],
   );
 
-  const waterMat = useMemo(
-    () =>
-      new THREE.ShaderMaterial({
-        vertexShader: WATER_VERT,
-        fragmentShader: WATER_FRAG,
-        fog: true,
-        side: THREE.DoubleSide,
-        uniforms: THREE.UniformsUtils.merge([
-          THREE.UniformsLib.fog,
-          {
-            uTime: { value: 0 },
-            uBase: { value: new THREE.Color('#07161d') },
-            uGlow: { value: new THREE.Color('#1B8A9C') },
-          },
-        ]),
-      }),
-    [],
-  );
-  const waterGeo = useMemo(() => riverGeometry(), []);
-
-  useFrame((_, dt) => {
-    waterMat.uniforms.uTime.value += dt;
-  });
 
   return (
     <group name="procedural-city-root">
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]} receiveShadow>
-        <planeGeometry args={[1600, 1600]} />
-        <meshStandardMaterial color="#0c1119" roughness={1} />
-      </mesh>
-      <Grid
-        position={[0, 0.02, 0]}
-        args={[1600, 1600]}
-        cellSize={10}
-        sectionSize={50}
-        cellColor="#172431"
-        sectionColor="#1c3440"
-        cellThickness={0.6}
-        sectionThickness={1}
-        fadeDistance={520}
-        fadeStrength={1.6}
-        infiniteGrid
-      />
-      <mesh name="water" geometry={waterGeo} material={waterMat} position={[0, 0.06, 0]} />
+      <Ground />
+      <River />
       <instancedMesh
         name="procedural-city"
         ref={setInstances}

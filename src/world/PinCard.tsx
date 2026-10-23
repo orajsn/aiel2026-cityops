@@ -1,9 +1,8 @@
 import { Html } from '@react-three/drei';
 import type { Asset } from '../content/geo';
-import { pinColor } from './pinColors';
 
 export function PinCardBody({ asset }: { asset: Asset }) {
-  const c = pinColor(asset.type);
+  const c = 'var(--teal)';
   return (
     <div className="pin-card" style={{ borderColor: c }}>
       <div className="pin-card__name mono">{asset.id}</div>

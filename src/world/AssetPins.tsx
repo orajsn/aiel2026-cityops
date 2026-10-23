@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { ASSETS, project, type Asset, type AssetType } from '../content/geo';
-import { pinColor, TYPE_ORDER } from './pinColors';
+import { TYPE_ORDER } from './pinColors';
+import { useUiStore } from '../engine/ui';
 import { PinCard } from './PinCard';
 
 export interface AssetPinsProps {
@@ -31,6 +32,7 @@ interface PinAnim {
 
 export function AssetPins({ visible, highlight = [], onHover, groupStaggerMs = 700 }: AssetPinsProps) {
   const [hovered, setHovered] = useState<string | null>(null);
+  const theme = useUiStore((s) => s.theme);
   const highlightSet = useMemo(() => new Set(highlight), [highlight]);
 
   const visibleTypes = useMemo<AssetType[]>(
@@ -46,11 +48,11 @@ export function AssetPins({ visible, highlight = [], onHover, groupStaggerMs = 7
       const group = ASSETS.filter((a) => a.type === type);
       group.forEach((asset, i) => {
         const p = project(asset.lat, asset.lon);
-        out.push({ asset, x: p.x, z: p.z, color: pinColor(asset.type), startMs: now + gi * groupStaggerMs + i * 60 });
+        out.push({ asset, x: p.x, z: p.z, color: theme.pin, startMs: now + gi * groupStaggerMs + i * 60 });
       });
     });
     return out;
-  }, [visibleTypes, groupStaggerMs]);
+  }, [visibleTypes, groupStaggerMs, theme.pin]);
 
   useEffect(() => {
     onHover?.(hovered);
@@ -91,7 +93,8 @@ function Pin({
   const ring = useRef<THREE.Mesh>(null);
   const ringMat = useRef<THREE.MeshBasicMaterial>(null);
   const head = useRef<THREE.Mesh>(null);
-  const color = useMemo(() => new THREE.Color(pin.color), [pin.color]);
+  const theme = useUiStore((s) => s.theme);
+  const color = useMemo(() => new THREE.Color(hot ? theme.pinHero : pin.color), [pin.color, hot, theme.pinHero]);
   const scaleRef = useRef(0);
 
   useFrame(({ clock }) => {

@@ -17,6 +17,7 @@ export default function App() {
       jump: () => ui.toggleJump(),
       notes: () => ui.toggleNotes(),
       lang: () => ui.toggleLang(),
+      theme: () => ui.toggleTheme(),
     });
     return () => {
       unHash();
@@ -27,12 +28,12 @@ export default function App() {
   return (
     <div id="app">
       <Canvas
+        shadows
         dpr={[1, 1.5]}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
         camera={{ position: [10, 150, 170], fov: 45, near: 0.5, far: 4000 }}
-        style={{ position: 'fixed', inset: 0, background: '#0B0E14' }}
+        style={{ position: 'fixed', inset: 0 }}
       >
-        <color attach="background" args={['#0B0E14']} />
         <World />
       </Canvas>
       <div id="overlay">
