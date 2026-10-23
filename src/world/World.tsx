@@ -9,6 +9,7 @@ import { DataStream } from './DataStream';
 import { OracleCore, type Face } from './OracleCore';
 import { GraphLines, edgesFor } from './GraphLines';
 import { VectorField, type VectorFieldProps } from './VectorField';
+import { HarborBridge } from './HarborBridge';
 
 export interface WorldProps {
   pins?: AssetType[] | 'all';
@@ -17,6 +18,9 @@ export interface WorldProps {
   core?: Face;
   graph?: boolean | string;
   vectors?: Omit<VectorFieldProps, 'position'>;
+  bridge?: boolean;
+  inspector?: boolean;
+  markers?: boolean;
 }
 
 export function World() {
@@ -37,6 +41,7 @@ export function World() {
           highlight={typeof w.graph === 'string' ? w.graph : undefined}
         />
       )}
+      {w.bridge && <HarborBridge inspector={w.inspector} markers={w.markers} />}
       {w.vectors && <VectorField {...w.vectors} position={[0, -80, 40]} />}
       <Effects />
     </>

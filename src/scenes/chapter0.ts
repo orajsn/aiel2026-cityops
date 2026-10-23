@@ -1,0 +1,70 @@
+import type { SceneDef } from '../engine/types';
+
+const HB = 'Harbor Bridge';
+
+export const chapter0: SceneDef[] = [
+  {
+    id: '0.1',
+    chapter: 0,
+    title: 'Night over the river',
+    enterFrom: 'gulf-approach',
+    shot: 'city-high',
+    overlay: 'TitleCard',
+    recapMode: true,
+  },
+  {
+    id: '0.2',
+    chapter: 0,
+    title: 'The city wakes up',
+    shot: 'city-high',
+    world: { pins: 'all' },
+    overlay: 'PinLegend',
+  },
+  {
+    id: '0.3',
+    chapter: 0,
+    title: 'The data stream',
+    shot: 'city-wide',
+    world: { pins: 'all', dataStream: true },
+    overlay: 'DataCounters',
+  },
+  {
+    id: '0.4',
+    chapter: 0,
+    title: 'The question on the bridge',
+    shot: 'bridge-pier3',
+    world: { bridge: true, inspector: true },
+    overlay: 'QuestionBubble',
+  },
+  {
+    id: '0.5',
+    chapter: 0,
+    title: 'One database, four shapes',
+    shot: 'core-dive',
+    world: { core: 'none' },
+    overlay: 'CoreCaption',
+    overlayProps: { face: 'none' },
+    recapMode: true,
+  },
+  { id: '0.5a', chapter: 0, title: 'Tables', shot: 'core-face-tables', world: { core: 'tables' }, overlay: 'CoreCaption', overlayProps: { face: 'tables' } },
+  { id: '0.5b', chapter: 0, title: 'JSON', shot: 'core-face-json', world: { core: 'json' }, overlay: 'CoreCaption', overlayProps: { face: 'json' } },
+  { id: '0.5c', chapter: 0, title: 'Graph', shot: 'core-face-graph', world: { core: 'graph', pins: 'all' }, overlay: 'CoreCaption', overlayProps: { face: 'graph' } },
+  { id: '0.5d', chapter: 0, title: 'Vectors', shot: 'core-face-vectors', world: { core: 'vectors' }, overlay: 'CoreCaption', overlayProps: { face: 'vectors' } },
+  {
+    id: '0.6',
+    chapter: 0,
+    title: 'Meet the small brain',
+    shot: 'core-dive',
+    world: { core: 'none' },
+    overlay: 'SmallBrain',
+  },
+  {
+    id: '0.7',
+    chapter: 0,
+    title: 'The hero asset',
+    shot: 'bridge-overview',
+    world: { pins: 'all', graph: HB, bridge: true, markers: true },
+    overlay: 'BridgeMarkers',
+    recapMode: true,
+  },
+];

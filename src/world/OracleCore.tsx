@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
@@ -10,6 +10,23 @@ import { CORE_POS } from './shots';
 export type Face = 'none' | 'tables' | 'json' | 'graph' | 'vectors';
 
 const R = 40;
+
+const HALO_VERT = /* glsl */ `
+  varying vec3 vN; varying vec3 vV;
+  void main() {
+    vN = normalize(normalMatrix * normal);
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    vV = -mv.xyz;
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+const HALO_FRAG = /* glsl */ `
+  uniform vec3 uColor; varying vec3 vN; varying vec3 vV;
+  void main() {
+    float f = pow(1.0 - max(0.0, dot(normalize(vN), normalize(vV))), 2.5);
+    gl_FragColor = vec4(uColor * f * 0.9, f * 0.6);
+  }
+`;
 
 const FACES: { id: Face; label: string; pos: [number, number, number] }[] = [
   { id: 'tables', label: 'Tables', pos: [-R - 4, 0, 0] },
@@ -34,7 +51,7 @@ export function OracleCore({ face }: { face: Face }) {
       const b = 1 + Math.sin(clock.elapsedTime * 0.8) * 0.012;
       inner.current.scale.setScalar(b);
     }
-    if (innerMat.current) innerMat.current.emissiveIntensity = face === 'none' ? 0.9 : 1.25;
+    if (innerMat.current) innerMat.current.emissiveIntensity = face === 'none' ? 0.35 : 0.5;
   });
 
   return (
@@ -43,11 +60,11 @@ export function OracleCore({ face }: { face: Face }) {
         <icosahedronGeometry args={[R * 0.82, 1]} />
         <meshStandardMaterial
           ref={innerMat}
-          color="#0f3d47"
+          color="#0c2f38"
           emissive="#1B8A9C"
-          emissiveIntensity={0.9}
-          roughness={0.35}
-          metalness={0.2}
+          emissiveIntensity={0.35}
+          roughness={0.45}
+          metalness={0.35}
           flatShading
         />
       </mesh>
@@ -56,6 +73,19 @@ export function OracleCore({ face }: { face: Face }) {
         <meshBasicMaterial color="#2fb3c7" wireframe transparent opacity={0.35} />
       </mesh>
       <pointLight color="#1B8A9C" intensity={2.5} distance={260} decay={1.2} />
+      <directionalLight position={[-60, 80, 120]} intensity={1.6} color="#dff6fa" />
+      {/* fresnel halo */}
+      <mesh>
+        <icosahedronGeometry args={[R * 1.08, 2]} />
+        <shaderMaterial
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          uniforms={{ uColor: { value: new THREE.Color('#1B8A9C') } }}
+          vertexShader={HALO_VERT}
+          fragmentShader={HALO_FRAG}
+        />
+      </mesh>
 
       {FACES.map((f) => (
         <FaceMarker key={f.id} pos={f.pos} label={f.label} active={face === f.id} />
@@ -63,9 +93,7 @@ export function OracleCore({ face }: { face: Face }) {
 
       {face === 'tables' && <TablesReveal />}
       {face === 'json' && <JsonReveal />}
-      {face === 'vectors' && (
-        <VectorField phase="embedded" position={[0, 0, R + 30]} documentsOffset={[-60, 0, 0]} />
-      )}
+      {face === 'vectors' && <VectorsReveal />}
     </group>
   );
 }
@@ -91,6 +119,16 @@ function FaceMarker({ pos, label, active }: { pos: [number, number, number]; lab
   );
 }
 
+/** Narratives stack as documents, then fly into the star field: the vector face. */
+function VectorsReveal() {
+  const [phase, setPhase] = useState<'documents' | 'embedded'>('documents');
+  useEffect(() => {
+    const t = setTimeout(() => setPhase('embedded'), 900);
+    return () => clearTimeout(t);
+  }, []);
+  return <VectorField phase={phase} n={600} position={[-10, -6, R + 34]} documentsOffset={[-70, 0, 0]} tweenMs={1800} />;
+}
+
 /** Rows of thin bars rise beside the core: the relational face. */
 function TablesReveal() {
   const rows = 7;
@@ -109,7 +147,7 @@ function TablesReveal() {
   });
   const cells = useMemo(() => Array.from({ length: rows * cols }, (_, i) => i), []);
   return (
-    <group position={[-R - 46, -16, 0]} rotation={[0, Math.PI / 2, 0]}>
+    <group position={[-R - 34, -10, 18]} rotation={[0, 0.5, 0]}>
       {cells.map((i) => {
         const r = Math.floor(i / cols);
         const c = i % cols;
@@ -134,11 +172,11 @@ function JsonReveal() {
     [],
   );
   return (
-    <group position={[R + 34, 6, 0]}>
+    <group position={[R + 22, 4, 18]}>
       {picks.map((a, i) => {
         const ang = (i - 2) * 0.32;
         return (
-          <group key={a.id} position={[Math.sin(ang) * 26, (i - 2) * 2.5, Math.cos(ang) * 26 - 26]} rotation={[0, -ang * 1.2, 0]}>
+          <group key={a.id} position={[Math.sin(ang) * 20 + i * 2, (i - 2) * 3, Math.cos(ang) * 20 - 20]} rotation={[0, -0.5 - ang * 0.8, 0]}>
             <Html transform distanceFactor={34} zIndexRange={[10, 0]} style={{ pointerEvents: 'none' }}>
               <div className="json-card" style={{ animationDelay: `${i * 120}ms` }}>
                 <PinCardBody asset={a} />

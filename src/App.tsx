@@ -6,9 +6,11 @@ import { useSceneStore } from './engine/store';
 import { useUiStore } from './engine/ui';
 import { bindHash } from './engine/hash';
 import { bindKeys } from './engine/keys';
+import { SCENES } from './scenes';
 
 export default function App() {
   useEffect(() => {
+    useSceneStore.getState().setScenes(SCENES);
     const ui = useUiStore.getState();
     const unHash = bindHash(useSceneStore);
     const unKeys = bindKeys(useSceneStore, {

@@ -102,7 +102,7 @@ export function VectorField({
     <group position={position}>
       <group ref={group} name="vector-field">
         <instancedMesh ref={mesh} args={[undefined, undefined, n]} frustumCulled={false}>
-          <octahedronGeometry args={[0.55, 0]} />
+          <octahedronGeometry args={[0.8, 0]} />
           <meshBasicMaterial toneMapped={false} />
         </instancedMesh>
         {query && phase === 'embedded' && (
