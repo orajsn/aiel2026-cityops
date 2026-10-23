@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
 import { ASSETS, project, type Asset, type AssetType } from '../content/geo';
 import { TYPE_ORDER } from './pinColors';
 import { useUiStore } from '../engine/ui';
@@ -69,6 +70,14 @@ export function AssetPins({ visible, highlight = [], onHover, groupStaggerMs = 7
           onHover={setHovered}
         />
       ))}
+      {/* the highlighted asset is the place the page is about: name it */}
+      {pins
+        .filter((p) => highlightSet.has(p.asset.id) && p.asset.id !== hovered)
+        .map((p) => (
+          <Html key={`name-${p.asset.id}`} position={[p.x, PIN_H + 0.5, p.z]} center zIndexRange={[15, 0]} style={{ pointerEvents: 'none' }}>
+            <div className="place-label mono">{p.asset.id}</div>
+          </Html>
+        ))}
       {pins
         .filter((p) => p.asset.id === hovered)
         .map((p) => (

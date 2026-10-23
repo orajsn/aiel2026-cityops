@@ -24,7 +24,7 @@ export interface SceneState {
   setCounters(c: Counters): void;
 }
 
-const EMPTY: SceneDef = { id: 'none', chapter: 0, title: '', shot: 'city-high' };
+const EMPTY: SceneDef = { id: 'none', chapter: 0, title: '', shot: 'city' };
 
 export const useSceneStore = create<SceneState>((set, get) => ({
   scenes: [],

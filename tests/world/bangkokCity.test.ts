@@ -27,5 +27,5 @@ test('the map fades into the haze over its last few units, so its cut edge never
   expect(edgeVisibility(taksin.x, taksin.z)).toBeGreaterThan(0.2); // the hero crossing stays readable
   expect(edgeVisibility(BKK.x, BKK.z + 4309 * BKK.scale)).toBe(0); // the south edge itself is pure haze
   expect(EDGE_FADE.north).toBeGreaterThan(10);
-  expect(EDGE_FADE.south).toBeLessThan(6);
+  expect(EDGE_FADE.south).toBeLessThan(2); // Harbor Bridge is 4.7 units from the south edge: frames need that ground
 });

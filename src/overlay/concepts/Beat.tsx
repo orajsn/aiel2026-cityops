@@ -41,11 +41,9 @@ export function Beat({ kicker, visual, message, notebook, tag }: BeatProps) {
           {kicker}
           {tag && <span className="beat__tag">{tag}</span>}
         </div>
+        <div className="beat__headline">“{message}”</div>
         <VisualView v={visual} />
         {notebook && <div className="beat__notebook mono">notebook · {notebook}</div>}
-      </motion.div>
-      <motion.div className="beat__message" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.6 }}>
-        “{message}”
       </motion.div>
     </div>
   );

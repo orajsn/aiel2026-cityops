@@ -14,7 +14,7 @@ export function beat(chapter: 1 | 2, id: string, title: string, shot: string, pr
 
 const HB = 'Harbor Bridge';
 
-const b11 = beat(1, '1.1', 'The bare model', 'ops-center', {
+const b11 = beat(1, '1.1', 'The bare model', 'ops', {
   kicker: 'Ops Center · the bare LLM',
   notebook: 'rag_to_agents_lab.ipynb · Section 0 setup, then the bare LLM question',
   visual: {
@@ -27,7 +27,7 @@ const b11 = beat(1, '1.1', 'The bare model', 'ops-center', {
   message: 'A model knows the world. It does not know your city.',
 }, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b12 = beat(1, '1.2', 'Text becomes a point', 'city-wide', {
+const b12 = beat(1, '1.2', 'Text becomes a point', 'city', {
   kicker: 'Embeddings · ALL_MINILM_L12_V2',
   notebook: 'rag_to_agents_lab.ipynb · Section 1.2 to 1.5, VECTOR_EMBEDDING(ALL_MINILM_L12_V2)',
   visual: {
@@ -38,7 +38,7 @@ const b12 = beat(1, '1.2', 'Text becomes a point', 'city-wide', {
   message: 'Similar meaning lands close together.',
 }, { pins: 'all' });
 
-const b13 = beat(1, '1.3', 'Grounding', 'bridge-pier3', {
+const b13 = beat(1, '1.3', 'Grounding', 'ops', {
   kicker: 'RAG · the envelope',
   notebook: 'rag_to_agents_lab.ipynb · Section 1.7 to 1.9, raw RAG and LangChain',
   visual: {
@@ -47,16 +47,16 @@ const b13 = beat(1, '1.3', 'Grounding', 'bridge-pier3', {
     hot: [2],
   },
   message: 'Give the model the evidence and it stops guessing.',
-}, { inspector: true });
+}, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b14 = beat(1, '1.4', 'One envelope is not enough', 'city-wide', {
+const b14 = beat(1, '1.4', 'One envelope is not enough', 'ops', {
   kicker: 'The maturity ladder',
   notebook: 'rag_to_agents_lab.ipynb · Section 2 (optional trace)',
   visual: { kind: 'cards', cols: 4, items: [{ title: 'Chatbot', tone: 'grey' }, { title: 'RAG', tone: 'teal' }, { title: 'Workflow', tone: 'teal' }, { title: 'Agent', tone: 'red' }] },
   message: 'RAG answers one question. Operations ask three at once.',
-}, { pins: 'all' });
+}, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b15 = beat(1, '1.5', 'The toolbelt', 'toolbelt-wall', {
+const b15 = beat(1, '1.5', 'The toolbelt', 'ops', {
   kicker: 'Tools on the Ops Center wall',
   notebook: 'rag_to_agents_lab.ipynb · Section 3, tools and INCIDENT_TRIAGE_SKILL',
   visual: {
@@ -72,7 +72,7 @@ const b15 = beat(1, '1.5', 'The toolbelt', 'toolbelt-wall', {
   message: 'The model only sees each card’s name and description. Docstrings are prompt engineering.',
 }, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b16 = beat(1, '1.6', 'One query, four shapes', 'bridge-overview', {
+const b16 = beat(1, '1.6', 'One query, four shapes', 'ops', {
   kicker: 'UNIFIED_SQL',
   notebook: 'rag_to_agents_lab.ipynb · Section 4, UNIFIED_SQL',
   visual: {
@@ -86,9 +86,9 @@ const b16 = beat(1, '1.6', 'One query, four shapes', 'bridge-overview', {
     ],
   },
   message: 'No ETL, no sync, one transaction.',
-}, { pins: 'all', graph: HB, bridge: true });
+}, { pins: 'all', graph: HB, highlight: ['City Operations Control Center'] });
 
-const b17 = beat(1, '1.7', 'The agent loop', 'bridge-overview', {
+const b17 = beat(1, '1.7', 'The agent loop', 'bridge', {
   kicker: 'Agent · the Pier 3 report arrives',
   notebook: 'rag_to_agents_lab.ipynb · Section 5, the agent and the Pier 3 report',
   tag: 'fictional scenario',
@@ -96,14 +96,14 @@ const b17 = beat(1, '1.7', 'The agent loop', 'bridge-overview', {
   message: 'The agent chooses its tools. The procedure keeps it honest.',
 }, { bridge: true, markers: true });
 
-const b18 = beat(1, '1.8', 'A sticky note', 'ops-center', {
+const b18 = beat(1, '1.8', 'A sticky note', 'ops', {
   kicker: 'store_incident',
   notebook: 'rag_to_agents_lab.ipynb · Section 5.8 and 6.1',
   visual: { kind: 'cards', cols: 1, items: [{ title: 'One row keyed to Harbor Bridge', sub: 'embedded on write' }] },
   message: 'A memory, but a thin one.',
-}, { pins: 'all', highlight: [HB] });
+}, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b19 = beat(1, '1.9', 'Three questions', 'bridge-pier2', {
+const b19 = beat(1, '1.9', 'Three questions', 'pier2', {
   kicker: 'Closing Lab 2',
   notebook: 'rag_to_agents_lab.ipynb · Section 6 close',
   visual: {

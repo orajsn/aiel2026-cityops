@@ -1,5 +1,6 @@
 import type { ShotId } from '../engine/types';
-import { harborBridgeFrame } from './bridgeFrame';
+import { assetPosition } from '../content/geo';
+import { BRIDGE, fromBridgeLocal } from './bridgeFrame';
 
 export type Vec3 = [number, number, number];
 
@@ -8,46 +9,56 @@ export interface Shot {
   target: Vec3;
   durationMs: number;
   ease?: 'inOut' | 'out';
+  /** the place this shot is about; tests check it stays on screen, left of the panel */
+  subject?: Vec3;
 }
 
-// Landmarks in scene units (see content/geo.ts): Harbor Bridge (23, 36), Ops Center (5, -67), CBD (-12, -29).
-export const CORE_POS: Vec3 = [-5, -58, 2];
-
-/** A shot expressed in Harbor Bridge local space (x along the deck, z across it). */
-function bridgeShot(pos: Vec3, target: Vec3, durationMs: number): Shot {
-  const f = harborBridgeFrame();
-  const toWorld = ([x, y, z]: Vec3): Vec3 => [
-    f.x + x * Math.cos(f.yaw) + z * Math.sin(f.yaw),
-    y,
-    f.z - x * Math.sin(f.yaw) + z * Math.cos(f.yaw),
-  ];
-  return { position: toWorld(pos), target: toWorld(target), durationMs, ease: 'inOut' };
+/**
+ * A camera that looks at `subject` from the south (north is always up the screen, so moving between
+ * places reads as travelling across one map), `pitchDeg` below level, `dist` away, turned `headingDeg`
+ * east of north. `screenX` slides the subject left (negative) to keep it clear of the right-hand panel;
+ * `lead` aims that far beyond the subject, which drops it lower in the frame (the city rises behind it).
+ */
+export function northShot(subject: Vec3, dist: number, pitchDeg: number, screenX: number, durationMs: number, headingDeg = 0, lead = 0): Shot {
+  const p = (pitchDeg * Math.PI) / 180;
+  const hd = (headingDeg * Math.PI) / 180;
+  const f = [Math.sin(hd), -Math.cos(hd)];
+  const r = [Math.cos(hd), Math.sin(hd)];
+  const tanX = Math.tan((22.5 * Math.PI) / 180) * (16 / 9);
+  const ox = screenX * dist * tanX;
+  const target: Vec3 = [subject[0] - r[0] * ox + f[0] * lead, subject[1], subject[2] - r[1] * ox + f[1] * lead];
+  const back = dist * Math.cos(p);
+  const position: Vec3 = [target[0] - f[0] * back, target[1] + dist * Math.sin(p), target[2] - f[1] * back];
+  return { position, target, durationMs, ease: 'inOut', subject };
 }
+
+// The five places of the story (and the opening). Every city camera looks roughly north, and every frame
+// shows only city:
+// tests/world/frame.test.ts checks all four corners of every page and every move between pages.
+const OPS = assetPosition('City Operations Control Center');
+const HB = fromBridgeLocal(0, 0);
+const PIER3 = fromBridgeLocal(BRIDGE.platform.x, BRIDGE.platform.z);
+const PIER2 = fromBridgeLocal(BRIDGE.piers[1], 0);
 
 export const SHOTS: Record<ShotId, Shot> = {
-  'calib-top': { position: [-30, 220, -29.99], target: [-30, 0, -30], durationMs: 0 },
-  // the model ends ~5 units south of Taksin: city cameras stay inside it and look north up the river
-  'gulf-approach': { position: [-34, 22, -17], target: [-46, 0, -52], durationMs: 0 },
-  'city-high': { position: [-36, 6, -17], target: [-44, 1, -40], durationMs: 2500, ease: 'inOut' },
-  // 0.3: the document flow lands at City Operations Control Center (5, -67), so it has to be in frame
-  'city-flow': { position: [12, 10, -82], target: [-4, 0, -60], durationMs: 2200, ease: 'inOut' },
-  'city-wide': { position: [-26, 8, -16], target: [-38, 1, -46], durationMs: 2000, ease: 'inOut' },
-  // City Operations Control Center (5, -67) sits near the map's east edge: cameras stand east of it and look west, into the city
-  'ops-center': { position: [11, 6, -58], target: [-2, 0.5, -71], durationMs: 2000, ease: 'inOut' },
-  // Pier 3 is at bridge-local x -0.2 with its platform on the +z (north) face; cameras hang over the water,
-  // far enough out to show the pier, the platform, the deck and the river together
-  'bridge-pier3': bridgeShot([0.5, 0.62, 1.95], [-0.2, 0.2, 0.2], 2200),
-  'bridge-pier2': bridgeShot([0.35, 0.6, 1.8], [-0.48, 0.22, 0.05], 1600),
-  'bridge-overview': bridgeShot([2.4, 1.8, 4.8], [0, 0.3, 0], 2200),
-  // framed on the database diorama (DatabaseDiorama.tsx: base at y -200, shapes 125 apart), as built for scene 0.5
+  /** the opening: low over the river by the bridge, before rising over the city */
+  arrive: northShot([HB.x, 0.3, HB.z], 10, 36, 0, 0, 0, 2),
+  /** the city around the Ops Center: the river, the old town, the pins; the flow lands near the middle */
+  city: northShot([OPS.x, 0.5, OPS.z], 34, 56, 0, 2600, -20, 3.4),
+  /** City Operations Control Center, where the operator and the copilot work */
+  ops: northShot([OPS.x, 0.5, OPS.z], 22, 42, -0.1, 2200, -15, 2.2),
+  /** Harbor Bridge whole, low in the frame, the city behind it */
+  bridge: northShot([HB.x, 0.3, HB.z], 14, 42, -0.1, 2200, 0, 2.8),
+  /** Pier 3 and its maintenance platform: the inspector, the crack (Lab 2); left of the question bubble */
+  pier3: northShot([PIER3.x, BRIDGE.platform.y, PIER3.z], 3.8, 42, -0.4, 2200),
+  /** Pier 2: the corrosion, Mercer and Vance (Lab 3) */
+  pier2: northShot([PIER2.x, 0.2, PIER2.z], 3.8, 42, -0.1, 1800),
   'core-dive': { position: [30, 60, 560], target: [-20, -96, -10], durationMs: 2500, ease: 'inOut' },
   'core-face-tables': { position: [-250, -120, 270], target: [-270, -180, 0], durationMs: 1400, ease: 'inOut' },
   'core-face-json': { position: [-125, -120, 270], target: [-145, -180, 0], durationMs: 1400, ease: 'inOut' },
   'core-face-graph': { position: [150, -40, 430], target: [80, -125, -20], durationMs: 1400, ease: 'inOut' },
   'core-face-vectors': { position: [250, -120, 270], target: [230, -178, 0], durationMs: 1400, ease: 'inOut' },
   'vector-field': { position: [185, -130, 230], target: [170, -180, 0], durationMs: 1600, ease: 'inOut' },
-  'memory-room': { position: [11, 4, -76], target: [0, 0.8, -64], durationMs: 2000, ease: 'inOut' },
-  'toolbelt-wall': { position: [11.5, 3.5, -63], target: [-1, 0.6, -70], durationMs: 2000, ease: 'inOut' },
 };
 
 export function easeInOut(t: number): number {

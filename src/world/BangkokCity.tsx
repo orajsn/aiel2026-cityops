@@ -35,7 +35,7 @@ export function bangkokCovers(x: number, z: number, margin = 0): boolean {
  * Width of the band, in world units, over which the map melts into the haze at its cut edge.
  * Wide on the west, east and north; narrow on the south, where Harbor Bridge stands ~5 units from the edge.
  */
-export const EDGE_FADE = { west: 18, east: 10, north: 18, south: 5 }; // east: the Ops Center is 8 units in
+export const EDGE_FADE = { west: 18, east: 10, north: 18, south: 1.2 }; // east: the Ops Center is 8 units in
 
 const smooth = (k: number) => {
   const c = Math.max(0, Math.min(1, k));

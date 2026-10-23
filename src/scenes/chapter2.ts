@@ -10,13 +10,13 @@ const HB = 'Harbor Bridge';
 const NB = 'notebook_student_ollama.ipynb';
 const FICTION = 'fictional scenario' as const;
 
-const b20 = beat(2, '2.0', 'Recap: the city', 'bridge-overview', {
+const b20 = beat(2, '2.0', 'Recap: the city', 'bridge', {
   kicker: 'Lab 3 · three-minute recap',
   visual: { kind: 'list', items: ['The city (0.1)', 'The database (0.5)', 'The hero asset: Harbor Bridge (0.7)'] },
   message: 'Same city, same database, same bridge. Now, memory.',
 }, { pins: 'all', graph: HB, bridge: true, markers: true });
 
-const b21 = beat(2, '2.1', 'The agent that forgets', 'bridge-pier2', {
+const b21 = beat(2, '2.1', 'The agent that forgets', 'pier2', {
   kicker: 'No memory',
   visual: {
     kind: 'chat',
@@ -30,7 +30,7 @@ const b21 = beat(2, '2.1', 'The agent that forgets', 'bridge-pier2', {
   notebook: `${NB} · motivation for Part 3 and the Day N cell`,
 }, { bridge: true });
 
-const b22 = beat(2, '2.2', 'The memory map', 'memory-room', {
+const b22 = beat(2, '2.2', 'The memory map', 'ops', {
   kicker: 'Kinds of memory',
   visual: {
     kind: 'cards',
@@ -43,36 +43,36 @@ const b22 = beat(2, '2.2', 'The memory map', 'memory-room', {
   },
   message: 'Several kinds of memory, doing different jobs, in one store.',
   notebook: 'CITY_MEMORY holds fact, preference, guideline and memory records',
-}, { pins: 'all' });
+}, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b23 = beat(2, '2.3', 'The glass', 'memory-room', {
+const b23 = beat(2, '2.3', 'The glass', 'ops', {
   kicker: 'The context window',
   visual: { kind: 'list', items: ['Overflow', 'Noise', 'The lost “size 9” detail', 'The right fact at the wrong turn'] },
   message: 'The context window is the model’s whole world, and it is a curation problem.',
   notebook: 'the Part 6 context card is the cure',
-}, { pins: 'all' });
+}, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b24 = beat(2, '2.4', 'Three dials', 'memory-room', {
+const b24 = beat(2, '2.4', 'Three dials', 'ops', {
   kicker: 'What flows into the glass',
   visual: { kind: 'cards', cols: 3, items: [{ title: 'Memory engineering' }, { title: 'Context engineering' }, { title: 'Harness engineering' }] },
   message: 'Three disciplines, one job: the right tokens in, the wrong ones out.',
-}, { pins: 'all' });
+}, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b25 = beat(2, '2.5', 'The loop with memory', 'ops-center', {
+const b25 = beat(2, '2.5', 'The loop with memory', 'ops', {
   kicker: 'Read, act, write',
   visual: { kind: 'flow', steps: ['Read memory at the start of the turn', 'The Lab 2 loop: model ↔ tools', 'Write memory at the end of the turn', 'The database under it'], loop: true, hot: [0, 2] },
   message: 'One store, one memory manager, any harness.',
   notebook: `${NB} · Part 1, TODO 1`,
 }, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b26 = beat(2, '2.6', 'One connection', 'ops-center', {
+const b26 = beat(2, '2.6', 'One connection', 'ops', {
   kicker: 'The copilot plugs into the database',
   visual: { kind: 'cards', cols: 2, items: [{ title: 'Copilot', sub: 'one connection' }, { title: 'ALL_MINILM_L12_V2', sub: 'still there from this afternoon' }] },
   message: 'Same 384 numbers as this afternoon, computed inside the database, no API key.',
   notebook: `${NB} · TODO 2 (report_event), peek_sdk_tables`,
 }, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b27 = beat(2, '2.7', 'The write path', 'memory-room', {
+const b27 = beat(2, '2.7', 'The write path', 'ops', {
   kicker: 'CITY_MESSAGE → CITY_MEMORY',
   visual: {
     kind: 'cards',
@@ -87,9 +87,9 @@ const b27 = beat(2, '2.7', 'The write path', 'memory-room', {
   },
   message: 'The agent does not store what you said. It stores what it learned.',
   notebook: `${NB} · Part 3, the extractor`,
-}, { pins: 'all' });
+}, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b28 = beat(2, '2.8', 'Scope is the key', 'memory-room', {
+const b28 = beat(2, '2.8', 'Scope is the key', 'ops', {
   kicker: 'Search by scope',
   visual: {
     kind: 'compare',
@@ -98,9 +98,9 @@ const b28 = beat(2, '2.8', 'Scope is the key', 'memory-room', {
   },
   message: 'Records inherit the scope of the thread that wrote them.',
   notebook: `${NB} · TODO 3`,
-}, { pins: 'all' });
+}, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b29 = beat(2, '2.9', 'The system of record', 'ops-center', {
+const b29 = beat(2, '2.9', 'The system of record', 'ops', {
   kicker: 'CITY_INSPECTION_FINDING',
   visual: {
     kind: 'cards',
@@ -109,9 +109,9 @@ const b29 = beat(2, '2.9', 'The system of record', 'ops-center', {
   },
   message: 'Memory is what the agent learns. Findings are what the city records.',
   notebook: `${NB} · Part 4, TODO 4`,
-}, { pins: 'all', highlight: [HB] });
+}, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b210 = beat(2, '2.10', 'Vector search with walls', 'city-wide', {
+const b210 = beat(2, '2.10', 'Vector search with walls', 'city', {
   kicker: 'Similarity + filters',
   visual: {
     kind: 'cards',
@@ -127,7 +127,7 @@ const b210 = beat(2, '2.10', 'Vector search with walls', 'city-wide', {
   notebook: `${NB} · TODO 5`,
 }, { pins: 'all', highlight: [HB] });
 
-const b211 = beat(2, '2.11', 'Private doors, shared hall', 'memory-room', {
+const b211 = beat(2, '2.11', 'Private doors, shared hall', 'ops', {
   kicker: 'Three keys',
   visual: {
     kind: 'cards',
@@ -142,9 +142,9 @@ const b211 = beat(2, '2.11', 'Private doors, shared hall', 'memory-room', {
   },
   message: 'This is a SQL WHERE clause, not a Python filter.',
   notebook: `${NB} · Part 5`,
-}, { pins: 'all' });
+}, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b212 = beat(2, '2.12', 'The copilot turn', 'ops-center', {
+const b212 = beat(2, '2.12', 'The copilot turn', 'ops', {
   kicker: 'The context card',
   visual: {
     kind: 'code',
@@ -154,7 +154,7 @@ const b212 = beat(2, '2.12', 'The copilot turn', 'ops-center', {
   notebook: `${NB} · Part 6, TODO 6`,
 }, { pins: 'all', highlight: ['City Operations Control Center'] });
 
-const b213 = beat(2, '2.13', 'Day 1: Mercer at Pier 2', 'bridge-pier2', {
+const b213 = beat(2, '2.13', 'Day 1: Mercer at Pier 2', 'pier2', {
   kicker: 'Day 1',
   tag: FICTION,
   visual: {
@@ -169,7 +169,7 @@ const b213 = beat(2, '2.13', 'Day 1: Mercer at Pier 2', 'bridge-pier2', {
   notebook: `${NB} · Day 1, three cells`,
 }, { bridge: true, markers: true });
 
-const b214 = beat(2, '2.14', 'Day N: Vance at the same pier', 'bridge-pier2', {
+const b214 = beat(2, '2.14', 'Day N: Vance at the same pier', 'pier2', {
   kicker: 'Day N · never met Mercer',
   tag: FICTION,
   visual: {
@@ -185,7 +185,7 @@ const b214 = beat(2, '2.14', 'Day N: Vance at the same pier', 'bridge-pier2', {
   notebook: `${NB} · Day N`,
 }, { bridge: true, markers: true });
 
-const b215 = beat(2, '2.15', 'With and without memory', 'bridge-pier2', {
+const b215 = beat(2, '2.15', 'With and without memory', 'pier2', {
   kicker: 'Same question twice',
   visual: {
     kind: 'compare',
@@ -196,7 +196,7 @@ const b215 = beat(2, '2.15', 'With and without memory', 'bridge-pier2', {
   notebook: 'the four-row comparison from the deck',
 }, { bridge: true, markers: true });
 
-const b216 = beat(2, '2.16', 'Where both labs meet', 'bridge-pier2', {
+const b216 = beat(2, '2.16', 'Where both labs meet', 'pier2', {
   kicker: 'Pier 2',
   visual: {
     kind: 'compare',
@@ -206,7 +206,7 @@ const b216 = beat(2, '2.16', 'Where both labs meet', 'bridge-pier2', {
   message: 'This afternoon the agent had the rule. Now it has the history. Together they make the call.',
 }, { bridge: true, markers: true });
 
-const b217 = beat(2, '2.17', 'Takeaways', 'bridge-overview', {
+const b217 = beat(2, '2.17', 'Takeaways', 'bridge', {
   kicker: 'Three takeaways',
   visual: { kind: 'list', ordered: true, items: ['Memory is the foundation.', 'Scope is governance.', 'One converged database.', 'Quiz: 5 min, 80% to pass, badge (QR code here)'] },
   message: 'The rule from this afternoon, the history from today. The same database held both.',

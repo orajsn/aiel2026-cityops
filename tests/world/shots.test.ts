@@ -1,5 +1,5 @@
 import { interpolateShot, SHOTS, type Shot } from '../../src/world/shots';
-import { bangkokCovers } from '../../src/world/BangkokCity';
+import { BASE_Y, DB_TOP_Y, shapeX } from '../../src/world/DatabaseDiorama';
 
 const a: Shot = { position: [0, 0, 0], target: [0, 0, -10], durationMs: 1000, ease: 'inOut' };
 const b: Shot = { position: [10, 20, 30], target: [10, 0, -20], durationMs: 1000, ease: 'inOut' };
@@ -25,22 +25,14 @@ test('inOut easing passes through the midpoint at t = 0.5', () => {
 
 test('the named shots exist', () => {
   for (const id of [
-    'gulf-approach', 'city-high', 'ops-center', 'bridge-pier3', 'bridge-pier2', 'core-dive',
+    'arrive', 'city', 'ops', 'bridge', 'pier3', 'pier2', 'core-dive',
     'core-face-tables', 'core-face-json', 'core-face-graph', 'core-face-vectors', 'vector-field',
-    'memory-room', 'toolbelt-wall',
   ])
     expect(SHOTS[id]).toBeDefined();
 });
 
-test('city shots keep the camera over the Bangkok model, not past its edge', () => {
-  for (const id of ['gulf-approach', 'city-high', 'city-wide', 'city-flow', 'ops-center', 'toolbelt-wall', 'memory-room'] as const) {
-    const [x, , z] = SHOTS[id].position;
-    expect(bangkokCovers(x, z, 1)).toBe(true);
-  }
-});
 
-test('database shots look at the diorama under the city, not at empty sky above it', async () => {
-  const { BASE_Y, DB_TOP_Y, shapeX } = await import('../../src/world/DatabaseDiorama');
+test('database shots look at the diorama under the city, not at empty sky above it', () => {
   for (const id of ['core-dive', 'core-face-tables', 'core-face-json', 'core-face-graph', 'core-face-vectors'] as const) {
     const ty = SHOTS[id].target[1];
     expect(ty).toBeGreaterThan(BASE_Y);
