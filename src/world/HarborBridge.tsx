@@ -58,8 +58,8 @@ export function HarborBridge({ inspector = false, markers = false }: { inspector
       {inspector && <Inspector x={pier3} y={deckY + 0.4} />}
       {markers && (
         <>
-          <Marker x={pier3} y={deckY} label="Pier 3" sub="crack · this afternoon" color="#C74634" delayMs={1800} />
-          <Marker x={pier2} y={deckY} label="Pier 2" sub="corrosion · next session" color="#8fd3de" delayMs={3000} />
+          <Marker x={pier3} y={deckY} label="Pier 3" sub="crack · this afternoon" color="#C74634" delayMs={1800} labelY={34} />
+          <Marker x={pier2} y={deckY} label="Pier 2" sub="corrosion · next session" color="#8fd3de" delayMs={3000} labelY={20} />
         </>
       )}
     </group>
@@ -96,7 +96,7 @@ function Inspector({ x, y }: { x: number; y: number }) {
   );
 }
 
-function Marker({ x, y, label, sub, color, delayMs }: { x: number; y: number; label: string; sub: string; color: string; delayMs: number }) {
+function Marker({ x, y, label, sub, color, delayMs, labelY = 26 }: { x: number; y: number; label: string; sub: string; color: string; delayMs: number; labelY?: number }) {
   const beam = useRef<THREE.Mesh>(null);
   const ring = useRef<THREE.Mesh>(null);
   const ringMat = useRef<THREE.MeshBasicMaterial>(null);
@@ -128,7 +128,7 @@ function Marker({ x, y, label, sub, color, delayMs }: { x: number; y: number; la
         <ringGeometry args={[1.6, 2, 40]} />
         <meshBasicMaterial ref={ringMat} color={color} transparent opacity={0.8} depthWrite={false} toneMapped={false} />
       </mesh>
-      <Html position={[0, 26, 0]} center zIndexRange={[30, 0]} style={{ pointerEvents: 'none' }}>
+      <Html position={[0, labelY, 0]} center zIndexRange={[30, 0]} style={{ pointerEvents: 'none' }}>
         <div ref={html} className="marker-label" style={{ borderColor: color, opacity: 0 }}>
           <div className="marker-label__pier mono" style={{ color }}>{label}</div>
           <div className="marker-label__sub">{sub}</div>
