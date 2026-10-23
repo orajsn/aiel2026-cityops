@@ -7,7 +7,7 @@ import { harborBridgeFrame } from './bridgeFrame';
 import { KIT } from './kitLayout';
 
 const DECK_TILE = 6; // road-bridge tile is 1 unit, scaled to the city cell
-const DECK_Y = 7;
+const DECK_Y = 1.6;
 
 /**
  * Harbor Bridge: Kenney road-bridge tiles on bridge-pillar piers across the river,
@@ -37,14 +37,14 @@ export function HarborBridge({ inspector = false, markers = false }: { inspector
       ))}
       {piers.map((x, i) =>
         [-2, 2].map((z, j) => (
-          <primitive key={`${i}-${j}`} object={pillarClones[i * 2 + j]} position={[x, 0, z]} scale={[16, DECK_Y * 2, 16]} />
+          <primitive key={`${i}-${j}`} object={pillarClones[i * 2 + j]} position={[x, -0.2, z]} scale={[18, (DECK_Y + 0.2) * 2, 18]} />
         )),
       )}
       {inspector && <Inspector x={pier3} y={DECK_Y + 0.3} />}
       {markers && (
         <>
-          <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={34} />
-          <Marker x={pier2} y={DECK_Y} label="Pier 2" sub="corrosion · next session" color={theme.data} delayMs={3000} labelY={20} />
+          <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={30} />
+          <Marker x={pier2} y={DECK_Y} label="Pier 2" sub="corrosion · next session" color={theme.data} delayMs={3000} labelY={18} />
         </>
       )}
     </group>

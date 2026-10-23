@@ -1,7 +1,7 @@
 import { project } from '../content/geo';
 import { rng, CITY_BOUNDS } from './cityLayout';
 import { isWater } from './river';
-import { inBridgeCorridor } from './bridgeFrame';
+import { harborBridgeFrame, inBridgeCorridor, onBridgeApproach } from './bridgeFrame';
 
 /** Kenney city-kit models (CC0, kenney.nl), served from public/models/kenney. */
 export const KIT = '/models/kenney';
@@ -58,13 +58,24 @@ export function kitLayout(seed = 11): Placement[] {
       const ez = Math.min(z - minZ, maxZ - z) / 150;
       const edge = Math.max(0, Math.min(1, ex, ez));
       const water = isWater(x, z, 2);
-      if (inBridgeCorridor(x, z, 9)) continue;
+      if (inBridgeCorridor(x, z, 9)) {
+        // approach roads join Harbor Bridge to the street grid; the rest of the corridor stays clear
+        if (!water && onBridgeApproach(x, z)) {
+          const f = harborBridgeFrame();
+          const alongX = Math.abs(Math.cos(f.yaw)) > 0.5; // deck runs along world x
+          out.push({ model: (onAvX && !alongX) || (onAvZ && alongX) ? 'roads/road-crossroad.glb' : 'roads/road-straight.glb', x, z, yaw: alongX ? 1 : 0, s: ROAD_SCALE });
+        }
+        continue;
+      }
 
       if (onAvX || onAvZ) {
         // avenues: road tiles; over water they become bridges; fade out at the edge
         if (r() > 0.2 + 0.8 * edge) continue;
         if (water) {
           if (onAvX && onAvZ) continue;
+          // Harbor Bridge is the only crossing near the port
+          const hb = harborBridgeFrame();
+          if (Math.hypot(x - hb.x, z - hb.z) < 60) continue;
           out.push({ model: 'roads/road-bridge.glb', x, z, yaw: onAvX ? 0 : 1, s: ROAD_SCALE });
         } else if (onAvX && onAvZ) {
           out.push({ model: 'roads/road-crossroad.glb', x, z, yaw: 0, s: ROAD_SCALE });
