@@ -25,7 +25,7 @@ export interface Asset {
   specs: Record<string, number | string>;
 }
 
-export const ASSETS = assetsJson as Asset[];
+export const ASSETS = assetsJson as unknown as Asset[];
 
 export function project(lat: number, lon: number): { x: number; z: number } {
   const x = (lon - CENTRE.lon) * UNITS_PER_DEG;
