@@ -156,6 +156,7 @@ code,
 .title__word { margin: 0; font-size: 96px; font-weight: 600; line-height: 1; color: var(--red); letter-spacing: 0.04em; }
 .title__rule { width: 120px; height: 2px; background: var(--red); margin: 22px 0 16px; transform-origin: left; }
 .title__sub { font-size: 20px; color: var(--ink); font-weight: 400; }
+.title__org { margin-top: 10px; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-dim); }
 
 /* 0.2 legend */
 .legend { position: fixed; left: 28px; bottom: 36px; font-size: 14px; }
