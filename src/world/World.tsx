@@ -5,10 +5,12 @@ import { Lighting } from './Lighting';
 import { Effects } from './Effects';
 import { AssetPins } from './AssetPins';
 import { CameraRig } from './CameraRig';
+import { DataStream } from './DataStream';
 
 export interface WorldProps {
   pins?: AssetType[] | 'all';
   highlight?: string[];
+  dataStream?: boolean;
 }
 
 export function World() {
@@ -21,6 +23,7 @@ export function World() {
       <Lighting />
       <City />
       {w.pins && <AssetPins visible={w.pins} highlight={w.highlight} />}
+      <DataStream running={!!w.dataStream} />
       <Effects />
     </>
   );
