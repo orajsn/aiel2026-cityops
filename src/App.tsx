@@ -35,6 +35,10 @@ export default function App() {
           gl={{ antialias: true, powerPreference: 'high-performance' }}
           camera={{ position: [10, 150, 170], fov: 45, near: 0.5, far: 4000 }}
           style={{ position: 'absolute', inset: 0 }}
+          // dev only: lets a verification script render full-size captures from any camera
+          onCreated={(state) => {
+            if (import.meta.env.DEV) (window as unknown as { __r3f: unknown }).__r3f = state;
+          }}
           resize={{ offsetSize: true, scroll: false, debounce: { scroll: 50, resize: 0 } }}
           events={(store) => ({
             ...store.getState().events,

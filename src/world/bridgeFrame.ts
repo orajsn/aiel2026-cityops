@@ -1,5 +1,3 @@
-import { assetPosition } from '../content/geo';
-import { RIVER_CURVE, distanceToRiver, riverHalfWidth } from './river';
 
 export interface BridgeFrame {
   /** deck centre, on the river centreline */
@@ -17,17 +15,19 @@ export interface BridgeFrame {
 
 let cached: BridgeFrame | null = null;
 
-/** Harbor Bridge: one straight deck across the river at the asset position, perpendicular to the flow. */
+/**
+ * Harbor Bridge is drawn over the real Taksin bridge deck in the TerraMesh model: centre where the
+ * deck crosses mid-river and heading, both measured top-down on the model's aerial texture.
+ */
+const TAKSIN_DECK = { x: -38.19, z: -19.52, headingDeg: 11 };
+
 export function harborBridgeFrame(): BridgeFrame {
   if (cached) return cached;
-  const p = assetPosition('Harbor Bridge');
-  const { t } = distanceToRiver(p.x, p.z);
-  const c = RIVER_CURVE.getPointAt(t);
-  const tan = RIVER_CURVE.getTangentAt(t);
-  const yaw = Math.atan2(tan.x, tan.z) + Math.PI / 2;
-  const water = 1.7; // the real river at Taksin is ~250 m across; a little margin on each bank
+  // the group's rotation.y maps local +x to (cos yaw, -sin yaw): a heading of +11 deg (east-south-east) is yaw -11 deg
+  const yaw = (-TAKSIN_DECK.headingDeg * Math.PI) / 180;
+  const water = 1.0; // the river is ~1.8 units (~200 m) wide along the deck; abutments just on the banks
   const ramp = 1.4;
-  cached = { x: c.x, z: c.z, water, ramp, half: water + ramp, yaw };
+  cached = { x: TAKSIN_DECK.x, z: TAKSIN_DECK.z, water, ramp, half: water + ramp, yaw };
   return cached;
 }
 

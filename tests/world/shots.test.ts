@@ -30,3 +30,11 @@ test('the named shots exist', () => {
   ])
     expect(SHOTS[id]).toBeDefined();
 });
+
+test('city shots keep the camera over the Bangkok model, not past its edge', async () => {
+  const { bangkokCovers } = await import('../../src/world/BangkokCity');
+  for (const id of ['gulf-approach', 'city-high', 'city-wide'] as const) {
+    const [x, , z] = SHOTS[id].position;
+    expect(bangkokCovers(x, z, 1)).toBe(true);
+  }
+});

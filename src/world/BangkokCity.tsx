@@ -9,20 +9,25 @@ import { useGLTF } from '@react-three/drei';
  */
 const URL = '/models/city/bangkok-full/scene.gltf';
 
-/** Model units -> scene units, fitted on Lumphini Park and Sanam Luang in the model's own aerial texture. */
+/**
+ * Model units -> scene units. Fitted on Sanam Luang and Lumphini Park in the model's aerial texture,
+ * then checked top-down against the OSM river and main roads (within ~100 m across the model).
+ * The model covers about 15 x 8 km: Bang Sue edge to just south of Taksin, Thonburi to Asok.
+ */
 export const BKK = {
-  scale: 1 / 54,
-  x: -56.6,
-  z: -57.3,
-  /** the model's north axis runs opposite to the scene's (+z is south here) */
-  mirrorZ: true,
+  scale: 1 / 110,
+  x: -57.11,
+  z: -54.04,
 };
 
-const HALF_X = 71.9 * 2;
-const HALF_Z = 39.9 * 2;
+/** half extents of the model in its own units */
+const MODEL_HALF_X = 7765;
+const MODEL_HALF_Z = 4309;
 /** True when (x, z) is inside the area the model covers. */
 export function bangkokCovers(x: number, z: number, margin = 0): boolean {
-  return Math.abs(x - BKK.x) < HALF_X - margin && Math.abs(z - BKK.z) < HALF_Z - margin;
+  return (
+    Math.abs(x - BKK.x) < MODEL_HALF_X * BKK.scale - margin && Math.abs(z - BKK.z) < MODEL_HALF_Z * BKK.scale - margin
+  );
 }
 
 export function BangkokCity() {
@@ -32,15 +37,13 @@ export function BangkokCity() {
     root.traverse((o) => {
       const m = o as THREE.Mesh;
       if (!m.isMesh) return;
-      const mat = m.material as THREE.MeshStandardMaterial;
-      mat.side = THREE.DoubleSide; // mirrored on z: both faces must draw
       m.castShadow = !m.name.startsWith('Map');
       m.receiveShadow = true;
     });
     return root;
   }, [gltf]);
   return (
-    <group name="bangkok-city" position={[BKK.x, 0, BKK.z]} scale={[BKK.scale, BKK.scale, BKK.mirrorZ ? -BKK.scale : BKK.scale]}>
+    <group name="bangkok-city" position={[BKK.x, 0, BKK.z]} scale={BKK.scale}>
       <primitive object={scene} />
     </group>
   );

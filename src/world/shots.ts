@@ -26,12 +26,14 @@ function bridgeShot(pos: Vec3, target: Vec3, durationMs: number): Shot {
 
 export const SHOTS: Record<ShotId, Shot> = {
   'calib-top': { position: [-30, 220, -29.99], target: [-30, 0, -30], durationMs: 0 },
-  'gulf-approach': { position: [-70, 18, 40], target: [-36, 2, -20], durationMs: 0 },
-  'city-high': { position: [-52, 9, 0], target: [-34, 1.5, -24], durationMs: 2500, ease: 'inOut' },
-  'city-wide': { position: [-56, 16, 6], target: [-30, 1, -30], durationMs: 2000, ease: 'inOut' },
+  // the model ends ~5 units south of Taksin: city cameras stay inside it and look north up the river
+  'gulf-approach': { position: [-34, 22, -17], target: [-46, 0, -52], durationMs: 0 },
+  'city-high': { position: [-36, 6, -17], target: [-44, 1, -40], durationMs: 2500, ease: 'inOut' },
+  'city-wide': { position: [-26, 8, -16], target: [-38, 1, -46], durationMs: 2000, ease: 'inOut' },
   'ops-center': { position: [26, 22, -30], target: [5, 3, -67], durationMs: 2000, ease: 'inOut' },
-  'bridge-pier3': bridgeShot([0.9, 0.45, 0.95], [0.2, 0.2, 0.1], 2200),
-  'bridge-pier2': bridgeShot([-0.9, 0.4, 0.9], [-0.25, 0.2, 0.05], 1600),
+  // Pier 3 is at bridge-local x -0.16, its platform on the +z side; both cameras hang over the water
+  'bridge-pier3': bridgeShot([0.45, 0.42, 1.15], [-0.16, 0.2, 0.3], 2200),
+  'bridge-pier2': bridgeShot([0.05, 0.4, 1.0], [-0.47, 0.2, 0.05], 1600),
   'bridge-overview': bridgeShot([2.4, 1.8, 4.8], [0, 0.3, 0], 2200),
   'core-dive': { position: [10, 22, 205], target: [-5, -36, -3], durationMs: 2500, ease: 'inOut' },
   'core-face-tables': { position: [-86, -40, 94], target: [-90, -62, 2], durationMs: 1400, ease: 'inOut' },
