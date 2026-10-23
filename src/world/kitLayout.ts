@@ -15,6 +15,7 @@ export const MODEL_SETS = {
   tree: ['suburban/tree-large.glb', 'suburban/tree-small.glb'],
   road: ['roads/road-straight.glb', 'roads/road-crossroad.glb', 'roads/road-bridge.glb'],
   lamp: ['roads/light-square.glb'],
+  port: ['industrial/shipping-container-a.glb', 'industrial/shipping-container-b.glb', 'industrial/shipping-container-c.glb', 'industrial/detail-tank-large.glb', 'industrial/water-tower.glb'],
 };
 
 export const ALL_MODELS: string[] = Object.values(MODEL_SETS).flat();
@@ -94,7 +95,10 @@ export function kitLayout(seed = 11): Placement[] {
       const dp = Math.hypot(x - PORT.x, z - PORT.z);
       let model: string;
       if (dc < 22 || dc2 < 14) model = r() < 0.7 ? pick(MODEL_SETS.tall) : pick(MODEL_SETS.mid);
-      else if (dp < 26) model = r() < 0.75 ? pick(MODEL_SETS.industrial) : pick(MODEL_SETS.mid);
+      else if (dp < 30) {
+        const k = r();
+        model = k < 0.4 ? pick(MODEL_SETS.industrial) : k < 0.9 ? pick(MODEL_SETS.port) : pick(MODEL_SETS.mid);
+      }
       else if (dc < 60 || dc2 < 40) model = r() < 0.6 ? pick(MODEL_SETS.mid) : pick(MODEL_SETS.plain);
       else {
         const k = r();
