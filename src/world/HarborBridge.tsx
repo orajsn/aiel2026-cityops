@@ -79,8 +79,8 @@ export function HarborBridge({ inspector = false, markers = false }: { inspector
       {inspector && <Inspector x={pier3} y={DECK_Y * 0.45 + 0.04} />}
       {markers && (
         <>
-          <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={14} />
-          <Marker x={pier2} y={DECK_Y} label="Pier 2" sub="corrosion · next session" color={theme.data} delayMs={3000} labelY={8} />
+          <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={7} />
+          <Marker x={pier2} y={DECK_Y} label="Pier 2" sub="corrosion · next session" color={theme.data} delayMs={3000} labelY={4.5} />
         </>
       )}
     </group>
