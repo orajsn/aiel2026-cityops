@@ -38,7 +38,8 @@ const SKY_FRAG = /* glsl */ `
  * instead of the slab's edge. The far plane is single-sided, so from under the slab it vanishes.
  */
 /** Sky dome and the far ground plane fading into the haze. */
-export function SkyAndHorizon() {
+/** `ground: false` drops the far ground plane, e.g. when the camera looks below street level at the database. */
+export function SkyAndHorizon({ ground = true }: { ground?: boolean }) {
   const theme = useUiStore((s) => s.theme);
   const sky = useMemo(
     () =>
@@ -57,10 +58,12 @@ export function SkyAndHorizon() {
       <mesh material={sky} renderOrder={-10} frustumCulled={false}>
         <sphereGeometry args={[1800, 32, 16]} />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.3, 0]}>
-        <circleGeometry args={[2400, 48]} />
-        <meshBasicMaterial color={theme.bg} />
-      </mesh>
+      {ground && (
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.3, 0]} name="far-ground">
+          <circleGeometry args={[2400, 48]} />
+          <meshBasicMaterial color={theme.bg} />
+        </mesh>
+      )}
     </>
   );
 }

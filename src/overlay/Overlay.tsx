@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
+import { useProgress } from '@react-three/drei';
 import { useSceneStore } from '../engine/store';
 import { useUiStore } from '../engine/ui';
 import { OVERLAYS } from './registry';
@@ -6,6 +7,13 @@ import { HandoffCard } from './HandoffCard';
 import { JumpMenu } from './JumpMenu';
 
 const CHAPTER_LABEL = ['The city', 'RAG to Agents', 'Agent Memory'];
+
+/** The map is ~70 MB: say so while it downloads instead of showing an empty sky. */
+function MapLoading() {
+  const { active, progress } = useProgress();
+  if (!active) return null;
+  return <div className="map-loading mono">Loading the Bangkok map · {Math.round(progress)}%</div>;
+}
 
 export function Overlay() {
   const scene = useSceneStore((s) => s.scenes[s.index]);
@@ -61,6 +69,8 @@ export function Overlay() {
       <div className="progress">
         <div className="progress__bar" style={{ width: `${((index + 1) / Math.max(1, total)) * 100}%` }} />
       </div>
+
+      <MapLoading />
 
       {jumpOpen && <JumpMenu />}
     </>

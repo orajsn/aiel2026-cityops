@@ -1,34 +1,29 @@
 import { Component, Suspense, type ReactNode } from 'react';
-import { useGLTF } from '@react-three/drei';
-import { ProceduralCity } from './ProceduralCity';
 import { KitCity } from './KitCity';
 
-/** An optional whole-city GLB (plan Task 5). null = kit city built from Kenney models. */
-export const CITY_MODEL_URL: string | null = null;
-
-class Boundary extends Component<{ fallback: ReactNode; children: ReactNode }, { failed: boolean }> {
+class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
   }
+  componentDidCatch(error: unknown) {
+    console.error('Bangkok map failed to load', error);
+  }
   render() {
-    return this.state.failed ? this.props.fallback : this.props.children;
+    return this.state.failed ? null : this.props.children;
   }
 }
 
-function GltfCity({ url }: { url: string }) {
-  const gltf = useGLTF(url);
-  return <primitive object={gltf.scene} name="gltf-city" />;
-}
-
 /**
- * The city. Kit models (or a whole-city GLB when configured) with the procedural
- * box city as the fallback while loading or if any model fails.
+ * The city: the owner's TerraMesh map. Nothing is drawn while it downloads (the overlay shows
+ * the loading progress); the old generated box city is never used as a stand-in.
  */
-export function City({ model = CITY_MODEL_URL }: { model?: string | null }) {
+export function City() {
   return (
-    <Boundary fallback={<ProceduralCity />}>
-      <Suspense fallback={<ProceduralCity />}>{model ? <GltfCity url={model} /> : <KitCity />}</Suspense>
+    <Boundary>
+      <Suspense fallback={null}>
+        <KitCity />
+      </Suspense>
     </Boundary>
   );
 }

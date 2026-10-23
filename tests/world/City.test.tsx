@@ -13,10 +13,10 @@ vi.mock('@react-three/drei', async () => {
 
 import { City } from '../../src/world/City';
 
-test('City falls back to the procedural city when the GLB fails', async () => {
+// the owner's map is the only city: never show the old generated box city, not even while loading
+test('City never falls back to the old procedural city', async () => {
   const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-  const r = await ReactThreeTestRenderer.create(<City model="/models/bangkok.glb" />);
-  const found = r.scene.findAll((n) => n.instance.name === 'procedural-city');
-  expect(found.length).toBeGreaterThan(0);
+  const r = await ReactThreeTestRenderer.create(<City />);
+  expect(r.scene.findAll((n) => n.instance.name === 'procedural-city')).toHaveLength(0);
   spy.mockRestore();
 });
