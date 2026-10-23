@@ -1,0 +1,38 @@
+:root {
+  --bg: #0b0e14;
+  --red: #c74634;
+  --teal: #1b8a9c;
+  --ink: #e6e9ef;
+  --ink-dim: #8b93a1;
+  --line: rgba(230, 233, 239, 0.12);
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-thai: 'Noto Sans Thai', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+}
+
+html,
+body,
+#root,
+#app {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+#overlay * {
+  pointer-events: auto;
+}
+
+code,
+.mono {
+  font-family: var(--font-mono);
+}
