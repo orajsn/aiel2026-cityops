@@ -19,9 +19,9 @@ test('the deck lies on the real Taksin bridge', () => {
   const f = harborBridgeFrame();
   // deck centre over the river, measured on the model's aerial texture
   expect(Math.hypot(f.x - -38.19, f.z - -19.52)).toBeLessThan(0.2);
-  // the deck heads east-south-east, about 11 degrees off due east
+  // the deck heads east-south-east along the real road, ~13 degrees off due east (both ramp feet on it)
   const d = deckDir();
-  expect((Math.atan2(d.z, d.x) * 180) / Math.PI).toBeCloseTo(11, 0);
+  expect((Math.atan2(d.z, d.x) * 180) / Math.PI).toBeCloseTo(13.3, 0);
 });
 
 test('bridge-local coordinates round-trip the deck axis', () => {
@@ -30,4 +30,11 @@ test('bridge-local coordinates round-trip the deck axis', () => {
   const p = toBridgeLocal(f.x + d.x * 2, f.z + d.z * 2);
   expect(p.lx).toBeCloseTo(2, 6);
   expect(p.lz).toBeCloseTo(0, 6);
+});
+
+test('the ramps come down onto the ground of each bank, not into it or above it', async () => {
+  const { BRIDGE } = await import('../../src/world/bridgeFrame');
+  // ground heights measured on the model along the deck axis, 2.4 units out from the centre
+  expect(BRIDGE.footY.west).toBeCloseTo(0.062, 2);
+  expect(BRIDGE.footY.east).toBeCloseTo(0.116, 2);
 });

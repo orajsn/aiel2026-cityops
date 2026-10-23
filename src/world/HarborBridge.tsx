@@ -3,12 +3,10 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
 import { useUiStore } from '../engine/ui';
-import { harborBridgeFrame } from './bridgeFrame';
+import { BRIDGE, BRIDGE_S, DECK_W, DECK_Y, harborBridgeFrame } from './bridgeFrame';
 
 /** structure scale: the map is real scale (1 unit ~ 108 m); the bridge is drawn a few times larger than life so it reads */
-const S = 0.22;
-const DECK_Y = 1.6;
-const DECK_W = 2.4;
+const S = BRIDGE_S;
 const DECK_T = 0.36;
 const PYLON_H = 11;
 
@@ -29,11 +27,12 @@ export function HarborBridge({ inspector = false, markers = false }: { inspector
   const f = useMemo(() => ({ ...f0, water: f0.water / S, ramp: f0.ramp / S }), [f0]);
   const theme = useUiStore((s) => s.theme);
 
-  // six piers across the water, numbered 1..6 from the north bank; Pier 3 and Pier 2 carry the story
-  const piers = [-0.78, -0.47, -0.16, 0.16, 0.47, 0.78].map((k) => k * f.water);
+  // six piers across the water, numbered 1..6 from the west bank; Pier 3 and Pier 2 carry the story.
+  // Layout (world units) lives in BRIDGE so the boats can keep to the open channel.
+  const piers = BRIDGE.piers.map((x) => x / S);
   const pier3 = piers[2];
   const pier2 = piers[1];
-  const pylons = [-0.32, 0.32].map((k) => k * f.water);
+  const pylons = BRIDGE.pylonPiers.map((i) => piers[i]);
 
   const cables = useMemo(() => {
     const out: [number, number, number][][] = [];
@@ -58,7 +57,16 @@ export function HarborBridge({ inspector = false, markers = false }: { inspector
   }, [f.water]);
 
   const rampLen = f.ramp;
-  const rampAngle = Math.atan2(DECK_Y - 0.1, rampLen);
+  // each ramp's top surface runs from the deck down to the map's ground at its foot
+  const deckTop = DECK_Y + DECK_T / 2;
+  const ramps = ([-1, 1] as const).map((s) => {
+    // flush with the map's road at the foot (a hair above it, so the photo road does not show through)
+    const footTop = (s < 0 ? BRIDGE.footY.west : BRIDGE.footY.east) / S + 0.005;
+    const drop = deckTop - footTop;
+    // two columns carry each ramp where it is still well above the street
+    const columns = [0.3, 0.62].map((k) => ({ x: s * (f.water + k * rampLen), top: deckTop - k * drop - DECK_T, bottom: footTop - 1.2 }));
+    return { s, len: Math.hypot(rampLen, drop), angle: Math.atan2(drop, rampLen), midTop: (deckTop + footTop) / 2, columns };
+  });
 
   return (
     <group position={[f.x, 0, f.z]} rotation={[0, f.yaw, 0]} scale={S} name="harbor-bridge">
@@ -81,26 +89,28 @@ export function HarborBridge({ inspector = false, markers = false }: { inspector
         </group>
       ))}
       {/* ramps on both banks, descending to street level */}
-      {[-1, 1].map((s) => (
-        <group key={`r${s}`} position={[s * (f.water + rampLen / 2), (DECK_Y + 0.1) / 2, 0]} rotation={[0, 0, -s * rampAngle]}>
+      {ramps.flatMap(({ s, columns }) =>
+        columns.map((c, i) => (
+          <mesh key={`rc${s}${i}`} position={[c.x, (c.top + c.bottom) / 2, 0]} castShadow>
+            <boxGeometry args={[0.5, c.top - c.bottom, DECK_W * 0.55]} />
+            <meshStandardMaterial color={CONCRETE} roughness={1} />
+          </mesh>
+        )),
+      )}
+      {ramps.map(({ s, len, angle, midTop }) => (
+        <group key={`r${s}`} position={[s * (f.water + rampLen / 2), midTop - DECK_T / 2, 0]} rotation={[0, 0, -s * angle]}>
           <mesh castShadow receiveShadow>
-            <boxGeometry args={[Math.hypot(rampLen, DECK_Y - 0.1), DECK_T, DECK_W]} />
+            <boxGeometry args={[len, DECK_T, DECK_W]} />
             <meshStandardMaterial color={DECK} roughness={1} />
           </mesh>
+          {/* kerbs stop short of the foot so the ramp runs out flat onto the street */}
           {[-1, 1].map((k) => (
-            <mesh key={k} position={[0, DECK_T / 2 + 0.06, k * (DECK_W / 2 - 0.14)]}>
-              <boxGeometry args={[Math.hypot(rampLen, DECK_Y - 0.1), 0.12, 0.28]} />
+            <mesh key={k} position={[-s * len * 0.12, DECK_T / 2 + 0.06, k * (DECK_W / 2 - 0.14)]}>
+              <boxGeometry args={[len * 0.76, 0.12, 0.28]} />
               <meshStandardMaterial color={CONCRETE} roughness={1} />
             </mesh>
           ))}
         </group>
-      ))}
-      {/* street-level approach strips beyond the ramps */}
-      {[-1, 1].map((s) => (
-        <mesh key={`a${s}`} position={[s * (f.water + rampLen + 5), 0.1, 0]} receiveShadow>
-          <boxGeometry args={[10, 0.1, DECK_W]} />
-          <meshStandardMaterial color={DECK} roughness={1} />
-        </mesh>
       ))}
       {/* lamp posts */}
       {lamps.map((x, i) => (
@@ -119,7 +129,7 @@ export function HarborBridge({ inspector = false, markers = false }: { inspector
       {piers.map((x, i) => (
         <group key={i} position={[x, 0, 0]}>
           <mesh position={[0, (DECK_Y - 0.3) / 2 - 0.4, 0]} castShadow>
-            <boxGeometry args={[0.9, DECK_Y - 0.3 + 0.8, 1.6]} />
+            <boxGeometry args={[BRIDGE.pierW / S, DECK_Y - 0.3 + 0.8, BRIDGE.pierD / S]} />
             <meshStandardMaterial color={CONCRETE} roughness={1} />
           </mesh>
           <mesh position={[0, DECK_Y - 0.3, 0]} castShadow>
@@ -147,23 +157,20 @@ export function HarborBridge({ inspector = false, markers = false }: { inspector
         <Line key={i} points={pts} color="#f3ead6" lineWidth={1} />
       ))}
       {/* maintenance platform on Pier 3 with a stair down the shaft */}
-      <group position={[pier3, DECK_Y - 0.95, DECK_W / 2 + 0.55]}>
+      {/* maintenance platform bolted to the north face of Pier 3, railing on its three open sides */}
+      <group position={[BRIDGE.platform.x / S, BRIDGE.platform.y / S, BRIDGE.platform.z / S]}>
         <mesh castShadow>
-          <boxGeometry args={[1.6, 0.08, 0.9]} />
+          <boxGeometry args={[BRIDGE.platform.w / S, 0.08, BRIDGE.platform.d / S]} />
           <meshStandardMaterial color="#b9bcc4" roughness={1} />
         </mesh>
-        {[[-0.78, 0], [0.78, 0], [0, 0.43]].map(([x, z], i) => (
-          <mesh key={i} position={[x, 0.22, z]}>
-            <boxGeometry args={[x === 0 ? 1.6 : 0.03, 0.4, z === 0 ? 0.9 : 0.03]} />
+        {[[-1, 0], [1, 0], [0, 1]].map(([sx, sz], i) => (
+          <mesh key={i} position={[(sx * BRIDGE.platform.w) / S / 2, 0.22, (sz * BRIDGE.platform.d) / S / 2]}>
+            <boxGeometry args={[sx === 0 ? BRIDGE.platform.w / S : 0.03, 0.4, sz === 0 ? BRIDGE.platform.d / S : 0.03]} />
             <meshStandardMaterial color="#8a8f98" roughness={1} />
           </mesh>
         ))}
-        <mesh position={[0.95, 0.25, -0.4]} rotation={[0, 0, 0.9]}>
-          <boxGeometry args={[0.06, 1.2, 0.35]} />
-          <meshStandardMaterial color="#8a8f98" roughness={1} />
-        </mesh>
       </group>
-      {inspector && <Inspector x={pier3 + 0.2} y={DECK_Y - 0.91} z={DECK_W / 2 + 0.55} />}
+      {inspector && <Inspector x={BRIDGE.platform.x / S + 0.15} y={BRIDGE.platform.y / S + 0.04} z={BRIDGE.platform.z / S} />}
       {markers && (
         <>
           <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={7} />

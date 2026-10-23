@@ -31,9 +31,10 @@ export const SHOTS: Record<ShotId, Shot> = {
   'city-high': { position: [-36, 6, -17], target: [-44, 1, -40], durationMs: 2500, ease: 'inOut' },
   'city-wide': { position: [-26, 8, -16], target: [-38, 1, -46], durationMs: 2000, ease: 'inOut' },
   'ops-center': { position: [26, 22, -30], target: [5, 3, -67], durationMs: 2000, ease: 'inOut' },
-  // Pier 3 is at bridge-local x -0.16, its platform on the +z side; both cameras hang over the water
-  'bridge-pier3': bridgeShot([0.45, 0.42, 1.15], [-0.16, 0.2, 0.3], 2200),
-  'bridge-pier2': bridgeShot([0.05, 0.4, 1.0], [-0.47, 0.2, 0.05], 1600),
+  // Pier 3 is at bridge-local x -0.2 with its platform on the +z (north) face; cameras hang over the water,
+  // far enough out to show the pier, the platform, the deck and the river together
+  'bridge-pier3': bridgeShot([0.5, 0.62, 1.95], [-0.2, 0.2, 0.2], 2200),
+  'bridge-pier2': bridgeShot([0.35, 0.6, 1.8], [-0.48, 0.22, 0.05], 1600),
   'bridge-overview': bridgeShot([2.4, 1.8, 4.8], [0, 0.3, 0], 2200),
   // framed on the database diorama (DatabaseDiorama.tsx: base at y -200, shapes 125 apart), as built for scene 0.5
   'core-dive': { position: [30, 60, 560], target: [-20, -96, -10], durationMs: 2500, ease: 'inOut' },

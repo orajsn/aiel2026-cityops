@@ -1,24 +1,65 @@
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { RIVER_CURVE, riverHalfWidth } from './river';
+import { RIVER_CURVE } from './river';
+import { BRIDGE, fromBridgeLocal, toBridgeLocal } from './bridgeFrame';
+import { terrainHeight } from './terrain';
 
-interface BoatSpec {
+export interface BoatSpec {
   t: number;
   speed: number;
   side: number;
   kind: 'ferry' | 'barge';
+  /** footprint in world units */
+  width: number;
+  length: number;
 }
 
-const BOATS: BoatSpec[] = [
-  { t: 0.3, speed: 0.0035, side: -0.4, kind: 'ferry' },
-  { t: 0.42, speed: -0.0028, side: 0.35, kind: 'barge' },
-  { t: 0.55, speed: 0.003, side: -0.3, kind: 'ferry' },
-  { t: 0.66, speed: -0.0025, side: 0.4, kind: 'barge' },
-  { t: 0.74, speed: 0.0032, side: -0.35, kind: 'ferry' },
+/** boat model scale: a ferry comes out ~6 m by ~19 m, a barge ~8 m by ~30 m */
+const BOAT_SCALE = 0.05;
+const FERRY = { w: 1.1, l: 3.6 };
+const BARGE = { w: 1.4, l: 5.5 };
+/** tallest part of a boat (barge wheelhouse) above the water */
+export const BOAT_TOP_Y = 1.4 * BOAT_SCALE;
+const FLOAT = 0.004;
+
+function spec(t: number, speed: number, side: number, kind: 'ferry' | 'barge'): BoatSpec {
+  const d = kind === 'ferry' ? FERRY : BARGE;
+  return { t, speed, side, kind, width: d.w * BOAT_SCALE, length: d.l * BOAT_SCALE };
+}
+
+export const BOATS: BoatSpec[] = [
+  spec(0.3, 0.0035, -0.4, 'ferry'),
+  spec(0.42, -0.0028, 0.35, 'barge'),
+  spec(0.55, 0.003, -0.3, 'ferry'),
+  spec(0.66, -0.0025, 0.4, 'barge'),
+  spec(0.74, 0.0032, -0.35, 'ferry'),
 ];
 
-/** A few boats drifting along the river: the city's slow ambient motion. */
+const tmp = new THREE.Vector3();
+function smooth(e0: number, e1: number, x: number) {
+  const k = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)));
+  return k * k * (3 - 2 * k);
+}
+
+/**
+ * Where a boat is at river position t: off the centreline by its side, and near Harbor Bridge
+ * steered into its lane through the main span (between Pier 3 and Pier 4), clear of every pier,
+ * tower leg and the Pier 3 platform.
+ */
+export function boatXZ(t: number, b: BoatSpec): { x: number; z: number } {
+  const p = RIVER_CURVE.getPointAt(t, tmp);
+  const tan = RIVER_CURVE.getTangentAt(t);
+  const x = p.x - tan.z * 0.3 * b.side;
+  const z = p.z + tan.x * 0.3 * b.side;
+  const { lx, lz } = toBridgeLocal(x, z);
+  const w = 1 - smooth(0.7, 1.6, Math.abs(lz));
+  if (w <= 0) return { x, z };
+  const lane = b.speed > 0 ? BRIDGE.lanes[0] : BRIDGE.lanes[1];
+  return fromBridgeLocal(lx + (lane - lx) * w, lz);
+}
+
+/** A few boats on the real river: the city's slow ambient motion. */
 export function Boats() {
   return (
     <group name="boats">
@@ -29,29 +70,30 @@ export function Boats() {
   );
 }
 
-function Boat({ spec }: { spec: BoatSpec }) {
+function Boat({ spec: b }: { spec: BoatSpec }) {
   const g = useRef<THREE.Group>(null);
-  const t = useRef(spec.t);
-  const tmp = useMemo(() => new THREE.Vector3(), []);
+  const t = useRef(b.t);
+  const prev = useMemo(() => new THREE.Vector2(), []);
   useFrame((_, dt) => {
-    t.current += spec.speed * dt;
+    t.current += b.speed * dt;
     if (t.current > 0.9) t.current = 0.25;
     if (t.current < 0.25) t.current = 0.9;
-    const p = RIVER_CURVE.getPointAt(t.current, tmp);
-    const tan = RIVER_CURVE.getTangentAt(t.current);
-    const w = riverHalfWidth(t.current);
-    const nx = -tan.z;
-    const nz = tan.x;
+    const { x, z } = boatXZ(t.current, b);
     if (g.current) {
-      g.current.position.set(p.x + nx * 0.9 * spec.side, 0.03, p.z + nz * 0.9 * spec.side);
-      g.current.rotation.y = Math.atan2(tan.x, tan.z) + (spec.speed < 0 ? Math.PI : 0);
+      // float on the map's water surface; face the way it is moving
+      g.current.position.set(x, terrainHeight(x, z) + FLOAT, z);
+      const mx = x - prev.x;
+      const mz = z - prev.y;
+      if (mx * mx + mz * mz > 1e-10) g.current.rotation.y = Math.atan2(mx, mz);
+      prev.set(x, z);
     }
   });
-  const ferry = spec.kind === 'ferry';
+  const ferry = b.kind === 'ferry';
+  const d = ferry ? FERRY : BARGE;
   return (
-    <group ref={g} scale={0.14}>
+    <group ref={g} scale={BOAT_SCALE}>
       <mesh position={[0, 0.3, 0]} castShadow>
-        <boxGeometry args={[ferry ? 1.1 : 1.4, 0.6, ferry ? 3.6 : 5.5]} />
+        <boxGeometry args={[d.w, 0.6, d.l]} />
         <meshStandardMaterial color={ferry ? '#f4f1ea' : '#4d5f73'} roughness={0.9} />
       </mesh>
       {ferry ? (

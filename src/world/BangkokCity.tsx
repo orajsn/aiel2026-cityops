@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useGLTF } from '@react-three/drei';
+import { setTerrainGrid, terrainGridFromMesh } from './terrain';
 
 /**
  * "Bangkok" by TerraMesh (Sketchfab, CC-BY-4.0), used as delivered: terrain with its aerial
@@ -42,6 +43,15 @@ export function BangkokCity() {
     });
     return root;
   }, [gltf]);
+  // publish the ground grid once the map sits in the scene, so boats can float on its water surface
+  useEffect(() => {
+    let ground: THREE.Mesh | null = null;
+    scene.traverse((o) => {
+      if (!ground && (o as THREE.Mesh).isMesh && o.name.startsWith('Map')) ground = o as THREE.Mesh;
+    });
+    if (ground) setTerrainGrid(terrainGridFromMesh(ground));
+    return () => setTerrainGrid(null);
+  }, [scene]);
   return (
     <group name="bangkok-city" position={[BKK.x, 0, BKK.z]} scale={BKK.scale}>
       <primitive object={scene} />
