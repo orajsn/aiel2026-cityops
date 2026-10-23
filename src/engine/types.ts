@@ -18,6 +18,8 @@ export interface SceneDef {
   chapter: 0 | 1 | 2;
   title: string;
   shot: ShotId;
+  /** Cut to this shot on entry, then fly to `shot` (used for the opening fly-in). */
+  enterFrom?: ShotId;
   world?: Record<string, unknown>;
   overlay?: OverlayKey;
   overlayProps?: Record<string, unknown>;

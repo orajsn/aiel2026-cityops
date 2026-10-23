@@ -4,6 +4,7 @@ import { City } from './City';
 import { Lighting } from './Lighting';
 import { Effects } from './Effects';
 import { AssetPins } from './AssetPins';
+import { CameraRig } from './CameraRig';
 
 export interface WorldProps {
   pins?: AssetType[] | 'all';
@@ -16,6 +17,7 @@ export function World() {
   return (
     <>
       <fogExp2 attach="fog" args={['#0B0E14', 0.0024]} />
+      <CameraRig />
       <Lighting />
       <City />
       {w.pins && <AssetPins visible={w.pins} highlight={w.highlight} />}

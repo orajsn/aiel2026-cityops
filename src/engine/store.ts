@@ -13,6 +13,9 @@ export interface SceneState {
   /** Direction of the last move: 1 forward, -1 back. */
   direction: 1 | -1;
   counters: Counters;
+  /** True once the camera has reached the current shot. Overlays fade in on this. */
+  settled: boolean;
+  setSettled(v: boolean): void;
   setScenes(s: SceneDef[]): void;
   next(): void;
   prev(): void;
@@ -28,6 +31,8 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   index: 0,
   direction: 1,
   counters: { logs: 0, reports: 0, findings: 0 },
+  settled: false,
+  setSettled: (settled) => set({ settled }),
   setScenes: (scenes) => set({ scenes, index: 0 }),
   next: () => {
     const { index, scenes } = get();
