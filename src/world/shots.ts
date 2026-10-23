@@ -25,13 +25,14 @@ function bridgeShot(pos: Vec3, target: Vec3, durationMs: number): Shot {
 }
 
 export const SHOTS: Record<ShotId, Shot> = {
+  'calib-top': { position: [-30, 220, -29.99], target: [-30, 0, -30], durationMs: 0 },
   'gulf-approach': { position: [-30, 34, 160], target: [0, 4, 0], durationMs: 0 },
   'city-high': { position: [-34, 24, 72], target: [6, 4, -30], durationMs: 2500, ease: 'inOut' },
   'city-wide': { position: [-20, 40, 70], target: [4, 2, -26], durationMs: 2000, ease: 'inOut' },
   'ops-center': { position: [26, 22, -30], target: [5, 3, -67], durationMs: 2000, ease: 'inOut' },
-  'bridge-pier3': bridgeShot([6, 3.2, 14], [1, 1.6, 0], 2200),
-  'bridge-pier2': bridgeShot([-8, 3, 12], [-2, 1.6, 0], 1600),
-  'bridge-overview': bridgeShot([14, 12, 30], [0, 2, 0], 2200),
+  'bridge-pier3': bridgeShot([4.2, 3.4, 9.5], [-0.3, 1.1, 0.8], 2200),
+  'bridge-pier2': bridgeShot([-4.5, 2.4, 7.5], [-1.2, 1.0, 0.4], 1600),
+  'bridge-overview': bridgeShot([11, 8, 22], [0, 1.4, 0], 2200),
   'core-dive': { position: [10, 22, 205], target: [-5, -36, -3], durationMs: 2500, ease: 'inOut' },
   'core-face-tables': { position: [-86, -40, 94], target: [-90, -62, 2], durationMs: 1400, ease: 'inOut' },
   'core-face-json': { position: [-46, -40, 94], target: [-54, -62, 2], durationMs: 1400, ease: 'inOut' },

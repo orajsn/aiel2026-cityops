@@ -3,6 +3,8 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { useUiStore } from '../engine/ui';
 import { HALF_WIDTH, ELEVATION, ribbonGeometry, roadRibbons, type RoadClass } from './roads';
+import { bangkokCovers } from './BangkokCity';
+import { harborBridgeFrame } from './bridgeFrame';
 
 const ROAD_CLASSES: RoadClass[] = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'link'];
 const BRIDGE_LIFT = 1.4;
@@ -14,7 +16,11 @@ const BRIDGE_LIFT = 1.4;
 export function Roads() {
   const theme = useUiStore((s) => s.theme);
   const built = useMemo(() => {
-    const ribbons = roadRibbons();
+    // the TerraMesh footprints already leave the streets as gaps; draw ribbons only outside its area
+    const hb = harborBridgeFrame();
+    const ribbons = roadRibbons().filter(
+      (r) => !r.pts.some((p) => bangkokCovers(p.x, p.z, 2)) && !(r.elevated && r.pts.some((p) => Math.hypot(p.x - hb.x, p.z - hb.z) < hb.half + 6)),
+    );
     const kerb: THREE.BufferGeometry[] = [];
     const road: THREE.BufferGeometry[] = [];
     const rail: THREE.BufferGeometry[] = [];

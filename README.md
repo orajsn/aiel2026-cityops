@@ -17,3 +17,5 @@ Quality: set `localStorage.setItem('cityops.quality', 'low')` to turn bloom off.
 Streets, rail and the river centreline come from OpenStreetMap (© OpenStreetMap contributors, ODbL), fetched with
 `tools/build_roads.py` from an Overpass export into `src/content/roads.json` and `src/content/river.json`.
 City models are Kenney's CC0 city kits (`public/models/kenney`). Landmarks are stylised, hand-built in `src/world/LandmarksMesh.tsx`.
+The central city is "Bangkok" by TerraMesh (https://sketchfab.com/3d-models/bangkok-52642605182e40709802bc030ce05174),
+CC-BY-4.0, with textures and terrain stripped and blocks recoloured (`public/models/city/bangkok`, `src/world/BangkokCity.tsx`).

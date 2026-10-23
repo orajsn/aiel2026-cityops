@@ -4,6 +4,7 @@ import { isWater } from './river';
 import { inBridgeCorridor } from './bridgeFrame';
 import { nearestRoad } from './roads';
 import { nearLandmark } from './landmarks';
+import { bangkokCovers } from './BangkokCity';
 
 /** Kenney city-kit models (CC0, kenney.nl), served from public/models/kenney. */
 export const KIT = '/models/kenney';
@@ -56,8 +57,9 @@ export function kitLayout(seed = 11): Placement[] {
       const jx = x + (r() - 0.5) * SPACING * 0.7;
       const jz = z + (r() - 0.5) * SPACING * 0.7;
       if (isWater(jx, jz, 1.2)) continue;
-      if (inBridgeCorridor(jx, jz, 2.2)) continue;
+      if (inBridgeCorridor(jx, jz, 9)) continue;
       if (nearLandmark(jx, jz)) continue;
+      if (bangkokCovers(jx, jz, 1)) continue;
       const near = nearestRoad(jx, jz, 10);
       if (near && near.gap < 0.6) continue;
       // density: dense near streets, sparse far from any street

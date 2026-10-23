@@ -5,78 +5,154 @@ import { Html, Line } from '@react-three/drei';
 import { useUiStore } from '../engine/ui';
 import { harborBridgeFrame } from './bridgeFrame';
 
-const DECK_Y = 1.4; // matches the elevated road ribbon
+const DECK_Y = 1.6;
+const DECK_W = 2.4;
+const DECK_T = 0.36;
+const PYLON_H = 11;
+
+const CONCRETE = '#d9d4c9';
+const DECK = '#8d93a0';
+const RAIL = '#f1ece2';
+const STEEL = '#e9e2d2';
 
 /**
- * Harbor Bridge: a cable-stayed bridge built on the real river crossing the roads already draw.
- * Two pylons, fans of cables, piers under the deck, a maintenance platform with the inspector
- * at Pier 3, and the two incident markers.
+ * Harbor Bridge, built for close-ups: a straight deck between the banks with ramps down to the
+ * streets, kerbs and railings, lamp posts, two pylons with cable fans, piers with caps in the water,
+ * a maintenance platform with stairs on Pier 3, the inspector, and the two incident markers.
+ * Always part of the city; `inspector` and `markers` only add the story props.
  */
 export function HarborBridge({ inspector = false, markers = false }: { inspector?: boolean; markers?: boolean }) {
-  const frame = useMemo(() => harborBridgeFrame(), []);
+  const f = useMemo(() => harborBridgeFrame(), []);
   const theme = useUiStore((s) => s.theme);
 
-  const piers = [-0.7, -0.42, -0.14, 0.14, 0.42, 0.7].map((k) => k * frame.half);
-  const pylons = [-0.3, 0.3].map((k) => k * frame.half);
-  const pier3 = piers[3];
-  const pier2 = piers[2];
-  const pylonH = 12;
+  // six piers across the water, numbered 1..6 from the north bank; Pier 3 and Pier 2 carry the story
+  const piers = [-0.78, -0.47, -0.16, 0.16, 0.47, 0.78].map((k) => k * f.water);
+  const pier3 = piers[2];
+  const pier2 = piers[1];
+  const pylons = [-0.32, 0.32].map((k) => k * f.water);
 
   const cables = useMemo(() => {
     const out: [number, number, number][][] = [];
     for (const px of pylons) {
-      for (let i = 1; i <= 6; i++) {
-        const dx = (i * (frame.half * 0.3)) / 6 + 0.6;
+      for (let i = 1; i <= 7; i++) {
+        const dx = 0.5 + i * ((f.water * 0.3) / 7);
         for (const sgn of [-1, 1]) {
           out.push([
-            [px, DECK_Y + pylonH - i * 0.8, 0],
-            [px + sgn * dx, DECK_Y + 0.1, 0],
+            [px, DECK_Y + PYLON_H - 0.4 - i * 0.55, 0],
+            [px + sgn * dx, DECK_Y + DECK_T / 2, 0],
           ]);
         }
       }
     }
     return out;
-  }, [frame.half]);
+  }, [f.water]);
+
+  const lamps = useMemo(() => {
+    const out: number[] = [];
+    for (let x = -f.water + 1.5; x < f.water; x += 2.6) out.push(x);
+    return out;
+  }, [f.water]);
+
+  const rampLen = f.ramp;
+  const rampAngle = Math.atan2(DECK_Y - 0.1, rampLen);
 
   return (
-    <group position={[frame.x, 0, frame.z]} rotation={[0, frame.yaw, 0]} name="harbor-bridge">
-      {piers.map((x, i) => (
-        <mesh key={i} position={[x, DECK_Y / 2, 0]} castShadow>
-          <boxGeometry args={[0.5, DECK_Y, 1.3]} />
-          <meshStandardMaterial color="#cfcac0" roughness={1} />
-        </mesh>
+    <group position={[f.x, 0, f.z]} rotation={[0, f.yaw, 0]} name="harbor-bridge">
+      {/* deck over water */}
+      <mesh position={[0, DECK_Y, 0]} castShadow receiveShadow>
+        <boxGeometry args={[f.water * 2, DECK_T, DECK_W]} />
+        <meshStandardMaterial color={DECK} roughness={1} />
+      </mesh>
+      {/* kerbs and railings */}
+      {[-1, 1].map((s) => (
+        <group key={s}>
+          <mesh position={[0, DECK_Y + DECK_T / 2 + 0.06, s * (DECK_W / 2 - 0.14)]}>
+            <boxGeometry args={[f.water * 2, 0.12, 0.28]} />
+            <meshStandardMaterial color={CONCRETE} roughness={1} />
+          </mesh>
+          <mesh position={[0, DECK_Y + DECK_T / 2 + 0.5, s * (DECK_W / 2 - 0.08)]}>
+            <boxGeometry args={[f.water * 2, 0.05, 0.05]} />
+            <meshStandardMaterial color={RAIL} roughness={0.8} />
+          </mesh>
+        </group>
       ))}
-      {pylons.map((x, i) => (
-        <group key={`p${i}`} position={[x, 0, 0]}>
-          {[-0.7, 0.7].map((z) => (
-            <mesh key={z} position={[0, (DECK_Y + pylonH) / 2, z]} castShadow>
-              <boxGeometry args={[0.45, DECK_Y + pylonH, 0.3]} />
-              <meshStandardMaterial color="#e9e2d2" roughness={0.9} />
+      {/* ramps on both banks, descending to street level */}
+      {[-1, 1].map((s) => (
+        <group key={`r${s}`} position={[s * (f.water + rampLen / 2), (DECK_Y + 0.1) / 2, 0]} rotation={[0, 0, -s * rampAngle]}>
+          <mesh castShadow receiveShadow>
+            <boxGeometry args={[Math.hypot(rampLen, DECK_Y - 0.1), DECK_T, DECK_W]} />
+            <meshStandardMaterial color={DECK} roughness={1} />
+          </mesh>
+          {[-1, 1].map((k) => (
+            <mesh key={k} position={[0, DECK_T / 2 + 0.06, k * (DECK_W / 2 - 0.14)]}>
+              <boxGeometry args={[Math.hypot(rampLen, DECK_Y - 0.1), 0.12, 0.28]} />
+              <meshStandardMaterial color={CONCRETE} roughness={1} />
             </mesh>
           ))}
-          <mesh position={[0, DECK_Y + pylonH - 0.3, 0]} castShadow>
-            <boxGeometry args={[0.5, 0.5, 1.7]} />
-            <meshStandardMaterial color="#e9e2d2" roughness={0.9} />
+        </group>
+      ))}
+      {/* lamp posts */}
+      {lamps.map((x, i) => (
+        <group key={i} position={[x, DECK_Y + DECK_T / 2, (i % 2 ? 1 : -1) * (DECK_W / 2 - 0.3)]}>
+          <mesh position={[0, 0.55, 0]}>
+            <cylinderGeometry args={[0.03, 0.04, 1.1, 6]} />
+            <meshStandardMaterial color={RAIL} roughness={0.8} />
+          </mesh>
+          <mesh position={[0, 1.1, 0]}>
+            <sphereGeometry args={[0.07, 8, 8]} />
+            <meshBasicMaterial color="#fff2c8" toneMapped={false} />
+          </mesh>
+        </group>
+      ))}
+      {/* piers: shaft in the water with a cap under the deck */}
+      {piers.map((x, i) => (
+        <group key={i} position={[x, 0, 0]}>
+          <mesh position={[0, (DECK_Y - 0.3) / 2 - 0.4, 0]} castShadow>
+            <boxGeometry args={[0.9, DECK_Y - 0.3 + 0.8, 1.6]} />
+            <meshStandardMaterial color={CONCRETE} roughness={1} />
+          </mesh>
+          <mesh position={[0, DECK_Y - 0.3, 0]} castShadow>
+            <boxGeometry args={[1.1, 0.24, DECK_W + 0.2]} />
+            <meshStandardMaterial color={CONCRETE} roughness={1} />
+          </mesh>
+        </group>
+      ))}
+      {/* pylons: two legs each side of the deck, joined above */}
+      {pylons.map((x, i) => (
+        <group key={`p${i}`} position={[x, 0, 0]}>
+          {[-1, 1].map((s) => (
+            <mesh key={s} position={[0, (DECK_Y + PYLON_H) / 2 - 0.4, s * (DECK_W / 2 + 0.25)]} castShadow>
+              <boxGeometry args={[0.5, DECK_Y + PYLON_H + 0.8, 0.36]} />
+              <meshStandardMaterial color={STEEL} roughness={0.9} />
+            </mesh>
+          ))}
+          <mesh position={[0, DECK_Y + PYLON_H - 0.2, 0]} castShadow>
+            <boxGeometry args={[0.55, 0.5, DECK_W + 0.9]} />
+            <meshStandardMaterial color={STEEL} roughness={0.9} />
           </mesh>
         </group>
       ))}
       {cables.map((pts, i) => (
-        <Line key={i} points={pts} color="#f0e6d2" lineWidth={1} />
+        <Line key={i} points={pts} color="#f3ead6" lineWidth={1} />
       ))}
-      {/* maintenance platform on Pier 3, as in the reference frame */}
-      <group position={[pier3, DECK_Y * 0.45, 0.95]}>
+      {/* maintenance platform on Pier 3 with a stair down the shaft */}
+      <group position={[pier3, DECK_Y - 0.95, DECK_W / 2 + 0.55]}>
         <mesh castShadow>
-          <boxGeometry args={[1.3, 0.08, 0.7]} />
+          <boxGeometry args={[1.6, 0.08, 0.9]} />
           <meshStandardMaterial color="#b9bcc4" roughness={1} />
         </mesh>
-        {[-0.62, 0.62].map((x) => (
-          <mesh key={x} position={[x, 0.2, 0]}>
-            <boxGeometry args={[0.03, 0.4, 0.7]} />
+        {[[-0.78, 0], [0.78, 0], [0, 0.43]].map(([x, z], i) => (
+          <mesh key={i} position={[x, 0.22, z]}>
+            <boxGeometry args={[x === 0 ? 1.6 : 0.03, 0.4, z === 0 ? 0.9 : 0.03]} />
             <meshStandardMaterial color="#8a8f98" roughness={1} />
           </mesh>
         ))}
+        <mesh position={[0.95, 0.25, -0.4]} rotation={[0, 0, 0.9]}>
+          <boxGeometry args={[0.06, 1.2, 0.35]} />
+          <meshStandardMaterial color="#8a8f98" roughness={1} />
+        </mesh>
       </group>
-      {inspector && <Inspector x={pier3} y={DECK_Y * 0.45 + 0.04} />}
+      {inspector && <Inspector x={pier3 + 0.2} y={DECK_Y - 0.91} z={DECK_W / 2 + 0.55} />}
       {markers && (
         <>
           <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={7} />
@@ -87,35 +163,39 @@ export function HarborBridge({ inspector = false, markers = false }: { inspector
   );
 }
 
-/** A simple figure in hi-vis with a torch on the platform. */
-function Inspector({ x, y }: { x: number; y: number }) {
-  const cone = useRef<THREE.Mesh>(null);
+/** The inspector: hi-vis vest, hard hat, torch beam on the pier face. */
+function Inspector({ x, y, z }: { x: number; y: number; z: number }) {
+  const beam = useRef<THREE.Mesh>(null);
   useFrame(({ clock }) => {
-    if (cone.current) cone.current.rotation.z = -0.9 + Math.sin(clock.elapsedTime * 0.5) * 0.25;
+    if (beam.current) beam.current.rotation.y = 0.2 + Math.sin(clock.elapsedTime * 0.5) * 0.2;
   });
   return (
-    <group position={[x + 0.2, y, 1.0]} scale={0.32}>
-      <mesh position={[0, 0.9, 0]} castShadow>
-        <capsuleGeometry args={[0.35, 1.0, 4, 8]} />
-        <meshStandardMaterial color="#d6e24a" roughness={0.8} />
+    <group position={[x, y, z]} scale={0.22} rotation={[0, Math.PI, 0]}>
+      <mesh position={[0, 1.0, 0]} castShadow>
+        <boxGeometry args={[0.9, 1.2, 0.5]} />
+        <meshStandardMaterial color="#d8e040" roughness={0.8} />
+      </mesh>
+      <mesh position={[0, 0.3, 0]} castShadow>
+        <boxGeometry args={[0.8, 0.7, 0.45]} />
+        <meshStandardMaterial color="#3b4150" roughness={0.9} />
       </mesh>
       <mesh position={[0, 1.95, 0]} castShadow>
-        <sphereGeometry args={[0.3, 12, 12]} />
+        <sphereGeometry args={[0.32, 12, 12]} />
         <meshStandardMaterial color="#ffd9b0" roughness={0.8} />
       </mesh>
-      <mesh position={[0, 2.2, 0]} castShadow>
-        <sphereGeometry args={[0.32, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
-        <meshStandardMaterial color="#ffffff" roughness={0.8} />
+      <mesh position={[0, 2.18, 0]} castShadow>
+        <sphereGeometry args={[0.36, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.7} />
       </mesh>
-      <mesh ref={cone} position={[-0.5, 1.3, 0]} rotation={[0, 0, 0.9]}>
-        <coneGeometry args={[1.4, 4, 24, 1, true]} />
-        <meshBasicMaterial color="#ffe6b0" transparent opacity={0.08} side={THREE.DoubleSide} depthWrite={false} />
+      <mesh ref={beam} position={[0.55, 1.3, 0]} rotation={[0, 0, -Math.PI / 2]}>
+        <coneGeometry args={[0.9, 3.2, 20, 1, true]} />
+        <meshBasicMaterial color="#fff0c0" transparent opacity={0.12} side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
     </group>
   );
 }
 
-function Marker({ x, y, label, sub, color, delayMs, labelY = 10 }: { x: number; y: number; label: string; sub: string; color: string; delayMs: number; labelY?: number }) {
+function Marker({ x, y, label, sub, color, delayMs, labelY = 5 }: { x: number; y: number; label: string; sub: string; color: string; delayMs: number; labelY?: number }) {
   const beam = useRef<THREE.Mesh>(null);
   const ring = useRef<THREE.Mesh>(null);
   const ringMat = useRef<THREE.MeshBasicMaterial>(null);
@@ -140,11 +220,11 @@ function Marker({ x, y, label, sub, color, delayMs, labelY = 10 }: { x: number; 
   return (
     <group position={[x, y, 0]}>
       <mesh ref={beam} visible={false} scale={[1, 0, 1]}>
-        <cylinderGeometry args={[0.08, 0.08, 14, 8]} />
+        <cylinderGeometry args={[0.06, 0.06, 9, 8]} />
         <meshBasicMaterial color={color} transparent opacity={0.6} toneMapped={false} />
       </mesh>
-      <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.3, 0]} visible={false}>
-        <ringGeometry args={[0.7, 0.95, 40]} />
+      <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.25, 0]} visible={false}>
+        <ringGeometry args={[0.6, 0.8, 40]} />
         <meshBasicMaterial ref={ringMat} color={color} transparent opacity={0.8} depthWrite={false} toneMapped={false} />
       </mesh>
       <Html position={[0, labelY, 0]} center zIndexRange={[30, 0]} style={{ pointerEvents: 'none' }}>

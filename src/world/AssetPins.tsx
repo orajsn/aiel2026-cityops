@@ -14,7 +14,7 @@ export interface AssetPinsProps {
   groupStaggerMs?: number;
 }
 
-const PIN_H = 5;
+const PIN_H = 4;
 
 function easeOutBack(t: number) {
   const c1 = 1.70158;
@@ -123,12 +123,12 @@ function Pin({
     <group ref={group} position={[pin.x, 0, pin.z]} scale={0}>
       {/* ground ring */}
       <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.15, 0]}>
-        <ringGeometry args={[1.2, 1.45, 48]} />
+        <ringGeometry args={[0.8, 0.98, 48]} />
         <meshBasicMaterial ref={ringMat} color={color} transparent opacity={0.3} depthWrite={false} />
       </mesh>
       {/* stem */}
       <mesh position={[0, PIN_H / 2, 0]}>
-        <cylinderGeometry args={[0.07, 0.07, PIN_H, 6]} />
+        <cylinderGeometry args={[0.045, 0.045, PIN_H, 6]} />
         <meshBasicMaterial color={color} transparent opacity={0.55} />
       </mesh>
       {/* head */}
@@ -146,7 +146,7 @@ function Pin({
           document.body.style.cursor = '';
         }}
       >
-        <sphereGeometry args={[0.7, 20, 20]} />
+        <sphereGeometry args={[0.42, 20, 20]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.1} roughness={0.4} />
       </mesh>
       {/* larger invisible hit target */}

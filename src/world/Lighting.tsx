@@ -11,6 +11,7 @@ export function Lighting() {
   useEffect(() => {
     gl.toneMapping = theme.toneMapped ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping;
     gl.shadowMap.enabled = theme.shadows;
+    gl.localClippingEnabled = true;
     gl.shadowMap.type = THREE.PCFSoftShadowMap;
     scene.traverse((o) => {
       const m = (o as THREE.Mesh).material as THREE.Material | THREE.Material[] | undefined;
