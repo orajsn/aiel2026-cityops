@@ -24,8 +24,8 @@ export const chapter0: SceneDef[] = [
     id: '0.3',
     chapter: 0,
     title: 'The data stream',
-    shot: 'city-wide',
-    world: { pins: 'all', dataStream: true },
+    shot: 'city-flow',
+    world: { pins: 'all', dataStream: true, highlight: ['City Operations Control Center'] },
     overlay: 'DataCounters',
   },
   {

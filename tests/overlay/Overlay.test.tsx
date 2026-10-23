@@ -35,3 +35,14 @@ test('on-screen Next and Back buttons step through the scenes (iPad has no arrow
   fireEvent.click(screen.getByRole('button', { name: 'Back' }));
   expect(useSceneStore.getState().index).toBe(0);
 });
+
+test('the presenter script shows under the page and the Script button hides and shows it', async () => {
+  const { fireEvent } = await import('@testing-library/react');
+  useSceneStore.getState().setScenes([{ id: 'a', chapter: 0, title: 'A', shot: 'city-high', script: 'Say this line.' }]);
+  render(<Overlay />);
+  expect(screen.getByText('Say this line.')).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Hide script' }));
+  expect(screen.queryByText('Say this line.')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Show script' }));
+  expect(screen.getByText('Say this line.')).toBeInTheDocument();
+});

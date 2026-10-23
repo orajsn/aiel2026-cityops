@@ -1,4 +1,5 @@
 import { interpolateShot, SHOTS, type Shot } from '../../src/world/shots';
+import { bangkokCovers } from '../../src/world/BangkokCity';
 
 const a: Shot = { position: [0, 0, 0], target: [0, 0, -10], durationMs: 1000, ease: 'inOut' };
 const b: Shot = { position: [10, 20, 30], target: [10, 0, -20], durationMs: 1000, ease: 'inOut' };
@@ -31,9 +32,8 @@ test('the named shots exist', () => {
     expect(SHOTS[id]).toBeDefined();
 });
 
-test('city shots keep the camera over the Bangkok model, not past its edge', async () => {
-  const { bangkokCovers } = await import('../../src/world/BangkokCity');
-  for (const id of ['gulf-approach', 'city-high', 'city-wide'] as const) {
+test('city shots keep the camera over the Bangkok model, not past its edge', () => {
+  for (const id of ['gulf-approach', 'city-high', 'city-wide', 'city-flow', 'ops-center', 'toolbelt-wall', 'memory-room'] as const) {
     const [x, , z] = SHOTS[id].position;
     expect(bangkokCovers(x, z, 1)).toBe(true);
   }

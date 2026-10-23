@@ -19,3 +19,13 @@ test('the Khlong Toei port is outside the model', () => {
 test('the model is not mirrored', () => {
   expect('mirrorZ' in BKK).toBe(false);
 });
+
+test('the map fades into the haze over its last few units, so its cut edge never shows', async () => {
+  const { edgeVisibility, EDGE_FADE } = await import('../../src/world/BangkokCity');
+  expect(edgeVisibility(BKK.x, BKK.z)).toBe(1);
+  const taksin = project(13.7196, 100.5124);
+  expect(edgeVisibility(taksin.x, taksin.z)).toBeGreaterThan(0.2); // the hero crossing stays readable
+  expect(edgeVisibility(BKK.x, BKK.z + 4309 * BKK.scale)).toBe(0); // the south edge itself is pure haze
+  expect(EDGE_FADE.north).toBeGreaterThan(10);
+  expect(EDGE_FADE.south).toBeLessThan(6);
+});

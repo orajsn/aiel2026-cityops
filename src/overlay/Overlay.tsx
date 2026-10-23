@@ -21,6 +21,7 @@ export function Overlay() {
   const total = useSceneStore((s) => s.scenes.length);
   const settled = useSceneStore((s) => s.settled);
   const jumpOpen = useUiStore((s) => s.jumpOpen);
+  const scriptOpen = useUiStore((s) => s.scriptOpen);
   if (!scene) return null;
 
   const Comp = scene.overlay ? OVERLAYS[scene.overlay] : null;
@@ -56,8 +57,23 @@ export function Overlay() {
 
       {scene.card && settled && <HandoffCard card={scene.card} />}
 
+      {/* presenter script under the page; CC (or S) hides it */}
+      {scene.script && scriptOpen && (
+        <div className="script" aria-label="presenter script">
+          {scene.script}
+        </div>
+      )}
+
       {/* touch navigation: the iPad has no arrow keys */}
       <nav className="stepper" aria-label="Scene navigation">
+        <button
+          type="button"
+          className={`stepper__btn stepper__btn--text${scriptOpen ? ' is-on' : ''}`}
+          aria-label={scriptOpen ? 'Hide script' : 'Show script'}
+          onClick={() => useUiStore.getState().toggleScript()}
+        >
+          CC
+        </button>
         <button type="button" className="stepper__btn" aria-label="Back" disabled={index === 0} onClick={() => useSceneStore.getState().prev()}>
           ‹
         </button>

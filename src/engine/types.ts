@@ -5,6 +5,8 @@ export interface HandoffCard {
   run: string;
   expect: string;
   minutes: string;
+  /** what to look at when it finishes (the recap) */
+  then?: string;
 }
 
 export interface RecapRef {
@@ -26,4 +28,6 @@ export interface SceneDef {
   card?: HandoffCard;
   recap?: RecapRef;
   recapMode?: boolean;
+  /** what the presenter says on this page (shown as a subtitle the presenter can hide) */
+  script?: string;
 }

@@ -29,8 +29,11 @@ export const SHOTS: Record<ShotId, Shot> = {
   // the model ends ~5 units south of Taksin: city cameras stay inside it and look north up the river
   'gulf-approach': { position: [-34, 22, -17], target: [-46, 0, -52], durationMs: 0 },
   'city-high': { position: [-36, 6, -17], target: [-44, 1, -40], durationMs: 2500, ease: 'inOut' },
+  // 0.3: the document flow lands at City Operations Control Center (5, -67), so it has to be in frame
+  'city-flow': { position: [12, 10, -82], target: [-4, 0, -60], durationMs: 2200, ease: 'inOut' },
   'city-wide': { position: [-26, 8, -16], target: [-38, 1, -46], durationMs: 2000, ease: 'inOut' },
-  'ops-center': { position: [26, 22, -30], target: [5, 3, -67], durationMs: 2000, ease: 'inOut' },
+  // City Operations Control Center (5, -67) sits near the map's east edge: cameras stand east of it and look west, into the city
+  'ops-center': { position: [11, 6, -58], target: [-2, 0.5, -71], durationMs: 2000, ease: 'inOut' },
   // Pier 3 is at bridge-local x -0.2 with its platform on the +z (north) face; cameras hang over the water,
   // far enough out to show the pier, the platform, the deck and the river together
   'bridge-pier3': bridgeShot([0.5, 0.62, 1.95], [-0.2, 0.2, 0.2], 2200),
@@ -43,8 +46,8 @@ export const SHOTS: Record<ShotId, Shot> = {
   'core-face-graph': { position: [150, -40, 430], target: [80, -125, -20], durationMs: 1400, ease: 'inOut' },
   'core-face-vectors': { position: [250, -120, 270], target: [230, -178, 0], durationMs: 1400, ease: 'inOut' },
   'vector-field': { position: [185, -130, 230], target: [170, -180, 0], durationMs: 1600, ease: 'inOut' },
-  'memory-room': { position: [260, 20, 220], target: [300, 8, 180], durationMs: 2000, ease: 'inOut' },
-  'toolbelt-wall': { position: [-260, 20, 220], target: [-300, 8, 180], durationMs: 2000, ease: 'inOut' },
+  'memory-room': { position: [11, 4, -76], target: [0, 0.8, -64], durationMs: 2000, ease: 'inOut' },
+  'toolbelt-wall': { position: [11.5, 3.5, -63], target: [-1, 0.6, -70], durationMs: 2000, ease: 'inOut' },
 };
 
 export function easeInOut(t: number): number {

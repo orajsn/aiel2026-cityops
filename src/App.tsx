@@ -19,6 +19,7 @@ export default function App() {
       notes: () => ui.toggleNotes(),
       lang: () => ui.toggleLang(),
       theme: () => ui.toggleTheme(),
+      script: () => ui.toggleScript(),
     });
     return () => {
       unHash();

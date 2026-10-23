@@ -31,6 +31,63 @@ export function bangkokCovers(x: number, z: number, margin = 0): boolean {
   );
 }
 
+/**
+ * Width of the band, in world units, over which the map melts into the haze at its cut edge.
+ * Wide on the west, east and north; narrow on the south, where Harbor Bridge stands ~5 units from the edge.
+ */
+export const EDGE_FADE = { west: 18, east: 10, north: 18, south: 5 }; // east: the Ops Center is 8 units in
+
+const smooth = (k: number) => {
+  const c = Math.max(0, Math.min(1, k));
+  return c * c * (3 - 2 * c);
+};
+
+/** 1 inside the map, falling smoothly to 0 at its cut edge (same maths as the shader below). */
+export function edgeVisibility(x: number, z: number): number {
+  const hx = MODEL_HALF_X * BKK.scale;
+  const hz = MODEL_HALF_Z * BKK.scale;
+  return Math.min(
+    smooth((x - (BKK.x - hx)) / EDGE_FADE.west),
+    smooth((BKK.x + hx - x) / EDGE_FADE.east),
+    smooth((z - (BKK.z - hz)) / EDGE_FADE.north),
+    smooth((BKK.z + hz - z) / EDGE_FADE.south),
+  );
+}
+
+/** Blend every map material towards the fog colour near the map's edge, after fog is applied. */
+function addEdgeFade(mat: THREE.Material) {
+  mat.onBeforeCompile = (shader) => {
+    shader.uniforms.uEdgeRect = {
+      value: new THREE.Vector4(BKK.x, BKK.z, MODEL_HALF_X * BKK.scale, MODEL_HALF_Z * BKK.scale),
+    };
+    shader.uniforms.uEdgeFade = { value: new THREE.Vector4(EDGE_FADE.west, EDGE_FADE.east, EDGE_FADE.north, EDGE_FADE.south) };
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', `#include <common>
+varying vec2 vEdgeXZ;`)
+      .replace('#include <project_vertex>', `#include <project_vertex>
+vEdgeXZ = (modelMatrix * vec4(transformed, 1.0)).xz;`);
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', `#include <common>
+varying vec2 vEdgeXZ;
+uniform vec4 uEdgeRect;
+uniform vec4 uEdgeFade;`)
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        #ifdef USE_FOG
+          vec2 edgeLo = vEdgeXZ - (uEdgeRect.xy - uEdgeRect.zw);
+          vec2 edgeHi = (uEdgeRect.xy + uEdgeRect.zw) - vEdgeXZ;
+          float edgeK = min(
+            min(smoothstep(0.0, 1.0, clamp(edgeLo.x / uEdgeFade.x, 0.0, 1.0)), smoothstep(0.0, 1.0, clamp(edgeHi.x / uEdgeFade.y, 0.0, 1.0))),
+            min(smoothstep(0.0, 1.0, clamp(edgeLo.y / uEdgeFade.z, 0.0, 1.0)), smoothstep(0.0, 1.0, clamp(edgeHi.y / uEdgeFade.w, 0.0, 1.0)))
+          );
+          gl_FragColor.rgb = mix(fogColor, gl_FragColor.rgb, edgeK);
+        #endif`,
+      );
+  };
+  mat.customProgramCacheKey = () => 'bkk-edge-fade';
+}
+
 export function BangkokCity() {
   const gltf = useGLTF(URL);
   const scene = useMemo(() => {
@@ -38,6 +95,7 @@ export function BangkokCity() {
     root.traverse((o) => {
       const m = o as THREE.Mesh;
       if (!m.isMesh) return;
+      addEdgeFade(m.material as THREE.Material);
       m.castShadow = !m.name.startsWith('Map');
       m.receiveShadow = true;
     });

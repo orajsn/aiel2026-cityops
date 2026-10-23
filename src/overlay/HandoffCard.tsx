@@ -9,6 +9,11 @@ export function HandoffCard({ card }: { card: Card }) {
         <div className="handoff__expect">
           <span className="ok">✔</span> {card.expect}
         </div>
+        {card.then && (
+          <div className="handoff__then">
+            <b>When it finishes:</b> {card.then}
+          </div>
+        )}
         <div className="handoff__pill">{card.minutes}</div>
       </div>
     </div>

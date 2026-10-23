@@ -32,3 +32,16 @@ test('the recap subset is marked', () => {
 test('SCENES starts with chapter 0', () => {
   expect(SCENES[0].id).toBe('0.1');
 });
+
+test('0.3 frames the place the document flow lands', async () => {
+  const { assetPosition } = await import('../../src/content/geo');
+  const s = chapter0.find((x) => x.id === '0.3')!;
+  const shot = SHOTS[s.shot];
+  const ops = assetPosition('City Operations Control Center');
+  // the Ops Center is in front of the camera and within ~25 degrees of where it looks
+  const look = [shot.target[0] - shot.position[0], shot.target[2] - shot.position[2]];
+  const toOps = [ops.x - shot.position[0], ops.z - shot.position[2]];
+  const cos = (look[0] * toOps[0] + look[1] * toOps[1]) / (Math.hypot(...look) * Math.hypot(...toOps));
+  expect(cos).toBeGreaterThan(Math.cos((25 * Math.PI) / 180));
+  expect((s.world as { highlight?: string[] }).highlight).toContain('City Operations Control Center');
+});

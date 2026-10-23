@@ -6,6 +6,7 @@ import { QuestionBubble } from './QuestionBubble';
 import { CoreCaption } from './CoreCaption';
 import { SmallBrain } from './SmallBrain';
 import { BridgeMarkers } from './BridgeMarkers';
+import { Beat } from './Beat';
 
 registerOverlay('TitleCard', TitleCard);
 registerOverlay('PinLegend', PinLegend);
@@ -14,3 +15,4 @@ registerOverlay('QuestionBubble', QuestionBubble);
 registerOverlay('CoreCaption', CoreCaption);
 registerOverlay('SmallBrain', SmallBrain);
 registerOverlay('BridgeMarkers', BridgeMarkers);
+registerOverlay('Beat', Beat);
