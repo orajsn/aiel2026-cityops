@@ -19,6 +19,7 @@ const RIVER_LATLON: [number, number][] = [
   [13.64, 100.565],
   [13.6, 100.56],
   [13.54, 100.555],
+  [13.46, 100.55],
 ];
 
 export const RIVER_CURVE = new THREE.CatmullRomCurve3(

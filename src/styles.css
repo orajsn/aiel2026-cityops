@@ -36,3 +36,33 @@ code,
 .mono {
   font-family: var(--font-mono);
 }
+
+/* pin cards */
+.pin-card {
+  min-width: 220px;
+  max-width: 280px;
+  padding: 10px 12px 8px;
+  background: rgba(11, 14, 20, 0.88);
+  border: 1px solid var(--line);
+  border-left-width: 3px;
+  border-radius: 6px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+  color: var(--ink);
+  transform: translateY(-50%);
+  animation: card-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(-50%) translateX(-6px); }
+  to { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+.pin-card__name { font-size: 14px; font-weight: 500; margin-bottom: 3px; white-space: nowrap; }
+.pin-card__meta { display: flex; gap: 10px; color: var(--ink-dim); margin-bottom: 6px; }
+.pin-card__crit { display: flex; gap: 4px; margin-bottom: 8px; }
+.pin-card__crit i { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--ink-dim); display: inline-block; }
+.pin-card__crit i.filled { background: var(--red); border-color: var(--red); }
+.pin-card__specs { margin: 0; font-size: 11px; }
+.pin-card__specs div { display: flex; justify-content: space-between; gap: 12px; padding: 2px 0; border-top: 1px solid var(--line); }
+.pin-card__specs dt { color: var(--ink-dim); margin: 0; }
+.pin-card__specs dd { margin: 0; color: var(--ink); }

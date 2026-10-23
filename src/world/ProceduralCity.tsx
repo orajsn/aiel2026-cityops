@@ -14,9 +14,9 @@ const BUILDING_VERT = /* glsl */ `
     vH = position.y;
     vec4 wp = instanceMatrix * vec4(position, 1.0);
     vN = normalize(mat3(instanceMatrix) * normal);
-    vec4 mv = modelViewMatrix * wp;
-    vView = -mv.xyz;
-    gl_Position = projectionMatrix * mv;
+    vec4 mvPosition = modelViewMatrix * wp;
+    vView = -mvPosition.xyz;
+    gl_Position = projectionMatrix * mvPosition;
     #include <fog_vertex>
   }
 `;
@@ -38,7 +38,7 @@ const BUILDING_FRAG = /* glsl */ `
     float side = 0.85 + 0.15 * max(0.0, dot(n, normalize(vec3(0.4, 0.2, 0.9))));
     col *= side;
     float rim = pow(1.0 - max(0.0, dot(n, v)), 3.0);
-    col += uGlow * rim * 0.45 * (1.0 - top);
+    col += uGlow * rim * 0.32 * (1.0 - top);
     col += uGlow * 0.08 * vH;
     gl_FragColor = vec4(col, 1.0);
     #include <fog_fragment>
@@ -52,8 +52,8 @@ const WATER_VERT = /* glsl */ `
   void main() {
     vUv = uv;
     vPos = position;
-    vec4 mv = modelViewMatrix * vec4(position, 1.0);
-    gl_Position = projectionMatrix * mv;
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * mvPosition;
     #include <fog_vertex>
   }
 `;
@@ -70,8 +70,8 @@ const WATER_FRAG = /* glsl */ `
     float lines = smoothstep(0.90, 1.0, sin((vPos.z * 0.9 + vPos.x * 0.35) + uTime * 0.9 + n * 2.5));
     float across = abs(vUv.x - 0.5) * 2.0;
     float shore = smoothstep(0.55, 1.0, across);
-    vec3 col = uBase + uGlow * (0.18 + 0.22 * lines);
-    col += uGlow * shore * 0.9;
+    vec3 col = uBase + uGlow * (0.10 + 0.10 * lines);
+    col += uGlow * shore * 0.45;
     gl_FragColor = vec4(col, 1.0);
     #include <fog_fragment>
   }
@@ -142,11 +142,12 @@ export function ProceduralCity() {
         vertexShader: WATER_VERT,
         fragmentShader: WATER_FRAG,
         fog: true,
+        side: THREE.DoubleSide,
         uniforms: THREE.UniformsUtils.merge([
           THREE.UniformsLib.fog,
           {
             uTime: { value: 0 },
-            uBase: { value: new THREE.Color('#0a1d26') },
+            uBase: { value: new THREE.Color('#07161d') },
             uGlow: { value: new THREE.Color('#1B8A9C') },
           },
         ]),

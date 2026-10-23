@@ -22,7 +22,7 @@ export function rng(seed: number): () => number {
 }
 
 /** City extent in scene units (x east, z south). */
-export const CITY_BOUNDS = { minX: -170, maxX: 130, minZ: -200, maxZ: 120 };
+export const CITY_BOUNDS = { minX: -300, maxX: 260, minZ: -340, maxZ: 260 };
 
 const CBD = project(13.728, 100.538); // Sathorn / Silom / Siam
 const CBD2 = project(13.765, 100.56); // Din Daeng / Ratchada
@@ -36,10 +36,10 @@ export function buildingLayout(seed = 11, step = 7): Building[] {
       const jx = x + (r() - 0.5) * step * 0.6;
       const jz = z + (r() - 0.5) * step * 0.6;
       // density: full inside, fading at the edges
-      const ex = Math.min(jx - minX, maxX - jx) / 60;
-      const ez = Math.min(jz - minZ, maxZ - jz) / 60;
+      const ex = Math.min(jx - minX, maxX - jx) / 150;
+      const ez = Math.min(jz - minZ, maxZ - jz) / 150;
       const edge = Math.min(1, ex, ez);
-      if (r() > 0.55 + 0.45 * edge) continue;
+      if (r() > 0.15 + 0.85 * edge * edge) continue;
       if (isWater(jx, jz, 5)) continue;
       const dc = Math.hypot(jx - CBD.x, jz - CBD.z);
       const dc2 = Math.hypot(jx - CBD2.x, jz - CBD2.z);
