@@ -14,7 +14,7 @@ export interface AssetPinsProps {
   groupStaggerMs?: number;
 }
 
-const PIN_H = 4;
+const PIN_H = 1.1;
 
 function easeOutBack(t: number) {
   const c1 = 1.70158;
@@ -72,7 +72,7 @@ export function AssetPins({ visible, highlight = [], onHover, groupStaggerMs = 7
       {pins
         .filter((p) => p.asset.id === hovered)
         .map((p) => (
-          <PinCard key={`card-${p.asset.id}`} asset={p.asset} position={[p.x + 1.5, PIN_H + 3, p.z]} />
+          <PinCard key={`card-${p.asset.id}`} asset={p.asset} position={[p.x + 0.4, PIN_H + 0.8, p.z]} />
         ))}
     </group>
   );
@@ -123,12 +123,12 @@ function Pin({
     <group ref={group} position={[pin.x, 0, pin.z]} scale={0}>
       {/* ground ring */}
       <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.15, 0]}>
-        <ringGeometry args={[0.8, 0.98, 48]} />
+        <ringGeometry args={[0.24, 0.3, 48]} />
         <meshBasicMaterial ref={ringMat} color={color} transparent opacity={0.3} depthWrite={false} />
       </mesh>
       {/* stem */}
       <mesh position={[0, PIN_H / 2, 0]}>
-        <cylinderGeometry args={[0.045, 0.045, PIN_H, 6]} />
+        <cylinderGeometry args={[0.014, 0.014, PIN_H, 6]} />
         <meshBasicMaterial color={color} transparent opacity={0.55} />
       </mesh>
       {/* head */}
@@ -146,7 +146,7 @@ function Pin({
           document.body.style.cursor = '';
         }}
       >
-        <sphereGeometry args={[0.42, 20, 20]} />
+        <sphereGeometry args={[0.13, 20, 20]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.1} roughness={0.4} />
       </mesh>
       {/* larger invisible hit target */}
@@ -159,7 +159,7 @@ function Pin({
         }}
         onPointerOut={() => onHover(null)}
       >
-        <sphereGeometry args={[1.8, 8, 8]} />
+        <sphereGeometry args={[0.5, 8, 8]} />
       </mesh>
     </group>
   );

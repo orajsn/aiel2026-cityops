@@ -5,6 +5,8 @@ import { Html, Line } from '@react-three/drei';
 import { useUiStore } from '../engine/ui';
 import { harborBridgeFrame } from './bridgeFrame';
 
+/** structure scale: the map is real scale (1 unit ~ 108 m); the bridge is drawn a few times larger than life so it reads */
+const S = 0.22;
 const DECK_Y = 1.6;
 const DECK_W = 2.4;
 const DECK_T = 0.36;
@@ -22,7 +24,9 @@ const STEEL = '#e9e2d2';
  * Always part of the city; `inspector` and `markers` only add the story props.
  */
 export function HarborBridge({ inspector = false, markers = false }: { inspector?: boolean; markers?: boolean }) {
-  const f = useMemo(() => harborBridgeFrame(), []);
+  const f0 = useMemo(() => harborBridgeFrame(), []);
+  // work in structure units inside a group scaled by S, so spans still match the world
+  const f = useMemo(() => ({ ...f0, water: f0.water / S, ramp: f0.ramp / S }), [f0]);
   const theme = useUiStore((s) => s.theme);
 
   // six piers across the water, numbered 1..6 from the north bank; Pier 3 and Pier 2 carry the story
@@ -57,7 +61,7 @@ export function HarborBridge({ inspector = false, markers = false }: { inspector
   const rampAngle = Math.atan2(DECK_Y - 0.1, rampLen);
 
   return (
-    <group position={[f.x, 0, f.z]} rotation={[0, f.yaw, 0]} name="harbor-bridge">
+    <group position={[f.x, 0, f.z]} rotation={[0, f.yaw, 0]} scale={S} name="harbor-bridge">
       {/* deck over water */}
       <mesh position={[0, DECK_Y, 0]} castShadow receiveShadow>
         <boxGeometry args={[f.water * 2, DECK_T, DECK_W]} />
@@ -90,6 +94,13 @@ export function HarborBridge({ inspector = false, markers = false }: { inspector
             </mesh>
           ))}
         </group>
+      ))}
+      {/* street-level approach strips beyond the ramps */}
+      {[-1, 1].map((s) => (
+        <mesh key={`a${s}`} position={[s * (f.water + rampLen + 5), 0.1, 0]} receiveShadow>
+          <boxGeometry args={[10, 0.1, DECK_W]} />
+          <meshStandardMaterial color={DECK} roughness={1} />
+        </mesh>
       ))}
       {/* lamp posts */}
       {lamps.map((x, i) => (

@@ -37,6 +37,34 @@ const SKY_FRAG = /* glsl */ `
  * Ground: the slab, plus a sky dome and a far ground plane so a low camera sees a horizon
  * instead of the slab's edge. The far plane is single-sided, so from under the slab it vanishes.
  */
+/** Sky dome and the far ground plane fading into the haze. */
+export function SkyAndHorizon() {
+  const theme = useUiStore((s) => s.theme);
+  const sky = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        vertexShader: SKY_VERT,
+        fragmentShader: SKY_FRAG,
+        side: THREE.BackSide,
+        depthWrite: false,
+        fog: false,
+        uniforms: { uTop: { value: new THREE.Color(theme.skyTop) }, uHorizon: { value: new THREE.Color(theme.skyHorizon) } },
+      }),
+    [theme.skyTop, theme.skyHorizon],
+  );
+  return (
+    <>
+      <mesh material={sky} renderOrder={-10} frustumCulled={false}>
+        <sphereGeometry args={[1800, 32, 16]} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.3, 0]}>
+        <circleGeometry args={[2400, 48]} />
+        <meshBasicMaterial color={theme.bg} />
+      </mesh>
+    </>
+  );
+}
+
 export function Ground() {
   const theme = useUiStore((s) => s.theme);
   const materials = useMemo(() => {

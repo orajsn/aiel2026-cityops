@@ -43,13 +43,13 @@ function Boat({ spec }: { spec: BoatSpec }) {
     const nx = -tan.z;
     const nz = tan.x;
     if (g.current) {
-      g.current.position.set(p.x + nx * w * spec.side, 0.12, p.z + nz * w * spec.side);
+      g.current.position.set(p.x + nx * 0.9 * spec.side, 0.03, p.z + nz * 0.9 * spec.side);
       g.current.rotation.y = Math.atan2(tan.x, tan.z) + (spec.speed < 0 ? Math.PI : 0);
     }
   });
   const ferry = spec.kind === 'ferry';
   return (
-    <group ref={g} scale={0.55}>
+    <group ref={g} scale={0.14}>
       <mesh position={[0, 0.3, 0]} castShadow>
         <boxGeometry args={[ferry ? 1.1 : 1.4, 0.6, ferry ? 3.6 : 5.5]} />
         <meshStandardMaterial color={ferry ? '#f4f1ea' : '#4d5f73'} roughness={0.9} />

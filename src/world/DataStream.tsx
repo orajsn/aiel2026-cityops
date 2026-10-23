@@ -15,7 +15,7 @@ export interface DataStreamProps {
 }
 
 const OPS = 'City Operations Control Center';
-const PIN_TOP = 5;
+const PIN_TOP = 1.1;
 
 interface Live {
   id: number;
@@ -98,8 +98,8 @@ export function DataStream({
           from={a.from}
           to={to}
           color={a.color}
-          lift={14 + (a.id % 5) * 3}
-          radius={0.18}
+          lift={4 + (a.id % 5) * 0.8}
+          radius={0.05}
           durationMs={1500}
           fadeMs={500}
           onDone={() => setLive((l) => l.filter((x) => x.id !== a.id))}

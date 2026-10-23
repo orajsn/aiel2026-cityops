@@ -89,7 +89,7 @@ export function FlowArc({
         <meshBasicMaterial color={col.clone().multiplyScalar(1.6)} toneMapped={false} />
       </mesh>
       <mesh ref={ring} position={[to[0], to[1] + 0.2, to[2]]} rotation={[-Math.PI / 2, 0, 0]} visible={false}>
-        <ringGeometry args={[0.8, 1.05, 40]} />
+        <ringGeometry args={[0.22, 0.3, 40]} />
         <meshBasicMaterial ref={ringMat} color={col} transparent opacity={0.8} depthWrite={false} />
       </mesh>
     </group>

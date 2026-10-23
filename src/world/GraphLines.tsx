@@ -27,7 +27,7 @@ export const EDGE_COLOR: Record<EdgeType, string> = {
   supports: '#9AA5B1',
 };
 
-const Y = 5.2; // pin head height
+const Y = 1.2; // pin head height
 
 export interface GraphLinesProps {
   edges: Edge[];
@@ -45,7 +45,7 @@ export function GraphLines({ edges, highlight, staggerMs = 90 }: GraphLinesProps
         const a = assetPosition(e.from);
         const b = assetPosition(e.to);
         // a gentle sag upward so the line reads as a link, not a road
-        const mid: [number, number, number] = [(a.x + b.x) / 2, Y + 3, (a.z + b.z) / 2];
+        const mid: [number, number, number] = [(a.x + b.x) / 2, Y + 0.8, (a.z + b.z) / 2];
         const hot = !highlight || e.from === highlight || e.to === highlight;
         return {
           key: `${e.from}->${e.to}`,

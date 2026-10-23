@@ -25,8 +25,8 @@ export function harborBridgeFrame(): BridgeFrame {
   const c = RIVER_CURVE.getPointAt(t);
   const tan = RIVER_CURVE.getTangentAt(t);
   const yaw = Math.atan2(tan.x, tan.z) + Math.PI / 2;
-  const water = riverHalfWidth(t) + 1.2;
-  const ramp = 6;
+  const water = 1.7; // the real river at Taksin is ~250 m across; a little margin on each bank
+  const ramp = 1.4;
   cached = { x: c.x, z: c.z, water, ramp, half: water + ramp, yaw };
   return cached;
 }
