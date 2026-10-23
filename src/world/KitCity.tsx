@@ -6,6 +6,8 @@ import { useUiStore } from '../engine/ui';
 import { ALL_MODELS, KIT, kitLayout, type Placement } from './kitLayout';
 import { River } from './RiverMesh';
 import { Ground } from './Ground';
+import { Roads } from './RoadsMesh';
+import { Landmarks } from './LandmarksMesh';
 
 /** One merged geometry + material per kit model, so each model is a single InstancedMesh. */
 function useKitModels() {
@@ -55,9 +57,9 @@ function Instanced({ model, items, geometry, material, footprint }: { model: str
     if (!m) return;
     items.forEach((p, i) => {
       // wide models shrink so they stay inside their cell
-      const s = model.startsWith('roads/') ? p.s : Math.min(p.s, (5.4 / Math.max(0.01, footprint)) * 1);
+      const s = Math.min(p.s, 2.5 / Math.max(0.01, footprint));
       tmp.position.set(p.x, 0, p.z);
-      tmp.rotation.set(0, (p.yaw * Math.PI) / 2, 0);
+      tmp.rotation.set(0, p.yaw, 0);
       tmp.scale.setScalar(s);
       tmp.updateMatrix();
       m.setMatrixAt(i, tmp.matrix);
@@ -70,7 +72,7 @@ function Instanced({ model, items, geometry, material, footprint }: { model: str
     <instancedMesh
       ref={ref}
       args={[geometry, mat, items.length]}
-      castShadow={theme.shadows && !model.startsWith('roads/road')}
+      castShadow={theme.shadows}
       receiveShadow={theme.shadows}
       frustumCulled={false}
       name={`kit:${model}`}
@@ -94,6 +96,8 @@ export function KitCity() {
     <group name="kit-city">
       <Ground />
       <River />
+      <Roads />
+      <Landmarks />
       {groups.map(([model, items]) => {
         const m = models.get(model);
         if (!m) return null;

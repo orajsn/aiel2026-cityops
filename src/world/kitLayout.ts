@@ -1,7 +1,9 @@
 import { project } from '../content/geo';
 import { rng, CITY_BOUNDS } from './cityLayout';
 import { isWater } from './river';
-import { harborBridgeFrame, inBridgeCorridor, onBridgeApproach } from './bridgeFrame';
+import { inBridgeCorridor } from './bridgeFrame';
+import { nearestRoad } from './roads';
+import { nearLandmark } from './landmarks';
 
 /** Kenney city-kit models (CC0, kenney.nl), served from public/models/kenney. */
 export const KIT = '/models/kenney';
@@ -13,9 +15,8 @@ export const MODEL_SETS = {
   low: 'abcdefghijklmnopqrstu'.split('').map((k) => `suburban/building-type-${k}.glb`),
   industrial: 'abcdefghijklmnopqrst'.split('').map((k) => `industrial/building-${k}.glb`),
   tree: ['suburban/tree-large.glb', 'suburban/tree-small.glb'],
-  road: ['roads/road-straight.glb', 'roads/road-crossroad.glb', 'roads/road-bridge.glb'],
-  lamp: ['roads/light-square.glb'],
   port: ['industrial/shipping-container-a.glb', 'industrial/shipping-container-b.glb', 'industrial/shipping-container-c.glb', 'industrial/detail-tank-large.glb', 'industrial/water-tower.glb'],
+  lamp: ['roads/light-square.glb'],
 };
 
 export const ALL_MODELS: string[] = Object.values(MODEL_SETS).flat();
@@ -24,87 +25,69 @@ export interface Placement {
   model: string;
   x: number;
   z: number;
-  /** quarter turns */
+  /** rotation about y in radians */
   yaw: number;
   /** uniform scale */
   s: number;
 }
 
-export const CELL = 6;
-/** every Nth row/column is an avenue */
-const AVENUE = 6;
-const BUILD_SCALE = 5;
-const ROAD_SCALE = CELL;
+/** Candidate spacing and model scale, in scene units (1 unit ~ 108 m; the city is a toy scale). */
+export const SPACING = 2.7;
+export const BUILD_SCALE = 2.3;
 
-const CBD = project(13.728, 100.538);
-const CBD2 = project(13.765, 100.56);
-const PORT = project(13.7, 100.575);
+const CBD = project(13.728, 100.538); // Sathorn / Silom
+const CBD2 = project(13.745, 100.535); // Siam / Ratchaprasong
+const CBD3 = project(13.765, 100.56); // Din Daeng / Ratchada
+const PORT = project(13.705, 100.572); // Khlong Toei port
+const OLD = project(13.75, 100.492); // Rattanakosin: low, no towers
 
-/** Deterministic placement of kit models on a grid with avenues, bridges and trees. */
+/**
+ * Organic placement: jittered candidates across the city, kept only where they clear the
+ * real streets and the river, turned to face the nearest street. Model mix by district.
+ */
 export function kitLayout(seed = 11): Placement[] {
   const r = rng(seed);
   const out: Placement[] = [];
   const { minX, maxX, minZ, maxZ } = CITY_BOUNDS;
-  const cols = Math.floor((maxX - minX) / CELL);
-  const rows = Math.floor((maxZ - minZ) / CELL);
   const pick = (list: string[]) => list[Math.floor(r() * list.length)];
 
-  for (let rz = 0; rz < rows; rz++) {
-    for (let cx = 0; cx < cols; cx++) {
-      const x = minX + (cx + 0.5) * CELL;
-      const z = minZ + (rz + 0.5) * CELL;
-      const onAvX = cx % AVENUE === 0;
-      const onAvZ = rz % AVENUE === 0;
-      const ex = Math.min(x - minX, maxX - x) / 150;
-      const ez = Math.min(z - minZ, maxZ - z) / 150;
+  for (let z = minZ + 2; z < maxZ - 2; z += SPACING) {
+    for (let x = minX + 2; x < maxX - 2; x += SPACING) {
+      const jx = x + (r() - 0.5) * SPACING * 0.7;
+      const jz = z + (r() - 0.5) * SPACING * 0.7;
+      if (isWater(jx, jz, 1.2)) continue;
+      if (inBridgeCorridor(jx, jz, 4)) continue;
+      if (nearLandmark(jx, jz)) continue;
+      const near = nearestRoad(jx, jz, 10);
+      if (near && near.gap < 0.6) continue;
+      // density: dense near streets, sparse far from any street
+      const far = near ? near.gap : 10;
+      if (r() > (far < 6 ? 0.95 : far < 9 ? 0.6 : 0.25)) continue;
+      const ex = Math.min(jx - minX, maxX - jx) / 30;
+      const ez = Math.min(jz - minZ, maxZ - jz) / 30;
       const edge = Math.max(0, Math.min(1, ex, ez));
-      const water = isWater(x, z, 2);
-      if (inBridgeCorridor(x, z, 9)) {
-        // approach roads join Harbor Bridge to the street grid; the rest of the corridor stays clear
-        if (!water && onBridgeApproach(x, z)) {
-          const f = harborBridgeFrame();
-          const alongX = Math.abs(Math.cos(f.yaw)) > 0.5; // deck runs along world x
-          out.push({ model: (onAvX && !alongX) || (onAvZ && alongX) ? 'roads/road-crossroad.glb' : 'roads/road-straight.glb', x, z, yaw: alongX ? 1 : 0, s: ROAD_SCALE });
-        }
-        continue;
-      }
+      if (r() > 0.25 + 0.75 * edge) continue;
 
-      if (onAvX || onAvZ) {
-        // avenues: road tiles; over water they become bridges; fade out at the edge
-        if (r() > 0.2 + 0.8 * edge) continue;
-        if (water) {
-          if (onAvX && onAvZ) continue;
-          // Harbor Bridge is the only crossing near the port
-          const hb = harborBridgeFrame();
-          if (Math.hypot(x - hb.x, z - hb.z) < 60) continue;
-          out.push({ model: 'roads/road-bridge.glb', x, z, yaw: onAvX ? 0 : 1, s: ROAD_SCALE });
-        } else if (onAvX && onAvZ) {
-          out.push({ model: 'roads/road-crossroad.glb', x, z, yaw: 0, s: ROAD_SCALE });
-        } else {
-          out.push({ model: 'roads/road-straight.glb', x, z, yaw: onAvX ? 0 : 1, s: ROAD_SCALE });
-          if ((cx + rz) % 3 === 0) out.push({ model: 'roads/light-square.glb', x: x + (onAvX ? 2.6 : 0), z: z + (onAvZ ? 2.6 : 0), yaw: onAvX ? 1 : 0, s: BUILD_SCALE });
-        }
-        continue;
-      }
-
-      if (water) continue;
-      if (r() > 0.12 + 0.88 * edge * edge) continue;
-
-      const dc = Math.hypot(x - CBD.x, z - CBD.z);
-      const dc2 = Math.hypot(x - CBD2.x, z - CBD2.z);
-      const dp = Math.hypot(x - PORT.x, z - PORT.z);
+      const dc = Math.min(Math.hypot(jx - CBD.x, jz - CBD.z), Math.hypot(jx - CBD2.x, jz - CBD2.z));
+      const dc3 = Math.hypot(jx - CBD3.x, jz - CBD3.z);
+      const dp = Math.hypot(jx - PORT.x, jz - PORT.z);
+      const dold = Math.hypot(jx - OLD.x, jz - OLD.z);
+      const k = r();
       let model: string;
-      if (dc < 22 || dc2 < 14) model = r() < 0.7 ? pick(MODEL_SETS.tall) : pick(MODEL_SETS.mid);
-      else if (dp < 30) {
-        const k = r();
-        model = k < 0.4 ? pick(MODEL_SETS.industrial) : k < 0.9 ? pick(MODEL_SETS.port) : pick(MODEL_SETS.mid);
+      if (dp < 9) model = k < 0.4 ? pick(MODEL_SETS.industrial) : k < 0.9 ? pick(MODEL_SETS.port) : pick(MODEL_SETS.plain);
+      else if (dold < 9) model = k < 0.15 ? pick(MODEL_SETS.tree) : k < 0.7 ? pick(MODEL_SETS.low) : pick(MODEL_SETS.plain);
+      else if (dc < 9 || dc3 < 5) model = k < 0.6 ? pick(MODEL_SETS.tall) : pick(MODEL_SETS.mid);
+      else if (dc < 20 || dc3 < 12) model = k < 0.12 ? pick(MODEL_SETS.tall) : k < 0.6 ? pick(MODEL_SETS.mid) : pick(MODEL_SETS.plain);
+      else model = k < 0.14 ? pick(MODEL_SETS.tree) : k < 0.55 ? pick(MODEL_SETS.plain) : k < 0.82 ? pick(MODEL_SETS.low) : pick(MODEL_SETS.mid);
+
+      // face the nearest street
+      let yaw = Math.floor(r() * 4) * (Math.PI / 2);
+      if (near) {
+        const s = near.seg;
+        yaw = Math.atan2(s.bx - s.ax, s.bz - s.az);
       }
-      else if (dc < 60 || dc2 < 40) model = r() < 0.6 ? pick(MODEL_SETS.mid) : pick(MODEL_SETS.plain);
-      else {
-        const k = r();
-        model = k < 0.12 ? pick(MODEL_SETS.tree) : k < 0.55 ? pick(MODEL_SETS.plain) : k < 0.8 ? pick(MODEL_SETS.low) : pick(MODEL_SETS.mid);
-      }
-      out.push({ model, x, z, yaw: Math.floor(r() * 4), s: BUILD_SCALE });
+      const scale = model.startsWith('suburban/tree') ? BUILD_SCALE * 1.2 : BUILD_SCALE;
+      out.push({ model, x: jx, z: jz, yaw, s: scale });
     }
   }
   return out;

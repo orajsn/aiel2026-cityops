@@ -1,26 +1,9 @@
 import * as THREE from 'three';
 import { project } from '../content/geo';
+import riverJson from '../content/river.json';
 
-/** The Chao Phraya, north to south, simplified. [lat, lon] pairs. */
-const RIVER_LATLON: [number, number][] = [
-  [13.86, 100.525],
-  [13.81, 100.508],
-  [13.78, 100.498],
-  [13.755, 100.488],
-  [13.738, 100.492],
-  [13.722, 100.506],
-  [13.708, 100.513],
-  [13.698, 100.525],
-  [13.692, 100.545],
-  [13.698, 100.565],
-  [13.69, 100.582],
-  [13.672, 100.58],
-  [13.66, 100.57],
-  [13.64, 100.565],
-  [13.6, 100.56],
-  [13.54, 100.555],
-  [13.46, 100.55],
-];
+/** The Chao Phraya centreline from OpenStreetMap (tools/build_roads.py), north to south. [lat, lon]. */
+const RIVER_LATLON = riverJson as [number, number][];
 
 export const RIVER_CURVE = new THREE.CatmullRomCurve3(
   RIVER_LATLON.map(([lat, lon]) => {
@@ -29,14 +12,15 @@ export const RIVER_CURVE = new THREE.CatmullRomCurve3(
   }),
   false,
   'centripetal',
+  0.2,
 );
 
-/** Half width of the river at curve parameter t (0 north, 1 south). */
-export function riverHalfWidth(t: number): number {
-  return 7 + 9 * t;
+/** Half width of the river in scene units (exaggerated for the diorama look). */
+export function riverHalfWidth(_t: number): number {
+  return 4.5;
 }
 
-const SAMPLES = 160;
+const SAMPLES = 400;
 const samples: THREE.Vector3[] = RIVER_CURVE.getSpacedPoints(SAMPLES);
 
 /** Approximate distance from (x, z) to the river centre line, and the t there. */
@@ -68,7 +52,7 @@ export function isWater(x: number, z: number, margin = 0): boolean {
 }
 
 /** A flat ribbon along the river curve. uv.x across (0..1), uv.y along (0..1). */
-export function riverGeometry(segments = 200): THREE.BufferGeometry {
+export function riverGeometry(segments = 600): THREE.BufferGeometry {
   const pts = RIVER_CURVE.getSpacedPoints(segments);
   const pos: number[] = [];
   const uv: number[] = [];

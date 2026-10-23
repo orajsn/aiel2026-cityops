@@ -22,7 +22,7 @@ export function rng(seed: number): () => number {
 }
 
 /** City extent in scene units (x east, z south). */
-export const CITY_BOUNDS = { minX: -300, maxX: 260, minZ: -340, maxZ: 260 };
+export const CITY_BOUNDS = { minX: -90, maxX: 80, minZ: -103, maxZ: 103 };
 
 const CBD = project(13.728, 100.538); // Sathorn / Silom / Siam
 const CBD2 = project(13.765, 100.56); // Din Daeng / Ratchada

@@ -39,7 +39,7 @@ export const THEMES: Record<ThemeName, Theme> = {
   light: {
     name: 'light',
     bg: '#EEF2F4',
-    fogDensity: 0.0006,
+    fogDensity: 0.0016,
     ground: '#E3E7E3',
     slabEdge: '#D3CCBD',
     base: '#E9E3D6',
@@ -66,7 +66,7 @@ export const THEMES: Record<ThemeName, Theme> = {
   night: {
     name: 'night',
     bg: '#0B0E14',
-    fogDensity: 0.0024,
+    fogDensity: 0.005,
     ground: '#0c1119',
     slabEdge: '#141b27',
     base: '#182230',

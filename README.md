@@ -11,3 +11,9 @@ npm run build    # dist/
 
 Keys: ArrowRight next, ArrowLeft back, J jump menu. Any scene opens with `#scene=<id>`, for example `#scene=0.5`.
 Quality: set `localStorage.setItem('cityops.quality', 'low')` to turn bloom off.
+
+## Map data
+
+Streets, rail and the river centreline come from OpenStreetMap (© OpenStreetMap contributors, ODbL), fetched with
+`tools/build_roads.py` from an Overpass export into `src/content/roads.json` and `src/content/river.json`.
+City models are Kenney's CC0 city kits (`public/models/kenney`). Landmarks are stylised, hand-built in `src/world/LandmarksMesh.tsx`.

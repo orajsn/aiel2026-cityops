@@ -6,8 +6,8 @@ import { useUiStore } from '../engine/ui';
 import { harborBridgeFrame } from './bridgeFrame';
 import { KIT } from './kitLayout';
 
-const DECK_TILE = 6; // road-bridge tile is 1 unit, scaled to the city cell
-const DECK_Y = 1.6;
+const DECK_TILE = 2.6; // road-bridge tile is 1 unit
+const DECK_Y = 1.3;
 
 /**
  * Harbor Bridge: Kenney road-bridge tiles on bridge-pillar piers across the river,
@@ -36,15 +36,15 @@ export function HarborBridge({ inspector = false, markers = false }: { inspector
         <primitive key={x} object={deckClones[i]} position={[x, DECK_Y - 0.5, 0]} rotation={[0, Math.PI / 2, 0]} scale={DECK_TILE} />
       ))}
       {piers.map((x, i) =>
-        [-2, 2].map((z, j) => (
-          <primitive key={`${i}-${j}`} object={pillarClones[i * 2 + j]} position={[x, -0.2, z]} scale={[18, (DECK_Y + 0.2) * 2, 18]} />
+        [-0.9, 0.9].map((z, j) => (
+          <primitive key={`${i}-${j}`} object={pillarClones[i * 2 + j]} position={[x, -0.2, z]} scale={[9, (DECK_Y + 0.2) * 2, 9]} />
         )),
       )}
       {inspector && <Inspector x={pier3} y={DECK_Y + 0.3} />}
       {markers && (
         <>
-          <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={30} />
-          <Marker x={pier2} y={DECK_Y} label="Pier 2" sub="corrosion · next session" color={theme.data} delayMs={3000} labelY={18} />
+          <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={16} />
+          <Marker x={pier2} y={DECK_Y} label="Pier 2" sub="corrosion · next session" color={theme.data} delayMs={3000} labelY={10} />
         </>
       )}
     </group>
@@ -64,7 +64,7 @@ function Inspector({ x, y }: { x: number; y: number }) {
     if (light.current) light.current.target.position.set(x + 2.5 + s * 3, y - 4, 0);
   });
   return (
-    <group position={[x - 1.6, y, 2.2]}>
+    <group position={[x - 0.8, y, 1.1]} scale={0.6}>
       <mesh position={[0, 0.9, 0]} castShadow>
         <capsuleGeometry args={[0.35, 1.0, 4, 8]} />
         <meshStandardMaterial color="#f0a24a" roughness={0.8} />
@@ -107,11 +107,11 @@ function Marker({ x, y, label, sub, color, delayMs, labelY = 26 }: { x: number; 
   return (
     <group position={[x, y, 0]}>
       <mesh ref={beam} visible={false} scale={[1, 0, 1]}>
-        <cylinderGeometry args={[0.15, 0.15, 44, 8]} />
+        <cylinderGeometry args={[0.12, 0.12, 22, 8]} />
         <meshBasicMaterial color={color} transparent opacity={0.6} toneMapped={false} />
       </mesh>
       <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.6, 0]} visible={false}>
-        <ringGeometry args={[1.6, 2, 40]} />
+        <ringGeometry args={[1.0, 1.3, 40]} />
         <meshBasicMaterial ref={ringMat} color={color} transparent opacity={0.8} depthWrite={false} toneMapped={false} />
       </mesh>
       <Html position={[0, labelY, 0]} center zIndexRange={[30, 0]} style={{ pointerEvents: 'none' }}>

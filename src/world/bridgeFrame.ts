@@ -31,11 +31,11 @@ export function harborBridgeFrame(): BridgeFrame {
   const dz = -Math.sin(yaw);
   const extent = (sign: number) => {
     let d = 0;
-    while (d < 90 && isWater(c.x + dx * d * sign, c.z + dz * d * sign, 1)) d += 1;
+    while (d < 40 && isWater(c.x + dx * d * sign, c.z + dz * d * sign, 0.5)) d += 0.5;
     return d;
   };
-  const half = Math.max(extent(1), extent(-1)) + 4;
-  cached = { x: c.x, z: c.z, half, approach: 40, yaw };
+  const half = Math.max(extent(1), extent(-1)) + 2;
+  cached = { x: c.x, z: c.z, half, approach: 12, yaw };
   return cached;
 }
 
@@ -58,7 +58,7 @@ export function inBridgeCorridor(x: number, z: number, margin = 8): boolean {
 }
 
 /** True when (x, z) is on the approach road (on land, within the corridor, beyond the deck). */
-export function onBridgeApproach(x: number, z: number, halfWidth = 3.5): boolean {
+export function onBridgeApproach(x: number, z: number, halfWidth = 1.6): boolean {
   const f = harborBridgeFrame();
   const { lx, lz } = toBridgeLocal(x, z);
   return Math.abs(lz) < halfWidth && Math.abs(lx) >= f.half - 1 && Math.abs(lx) < f.half + f.approach;

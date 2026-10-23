@@ -4,8 +4,8 @@ import { Grid } from '@react-three/drei';
 import { useUiStore } from '../engine/ui';
 import { CITY_BOUNDS } from './cityLayout';
 
-export const SLAB_THICKNESS = 16;
-const MARGIN = 24;
+export const SLAB_THICKNESS = 6;
+const MARGIN = 8;
 
 /** The slab the city stands on: top face is the ground, the sides show when the camera drops below it. */
 export const SLAB = {

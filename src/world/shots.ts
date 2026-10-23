@@ -10,22 +10,22 @@ export interface Shot {
 }
 
 // Landmarks in scene units (see content/geo.ts): Harbor Bridge (23, 36), Ops Center (5, -67), CBD (-12, -29).
-export const CORE_POS: Vec3 = [-20, -170, 0];
+export const CORE_POS: Vec3 = [-5, -58, 2];
 
 export const SHOTS: Record<ShotId, Shot> = {
-  'gulf-approach': { position: [90, 170, 520], target: [20, 0, 80], durationMs: 0 },
-  'city-high': { position: [10, 150, 170], target: [-5, 0, -30], durationMs: 2500, ease: 'inOut' },
-  'city-wide': { position: [60, 200, 230], target: [0, 0, -40], durationMs: 2000, ease: 'inOut' },
-  'ops-center': { position: [40, 60, -10], target: [5, 6, -67], durationMs: 2000, ease: 'inOut' },
-  'bridge-pier3': { position: [52, 22, 70], target: [23, 2, 36], durationMs: 2200, ease: 'inOut' },
-  'bridge-pier2': { position: [0, 14, 62], target: [20, 4, 38], durationMs: 1600, ease: 'inOut' },
-  'bridge-overview': { position: [78, 58, 112], target: [18, 2, 28], durationMs: 2200, ease: 'inOut' },
-  'core-dive': { position: [30, 60, 560], target: [-20, -96, -10], durationMs: 2500, ease: 'inOut' },
-  'core-face-tables': { position: [-250, -120, 270], target: [-270, -180, 0], durationMs: 1400, ease: 'inOut' },
-  'core-face-json': { position: [-125, -120, 270], target: [-145, -180, 0], durationMs: 1400, ease: 'inOut' },
-  'core-face-graph': { position: [150, -40, 430], target: [80, -125, -20], durationMs: 1400, ease: 'inOut' },
-  'core-face-vectors': { position: [250, -120, 270], target: [230, -178, 0], durationMs: 1400, ease: 'inOut' },
-  'vector-field': { position: [185, -130, 230], target: [170, -180, 0], durationMs: 1600, ease: 'inOut' },
+  'gulf-approach': { position: [50, 90, 300], target: [20, 0, 60], durationMs: 0 },
+  'city-high': { position: [6, 72, 92], target: [-6, 0, -14], durationMs: 2500, ease: 'inOut' },
+  'city-wide': { position: [26, 100, 118], target: [-2, 0, -18], durationMs: 2000, ease: 'inOut' },
+  'ops-center': { position: [30, 40, -10], target: [5, 3, -67], durationMs: 2000, ease: 'inOut' },
+  'bridge-pier3': { position: [52, 14, 40], target: [35, 1.5, 17], durationMs: 2200, ease: 'inOut' },
+  'bridge-pier2': { position: [20, 10, 38], target: [34, 1.5, 19], durationMs: 1600, ease: 'inOut' },
+  'bridge-overview': { position: [66, 34, 58], target: [33, 1, 14], durationMs: 2200, ease: 'inOut' },
+  'core-dive': { position: [10, 22, 205], target: [-5, -36, -3], durationMs: 2500, ease: 'inOut' },
+  'core-face-tables': { position: [-86, -40, 94], target: [-90, -62, 2], durationMs: 1400, ease: 'inOut' },
+  'core-face-json': { position: [-46, -40, 94], target: [-54, -62, 2], durationMs: 1400, ease: 'inOut' },
+  'core-face-graph': { position: [50, -14, 150], target: [26, -44, -6], durationMs: 1400, ease: 'inOut' },
+  'core-face-vectors': { position: [84, -40, 94], target: [74, -61, 2], durationMs: 1400, ease: 'inOut' },
+  'vector-field': { position: [84, -40, 94], target: [74, -61, 2], durationMs: 1600, ease: 'inOut' },
   'memory-room': { position: [260, 20, 220], target: [300, 8, 180], durationMs: 2000, ease: 'inOut' },
   'toolbelt-wall': { position: [-260, 20, 220], target: [-300, 8, 180], durationMs: 2000, ease: 'inOut' },
 };
