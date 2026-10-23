@@ -9,6 +9,10 @@ export interface Theme {
   bg: string;
   fogDensity: number;
   ground: string;
+  /** side faces of the city slab */
+  slabEdge: string;
+  /** the base the database and the four shapes stand on */
+  base: string;
   grid: boolean;
   waterBase: string;
   waterGlow: string;
@@ -35,8 +39,10 @@ export const THEMES: Record<ThemeName, Theme> = {
   light: {
     name: 'light',
     bg: '#EEF2F4',
-    fogDensity: 0.0011,
+    fogDensity: 0.0006,
     ground: '#E3E7E3',
+    slabEdge: '#D3CCBD',
+    base: '#E9E3D6',
     grid: false,
     waterBase: '#9CC5D4',
     waterGlow: '#C9E6EE',
@@ -62,6 +68,8 @@ export const THEMES: Record<ThemeName, Theme> = {
     bg: '#0B0E14',
     fogDensity: 0.0024,
     ground: '#0c1119',
+    slabEdge: '#141b27',
+    base: '#182230',
     grid: true,
     waterBase: '#07161d',
     waterGlow: '#1B8A9C',

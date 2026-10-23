@@ -7,7 +7,7 @@ import { Effects } from './Effects';
 import { AssetPins } from './AssetPins';
 import { CameraRig } from './CameraRig';
 import { DataStream } from './DataStream';
-import { OracleCore, type Face } from './OracleCore';
+import { DatabaseDiorama, type Face } from './DatabaseDiorama';
 import { GraphLines, edgesFor } from './GraphLines';
 import { VectorField, type VectorFieldProps } from './VectorField';
 import { HarborBridge } from './HarborBridge';
@@ -37,7 +37,7 @@ export function World() {
       <City />
       {w.pins && <AssetPins visible={w.pins} highlight={w.highlight} />}
       <DataStream running={!!w.dataStream} />
-      {w.core && <OracleCore face={w.core} />}
+      {w.core && <DatabaseDiorama face={w.core} />}
       {(w.graph || w.core === 'graph') && (
         <GraphLines
           edges={edgesFor(typeof w.graph === 'string' ? w.graph : undefined)}

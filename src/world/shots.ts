@@ -10,7 +10,7 @@ export interface Shot {
 }
 
 // Landmarks in scene units (see content/geo.ts): Harbor Bridge (23, 36), Ops Center (5, -67), CBD (-12, -29).
-export const CORE_POS: Vec3 = [0, -80, -20];
+export const CORE_POS: Vec3 = [-20, -170, 0];
 
 export const SHOTS: Record<ShotId, Shot> = {
   'gulf-approach': { position: [90, 170, 520], target: [20, 0, 80], durationMs: 0 },
@@ -20,12 +20,12 @@ export const SHOTS: Record<ShotId, Shot> = {
   'bridge-pier3': { position: [52, 22, 70], target: [23, 2, 36], durationMs: 2200, ease: 'inOut' },
   'bridge-pier2': { position: [0, 14, 62], target: [20, 4, 38], durationMs: 1600, ease: 'inOut' },
   'bridge-overview': { position: [78, 58, 112], target: [18, 2, 28], durationMs: 2200, ease: 'inOut' },
-  'core-dive': { position: [0, -30, 215], target: CORE_POS, durationMs: 2500, ease: 'inOut' },
-  'core-face-tables': { position: [-110, -60, 130], target: [-30, -84, -20], durationMs: 1400, ease: 'inOut' },
-  'core-face-json': { position: [110, -60, 130], target: [30, -84, -20], durationMs: 1400, ease: 'inOut' },
-  'core-face-graph': { position: [0, -70, 190], target: [0, -20, -40], durationMs: 1400, ease: 'inOut' },
-  'core-face-vectors': { position: [-40, -80, 175], target: [-10, -86, 30], durationMs: 1400, ease: 'inOut' },
-  'vector-field': { position: [0, -70, 70], target: CORE_POS, durationMs: 1600, ease: 'inOut' },
+  'core-dive': { position: [30, 60, 560], target: [-20, -96, -10], durationMs: 2500, ease: 'inOut' },
+  'core-face-tables': { position: [-250, -120, 270], target: [-270, -180, 0], durationMs: 1400, ease: 'inOut' },
+  'core-face-json': { position: [-125, -120, 270], target: [-145, -180, 0], durationMs: 1400, ease: 'inOut' },
+  'core-face-graph': { position: [150, -40, 430], target: [80, -125, -20], durationMs: 1400, ease: 'inOut' },
+  'core-face-vectors': { position: [250, -120, 270], target: [230, -178, 0], durationMs: 1400, ease: 'inOut' },
+  'vector-field': { position: [185, -130, 230], target: [170, -180, 0], durationMs: 1600, ease: 'inOut' },
   'memory-room': { position: [260, 20, 220], target: [300, 8, 180], durationMs: 2000, ease: 'inOut' },
   'toolbelt-wall': { position: [-260, 20, 220], target: [-300, 8, 180], durationMs: 2000, ease: 'inOut' },
 };
