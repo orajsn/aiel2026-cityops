@@ -5,6 +5,7 @@ import { useSceneStore } from '../engine/store';
 import { useUiStore } from '../engine/ui';
 import { OVERLAYS } from './registry';
 import { HandoffCard } from './HandoffCard';
+import { JupyterDrawer } from './jupyter/JupyterDrawer';
 import { JumpMenu } from './JumpMenu';
 import { CameraEditor } from './CameraEditor';
 import { useCameraStore } from '../engine/camera';
@@ -71,6 +72,9 @@ export function Overlay() {
       </AnimatePresence>
 
       {scene.card && settled && <HandoffCard card={scene.card} />}
+
+      {/* lab guide: on a page with a notebook stop, the Jupyter drawer waits on the left edge */}
+      {settled && <JupyterDrawer key={scene.id} sceneId={scene.id} />}
 
       {/* presenter script under the page; CC (or S) hides it */}
       {scene.script && scriptOpen && (
