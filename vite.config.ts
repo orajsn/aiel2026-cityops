@@ -42,8 +42,9 @@ export default defineConfig({
   plugins: [react(), cameraOverrides()],
   base: './',
   build: { assetsInlineLimit: 0 },
-  // the saved-angles file changes while presenting: do not reload the page when it does
-  server: { port: 5173, strictPort: false, watch: { ignored: ['**/src/content/cameraOverrides.json'] }, allowedHosts: TUNNEL_HOSTS },
+  // the saved-angles file changes while presenting: do not reload the page when it does. Polling: on this
+  // machine the file-change events were sometimes missed and the server kept serving stale code.
+  server: { port: 5173, strictPort: false, watch: { ignored: ['**/src/content/cameraOverrides.json', '**/public/**'], usePolling: true, interval: 400 }, allowedHosts: TUNNEL_HOSTS },
   test: {
     environment: 'jsdom',
     globals: true,
