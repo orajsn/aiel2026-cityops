@@ -36,7 +36,7 @@ const ease = (t: number) => {
 export const MIN_LABEL_PX = 20;
 export const MAX_LABEL_PX = 48;
 /** a label may grow up to this many times the space it was designed for to reach 20 px; any more and it hides */
-const ROOM = 1.6;
+const ROOM = 1.9;
 const STAGE_H = 1080;
 
 /**
@@ -117,14 +117,14 @@ export function Label({ text, position, size = 0.16, color = INK, weight = 500, 
   );
 }
 
-export function DataShape({ kind, lit = false, title = true }: { kind: DataKind; lit?: boolean; title?: boolean }) {
+export function DataShape({ kind, lit = false, title = true, caption }: { kind: DataKind; lit?: boolean; title?: boolean; caption?: string }) {
   return (
     <group>
       {kind === 'table' && <TableShape lit={lit} />}
       {kind === 'json' && <JsonShape lit={lit} />}
       {kind === 'graph' && <GraphShape lit={lit} />}
       {kind === 'vectors' && <VectorShape lit={lit} />}
-      {title && <Label text={TITLES[kind]} position={[0, -1.35, 0]} size={0.24} weight={600} color={lit ? DEEP : INK} plate />}
+      {title && <Label text={caption ?? TITLES[kind]} position={[0, -1.35, 0]} size={0.24} weight={600} color={lit ? DEEP : INK} plate />}
     </group>
   );
 }
@@ -209,8 +209,8 @@ function JsonShape({ lit }: { lit: boolean }) {
       <group ref={lines}>
         {entries.map(([k, v], i) => (
           <group key={k} position={[-0.1, 0.42 - i * 0.27, 0]}>
-            <Label text={`"${k}":`} position={[-0.32, 0, 0]} size={0.14} color={DEEP} mono weight={600} />
-            <Label text={JSON.stringify(v)} position={[0.62, 0, 0]} size={0.14} color={k === 'piers' && lit ? RED : INK} mono />
+            <Label text={`"${k}":`} position={[-0.45, 0, 0]} size={0.14} color={DEEP} mono weight={600} />
+            <Label text={JSON.stringify(v)} position={[0.85, 0, 0]} size={0.14} color={k === 'piers' && lit ? RED : INK} mono />
           </group>
         ))}
       </group>

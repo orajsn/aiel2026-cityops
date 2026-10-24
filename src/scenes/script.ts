@@ -8,7 +8,7 @@ export const SCRIPT: Record<string, string> = {
   '0.2': 'Every pin is a piece of infrastructure: bridges, substations, pipelines, sensors. Twenty-eight assets. Each one has a record, a spec sheet, a history, and neighbours.',
   '0.3': 'Every day the city writes about itself: 308 logs, 60 reports, 220 findings, all flowing into the City Operations Control Center. Most of it is free text written by inspectors.',
   '0.4': 'Meet our inspector on Pier 3 of Harbor Bridge. The question is simple: what do we know about this bridge, and what should I do? The answer exists. In four shapes, in four places. The inspector has none of them.',
-  '0.5': 'The whole city runs on one Oracle AI Database. Not four databases to sync. The same engine does all four shapes.',
+  '0.5': 'To answer the inspector we need four things: the asset record, its spec sheet, what it depends on, and similar past reports. Four shapes of data. And one Oracle AI Database holds all four. Not four databases to sync.',
   '0.5a': 'First shape: tables. The asset record, CITY_ASSET and friends, rows and columns, the way the city has always kept its books.',
   '0.5b': 'Second shape: JSON. Every asset has a spec sheet with different keys, and we read it with plain dot notation in SQL.',
   '0.5c': 'Third shape: the graph. Which substation powers the bridge, which sensors watch it. Asking who is connected to whom is one query.',

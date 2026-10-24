@@ -43,7 +43,7 @@ export const chapter0: SceneDef[] = [
     title: 'One database, four shapes',
     // the database explained on the sky stage over the Ops Center, like 1.1 to 1.3
     shot: 'sky',
-    world: { sky: 'shapes', pins: 'all', highlight: ['City Operations Control Center'] },
+    world: { sky: 'shapes' },
     overlay: 'CoreCaption',
     overlayProps: { face: 'none' },
     recapMode: true,

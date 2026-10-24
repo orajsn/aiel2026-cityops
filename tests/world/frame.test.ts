@@ -71,7 +71,8 @@ test('every page at the Ops Center shows the control room; sky pages name the Op
   const w = (s: (typeof SCENES)[number]) => (s.world ?? {}) as { ops?: boolean; highlight?: string[] };
   expect(SCENES.filter((s) => s.shot === 'ops' && !w(s).ops).map((s) => s.id)).toEqual([]);
   expect(SCENES.filter((s) => s.shot !== 'ops' && w(s).ops).map((s) => s.id)).toEqual([]);
-  expect(SCENES.filter((s) => s.shot === 'sky' && !(w(s).highlight ?? []).includes('City Operations Control Center')).map((s) => s.id)).toEqual([]);
+  // 0.5 is the exception: the pieces fly up from the bridge, and pins rising in the camera's path got in the way
+  expect(SCENES.filter((s) => s.shot === 'sky' && s.id !== '0.5' && !(w(s).highlight ?? []).includes('City Operations Control Center')).map((s) => s.id)).toEqual([]);
 });
 
 test('screenPoint is the inverse of projectToScreen', async () => {
