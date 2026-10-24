@@ -165,8 +165,8 @@
   "type": "ops",
   "district": "Din Daeng",
   "criticality": 5,
-  "lat": 13.73498,
-  "lon": 100.53,
+  "lat": 13.72526,
+  "lon": 100.519,
   "specs": {
    "operators_on_shift": 12,
    "screens": 48,

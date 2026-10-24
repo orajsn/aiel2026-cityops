@@ -16,11 +16,19 @@ test('t beyond 1 is clamped to the end pose', () => {
   expect(interpolateShot(a, b, 2)).toEqual({ position: [10, 20, 30], target: [10, 0, -20] });
 });
 
-test('inOut easing passes through the midpoint at t = 0.5', () => {
-  const m = interpolateShot(a, b, 0.5);
-  expect(Math.abs(m.position[0] - 5)).toBeLessThan(1e-6);
-  expect(Math.abs(m.position[1] - 10)).toBeLessThan(1e-6);
-  expect(Math.abs(m.target[2] - -15)).toBeLessThan(1e-6);
+test('a sideways move at the same distance looks half way between the targets half way through', () => {
+  const p: Shot = { position: [0, 10, 10], target: [0, 0, 0], durationMs: 1000 };
+  const q: Shot = { position: [20, 10, 10], target: [20, 0, 0], durationMs: 1000 };
+  const m = interpolateShot(p, q, 0.5);
+  expect(m.target[0]).toBeCloseTo(10, 3);
+  expect(m.position[1]).toBeCloseTo(10, 3);
+});
+
+test('moving from a close-up, the view slides slowly while close and faster once pulled back', () => {
+  const close: Shot = { position: [0, 0.5, 1], target: [0, 0, 0], durationMs: 1000 };
+  const far: Shot = { position: [20, 12, 24], target: [20, 0, 0], durationMs: 1000 };
+  const early = interpolateShot(close, far, 0.2).target[0];
+  expect(early).toBeLessThan(20 * 0.2 * 0.5); // well behind a straight-line pan
 });
 
 test('the named shots exist', () => {

@@ -1,10 +1,10 @@
 import { motion } from 'motion/react';
 
 const TEXT: Record<string, { title: string; body: string; code?: string }> = {
-  none: { title: 'One database, four shapes', body: 'One Oracle AI Database under the city. Not four databases to sync. The same engine does all four.' },
+  none: { title: 'One database, four shapes', body: 'One Oracle AI Database for the whole city. Not four databases to sync. The same engine does all four.' },
   tables: { title: 'Tables', body: 'Rows and columns: every asset, every log, every finding has a record.', code: 'SELECT ... FROM CITY_ASSET' },
   json: { title: 'JSON', body: 'The spec sheet travels with the asset as a document, read with dot notation.', code: 'a.specs.span_length_m' },
-  graph: { title: 'Graph', body: 'Who powers, monitors and coordinates what. Drawn on the map above.', code: 'GRAPH_TABLE(citypulse_graph ...)' },
+  graph: { title: 'Graph', body: 'Who powers, monitors and coordinates what. Drawn on the map below.', code: 'GRAPH_TABLE(citypulse_graph ...)' },
   vectors: { title: 'Vectors', body: 'Free text becomes a point. Similar narratives land close together.', code: 'VECTOR_EMBEDDING(ALL_MINILM_L12_V2 ...)' },
 };
 

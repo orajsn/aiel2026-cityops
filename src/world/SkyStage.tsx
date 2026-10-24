@@ -7,6 +7,7 @@ import { useUiStore } from '../engine/ui';
 import { FlowArc } from './FlowArc';
 import { VectorField } from './VectorField';
 import { layoutCloud, nearestK } from './vectorLayout';
+import { SkyShapes, type Face } from './SkyShapes';
 import type { Vec3 } from './shots';
 
 /**
@@ -20,8 +21,12 @@ import type { Vec3 } from './shots';
  *              the question becomes one point and its 5 nearest light up.
  *  - envelope: those 5 fly into an envelope with the question, the envelope goes to the model,
  *              and the answer comes down to the Ops Center.
+ * Acts (the city, 0.5 to 0.6):
+ *  - shapes:   one Oracle AI Database with its four shapes around it (table, JSON, graph, vectors);
+ *  - tables / json / graph / vectors: the same, with that shape lit;
+ *  - brain:    the small model alone, centre stage.
  */
-export type SkyAct = 'model' | 'embed' | 'envelope';
+export type SkyAct = 'model' | 'embed' | 'envelope' | 'shapes' | Face | 'brain';
 
 const OPS = assetPosition('City Operations Control Center');
 export const SKY_ANCHOR: Vec3 = [OPS.x, 9, OPS.z];
@@ -34,6 +39,8 @@ const ENVELOPE: Vec3 = [A[0] - 0.4, A[1] + 1.6, A[2]];
 const OPS_TOP: Vec3 = [OPS.x, 1.2, OPS.z];
 /** the question as a point in the cloud's own space (near the "structural" cluster) */
 const QUERY: Vec3 = [8, 6, -4];
+
+const SHAPE_ACTS: (SkyAct | null)[] = ['shapes', 'tables', 'json', 'graph', 'vectors'];
 
 const ease = (t: number) => {
   const c = Math.max(0, Math.min(1, t));
@@ -101,7 +108,9 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       <group position={A}>
         <group ref={root}>
           <group position={[-A[0], -A[1], -A[2]]}>
-            <ModelOrb lit={act === 'envelope' && t > 3600} doubt={act === 'model' && t > 2600} labelled={visible} />
+            {(act === 'model' || act === 'embed' || act === 'envelope') && <ModelOrb position={MODEL} lit={act === 'envelope' && t > 3600} doubt={act === 'model' && t > 2600} labelled={visible} />}
+            {act === 'brain' && <ModelOrb position={[A[0], A[1] + 0.4, A[2]]} lit={false} doubt={false} labelled={visible} scale={1.6} />}
+            {act && SHAPE_ACTS.includes(act) && <SkyShapes center={[A[0], A[1] + 0.2, A[2]]} face={act === 'shapes' ? null : (act as Face)} t={t} red={theme.red} />}
             {hasDb && <SkyDatabase color={theme.red} appearMs={0} t={t} />}
             {hasDb && (
               <group position={CLOUD} scale={CLOUD_SCALE}>
@@ -136,7 +145,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
 }
 
 /** the model: a pale orb with a slow ring; grey with a question mark when it has nothing to go on, teal when it has the evidence */
-function ModelOrb({ lit, doubt, labelled }: { lit: boolean; doubt: boolean; labelled: boolean }) {
+function ModelOrb({ position, lit, doubt, labelled, scale = 1 }: { position: Vec3; lit: boolean; doubt: boolean; labelled: boolean; scale?: number }) {
   const ring = useRef<THREE.Mesh>(null);
   const mat = useRef<THREE.MeshStandardMaterial>(null);
   const col = useMemo(() => new THREE.Color(), []);
@@ -149,7 +158,7 @@ function ModelOrb({ lit, doubt, labelled }: { lit: boolean; doubt: boolean; labe
     }
   });
   return (
-    <group position={MODEL}>
+    <group position={position} scale={scale}>
       <mesh castShadow>
         <sphereGeometry args={[0.75, 32, 32]} />
         <meshStandardMaterial ref={mat} color="#e8eef2" roughness={0.35} metalness={0.1} />

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useSceneStore } from '../engine/store';
 import { shotForScene, useCameraStore } from '../engine/camera';
-import { SHOTS, interpolateShot, type Shot, type Vec3 } from './shots';
+import { SHOTS, interpolateShot, moveDuration, type Shot, type Vec3 } from './shots';
 
 /**
  * Flies the camera from its live pose to the current page's camera: the owner's saved angle for the
@@ -45,7 +45,8 @@ export function CameraRig() {
     }
     wasEditing.current = false;
     setSettled(false);
-    tween.current = { from, to: { ...to, durationMs: Math.max(to.durationMs, 900) }, start: performance.now() + (cut ? 400 : 0) };
+    // as long as the move needs to stay calm (shots.ts CALM), never shorter than the page's own time
+    tween.current = { from, to: { ...to, durationMs: moveDuration(from, to) }, start: performance.now() + (cut ? 400 : 0) };
   }, [scene, camera, setSettled, editing, saved]);
 
   useFrame(() => {

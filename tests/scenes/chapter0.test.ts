@@ -22,8 +22,12 @@ test('every shot and overlay referenced by chapter 0 exists', () => {
   }
 });
 
-test('the core dive has four face sub-scenes', () => {
-  const faces = chapter0.filter((s) => s.id.startsWith('0.5') && s.id !== '0.5').map((s) => s.world?.core);
+test('the database pages sit on the sky stage, one page lighting each of the four shapes', () => {
+  const pages = chapter0.filter((s) => s.id.startsWith('0.5') || s.id === '0.6');
+  expect(pages.every((s) => s.shot === 'sky')).toBe(true);
+  expect(chapter0.find((s) => s.id === '0.5')!.world?.sky).toBe('shapes');
+  expect(chapter0.find((s) => s.id === '0.6')!.world?.sky).toBe('brain');
+  const faces = chapter0.filter((s) => s.id.startsWith('0.5') && s.id !== '0.5').map((s) => s.world?.sky);
   expect(faces).toEqual(['tables', 'json', 'graph', 'vectors']);
 });
 
