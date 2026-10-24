@@ -425,3 +425,31 @@ code,
 .sky-card.tone-grey { --tone: #9aa1aa; }
 .sky-card__who { font-size: 14px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 6px; }
 .sky-card__text { font-size: 22px; line-height: 1.35; color: var(--ink); }
+
+/* Lab 2 page 5 · tools and the skill (Toolbelt.tsx): cards beside the 3D database and model */
+.tb { position: absolute; inset: 0; pointer-events: none; }
+.tb__svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tb__head { position: absolute; font-size: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dim); background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 6px; }
+.tb__card { position: absolute; box-sizing: border-box; padding: 12px 18px; border-radius: 12px; background: var(--panel-strong); border-left: 5px solid var(--teal); box-shadow: 0 6px 20px rgba(0,0,0,0.14); display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+.tb__card--mem { border-left-color: #9aa1aa; }
+.tb__name { font-size: 22px; font-weight: 700; color: var(--ink); }
+.tb__reads { font-size: 17px; color: var(--ink-dim); }
+.tb__shape { color: var(--teal); font-weight: 700; }
+.tb__sop { position: absolute; box-sizing: border-box; padding: 16px 22px; border-radius: 14px; background: var(--panel-strong); border-top: 5px solid #d99a2b; box-shadow: 0 6px 20px rgba(0,0,0,0.14); display: flex; flex-direction: column; gap: 10px; }
+.tb__sop-kicker { font-size: 14px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dim); }
+.tb__sop-title { font-size: 24px; font-weight: 700; color: var(--ink); }
+.tb__steps { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 18px; color: var(--ink); }
+.tb__step i { display: inline-flex; width: 24px; height: 24px; border-radius: 50%; background: var(--teal); color: #fff; font-style: normal; font-weight: 700; font-size: 14px; align-items: center; justify-content: center; margin-right: 4px; }
+.tb__step + .tb__step::before { content: '\2192'; color: var(--ink-dim); margin-right: 10px; }
+.tb__red { font-size: 19px; font-weight: 700; color: var(--red); }
+/* Lab 2 page 6 · the one brief (UnifiedQuery.tsx) */
+.uq__brief { position: absolute; box-sizing: border-box; padding: 14px 20px; border-radius: 14px; background: var(--panel-strong); border-top: 5px solid var(--red); box-shadow: 0 6px 20px rgba(0,0,0,0.14); }
+.uq__kicker { font-size: 14px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--red); }
+.uq__query { font-family: var(--font-mono); font-size: 14px; color: var(--ink-dim); margin: 6px 0 10px; }
+.uq__parts { list-style: none; margin: 0; padding: 0; }
+.uq__parts li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px solid var(--line); font-size: 18px; color: var(--ink); }
+.uq__parts b { font-weight: 700; }
+.uq__parts span { color: var(--ink-dim); }
+.uq .board__head { font-size: 22px; gap: 10px; }
+.uq .board__shape { font-size: 17px; }
+.uq__tick { width: 26px; height: 26px; border-radius: 50%; background: var(--red); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; flex: none; }

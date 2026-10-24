@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
-import { ASSETS, assetPosition, project } from '../content/geo';
+import { ASSETS, project } from '../content/geo';
 import { useUiStore } from '../engine/ui';
 import { FlowArc } from './FlowArc';
 import { VectorField } from './VectorField';
@@ -10,7 +10,10 @@ import { layoutCloud, nearestK } from './vectorLayout';
 import { SkyShapes } from './SkyShapes';
 import { SkyLab2, type Lab2Act } from './SkyLab2';
 import { NeuralNet } from './NeuralNet';
-import { SHOTS, type Vec3 } from './shots';
+import type { Vec3 } from './shots';
+import { SKY_ANCHOR, MODEL, MODEL_SCALE, MODEL_IN, MODEL_OUT, DB, CLOUD, ENVELOPE, OPS_TOP, along, DB_WIDE, MODEL_WIDE, MODEL_WIDE_IN, BRIEF_AT } from './skyPlaces';
+import { UnifiedBoard } from './UnifiedBoard';
+import { boardPoint } from './answerBoard';
 
 /**
  * The sky stage: where the AI ideas are explained, floating above City Operations Control Center
@@ -27,34 +30,17 @@ import { SHOTS, type Vec3 } from './shots';
  *  - shapes:   what the inspector's answer needs: four panels (table, JSON, graph, vectors) around one Oracle AI Database;
  *  - brain:    the small model alone, centre stage.
  */
-export type SkyAct = 'model' | 'embed' | 'envelope' | 'shapes' | 'brain' | Lab2Act;
+export type SkyAct = 'model' | 'embed' | 'envelope' | 'shapes' | 'brain' | 'tools' | 'unified' | Lab2Act;
 
-const OPS = assetPosition('City Operations Control Center');
-export const SKY_ANCHOR: Vec3 = [OPS.x, 9, OPS.z];
+export { SKY_ANCHOR } from './skyPlaces';
 const A = SKY_ANCHOR;
-// the data flows left to right: the database and its vector space on the left, the language model on the right
-const MODEL: Vec3 = [A[0] + 3.0, A[1] + 0.3, A[2]];
-const MODEL_SCALE = 1.25;
-const DB: Vec3 = [A[0] - 2.8, A[1] - 1.4, A[2]];
-const CLOUD: Vec3 = [A[0] - 2.6, A[1] + 3.6, A[2]];
 const CLOUD_SCALE = 0.075;
-const ENVELOPE: Vec3 = [A[0] + 0.1, A[1] + 1.4, A[2]];
-/** the sky camera's right: the network faces the camera, so its first layer (input) is on the left */
-const RIGHT: Vec3 = (() => {
-  const [p, q] = [SHOTS.sky.position, SHOTS.sky.target];
-  const f = [q[0] - p[0], q[2] - p[2]];
-  const l = Math.hypot(f[0], f[1]) || 1;
-  return [-f[1] / l, 0, f[0] / l];
-})();
-const along = (p: Vec3, k: number): Vec3 => [p[0] + RIGHT[0] * k, p[1], p[2] + RIGHT[2] * k];
-/** where words enter the model (its first layer) and where the answer leaves (its last) */
-const MODEL_IN = along(MODEL, -1.35 * MODEL_SCALE);
-const MODEL_OUT = along(MODEL, 1.35 * MODEL_SCALE);
-const OPS_TOP: Vec3 = [OPS.x, 1.2, OPS.z];
 /** the question as a point in the cloud's own space (near the "structural" cluster) */
 const QUERY: Vec3 = [8, 6, -4];
 
-const LAB2_ACTS: (SkyAct | null)[] = ['overflow', 'tools', 'unified', 'note'];
+const LAB2_ACTS: (SkyAct | null)[] = ['overflow', 'note'];
+/** Lab 2 pages 5 and 6: the database far left, the model far right (skyPlaces), the tools or the four shapes between */
+const WIDE_ACTS: (SkyAct | null)[] = ['tools', 'unified'];
 
 /**
  * 1.1 · the bare model. The question is the lab's own (rag_to_agents_lab, scenario 1); the answer is a draft
@@ -150,6 +136,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
     <>
       {/* 0.5's board sits outside the grow-in: its pieces hand over from 0.4 without a hidden frame */}
       {act === 'shapes' && <SkyShapes red={theme.red} />}
+      {act === 'unified' && <UnifiedBoard t={t} />}
       <group name="sky-stage" visible={visible}>
       {/* scale about the anchor so the stage grows out of its own centre */}
       <group position={A}>
@@ -159,6 +146,8 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
             {act === 'brain' && <ModelOrb position={[A[0], A[1] + 0.4, A[2]]} lit doubt={false} producing labelled={visible} scale={2.2} />}
             {act && LAB2_ACTS.includes(act) && <SkyLab2 act={act as Lab2Act} center={[A[0], A[1] + 0.2, A[2]]} t={t} red={theme.red} opsTop={OPS_TOP} />}
             {hasDb && <SkyDatabase color={theme.red} appearMs={0} t={t} />}
+            {act && WIDE_ACTS.includes(act) && <SkyDatabase color={theme.red} appearMs={0} t={9999} position={DB_WIDE} />}
+            {act && WIDE_ACTS.includes(act) && <ModelOrb position={MODEL_WIDE} lit doubt={false} producing={act === 'tools' || t > 5600} labelled={visible} scale={MODEL_SCALE} />}
             {hasDb && (
               <group position={CLOUD} scale={CLOUD_SCALE}>
                 <VectorField phase={embedded ? 'embedded' : 'documents'} query={showQuery ? QUERY : undefined} k={5} spin={false} documentsOffset={[0, -14, 0]} tweenMs={1400} />
@@ -183,6 +172,9 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       {visible && act === 'model' && <FlowArc key="q-up" from={along([QUESTION_AT[0], QUESTION_AT[1] - 0.4, QUESTION_AT[2]], 1.5)} to={MODEL_IN} lift={0.4} radius={0.05} durationMs={1600} delayMs={900} fadeMs={900} color="#ffffff" />}
       {visible && act === 'embed' &&
         sources.map((s, i) => <FlowArc key={`doc-${i}`} from={s} to={DB} lift={2.5} radius={0.04} durationMs={1300} delayMs={500 + i * 180} fadeMs={600} color={theme.data} />)}
+      {/* page 6: the query comes up from the Ops Center into the database; the brief goes into the model's first layer */}
+      {visible && act === 'unified' && <FlowArc key="query" from={OPS_TOP} to={[DB_WIDE[0], DB_WIDE[1] + 0.5, DB_WIDE[2]]} lift={1.2} radius={0.05} durationMs={1200} delayMs={200} fadeMs={800} color="#ffffff" />}
+      {visible && act === 'unified' && <FlowArc key="brief" from={boardPoint(BRIEF_AT.x, BRIEF_AT.y + 0.17)} to={MODEL_WIDE_IN} lift={0.3} radius={0.05} durationMs={1200} delayMs={4600} persist color="#C74634" />}
       {visible && act === 'envelope' && <FlowArc key="answer" from={MODEL_OUT} to={OPS_TOP} lift={0.2} radius={0.06} durationMs={1500} delayMs={4600} persist color={theme.data} />}
       {/* 1.1: the inspector's question goes in bare, and a general guess comes out */}
       {visible && act === 'model' && <SkyCard position={QUESTION_AT} who="the question" text={BARE_Q} show={t > 200} />}
@@ -213,9 +205,9 @@ function ModelOrb({ position, lit, doubt, labelled, producing, scale = 1 }: { po
 }
 
 /** the Oracle database: three red discs, rising in one after another */
-function SkyDatabase({ color, t }: { color: string; appearMs: number; t: number }) {
+function SkyDatabase({ color, t, position = DB }: { color: string; appearMs: number; t: number; position?: Vec3 }) {
   return (
-    <group position={DB}>
+    <group position={position}>
       {[0, 1, 2].map((i) => {
         const k = ease((t - i * 180) / 700);
         return (

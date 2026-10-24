@@ -1,16 +1,13 @@
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { Line } from '@react-three/drei';
 import { ASSETS, project } from '../content/geo';
 import { FlowArc } from './FlowArc';
 import { Stack } from './SkyShapes';
-import { NeuralNet } from './NeuralNet';
-import { layoutCloud } from './vectorLayout';
 import type { Vec3 } from './shots';
 
 /** Lab 2 ideas on the sky stage after RAG (1.4 to 1.8). All positions are relative to the stage centre. */
-export type Lab2Act = 'overflow' | 'tools' | 'unified' | 'note';
+export type Lab2Act = 'overflow' | 'note';
 
 const ease = (t: number) => {
   const c = Math.max(0, Math.min(1, t));
@@ -72,8 +69,6 @@ export function SkyLab2({ act, center, t, red, opsTop }: { act: Lab2Act; center:
     // drawn around the origin, then placed at the stage centre one and a half times larger so the cards read
     <group name={`sky-${act}`} position={center} scale={LAB2_SCALE}>
       {act === 'overflow' && <Overflow c={O} t={t} opsTop={local(opsTop, center)} />}
-      {act === 'tools' && <Tools c={O} t={t} red={red} />}
-      {act === 'unified' && <Unified c={O} t={t} red={red} opsTop={local(opsTop, center)} center={center} />}
       {act === 'note' && <Note c={O} t={t} red={red} center={center} />}
     </group>
   );
@@ -120,83 +115,6 @@ function Overflow({ c, t, opsTop }: { c: Vec3; t: number; opsTop: Vec3 }) {
           </group>
         );
       })}
-    </group>
-  );
-}
-
-/* 1.5 · the toolbelt: tools circle the model, each wired to one place in the database; the SOP clipboard */
-function Tools({ c, t, red }: { c: Vec3; t: number; red: string }) {
-  const model = add(c, [-1.8, 0.5, 0]);
-  const db = add(c, [2.4, -0.3, 0]);
-  const tools = ['get_asset_incident_brief', 'recall', 'remember'];
-  return (
-    <group>
-      {/* the language model, thinking with its tools */}
-      <group position={model} scale={0.6}>
-        <NeuralNet producing />
-      </group>
-      <group position={db}>
-        <Stack red={red} t={9999} />
-      </group>
-      <group position={model}>
-        {tools.map((name, i) => {
-          // a still arc in front of the model, every card facing the camera
-          const k = ease((t - 400 - i * 300) / 700);
-          const p: Vec3 = [(i - 1) * 1.85, 1.25 + (i === 1 ? 0.35 : 0), 0.6];
-          return <TextCard key={name} title={name} lines={['one place in the database']} width={1.7} position={p} scale={Math.max(0.001, k)} />;
-        })}
-      </group>
-      {/* one wire per tool from the model into the database */}
-      {tools.map((_, i) => (
-        <Line key={i} points={[add(model, [0.6, (i - 1) * 0.25, 0]), add(db, [-1.1, (i - 1) * 0.35, 0])]} color={TEAL} lineWidth={1.5} transparent opacity={ease((t - 1400 - i * 200) / 500) * 0.8} dashed dashSize={0.15} gapSize={0.1} />
-      ))}
-      <TextCard title="INCIDENT_TRIAGE_SKILL" lines={['the procedure (SOP)', '!section loss > 25%']} tone={AMBER} width={2.0} position={add(c, [-1.6, -1.7, 0.2])} scale={ease((t - 2300) / 700) || 0.001} />
-    </group>
-  );
-}
-
-/* 1.6 · one query, four shapes: one beam in, four beams out, one brief */
-function Unified({ c, t, red, opsTop, center }: { c: Vec3; t: number; red: string; opsTop: Vec3; center: Vec3 }) {
-  const db = add(c, [0, -1.2, 0]);
-  const parts: { key: string; sub: string; at: Vec3 }[] = [
-    { key: 'asset', sub: 'the row', at: add(c, [-3.2, 0.2, 0]) },
-    { key: 'specifications', sub: 'the JSON', at: add(c, [-1.25, 1.3, 0]) },
-    { key: 'graph_context', sub: 'the graph edges', at: add(c, [1.25, 1.3, 0]) },
-    { key: 'ranked_evidence', sub: 'the ranked vectors', at: add(c, [3.2, 0.2, 0]) },
-  ];
-  const brief = add(c, [0, 3.0, 0]);
-  const hb = ASSETS.find((a) => a.id === 'Harbor Bridge')!;
-  const hbp = project(hb.lat, hb.lon);
-  const cloud = useMemo(() => layoutCloud(60, 5).map((p) => [p[0] * 0.012, p[1] * 0.012, p[2] * 0.004] as Vec3), []);
-  return (
-    <group>
-      <group position={db}>
-        <Stack red={red} t={9999} />
-      </group>
-      {/* the one query, from the Ops Center into the database */}
-      <FlowArc from={opsTop} to={add(db, [0, 0.4, 0])} lift={1.2} radius={0.05} durationMs={1200} delayMs={200} fadeMs={800} color="#ffffff" />
-      {parts.map((p, i) => {
-        const k = ease((t - 1500 - i * 250) / 600);
-        return (
-          <group key={p.key}>
-            <Line points={[add(db, [0, 0.4, 0]), p.at]} color={TEAL} lineWidth={2} transparent opacity={0.8 * k} />
-            <TextCard title={p.key} lines={[p.sub]} width={1.7} position={p.at} scale={Math.max(0.001, k)} />
-            {/* and from each part, into the one brief */}
-            <Line points={[p.at, brief]} color={RED} lineWidth={1.5} transparent opacity={0.7 * ease((t - 3200 - i * 150) / 500)} dashed dashSize={0.12} gapSize={0.08} />
-          </group>
-        );
-      })}
-      {/* the graph part draws its edges down onto the real pins: Harbor Bridge and its neighbours */}
-      <FlowArc from={add(c, [1.25, 1.0, 0])} to={local([hbp.x, 1.1, hbp.z], center)} lift={0.6} radius={0.03} durationMs={1200} delayMs={2100} persist color={TEAL} />
-      <group position={add(c, [3.2, -0.65, 0.1])} scale={ease((t - 2200) / 600) || 0.001}>
-        {cloud.map((q, i) => (
-          <mesh key={i} position={q}>
-            <octahedronGeometry args={[0.03, 0]} />
-            <meshBasicMaterial color={i < 5 ? RED : TEAL} />
-          </mesh>
-        ))}
-      </group>
-      <TextCard title="one brief · one SQL" lines={['asset · specifications', 'graph_context · ranked_evidence']} tone={RED} width={2.4} position={brief} scale={ease((t - 3600) / 600) || 0.001} />
     </group>
   );
 }

@@ -42,19 +42,25 @@ const b14 = beat(1, '2.4', 'One envelope is not enough', 'sky', {
   message: 'RAG answers **one question**. Operations ask **three at once**.',
 }, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'overflow' });
 
-const b15 = beat(1, '2.5', 'The toolbelt', 'sky', {
-  kicker: 'The toolbelt',
-  notebook: 'rag_to_agents_lab.ipynb · Section 3, tools and INCIDENT_TRIAGE_SKILL',
-  visual: { kind: 'none' },
-  message: 'The model only sees each card’s **name and description**. Docstrings are **prompt engineering**.',
-}, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'tools' });
+const b15: SceneDef = {
+  id: '2.5',
+  chapter: 1,
+  title: 'Tools and the skill',
+  shot: 'sky',
+  world: { pins: 'all', sky: 'tools' },
+  overlay: 'Toolbelt',
+  overlayProps: { message: '**Tools** are what the agent can do. **The skill** is how you want it done.' },
+};
 
-const b16 = beat(1, '2.6', 'One query, four shapes', 'sky', {
-  kicker: 'UNIFIED_SQL',
-  notebook: 'rag_to_agents_lab.ipynb · Section 4, UNIFIED_SQL',
-  visual: { kind: 'none' },
-  message: 'No ETL, no sync, **one transaction**.',
-}, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'unified' });
+const b16: SceneDef = {
+  id: '2.6',
+  chapter: 1,
+  title: 'One query, four shapes',
+  shot: 'sky',
+  world: { pins: 'all', sky: 'unified' },
+  overlay: 'UnifiedQuery',
+  overlayProps: { message: '**One call, four data models, one transaction.** No ETL, no sync jobs, no stale copies.' },
+};
 
 const b17 = beat(1, '2.7', 'The agent loop', 'bridge', {
   kicker: 'Agent · the crack report arrives',
