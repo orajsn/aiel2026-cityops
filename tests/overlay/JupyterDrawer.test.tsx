@@ -123,7 +123,10 @@ test('notebook text: bold that contains an asterisk (CITY_*) still renders bold,
 });
 
 test('iPad: the drawer adds no full-screen layer over the page buttons, and its notebook scrolls by finger', async () => {
-  const css = (await import('../../src/styles.css?raw')).default as string;
+  // read from disk: vitest blanks CSS modules (even ?raw); the project has no Node types, hence the expect-error
+  // @ts-expect-error node:fs has no type declarations here
+  const fs = (await import('node:fs')) as { readFileSync(p: string, enc: string): string };
+  const css = fs.readFileSync('src/styles.css', 'utf8');
   const rule = (sel: string) => css.match(new RegExp(`\n${sel.replace('.', '\.')} \{([^}]*)\}`))?.[1] ?? '';
   // the wrapper is a zero-size anchor: only the handle and the open panel take touches
   expect(rule('.jd')).toMatch(/width: 0/);
