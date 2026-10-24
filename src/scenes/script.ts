@@ -25,7 +25,9 @@ export const SCRIPT: Record<string, string> = {
 
   // Chapter 2 · Agent Memory
   '2.0': 'Welcome back to the same city. Same city, same database, same bridge. Now, memory.',
-  '2.1': 'On Day 1, Evelyn Mercer tells the copilot what she found on Pier 2. On Day 5, Jordan Vance asks about the same pier and gets a generic answer. Nothing was kept. Every session is a first date.',
+  '2.1a': 'Day 1. Evelyn Mercer is at Pier 2. She tells the copilot what she found, what she advises and what needs follow-up. The copilot says: noted.',
+  '2.1b': 'Then the chat closes. Mercer goes home, and everything she told the copilot goes with the session. Nothing carried over.',
+  '2.1c': 'Day 2. Jordan Vance comes to the same rust and asks what happened here. The copilot has nothing. Same questions again, the earlier advice is missing, and the follow-up is out of view. The records may still exist. The next visit needs a way to find and use the relevant history.',
   '2.2': 'An agent needs several kinds of memory. Short-term on the desk: the context window and the session. Long-term on the shelves: procedures, episodes, facts. And a shared shelf everyone can read. Several kinds of memory, doing different jobs, in one store.',
   '2.3': 'The context window is a glass. Pour in too much and it overflows; pour in noise and the small detail gets lost; the right fact can still arrive at the wrong turn. The context window is the model’s whole world, and it is a curation problem.',
   '2.4': 'Three dials decide what goes in the glass: memory engineering, context engineering and harness engineering. Three disciplines, one job: the right tokens in, the wrong ones out.',
@@ -38,7 +40,7 @@ export const SCRIPT: Record<string, string> = {
   '2.11': 'Three keys decide who sees what: user, agent and thread. Vance cannot open Mercer’s private door, but he finds her guideline in the shared hall. This is a SQL WHERE clause, not a Python filter.',
   '2.12': 'Here is one copilot turn, step by step, and the context card it builds: a summary, the topics, the relevant information and the recent messages. This is the prompt the model actually receives.',
   '2.13': 'Day 1. Mercer at Pier 2: about 25 percent section loss, rust bleed. She logs the finding: corrosion, medium, grade C, repair within 60 days, and her guideline lands on the shared shelf for Harbor Bridge. This is what the next inspector inherits.',
-  '2.14': 'Day N. Vance stands at the same pier. He has never met Mercer. Two beams reach back: her logged finding and the pooled guideline, while his own thread stays private. No human handoff. The finding and the distilled memory carried it.',
+  '2.14': 'Day 2. Vance stands at the same pier. He has never met Mercer. Two beams reach back: her logged finding and the pooled guideline, while his own thread stays private. No human handoff. The finding and the distilled memory carried it.',
   '2.15': 'Same question, asked twice. Without memory: a generic answer. With memory: Pier 2, about 25 percent, grade C, 60 days, Mercer, Day 1. Same model. Same question. Only the memory differs.',
   '2.16': 'And here both labs meet. This afternoon’s rule says act when section loss passes 25 percent. Today’s finding says about 25 percent. This afternoon the agent had the rule. Now it has the history. Together they make the call.',
   '2.17': 'Three things to take home: memory is the foundation, scope is governance, and it all lives in one converged database. The rule from this afternoon, the history from today. The same database held both. Now scan the code for the quiz.',

@@ -23,7 +23,7 @@ const STEEL = '#e9e2d2';
  * inspection platforms on Pier 3 and Pier 2 with the damage on the pier faces, the inspector, and
  * the two incident markers. Always part of the city; `inspect` and `markers` only add the story props.
  */
-export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: 'pier3' | 'pier2'; who: Who }; markers?: boolean }) {
+export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: 'pier3' | 'pier2'; who: Who; leave?: boolean }; markers?: boolean }) {
   const f0 = useMemo(() => harborBridgeFrame(), []);
   // work in structure units inside a group scaled by S, so spans still match the world
   const f = useMemo(() => ({ ...f0, water: f0.water / S, ramp: f0.ramp / S }), [f0]);
@@ -183,7 +183,7 @@ export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: '
       {/* the damage is always there; it glows when the story is about it */}
       <Crack alert={markers || inspect?.pier === 'pier3'} />
       <Corrosion alert={markers || inspect?.pier === 'pier2'} />
-      {inspect && <Inspection key={`${inspect.pier}-${inspect.who}`} pier={inspect.pier} who={inspect.who} />}
+      {inspect && <Inspection key={`${inspect.pier}-${inspect.who}${inspect.leave ? '-leave' : ''}`} pier={inspect.pier} who={inspect.who} leave={!!inspect.leave} />}
       {markers && (
         <>
           <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={10} />
@@ -278,9 +278,10 @@ function AlertRing({ position, radius, color, show }: { position: Vec3; radius: 
 
 /**
  * An inspector walks along the platform to the damage, turns to the pier and shines a torch on it;
- * once they are there, the finding is named next to it.
+ * once they are there, the finding is named next to it. With `leave` (2.1b) they start at the damage
+ * and walk back off the platform instead, torch off, and are gone once out of the shot.
  */
-function Inspection({ pier, who }: { pier: 'pier3' | 'pier2'; who: Who }) {
+function Inspection({ pier, who, leave = false }: { pier: 'pier3' | 'pier2'; who: Who; leave?: boolean }) {
   const p = BRIDGE.platforms[pier === 'pier3' ? 0 : 1];
   const d = pier === 'pier3' ? BRIDGE.damage.crack : BRIDGE.damage.corrosion;
   const floor = p.y / S + 0.04;
@@ -290,11 +291,20 @@ function Inspection({ pier, who }: { pier: 'pier3' | 'pier2'; who: Who }) {
   const spot: Vec3 = [d.x / S + DAMAGE_SHIFT, d.y / S, d.z / S];
   const facing = Math.atan2(spot[0] - to[0], spot[2] - to[2]);
   const WALK = 2600;
+  const LEAVE_DELAY = 700;
   const beam = useRef<THREE.MeshBasicMaterial>(null);
   const label = useRef<HTMLDivElement>(null);
+  const walker = useRef<THREE.Group>(null);
   const start = useRef(performance.now());
   useFrame(() => {
-    const k = Math.max(0, Math.min(1, (performance.now() - start.current - WALK - 300) / 600));
+    const t = performance.now() - start.current;
+    if (leave) {
+      if (beam.current) beam.current.opacity = 0;
+      if (label.current) label.current.style.opacity = '1';
+      if (walker.current) walker.current.visible = t < LEAVE_DELAY + WALK;
+      return;
+    }
+    const k = Math.max(0, Math.min(1, (t - WALK - 300) / 600));
     if (beam.current) beam.current.opacity = 0.22 * k;
     if (label.current) label.current.style.opacity = String(k);
   });
@@ -310,7 +320,13 @@ function Inspection({ pier, who }: { pier: 'pier3' | 'pier2'; who: Who }) {
   const red = pier === 'pier3';
   return (
     <group name={`inspection-${pier}`}>
-      <Person who={who} from={from} position={to} walkMs={WALK} delayMs={300} pose="interact-right" facing={facing} height={0.48} />
+      <group ref={walker}>
+        {leave ? (
+          <Person who={who} from={to} position={from} walkMs={WALK} delayMs={LEAVE_DELAY} pose="idle" facing={Math.atan2(from[0] - to[0], from[2] - to[2])} height={0.48} />
+        ) : (
+          <Person who={who} from={from} position={to} walkMs={WALK} delayMs={300} pose="interact-right" facing={facing} height={0.48} />
+        )}
+      </group>
       <mesh position={beamPose.mid} quaternion={beamPose.q}>
         <coneGeometry args={[0.12, beamPose.len, 20, 1, true]} />
         <meshBasicMaterial ref={beam} color="#fff0c0" transparent opacity={0} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />

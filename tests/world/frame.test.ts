@@ -59,7 +59,7 @@ test('on pages with the right-hand panel, the place the page is about sits left 
 
 test('the camera only moves when the story changes place: five places and the sky stage, at most 16 city moves in 38 pages', () => {
   const places = new Set(SCENES.filter((s) => isCity(s.shot)).map((s) => s.shot));
-  expect([...places].sort()).toEqual(['bridge', 'city', 'ops', 'pier2', 'pier2-inspect', 'pier3', 'sky']);
+  expect([...places].sort()).toEqual(['bridge', 'city', 'ops', 'pier2', 'pier2-close', 'pier2-inspect', 'pier3', 'sky']);
   let moves = 0;
   SCENES.forEach((s, i) => {
     if (i > 0 && SCENES[i - 1].shot !== s.shot && isCity(s.shot) && isCity(SCENES[i - 1].shot)) moves++;

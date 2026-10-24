@@ -8,7 +8,7 @@ import { SkyAndHorizon } from './Ground';
 /** The city: the TerraMesh Bangkok model as delivered, the boats on the real river, and Harbor Bridge. */
 export function KitCity() {
   const sceneWorld = useSceneStore((s) => s.scenes[s.index]?.world);
-  const world = (sceneWorld ?? {}) as { inspect?: { pier: 'pier3' | 'pier2'; who: Who }; markers?: boolean; core?: string };
+  const world = (sceneWorld ?? {}) as { inspect?: { pier: 'pier3' | 'pier2'; who: Who; leave?: boolean }; markers?: boolean; core?: string };
   return (
     <group name="city">
       <SkyAndHorizon ground={!world.core} />

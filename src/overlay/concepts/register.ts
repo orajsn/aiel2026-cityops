@@ -7,6 +7,7 @@ import { CoreCaption } from './CoreCaption';
 import { SmallBrain } from './SmallBrain';
 import { BridgeMarkers } from './BridgeMarkers';
 import { Beat } from './Beat';
+import { ForgetSlots } from './ForgetSlots';
 
 registerOverlay('TitleCard', TitleCard);
 registerOverlay('PinLegend', PinLegend);
@@ -16,3 +17,4 @@ registerOverlay('CoreCaption', CoreCaption);
 registerOverlay('SmallBrain', SmallBrain);
 registerOverlay('BridgeMarkers', BridgeMarkers);
 registerOverlay('Beat', Beat);
+registerOverlay('ForgetSlots', ForgetSlots);

@@ -1,4 +1,6 @@
 import type { SceneDef } from '../engine/types';
+import type { ForgetSlotsProps } from '../overlay/concepts/ForgetSlots';
+import type { Who } from '../world/Person';
 import { beat } from './chapter1';
 
 /**
@@ -15,19 +17,52 @@ const b20 = beat(2, '2.0', 'Recap: the city', 'bridge', {
   message: 'Same city, same database, same bridge. Now, memory.',
 }, { pins: 'all', graph: HB, bridge: true, markers: true });
 
-const b21 = beat(2, '2.1', 'The agent that forgets', 'pier2-inspect', {
-  kicker: 'No memory',
-  visual: {
-    kind: 'chat',
-    lines: [
-      { who: 'Day 1 · Evelyn_H_Mercer', text: 'Tells the copilot about Pier 2.', tone: 'teal' },
-      { who: 'Day 5 · Jordan_Vance', text: 'Asks about Pier 2.', tone: 'teal' },
-      { who: 'copilot', text: 'A generic answer. Memory: empty.', tone: 'grey' },
-    ],
-  },
-  message: 'Every session is a first date.',
+/**
+ * 2.1 · The agent that forgets, in three clicks at the Pier 2 corrosion (owner, 24 Oct): Day 1 Mercer leaves
+ * three notes with the copilot, the chat closes and the notes empty out, Day 2 Vance finds three empty slots.
+ * Words from the Lab 3 deck, slides 5, 6 and 9. The camera closes in on 2.1a and holds there.
+ */
+const FORGET_SLOTS: ForgetSlotsProps['slots'] = [
+  { title: 'What she found', text: 'rust, ~25% loss', missing: 'Same questions. Again.' },
+  { title: 'Her advice', text: 'repair in 60 days', missing: 'Earlier advice is missing' },
+  { title: 'Follow-up', text: 'work to plan', missing: 'And the follow-up?' },
+];
+
+const forget = (id: string, title: string, shot: string, props: Omit<ForgetSlotsProps, 'slots'>, inspect: { who: Who; leave?: boolean }): SceneDef => ({
+  id,
+  chapter: 2,
+  title,
+  shot,
+  world: { bridge: true, inspect: { pier: 'pier2', ...inspect } },
+  overlay: 'ForgetSlots',
+  overlayProps: { ...props, slots: FORGET_SLOTS } as unknown as Record<string, unknown>,
+});
+
+const b21a = forget('2.1a', 'The agent that forgets · Day 1', 'pier2-inspect', {
+  kicker: 'Day 1 · Pier 2',
+  message: 'Mercer tells the copilot what she found.',
+  state: 'filled',
+  chat: [{ who: 'Evelyn_H_Mercer', text: 'Rust at Pier 2. My finding, my advice, the follow-up.', tone: 'teal' }],
+  footnote: 'copilot · “Noted.”',
+}, { who: 'character-female-a' });
+
+const b21b = forget('2.1b', 'The agent that forgets · the chat closes', 'pier2-close', {
+  kicker: 'The chat closes',
+  message: 'Nothing carried over.',
+  state: 'emptying',
+  footnote: 'Mercer leaves. The session ends.',
+}, { who: 'character-female-a', leave: true });
+
+const b21c = forget('2.1c', 'The agent that forgets · Day 2', 'pier2-close', {
+  kicker: 'Day 2 · the same pier',
+  message: 'The records may still exist. The next visit needs a way to find and use the relevant history.',
+  state: 'missing',
+  chat: [
+    { who: 'Jordan_Vance', text: 'What happened at this pier?', tone: 'teal' },
+    { who: 'copilot', text: 'I have no earlier information. What do you see?', tone: 'grey' },
+  ],
   notebook: `${NB} · motivation for Part 3 and the Day N cell`,
-}, { bridge: true, inspect: { pier: 'pier2', who: 'character-female-a' } });
+}, { who: 'character-male-d' });
 
 const b22 = beat(2, '2.2', 'The memory map', 'ops', {
   kicker: 'Kinds of memory',
@@ -167,8 +202,8 @@ const b213 = beat(2, '2.13', 'Day 1: Mercer at Pier 2', 'pier2-inspect', {
   notebook: `${NB} · Day 1, three cells`,
 }, { bridge: true, inspect: { pier: 'pier2', who: 'character-female-a' } });
 
-const b214 = beat(2, '2.14', 'Day N: Vance at the same pier', 'pier2-inspect', {
-  kicker: 'Day N · never met Mercer',
+const b214 = beat(2, '2.14', 'Day 2: Vance at the same pier', 'pier2-inspect', {
+  kicker: 'Day 2 · never met Mercer',
   visual: {
     kind: 'chat',
     lines: [
@@ -211,7 +246,9 @@ const b217 = beat(2, '2.17', 'Takeaways', 'bridge', {
 
 export const chapter2: SceneDef[] = [
   b20,
-  b21,
+  b21a,
+  b21b,
+  b21c,
   b22,
   b23,
   b24,

@@ -68,6 +68,8 @@ export const SHOTS: Record<ShotId, Shot> = {
   pier2: northShot([PIER2.x, 0.2, PIER2.z], 3.8, 42, -0.1, 1800),
   /** Pier 2 when someone inspects it: arrive, then close in on the corrosion */
   'pier2-inspect': withPush(northShot([PIER2.x, 0.2, PIER2.z], 3.8, 42, -0.1, 1800), northShot([RUST.x - 0.02, BRIDGE.damage.corrosion.y, RUST.z], 0.75, 24, -0.32, 0, 10), 1200),
+  /** Pier 2 already closed in on the corrosion (where 'pier2-inspect' ends): the pages after it hold here, no pull-back */
+  'pier2-close': northShot([RUST.x - 0.02, BRIDGE.damage.corrosion.y, RUST.z], 0.75, 24, -0.32, 1400, 10),
   'core-dive': { position: [30, 60, 560], target: [-20, -96, -10], durationMs: 2500, ease: 'inOut' },
   'core-face-tables': { position: [-250, -120, 270], target: [-270, -180, 0], durationMs: 1400, ease: 'inOut' },
   'core-face-json': { position: [-125, -120, 270], target: [-145, -180, 0], durationMs: 1400, ease: 'inOut' },

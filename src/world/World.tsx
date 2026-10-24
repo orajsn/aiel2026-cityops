@@ -26,7 +26,7 @@ export interface WorldProps {
   vectors?: Omit<VectorFieldProps, 'position'>;
   bridge?: boolean;
   /** someone inspecting the damage on a pier (HarborBridge.tsx) */
-  inspect?: { pier: 'pier3' | 'pier2'; who: string };
+  inspect?: { pier: 'pier3' | 'pier2'; who: string; leave?: boolean };
   markers?: boolean;
   /** which AI idea the sky stage over the Ops Center is showing (none = hidden) */
   sky?: SkyAct;

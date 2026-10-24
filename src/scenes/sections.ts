@@ -15,7 +15,7 @@ export const SECTIONS: Section[] = [
   { chapter: 1, name: 'Why a bare model is not enough', pages: ['1.1', '1.2', '1.3'] },
   { chapter: 1, name: 'From RAG to an agent', pages: ['1.4', '1.5', '1.6', '1.7', '1.8'] },
   { chapter: 1, name: 'Closing Lab 2', pages: ['1.9'] },
-  { chapter: 2, name: 'The agent that forgets', pages: ['2.0', '2.1'] },
+  { chapter: 2, name: 'The agent that forgets', pages: ['2.0', '2.1a', '2.1b', '2.1c'] },
   { chapter: 2, name: 'How memory works', pages: ['2.2', '2.3', '2.4', '2.5', '2.6'] },
   { chapter: 2, name: 'Writing and finding memories', pages: ['2.7', '2.8', '2.9', '2.10', '2.11', '2.12'] },
   { chapter: 2, name: 'Back on the bridge', pages: ['2.13', '2.14', '2.15', '2.16'] },
