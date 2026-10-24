@@ -33,7 +33,7 @@ test('moving from a close-up, the view slides slowly while close and faster once
 
 test('the named shots exist', () => {
   for (const id of [
-    'arrive', 'city', 'sky', 'ops', 'bridge', 'pier3', 'pier2', 'core-dive',
+    'arrive', 'city', 'sky', 'sky-model', 'ops', 'bridge', 'pier3', 'pier2', 'core-dive',
     'core-face-tables', 'core-face-json', 'core-face-graph', 'core-face-vectors', 'vector-field',
   ])
     expect(SHOTS[id]).toBeDefined();

@@ -62,9 +62,9 @@ const LAB2_ACTS: (SkyAct | null)[] = ['overflow', 'tools', 'unified', 'note'];
  */
 const BARE_Q = '“What recent issues have been reported on Harbor Bridge?”';
 /** the question stands on the left, the guess on the right, and both stay until the next page (owner: give people time to read) */
-const QUESTION_AT: Vec3 = [A[0] - 2.9, A[1] + 1.1, A[2]];
+const QUESTION_AT: Vec3 = along([MODEL_IN[0], MODEL[1] + 0.7, MODEL_IN[2]], -2.5);
 /** the answer stands to the right of the model's last layer */
-const ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 0.3, MODEL_OUT[2]], 3.4);
+const ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 0.5, MODEL_OUT[2]], 2.5);
 const BARE_A = '“I don’t have any reports about a Harbor Bridge in your city. In general, bridges can show cracking, corrosion or bearing wear…”';
 
 const ease = (t: number) => {
@@ -180,7 +180,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
         </group>
       </group>
       {/* flows between the city and the stage (outside the scaled group so they stay anchored to the city) */}
-      {visible && act === 'model' && <FlowArc key="q-up" from={[QUESTION_AT[0] + 1.0, QUESTION_AT[1] - 0.2, QUESTION_AT[2]]} to={MODEL_IN} lift={0.6} radius={0.05} durationMs={1600} delayMs={900} fadeMs={900} color="#ffffff" />}
+      {visible && act === 'model' && <FlowArc key="q-up" from={along([QUESTION_AT[0], QUESTION_AT[1] - 0.4, QUESTION_AT[2]], 1.5)} to={MODEL_IN} lift={0.4} radius={0.05} durationMs={1600} delayMs={900} fadeMs={900} color="#ffffff" />}
       {visible && act === 'embed' &&
         sources.map((s, i) => <FlowArc key={`doc-${i}`} from={s} to={DB} lift={2.5} radius={0.04} durationMs={1300} delayMs={500 + i * 180} fadeMs={600} color={theme.data} />)}
       {visible && act === 'envelope' && <FlowArc key="answer" from={MODEL_OUT} to={OPS_TOP} lift={0.2} radius={0.06} durationMs={1500} delayMs={4600} persist color={theme.data} />}

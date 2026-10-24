@@ -57,6 +57,8 @@ export const SHOTS: Record<ShotId, Shot> = {
   /** the sky stage over the Ops Center, where the AI ideas are explained (SkyStage.tsx), the Ops Center below */
   // lower and more forward than the city cameras so the stage is seen from the side; the haze shows at the top
   sky: northShot([OPS.x, 9, OPS.z], 17, 22, -0.18, 2200, -20, -1),
+  /** the bare model (Lab 2 page 1): the same view, pushed in with the language model in the middle (SkyStage MODEL = anchor + [3, 0.3, 0]) */
+  'sky-model': northShot([OPS.x + 3.0, 9.3, OPS.z], 10, 22, 0, 2200, -20, -1),
   /** close on the control room over the Ops Center (OpsRoom.tsx, floor at y 2.6): over the operators' shoulders to the video wall */
   ops: northShot([OPS.x, 3.3, OPS.z - 0.4], 9, 36, -0.38, 2200, -8),
   /** Harbor Bridge whole, low in the frame, the city behind it */

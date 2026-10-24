@@ -14,12 +14,12 @@ export function beat(chapter: 1 | 2, id: string, title: string, shot: string, pr
 
 const HB = 'Harbor Bridge';
 
-const b11 = beat(1, '2.1', 'The bare model', 'sky', {
+const b11 = beat(1, '2.1', 'The bare model', 'sky-model', {
   kicker: 'Ops Center · the bare LLM',
   notebook: 'rag_to_agents_lab.ipynb · Section 0 setup, then the bare LLM question',
   visual: { kind: 'none' },
   message: 'A model knows **the world**. It does not know !!your city!!.',
-}, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'model' });
+}, { pins: 'all', sky: 'model' }); // no Ops Center name: this close it would sit under the script bar
 
 const b12 = beat(1, '2.2', 'Text becomes a point', 'sky', {
   kicker: 'Embeddings · ALL_MINILM_L12_V2',

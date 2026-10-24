@@ -5,7 +5,7 @@ import { SCENES } from '../../src/scenes/index';
 // the database scenes (0.5, 0.6) are a separate diorama under the city, waiting for the owner's rework
 const isCity = (shot: string) => !shot.startsWith('core-') && shot !== 'vector-field';
 // the sky stage is meant to be seen from the side, so the haze shows above it (owner, 24 Oct)
-const mustHideSky = (shot: string) => isCity(shot) && shot !== 'sky';
+const mustHideSky = (shot: string) => isCity(shot) && !shot.startsWith('sky');
 
 test('frame maths: a camera looking straight down sees ground at all four corners, one looking level sees sky', () => {
   expect(frameCorners([-57, 30, -54], [-57, 0, -54.01]).every(Boolean)).toBe(true);
@@ -59,12 +59,13 @@ test('on pages with the right-hand panel, the place the page is about sits left 
 
 test('the camera only moves when the story changes place: five places and the sky stage, at most 16 city moves in 38 pages', () => {
   const places = new Set(SCENES.filter((s) => isCity(s.shot)).map((s) => s.shot));
-  expect([...places].sort()).toEqual(['bridge', 'city', 'ops', 'pier2', 'pier2-close', 'pier2-inspect', 'pier3', 'sky']);
+  expect([...places].sort()).toEqual(['bridge', 'city', 'ops', 'pier2', 'pier2-close', 'pier2-inspect', 'pier3', 'sky', 'sky-model']);
   let moves = 0;
   SCENES.forEach((s, i) => {
     if (i > 0 && SCENES[i - 1].shot !== s.shot && isCity(s.shot) && isCity(SCENES[i - 1].shot)) moves++;
   });
-  expect(moves).toBeLessThanOrEqual(16);
+  // 17: the push-in on the bare model (Lab 2 page 1, owner) and back out for the database
+  expect(moves).toBeLessThanOrEqual(17);
 });
 
 test('every page at the Ops Center shows the control room; sky pages name the Ops Center below', () => {
