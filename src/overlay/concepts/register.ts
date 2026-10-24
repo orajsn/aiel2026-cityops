@@ -17,6 +17,8 @@ import { Glass } from './Glass';
 import { Disciplines } from './Disciplines';
 import { MemoryLoop } from './MemoryLoop';
 import { OneConnection, WritePath, Scope, SystemOfRecord, VectorWalls } from './HandsOn';
+import { DoorsAndHall, CopilotTurn } from './HandsOn2';
+import { WithWithout, FailuresSolved, BothLabs, Takeaways } from './Ending';
 
 registerOverlay('TitleCard', TitleCard);
 registerOverlay('PinLegend', PinLegend);
@@ -40,3 +42,9 @@ registerOverlay('WritePath', WritePath);
 registerOverlay('Scope', Scope);
 registerOverlay('SystemOfRecord', SystemOfRecord);
 registerOverlay('VectorWalls', VectorWalls);
+registerOverlay('DoorsAndHall', DoorsAndHall);
+registerOverlay('CopilotTurn', CopilotTurn);
+registerOverlay('WithWithout', WithWithout);
+registerOverlay('FailuresSolved', FailuresSolved);
+registerOverlay('BothLabs', BothLabs);
+registerOverlay('Takeaways', Takeaways);

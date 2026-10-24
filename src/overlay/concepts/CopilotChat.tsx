@@ -71,10 +71,16 @@ export function chatSchedule(items: ChatItem[]) {
  * answers on the left, stacking downwards, with a line between days. Used for 2.1 (the agent that
  * forgets) and meant for every page where someone talks to the copilot.
  */
-export function CopilotChat({ kicker, message, title = 'Copilot', subtitle = 'Harbor Bridge inspections', items, notebook }: CopilotChatProps) {
-  const s = chatSchedule(items);
-  let emptyN = 0;
-  let labelN = 0;
+/** a box under the chat window: what happened because of the chat (a finding logged, where an answer came from) */
+export interface ChatNote {
+  title: string;
+  text?: string;
+  /** red for the one thing to look at on the page, teal otherwise */
+  tone?: 'teal' | 'red';
+}
+
+export function CopilotChat({ kicker, message, title = 'Copilot', subtitle = 'Harbor Bridge inspections', items, notebook, after = [] }: CopilotChatProps & { after?: ChatNote[] }) {
+  const notesAt = chatSchedule(items).labelsAt + 0.2;
   return (
     <div className="beat">
       <motion.div className="beat__panel" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, ease: EASE }}>
@@ -82,26 +88,59 @@ export function CopilotChat({ kicker, message, title = 'Copilot', subtitle = 'Ha
         <div className="beat__headline">
           “<Rich text={message} />”
         </div>
-
-        <div style={windowStyle} data-testid="copilot-chat">
-          <div style={titleBar}>
-            <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--teal)', flex: 'none' }} />
-            <span style={{ fontWeight: 600, color: 'var(--ink)' }}>{title}</span>
-            <span style={{ color: 'var(--ink-dim)', marginLeft: 'auto', fontSize: 15 }}>{subtitle}</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '14px 16px 16px' }}>
-            {items.map((it, i) => {
-              if (isDivider(it)) return <Divider key={i} text={it.divider} delay={s.at[i]} />;
-              const state = it.state ?? 'shown';
-              if (state === 'emptying') return <Bubble key={i} m={it} mode="emptying" delay={s.emptyAt + 0.22 * emptyN++} />;
-              if (state === 'empty') return <Bubble key={i} m={it} mode="empty" delay={s.labelsAt + 0.35 * labelN++} />;
-              return <Bubble key={i} m={it} mode="shown" delay={s.at[i]} typingAt={s.typingAt[i]} />;
+        <ChatWindow title={title} subtitle={subtitle} items={items} />
+        {after.length > 0 && (
+          // side by side, so a long chat plus its notes still fits the panel
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(after.length, 2)}, 1fr)`, gap: 10, marginTop: 14 }}>
+            {after.map((n, i) => {
+              const red = n.tone === 'red';
+              return (
+                <motion.div
+                  key={n.title}
+                  data-note={n.title}
+                  style={{ padding: '10px 16px', borderRadius: 12, border: `2px solid ${red ? 'var(--red)' : 'var(--teal)'}`, background: red ? 'rgba(199, 70, 52, 0.08)' : 'rgba(27, 138, 156, 0.1)' }}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: notesAt + i * 0.45, duration: 0.45, ease: EASE }}
+                >
+                  <div style={{ fontSize: 20, fontWeight: 700, color: red ? 'var(--red)' : 'var(--teal)' }}>{n.title}</div>
+                  {n.text && (
+                    <div style={{ fontSize: 19, color: 'var(--ink)', marginTop: 2 }}>
+                      <Rich text={n.text} />
+                    </div>
+                  )}
+                </motion.div>
+              );
             })}
           </div>
-        </div>
-
+        )}
         {notebook && <div className="beat__notebook">notebook · {notebook}</div>}
       </motion.div>
+    </div>
+  );
+}
+
+/** the chat window alone (title bar and stacked messages), for panels that show one or more of them */
+export function ChatWindow({ title = 'Copilot', subtitle = 'Harbor Bridge inspections', items, testId = 'copilot-chat' }: { title?: string; subtitle?: string; items: ChatItem[]; testId?: string }) {
+  const s = chatSchedule(items);
+  let emptyN = 0;
+  let labelN = 0;
+  return (
+    <div style={windowStyle} data-testid={testId}>
+      <div style={titleBar}>
+        <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--teal)', flex: 'none' }} />
+        <span style={{ fontWeight: 600, color: 'var(--ink)' }}>{title}</span>
+        <span style={{ color: 'var(--ink-dim)', marginLeft: 'auto', fontSize: 15 }}>{subtitle}</span>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '14px 16px 16px' }}>
+        {items.map((it, i) => {
+          if (isDivider(it)) return <Divider key={i} text={it.divider} delay={s.at[i]} />;
+          const state = it.state ?? 'shown';
+          if (state === 'emptying') return <Bubble key={i} m={it} mode="emptying" delay={s.emptyAt + 0.22 * emptyN++} />;
+          if (state === 'empty') return <Bubble key={i} m={it} mode="empty" delay={s.labelsAt + 0.35 * labelN++} />;
+          return <Bubble key={i} m={it} mode="shown" delay={s.at[i]} typingAt={s.typingAt[i]} />;
+        })}
+      </div>
     </div>
   );
 }

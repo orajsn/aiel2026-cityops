@@ -1,11 +1,13 @@
 import type { SceneDef } from '../engine/types';
 import type { CastProps } from '../overlay/concepts/Cast';
-import type { CopilotChatProps } from '../overlay/concepts/CopilotChat';
+import type { ChatNote, CopilotChatProps } from '../overlay/concepts/CopilotChat';
 import type { MemoryMapProps } from '../overlay/concepts/MemoryMap';
 import type { GlassProps } from '../overlay/concepts/Glass';
 import type { DisciplinesProps } from '../overlay/concepts/Disciplines';
 import type { MemoryLoopProps } from '../overlay/concepts/MemoryLoop';
 import type { HandsOnProps, ScopeProps } from '../overlay/concepts/HandsOn';
+import type { CopilotTurnProps } from '../overlay/concepts/HandsOn2';
+import type { BothLabsProps, EndingProps, TakeawaysProps, WithWithoutProps } from '../overlay/concepts/Ending';
 import type { Who } from '../world/Person';
 import { beat } from './chapter1';
 // bundled, not in public/: the dev server only serves public files it saw at start-up
@@ -57,7 +59,7 @@ const MERCER_SAYS: { text: string; missing: string }[] = [
   { text: 'Follow-up: work to plan.', missing: 'And the follow-up?' },
 ];
 
-const chat = (id: string, title: string, shot: string, props: CopilotChatProps, inspect: { who: Who; leave?: boolean }): SceneDef => ({
+const chat = (id: string, title: string, shot: string, props: CopilotChatProps & { after?: ChatNote[] }, inspect: { who: Who; leave?: boolean }): SceneDef => ({
   id,
   chapter: 2,
   title,
@@ -167,88 +169,88 @@ const b28b = atOps('3.8b', 'Scope is the key', 'Scope', { kicker: 'Lab 3 · Part
 const b29 = atOps('3.9', 'The system of record', 'SystemOfRecord', { kicker: 'Lab 3 · Part 4', message: 'Memory is what the agent learns. Findings are what **the city records**.', notebook: `${NB} · Part 4, TODO 4` } satisfies HandsOnProps);
 const b210 = atOps('3.10', 'Vector search with walls', 'VectorWalls', { kicker: 'Lab 3 · Part 4, TODO 5', message: 'Vector similarity and relational filters in **one SQL statement**.', notebook: `${NB} · TODO 5` } satisfies HandsOnProps);
 
-const b211 = beat(2, '3.11', 'Private doors, shared hall', 'ops', {
-  kicker: 'Three keys',
-  visual: {
-    kind: 'cards',
-    cols: 3,
-    items: [
-      { title: 'user_id' },
-      { title: 'agent_id' },
-      { title: 'thread_id' },
-      { title: 'Jordan_Vance → Evelyn_H_Mercer’s door', sub: 'bounces off', tone: 'grey' },
-      { title: 'the shared hall', sub: 'finds the guideline', tone: 'amber' },
-    ],
-  },
-  message: 'This is a SQL WHERE clause, not a Python filter.',
-  notebook: `${NB} · Part 5`,
-}, { ops: true });
+/**
+ * Lab 3 pages 21 to 29 (3.11-3.17), sketches agreed in chat (owner, 25 Oct). 21-23 stay in the Ops room; 24-27 go
+ * back to the rust, Day 1 and Day 2 in the chat window from page 2; 28 over the bridge; 29 the takeaways.
+ */
+const b211 = atOps('3.11', 'Private doors, shared hall', 'DoorsAndHall', { kicker: 'Lab 3 · Part 5', message: 'This is a **SQL WHERE clause**, not a Python filter.', notebook: `${NB} · Part 5` } satisfies HandsOnProps);
+const b212a = atOps('3.12a', 'The copilot turn', 'CopilotTurn', { kicker: 'Lab 3 · Part 6, TODO 6', step: 1, message: 'One copilot turn, **eight steps**.', notebook: `${NB} · Part 6, TODO 6` } satisfies CopilotTurnProps, 'turn');
+const b212b = atOps('3.12b', 'The context card', 'CopilotTurn', { kicker: 'Lab 3 · Part 6, TODO 6', step: 2, message: 'This is **the prompt the model actually receives**.', notebook: `${NB} · Part 6, the context card` } satisfies CopilotTurnProps, 'turn');
 
-const b212 = beat(2, '3.12', 'The copilot turn', 'ops', {
-  kicker: 'The context card',
-  visual: {
-    kind: 'code',
-    lines: ['<summary> … </summary>', '<topics> … </topics>', '<relevant_information> … </relevant_information>', '<recent_messages> … </recent_messages>'],
-  },
-  message: 'This is the prompt the model actually receives.',
-  notebook: `${NB} · Part 6, TODO 6`,
-}, { ops: true });
-
-const b213 = beat(2, '3.13', 'Day 1: Mercer at the rust', 'pier2-inspect', {
-  kicker: 'Day 1',
-  visual: {
-    kind: 'chat',
-    lines: [
-      { who: 'Evelyn_H_Mercer · the rust', text: '~25% section loss, rust bleed.', tone: 'teal' },
-      { who: 'finding logged', text: 'corrosion · medium · grade C · repair within 60 days', tone: 'red' },
-      { who: 'shared shelf · user_id="Harbor Bridge"', text: 'her guideline lands here', tone: 'amber' },
-    ],
-  },
-  message: 'This is what the next inspector inherits.',
+const b213 = chat('3.13', 'Day 1: Mercer at the rust', 'pier2-inspect', {
+  kicker: 'Day 1 · the rust',
+  message: 'This is what the next inspector **inherits**.',
+  items: [
+    { divider: 'Day 1 · Mercer' },
+    { from: 'person', text: '~25% section loss, rust bleed, 1.5 m.' },
+    { from: 'copilot', text: 'Noted. I’ll log it as a finding for Harbor Bridge.' },
+  ],
+  after: [
+    { title: 'Finding logged', text: 'corrosion · medium · grade C · repair within 60 days', tone: 'red' },
+    { title: 'Her guideline goes to shared memory', text: 'user_id="Harbor Bridge"' },
+  ],
   notebook: `${NB} · Day 1, three cells`,
-}, { bridge: true, inspect: { pier: 'pier2', who: 'character-female-a' } });
+}, { who: 'character-female-a' });
 
-const b214 = beat(2, '3.14', 'Day 2: Vance at the same pier', 'pier2-inspect', {
-  kicker: 'Day 2 · never met Mercer',
-  visual: {
-    kind: 'chat',
-    lines: [
-      { who: 'Jordan_Vance · the same rust', text: 'Asks about the same rust.', tone: 'teal' },
-      { who: 'beam 1 · the logged finding', text: 'score 0.289 · grade C', tone: 'red' },
-      { who: 'beam 2 · the pooled guideline', text: 'from the shared shelf', tone: 'amber' },
-      { who: 'his private thread', text: 'stays his own', tone: 'grey' },
-    ],
-  },
-  message: 'No human handoff. The finding and the distilled memory carried it.',
+const b214 = chat('3.14', 'Day 2: Vance at the same rust', 'pier2-close', {
+  kicker: 'Day 2 · the same rust',
+  message: 'No human handoff. **The finding and the memory carried it.**',
+  items: [
+    { divider: 'Day 1 · kept in memory' },
+    ...MERCER_SAYS.map((m) => ({ from: 'person' as const, text: m.text })),
+    { divider: 'Day 2 · Vance' },
+    { from: 'person', text: 'What happened at this pier?' },
+    { from: 'copilot', text: 'Mercer logged corrosion here on Day 1: about 25% section loss, grade C, repair within 60 days.' },
+  ],
+  after: [
+    { title: 'Source · Mercer’s finding', text: 'similarity score **0.289**' },
+    { title: 'Source · her guideline', text: 'from **shared memory**' },
+  ],
   notebook: `${NB} · Day N`,
-}, { bridge: true, inspect: { pier: 'pier2', who: 'character-male-d' } });
+}, { who: 'character-male-d' });
 
-const b215 = beat(2, '3.15', 'With and without memory', 'pier2', {
-  kicker: 'Same question twice',
-  visual: {
-    kind: 'compare',
-    left: { title: 'Without memory', lines: ['A generic answer.'], tone: 'grey' },
-    right: { title: 'With memory', lines: ['the rust · ~25%', 'grade C · 60 days', 'Evelyn_H_Mercer · Day 1'], tone: 'teal' },
-  },
-  message: 'Same model. Same question. Only the memory differs.',
-  notebook: 'the four-row comparison from the deck',
-}, { bridge: true, markers: true });
+const b215 = atRust('3.15', 'With and without memory', 'WithWithout', {
+  kicker: 'Same question, asked twice',
+  message: 'Same model. Same question. **Only the memory differs.**',
+  question: 'What happened at this pier?',
+  without: 'I have no earlier information. What do you see?',
+  withMemory: 'Mercer logged corrosion on Day 1: ~25% section loss, grade C, repair within 60 days.',
+  notebook: `${NB} · the comparison cell`,
+} satisfies WithWithoutProps);
+const b215b = atRust('3.15b', 'The four failures, solved', 'FailuresSolved', { kicker: 'Back to the glass', message: 'The four failures from the glass, **solved**.' } satisfies EndingProps);
 
-const b216 = beat(2, '3.16', 'Where both labs meet', 'pier2', {
-  kicker: 'The rust',
-  visual: {
-    kind: 'compare',
-    left: { title: 'Lab 2 · the rule', lines: ['SOP: section loss > 25%'], tone: 'teal' },
-    right: { title: 'Lab 3 · the history', lines: ['finding: ~25% section loss'], tone: 'red' },
-  },
-  message: 'This afternoon the agent had the rule. Now it has the history. Together they make the call.',
-}, { bridge: true, markers: true });
+const b216: SceneDef = {
+  id: '3.16',
+  chapter: 2,
+  title: 'Where both labs meet',
+  shot: 'pier2',
+  world: { bridge: true, markers: 'pier2' },
+  overlay: 'BothLabs',
+  overlayProps: {
+    rule: ['Section loss **over 25%**', '→ immediate structural review'],
+    history: ['Mercer’s finding:', '!!~25% section loss!!'],
+    message: 'This afternoon the agent had **the rule**. Now it has **the history**. Together they make the call.',
+  } satisfies BothLabsProps as unknown as Record<string, unknown>,
+};
 
-const b217 = beat(2, '3.17', 'Takeaways', 'bridge', {
-  kicker: 'Three takeaways',
-  visual: { kind: 'list', ordered: true, items: ['Memory is the foundation.', 'Scope is governance.', 'One converged database.', 'Quiz: 5 min, 80% to pass, badge (QR code here)'] },
-  message: 'The rule from this afternoon, the history from today. The same database held both.',
-}, { pins: 'all', graph: HB, bridge: true });
+const b217: SceneDef = {
+  id: '3.17',
+  chapter: 2,
+  title: 'Takeaways',
+  shot: 'bridge',
+  world: { bridge: true, markers: 'pier2' },
+  overlay: 'Takeaways',
+  overlayProps: {
+    kicker: 'If you only remember three things',
+    message: 'Three things to **take home**.',
+    points: [
+      { title: 'Memory is the foundation, not a feature', text: 'An agent is only as good as what it can recall.' },
+      { title: 'The context window is a curation problem', text: 'Memory, context and harness engineering solve it.' },
+      { title: 'One converged store beats four services', text: 'Vector, SQL, JSON and graph in one database.' },
+    ],
+    quiz: ['5 minutes', '80% to pass', 'a badge'],
+  } satisfies TakeawaysProps as unknown as Record<string, unknown>,
+};
 
 export const chapter2: SceneDef[] = [
   b20,
@@ -272,10 +274,12 @@ export const chapter2: SceneDef[] = [
   b29,
   b210,
   b211,
-  b212,
+  b212a,
+  b212b,
   b213,
   b214,
   b215,
+  b215b,
   b216,
   b217,
 ];
