@@ -46,7 +46,8 @@ export const SHOTS: Record<ShotId, Shot> = {
   /** the city: ICONSIAM across the river, the Silom and Sathorn towers, the Ops Center; low enough that the towers show their sides */
   city: northShot([-26, 0, -36], 30, 44, 0, 2600, -15),
   /** the sky stage over the Ops Center, where the AI ideas are explained (SkyStage.tsx), the Ops Center below */
-  sky: northShot([OPS.x, 9, OPS.z], 14, 48, -0.18, 2200, -20), // stage a little left: the point cloud must clear the panel
+  // lower and more forward than the city cameras so the stage is seen from the side; the haze shows at the top
+  sky: northShot([OPS.x, 9, OPS.z], 17, 22, -0.18, 2200, -20, -1),
   /** City Operations Control Center, where the operator and the copilot work */
   ops: northShot([OPS.x, 0.5, OPS.z], 22, 42, -0.1, 2200, -15, 2.2),
   /** Harbor Bridge whole, low in the frame, the city behind it */

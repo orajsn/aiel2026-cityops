@@ -5,6 +5,8 @@ import { useUiStore } from '../engine/ui';
 import { OVERLAYS } from './registry';
 import { HandoffCard } from './HandoffCard';
 import { JumpMenu } from './JumpMenu';
+import { CameraEditor } from './CameraEditor';
+import { useCameraStore } from '../engine/camera';
 
 const CHAPTER_LABEL = ['The city', 'RAG to Agents', 'Agent Memory'];
 
@@ -22,6 +24,7 @@ export function Overlay() {
   const settled = useSceneStore((s) => s.settled);
   const jumpOpen = useUiStore((s) => s.jumpOpen);
   const scriptOpen = useUiStore((s) => s.scriptOpen);
+  const cameraEditing = useCameraStore((s) => s.editing);
   if (!scene) return null;
 
   const Comp = scene.overlay ? OVERLAYS[scene.overlay] : null;
@@ -74,6 +77,14 @@ export function Overlay() {
         >
           CC
         </button>
+        <button
+          type="button"
+          className={`stepper__btn stepper__btn--text${cameraEditing ? ' is-on' : ''}`}
+          aria-label={cameraEditing ? 'Leave Camera mode' : 'Camera mode'}
+          onClick={() => useCameraStore.getState().setEditing(!cameraEditing)}
+        >
+          CAM
+        </button>
         <button type="button" className="stepper__btn" aria-label="Back" disabled={index === 0} onClick={() => useSceneStore.getState().prev()}>
           ‹
         </button>
@@ -87,6 +98,7 @@ export function Overlay() {
       </div>
 
       <MapLoading />
+      <CameraEditor />
 
       {jumpOpen && <JumpMenu />}
     </>

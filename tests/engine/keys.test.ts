@@ -21,3 +21,16 @@ test('ArrowRight advances, ArrowLeft goes back, J calls jump, unbind stops it', 
   window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
   expect(useSceneStore.getState().index).toBe(0);
 });
+
+test('arrow keys do not change the page while the camera is being edited', async () => {
+  const { useSceneStore } = await import('../../src/engine/store');
+  const { bindKeys } = await import('../../src/engine/keys');
+  useSceneStore.getState().setScenes([
+    { id: 'a', chapter: 0, title: 'A', shot: 'city' },
+    { id: 'b', chapter: 0, title: 'B', shot: 'city' },
+  ]);
+  const un = bindKeys(useSceneStore, { jump() {}, notes() {}, lang() {}, isEditing: () => true });
+  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+  expect(useSceneStore.getState().index).toBe(0);
+  un();
+});

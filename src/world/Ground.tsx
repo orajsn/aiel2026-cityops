@@ -28,8 +28,11 @@ const SKY_FRAG = /* glsl */ `
   varying vec3 vPos;
   void main() {
     float h = normalize(vPos).y;
-    float k = smoothstep(-0.05, 0.45, h);
+    float k = smoothstep(0.0, 0.6, h);
     gl_FragColor = vec4(mix(uHorizon, uTop, k), 1.0);
+    // same colour pipeline as every other material, so the horizon meets the haze with no seam
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
   }
 `;
 

@@ -6,7 +6,9 @@ A deterministic, offline, click-through 3D web experience for two Oracle LiveLab
 
 **Verification rule (owner's words):** never judge a scene from a wide shot. Screenshot at full size and zoom into the close-up before calling anything done.
 
-**Camera rules (owner, 24 Oct):** every camera move must mean something. Five places only: `city`, `ops` (City Operations Control Center), `bridge`, `pier3`, `pier2` (`src/world/shots.ts`); the camera moves only when the story changes place, otherwise it holds and the panel changes. Every city camera looks roughly north. Never show the sky or where the map ends: `tests/world/frame.test.ts` checks the four frame corners of every page and of every move between pages. Harbor Bridge is ~500 m from the map's south edge, so bridge shots keep it low in the frame.
+**Camera rules (owner, 24 Oct):** every camera move must mean something. Five places only: `city`, `ops` (City Operations Control Center), `bridge`, `pier3`, `pier2` (`src/world/shots.ts`); the camera moves only when the story changes place, otherwise it holds and the panel changes. Every city camera looks roughly north. Never show the sky or where the map ends: `tests/world/frame.test.ts` checks the four frame corners of every page and of every move between pages. Harbor Bridge is ~500 m from the map's south edge, so bridge shots keep it low in the frame. The sky stage (`sky`) is the one place allowed to show the haze above the city.
+
+**Camera mode (owner tool):** CAM button or C key. Arrows/WASD walk, Q/E down/up, drag to look, wheel forward; iPad: one finger looks, two fingers move. Save writes `src/content/cameraOverrides.json` through the dev server (`/__camera-overrides`, see vite.config.ts); a saved angle wins over the page's place. Those saves are the owner's choices: never overwrite them without asking.
 
 **Spec:** the storyline doc https://claude.ai/artifact/RuZ6iZL6VdBLEwYhkgjeyG (read it with the Artifact or docs tools, never web-fetch). Task-by-task plan: `docs/superpowers/plans/2026-10-23-cityops-live-experience.md`.
 

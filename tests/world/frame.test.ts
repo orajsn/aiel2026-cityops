@@ -4,6 +4,8 @@ import { SCENES } from '../../src/scenes/index';
 
 // the database scenes (0.5, 0.6) are a separate diorama under the city, waiting for the owner's rework
 const isCity = (shot: string) => !shot.startsWith('core-') && shot !== 'vector-field';
+// the sky stage is meant to be seen from the side, so the haze shows above it (owner, 24 Oct)
+const mustHideSky = (shot: string) => isCity(shot) && shot !== 'sky';
 
 test('frame maths: a camera looking straight down sees ground at all four corners, one looking level sees sky', () => {
   expect(frameCorners([-57, 30, -54], [-57, 0, -54.01]).every(Boolean)).toBe(true);
@@ -13,7 +15,7 @@ test('frame maths: a camera looking straight down sees ground at all four corner
 
 // the owner's rule: never see the sky or where the city ends
 test('every city page frames only the city: no sky, no map edge', () => {
-  const bad = SCENES.filter((s) => isCity(s.shot))
+  const bad = SCENES.filter((s) => mustHideSky(s.shot))
     .map((s) => ({ id: s.id, score: frameCityScore(SHOTS[s.shot].position, SHOTS[s.shot].target) }))
     .filter((r) => r.score < 0.97);
   expect(bad).toEqual([]);
@@ -23,7 +25,7 @@ test('every camera move between city pages stays on the city the whole way', () 
   const bad: string[] = [];
   SCENES.forEach((s, i) => {
     const from = i === 0 ? s.enterFrom : SCENES[i - 1].shot;
-    if (!from || !isCity(from) || !isCity(s.shot)) return;
+    if (!from || !mustHideSky(from) || !mustHideSky(s.shot)) return;
     if (i === 0) {
       const a = SHOTS[from];
       if (frameCityScore(a.position, a.target) < 0.97) bad.push(`${s.id} start`);

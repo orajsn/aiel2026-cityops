@@ -6,6 +6,7 @@ import { Lighting } from './Lighting';
 import { Effects } from './Effects';
 import { AssetPins } from './AssetPins';
 import { CameraRig } from './CameraRig';
+import { FreeCam } from './FreeCam';
 import { DataStream } from './DataStream';
 import { DatabaseDiorama, type Face } from './DatabaseDiorama';
 import { GraphLines, edgesFor } from './GraphLines';
@@ -35,6 +36,7 @@ export function World() {
       <color attach="background" args={[theme.bg]} />
       <fogExp2 attach="fog" args={[theme.bg, theme.fogDensity]} />
       <CameraRig />
+      <FreeCam />
       <Lighting />
       <City />
       {w.pins && <AssetPins visible={w.pins} highlight={w.highlight} />}

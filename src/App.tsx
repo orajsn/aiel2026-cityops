@@ -8,10 +8,12 @@ import { useUiStore } from './engine/ui';
 import { bindHash } from './engine/hash';
 import { bindKeys } from './engine/keys';
 import { SCENES } from './scenes';
+import { loadOverrides, useCameraStore } from './engine/camera';
 
 export default function App() {
   useEffect(() => {
     useSceneStore.getState().setScenes(SCENES);
+    void loadOverrides();
     const ui = useUiStore.getState();
     const unHash = bindHash(useSceneStore);
     const unKeys = bindKeys(useSceneStore, {
@@ -20,6 +22,8 @@ export default function App() {
       lang: () => ui.toggleLang(),
       theme: () => ui.toggleTheme(),
       script: () => ui.toggleScript(),
+      camera: () => useCameraStore.getState().setEditing(!useCameraStore.getState().editing),
+      isEditing: () => useCameraStore.getState().editing,
     });
     return () => {
       unHash();

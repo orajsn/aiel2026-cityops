@@ -1,43 +1,57 @@
 import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useSceneStore } from '../engine/store';
+import { shotForScene, useCameraStore } from '../engine/camera';
 import { SHOTS, interpolateShot, type Shot, type Vec3 } from './shots';
 
 /**
- * Flies the camera from its live pose to the current scene's shot.
- * Scene `enterFrom` (optional) cuts to that shot first, then flies to `shot`.
+ * Flies the camera from its live pose to the current page's camera: the owner's saved angle for the
+ * page if there is one, else its place. Scene `enterFrom` (optional) cuts to that shot first.
+ * In Camera mode the rig lets go (FreeCam drives); leaving Camera mode flies back to the page's camera.
  */
 export function CameraRig() {
   const camera = useThree((s) => s.camera);
   const scene = useSceneStore((s) => s.scenes[s.index]);
   const setSettled = useSceneStore((s) => s.setSettled);
+  const editing = useCameraStore((s) => s.editing);
+  const saved = useCameraStore((s) => (scene ? s.overrides[scene.id] : undefined));
 
   const target = useRef<Vec3>([0, 0, 0]);
   const tween = useRef<{ from: Shot; to: Shot; start: number } | null>(null);
+  const wasEditing = useRef(false);
 
   useEffect(() => {
     if (!scene) return;
-    const to = SHOTS[scene.shot];
+    if (editing) {
+      tween.current = null;
+      wasEditing.current = true;
+      setSettled(true);
+      return;
+    }
+    const to = shotForScene(scene);
     if (!to) return;
-    let from: Shot = {
-      position: [camera.position.x, camera.position.y, camera.position.z],
-      target: [...target.current] as Vec3,
-      durationMs: 0,
-    };
-    if (scene.enterFrom && SHOTS[scene.enterFrom]) {
-      from = SHOTS[scene.enterFrom];
+    // after Camera mode, start from where the free camera was looking
+    const dir = camera.getWorldDirection(camera.position.clone());
+    const here: Vec3 = wasEditing.current
+      ? [camera.position.x + dir.x * 12, camera.position.y + dir.y * 12, camera.position.z + dir.z * 12]
+      : ([...target.current] as Vec3);
+    let from: Shot = { position: [camera.position.x, camera.position.y, camera.position.z], target: here, durationMs: 0 };
+    const cut = !!scene.enterFrom && !!SHOTS[scene.enterFrom] && !wasEditing.current;
+    if (cut) {
+      from = SHOTS[scene.enterFrom!];
       camera.position.set(...from.position);
       target.current = [...from.target] as Vec3;
       camera.lookAt(...from.target);
     }
+    wasEditing.current = false;
     setSettled(false);
-    tween.current = { from, to, start: performance.now() + (scene.enterFrom ? 400 : 0) };
-  }, [scene, camera, setSettled]);
+    tween.current = { from, to: { ...to, durationMs: Math.max(to.durationMs, 900) }, start: performance.now() + (cut ? 400 : 0) };
+  }, [scene, camera, setSettled, editing, saved]);
 
   useFrame(() => {
     const tw = tween.current;
     if (!tw) return;
-    const t = tw.to.durationMs === 0 ? 1 : (performance.now() - tw.start) / tw.to.durationMs;
+    const t = (performance.now() - tw.start) / tw.to.durationMs;
     const pose = interpolateShot(tw.from, tw.to, t);
     camera.position.set(...pose.position);
     target.current = pose.target;
@@ -50,4 +64,3 @@ export function CameraRig() {
 
   return null;
 }
-
