@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
+import { canSaveFrom, TUNNEL_HOSTS } from './src/engine/remote';
 
 /** Camera mode → Save: write the owner's saved angles into the project (dev server only). */
 function cameraOverrides(): Plugin {
@@ -19,6 +20,8 @@ function cameraOverrides(): Plugin {
           return void res.end(existsSync(file) ? readFileSync(file, 'utf8') : '{}');
         }
         if (req.method !== 'POST') return void res.writeHead(405).end();
+        // the public tunnel link is view-only
+        if (!canSaveFrom(req.headers)) return void res.writeHead(403).end('view-only');
         let body = '';
         req.on('data', (c) => (body += c));
         req.on('end', () => {
@@ -40,7 +43,7 @@ export default defineConfig({
   base: './',
   build: { assetsInlineLimit: 0 },
   // the saved-angles file changes while presenting: do not reload the page when it does
-  server: { port: 5173, strictPort: false, watch: { ignored: ['**/src/content/cameraOverrides.json'] } },
+  server: { port: 5173, strictPort: false, watch: { ignored: ['**/src/content/cameraOverrides.json'] }, allowedHosts: TUNNEL_HOSTS },
   test: {
     environment: 'jsdom',
     globals: true,
