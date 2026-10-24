@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
@@ -29,7 +29,19 @@ const ease = (t: number) => {
 export function BridgeQuestion() {
   const cam = SHOTS.pier3.push ?? SHOTS.pier3;
   const at = (x: number, y: number) => screenPoint(cam.position, cam.target, x, y, DEPTH);
+  const at2 = (x: number, y: number, d: number) => screenPoint(cam.position, cam.target, x, y, d);
   const ask: Vec3 = at(-0.2, 0.6);
+  // a solid backing behind the four shapes, so the bridge does not show through their words
+  const panel = useMemo(() => {
+    const d = DEPTH + 0.03;
+    const c = [at2(-0.06, 0.66, d), at2(0.98, 0.66, d), at2(0.98, -0.68, d), at2(-0.06, -0.68, d)];
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(c.flat(), 3));
+    g.setIndex([0, 3, 1, 1, 3, 2]);
+    return g;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const panelMat = useRef<THREE.MeshBasicMaterial>(null);
   // the clock starts when the camera reaches the close-up (the move in from the city takes several seconds)
   const camera = useThree((st) => st.camera);
   const start = useRef<number | null>(null);
@@ -46,12 +58,16 @@ export function BridgeQuestion() {
       // after the inspector reaches the crack and the camera has pushed in (~3 s), one shape at a time
       if (g) g.scale.setScalar(Math.max(0.0001, SHAPE_SCALE * ease((t - 3300 - i * 300) / 600)));
     });
+    if (panelMat.current) panelMat.current.opacity = 0.9 * ease((t - 3200) / 600);
     if (t < 6000) tick((n) => n + 1);
   });
   const t = start.current === null ? 0 : performance.now() - start.current;
   const askIn = ease((t - 2900) / 500);
   return (
     <group name="bridge-question">
+      <mesh geometry={panel} renderOrder={5}>
+        <meshBasicMaterial ref={panelMat} color="#f7f5f1" transparent opacity={0} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
+      </mesh>
       <Html position={ask} center zIndexRange={[25, 0]} style={{ pointerEvents: 'none' }}>
         <div className="q3d" style={{ opacity: askIn, transform: `translateY(${(1 - askIn) * 10}px)` }}>
           <div className="q3d__who">inspector · Harbor Bridge · Pier 3</div>

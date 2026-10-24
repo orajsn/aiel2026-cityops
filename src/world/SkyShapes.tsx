@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { Line } from '@react-three/drei';
+import { Billboard, Line } from '@react-three/drei';
 import { DataShape, Label, type DataKind } from './DataShapes';
 import type { Vec3 } from './shots';
 
@@ -17,7 +17,7 @@ const SLOTS: Record<Face, { at: Vec3; kind: DataKind }> = {
 };
 const FACES = Object.keys(SLOTS) as Face[];
 /** where the lit shape comes to, in front of the database */
-const FRONT: Vec3 = [0, 2.6, 2.4];
+const FRONT: Vec3 = [0, 1.9, 3.8];
 
 const ease = (t: number) => {
   const c = Math.max(0, Math.min(1, t));
@@ -36,7 +36,7 @@ export function SkyShapes({ center, face, t, red }: { center: Vec3; face: Face |
       {FACES.map((f, i) => (
         <Slot key={f} f={f} i={i} face={face} t={t} />
       ))}
-      <Label text="Oracle AI Database" position={[0, -1.75, 0.6]} size={0.26} color={red} weight={700} plate />
+      {!face && <Label text="Oracle AI Database" position={[0, -1.75, 0.6]} size={0.26} color={red} weight={700} plate />}
     </group>
   );
 }
@@ -48,7 +48,8 @@ function Slot({ f, i, face, t }: { f: Face; i: number; face: Face | null; t: num
     const lit = face === f;
     const appear = face ? 1 : ease((t - 900 - i * 250) / 600);
     const goal: Vec3 = lit ? FRONT : SLOTS[f].at;
-    const goalS = (lit ? 2.6 : face ? 0.7 : 1.15) * appear;
+    // on a shape's own page the other three step away entirely: one thing to read
+    const goalS = (lit ? 2.6 : face ? 0 : 1.15) * appear;
     const k = Math.min(1, dt * 3.5);
     cur.current.p = [cur.current.p[0] + (goal[0] - cur.current.p[0]) * k, cur.current.p[1] + (goal[1] - cur.current.p[1]) * k, cur.current.p[2] + (goal[2] - cur.current.p[2]) * k];
     cur.current.s += (goalS - cur.current.s) * k;
@@ -60,8 +61,17 @@ function Slot({ f, i, face, t }: { f: Face; i: number; face: Face | null; t: num
   const lit = face === f;
   return (
     <group>
-      <Line points={[[0, 0.3, 0], SLOTS[f].at]} color={lit ? '#2bb3c8' : '#1B8A9C'} lineWidth={lit ? 2.5 : 1.5} transparent opacity={face && !lit ? 0.25 : 0.7} />
+      {!face && <Line points={[[0, 0.3, 0], SLOTS[f].at]} color="#1B8A9C" lineWidth={1.5} transparent opacity={0.7} />}
       <group ref={g}>
+        {/* the shape in focus gets a solid backing so the city photo does not show through its words */}
+        {lit && (
+          <Billboard position={[0, -0.15, -0.9]}>
+            <mesh renderOrder={1}>
+              <planeGeometry args={[3.4, 3.1]} />
+              <meshBasicMaterial color="#f7f5f1" transparent opacity={0.97} depthWrite={false} toneMapped={false} />
+            </mesh>
+          </Billboard>
+        )}
         <DataShape kind={SLOTS[f].kind} lit={lit} />
       </group>
     </group>

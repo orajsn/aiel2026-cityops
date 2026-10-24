@@ -32,38 +32,85 @@ const ease = (t: number) => {
   return 1 - Math.pow(1 - c, 3);
 };
 
-/** a short line of text drawn on a transparent canvas: always faces the camera, no background */
-export function Label({ text, position, size = 0.16, color = INK, weight = 500, mono = false, plate = false }: { text: string; position: Vec3; size?: number; color?: string; weight?: number; mono?: boolean; plate?: boolean }) {
+/** smallest and largest text on the 1920 x 1080 stage */
+export const MIN_LABEL_PX = 20;
+export const MAX_LABEL_PX = 48;
+/** a label may grow up to this many times the space it was designed for to reach 20 px; any more and it hides */
+const ROOM = 1.6;
+const STAGE_H = 1080;
+
+/**
+ * How tall a label is: it fills the space its shape gives it (`designSize` x the shape's scale), held
+ * between 20 and 48 px on the stage. If reaching 20 px needs much more than that space, it hides, so it
+ * never piles onto its neighbours.
+ */
+export function labelLayout({ designSize, parentScale, distance, fovDeg }: { designSize: number; parentScale: number; distance: number; fovDeg: number }) {
+  const worldPerPx = (2 * distance * Math.tan(((fovDeg / 2) * Math.PI) / 180)) / STAGE_H;
+  const room = designSize * parentScale;
+  const px = Math.min(MAX_LABEL_PX, Math.max(MIN_LABEL_PX, room / worldPerPx));
+  const worldHeight = px * worldPerPx;
+  return { worldHeight, visible: room > 0 && worldHeight <= room * ROOM };
+}
+
+/**
+ * A short line of text: always faces the camera, sized to its shape but never below 20 px or above 48 px,
+ * with a white outline so it reads on any background. Hidden while its shape is too small to give it
+ * room, so it never piles onto its neighbours. `size` is the space the shape gives it, in its own units.
+ */
+export function Label({ text, position, size = 0.16, color = INK, weight = 500, mono = false, plate = false, halo = true }: { text: string; position: Vec3; size?: number; color?: string; weight?: number; mono?: boolean; plate?: boolean; halo?: boolean }) {
   const { tex, aspect } = useMemo(() => {
     const px = 64;
     const font = `${weight} ${px}px ${mono ? '"JetBrains Mono", monospace' : 'Inter, sans-serif'}`;
     const probe = document.createElement('canvas').getContext('2d')!;
     probe.font = font;
-    const w = Math.ceil(probe.measureText(text).width) + (plate ? 48 : 12);
-    const h = px + (plate ? 30 : 16);
+    const pad = plate ? 48 : 28;
+    const w = Math.ceil(probe.measureText(text).width) + pad;
+    const h = px + (plate ? 30 : 24);
     const c = Object.assign(document.createElement('canvas'), { width: w, height: h });
     const g = c.getContext('2d')!;
     if (plate) {
-      g.fillStyle = 'rgba(255,255,255,0.88)';
+      g.fillStyle = 'rgba(255,255,255,0.92)';
       g.beginPath();
       g.roundRect(0, 0, w, h, h / 2);
       g.fill();
     }
     g.font = font;
-    g.fillStyle = color;
     g.textBaseline = 'middle';
-    g.fillText(text, plate ? 24 : 6, h / 2 + 2);
+    if (!plate && halo) {
+      // a white halo keeps the words readable over the city photo or a busy shape
+      g.lineJoin = 'round';
+      g.lineWidth = 14;
+      g.strokeStyle = 'rgba(255,255,255,0.92)';
+      g.strokeText(text, pad / 2, h / 2 + 2);
+    }
+    g.fillStyle = color;
+    g.fillText(text, pad / 2, h / 2 + 2);
     const t = new THREE.CanvasTexture(c);
     t.colorSpace = THREE.SRGBColorSpace;
     t.anisotropy = 4;
     return { tex: t, aspect: w / h };
-  }, [text, color, weight, mono, plate]);
+  }, [text, color, weight, mono, plate, halo]);
   useEffect(() => () => tex.dispose(), [tex]);
+  const mesh = useRef<THREE.Mesh>(null);
+  const world = useMemo(() => new THREE.Vector3(), []);
+  const scale = useMemo(() => new THREE.Vector3(), []);
+  useFrame(({ camera }) => {
+    const m = mesh.current;
+    if (!m || !m.parent) return;
+    m.parent.getWorldPosition(world);
+    m.parent.getWorldScale(scale);
+    const cam = camera as THREE.PerspectiveCamera;
+    const l = labelLayout({ designSize: size, parentScale: scale.y, distance: world.distanceTo(camera.position), fovDeg: cam.fov ?? 45 });
+    m.visible = l.visible;
+    // the mesh is 1 unit tall; undo the parents' scale so the label keeps its screen size
+    const s = l.worldHeight / (scale.y || 1);
+    m.scale.set(s * aspect, s, 1);
+  });
   return (
     // drawn over its own shape (no depth test), so a neighbouring cell or node never cuts the words
     <Billboard position={position}>
-      <mesh renderOrder={20}>
-        <planeGeometry args={[size * aspect, size]} />
+      <mesh ref={mesh} renderOrder={20}>
+        <planeGeometry args={[1, 1]} />
         <meshBasicMaterial map={tex} transparent depthWrite={false} depthTest={false} toneMapped={false} />
       </mesh>
     </Billboard>
@@ -91,7 +138,7 @@ export const TITLES: Record<DataKind, string> = {
 
 /* ---------- table: CITY_ASSET rows as floating cell slabs ---------- */
 
-const TABLE_ROWS = ['Harbor Bridge', 'Substation Gamma', 'Pipeline North-7', 'City Operations Control Center'].map((id) => ASSETS.find((a) => a.id === id)!);
+const TABLE_ROWS = ['Harbor Bridge', 'Substation Gamma', 'Pipeline North-7'].map((id) => ASSETS.find((a) => a.id === id)!);
 
 function TableShape({ lit }: { lit: boolean }) {
   const rows = useRef<THREE.Group>(null);
@@ -104,10 +151,10 @@ function TableShape({ lit }: { lit: boolean }) {
       r.position.z = (1 - k) * 0.6;
     });
   });
-  const cols = [1.25, 0.6, 0.75, 0.3];
+  const cols = [1.4, 0.8, 0.45];
   const xs = cols.map((_, i) => -1.2 + cols.slice(0, i).reduce((a, b) => a + b + 0.06, 0) + cols[i] / 2);
-  const header = ['asset', 'type', 'district', 'crit.'];
-  const cell = (r: Asset) => [r.id === 'City Operations Control Center' ? 'Ops Control Center' : r.id, r.type, r.district, String(r.criticality)];
+  const header = ['asset', 'type', 'crit.'];
+  const cell = (r: Asset) => [r.id, r.type, String(r.criticality)];
   return (
     <group>
       <group position={[0, 0.75, 0]}>
@@ -117,20 +164,20 @@ function TableShape({ lit }: { lit: boolean }) {
               <boxGeometry args={[cols[c], 0.24, 0.06]} />
               <meshStandardMaterial color={DEEP} />
             </mesh>
-            <Label text={h} position={[0, 0, 0.05]} size={0.13} color="#ffffff" weight={600} mono />
+            <Label text={h} position={[0, 0, 0.05]} size={0.13} color="#ffffff" weight={600} mono halo={false} />
           </group>
         ))}
       </group>
       <group ref={rows}>
         {TABLE_ROWS.map((r, i) => (
-          <group key={r.id} position={[0, 0.4 - i * 0.32, 0]}>
+          <group key={r.id} position={[0, 0.38 - i * 0.36, 0]}>
             {cell(r).map((v, c) => (
               <group key={c} position={[xs[c], 0, 0]}>
                 <mesh>
-                  <boxGeometry args={[cols[c], 0.25, 0.05]} />
+                  <boxGeometry args={[cols[c], 0.29, 0.05]} />
                   <meshStandardMaterial color={r.id === HB && lit ? '#fbe3de' : '#f2f4f6'} />
                 </mesh>
-                <Label text={v} position={[0, 0, 0.045]} size={0.115} color={r.id === HB ? RED : INK} weight={r.id === HB ? 600 : 400} />
+                <Label text={v} position={[0, 0, 0.045]} size={0.115} color={r.id === HB ? RED : INK} weight={r.id === HB ? 600 : 400} halo={false} />
               </group>
             ))}
           </group>
@@ -194,7 +241,7 @@ function useGraph() {
     const pos = new Map<string, Vec3>([[HB, [0, 0, 0]]]);
     ring.forEach((id, i) => {
       const a = (i / ring.length) * Math.PI * 2 + 0.4;
-      pos.set(id, [Math.cos(a) * 0.95, Math.sin(a) * 0.62, Math.sin(a * 2) * 0.35]);
+      pos.set(id, [Math.cos(a) * 1.1, Math.sin(a) * 0.78, Math.sin(a * 2) * 0.3]);
     });
     outer.forEach((id) => {
       const src = second.find((c) => c.to === id || c.from === id)!;
@@ -211,7 +258,7 @@ function GraphShape({ lit }: { lit: boolean }) {
   const pulses = useRef<THREE.Group>(null);
   const spin = useRef<THREE.Group>(null);
   useFrame(({ clock }, dt) => {
-    if (spin.current) spin.current.rotation.y = Math.sin(clock.elapsedTime * 0.25) * 0.35;
+    if (spin.current) spin.current.rotation.y = Math.sin(clock.elapsedTime * 0.25) * 0.18;
     // a query runs along the edges: hop 1 from Harbor Bridge, then hop 2
     pulses.current?.children.forEach((p, i) => {
       const e = edges[i];
@@ -235,7 +282,7 @@ function GraphShape({ lit }: { lit: boolean }) {
         return (
           <group key={i}>
             <Line points={[a, b]} color={first ? TEAL : '#8fbfca'} lineWidth={first ? 2.2 : 1.4} />
-            <Label text={e.type} position={mid} size={0.1} color={first ? DEEP : DIM} mono />
+            <Label text={e.type} position={mid} size={0.075} color={first ? DEEP : DIM} mono />
           </group>
         );
       })}
@@ -248,7 +295,7 @@ function GraphShape({ lit }: { lit: boolean }) {
               <sphereGeometry args={[hb ? 0.15 : near ? 0.09 : 0.065, 24, 24]} />
               <meshStandardMaterial color={hb ? RED : near ? DEEP : '#7fb3bf'} emissive={hb ? RED : DEEP} emissiveIntensity={hb ? 0.35 : 0.15} />
             </mesh>
-            <Label text={short(id)} position={[0, hb ? 0.27 : 0.18, 0]} size={hb ? 0.15 : 0.11} color={hb ? RED : INK} weight={hb ? 700 : 500} />
+            <Label text={short(id)} position={[0, hb ? -0.3 : 0.18, 0]} size={hb ? 0.15 : near ? 0.11 : 0.075} color={hb ? RED : INK} weight={hb ? 700 : 500} />
           </group>
         );
       })}
@@ -268,11 +315,11 @@ function GraphShape({ lit }: { lit: boolean }) {
 
 /** report text from the lab notebooks, grouped by what it is about; the bridge-bearing ones sit together */
 const DOCS: { text: string; topic: 'bridge' | 'power' | 'water' | 'other'; at: Vec3 }[] = [
-  { text: 'Hairline crack ~0.12 mm at Pier 3 bearing plate', topic: 'bridge', at: [0.55, 0.35, 0.2] },
-  { text: 'Corrosion and pitting on Pier 2 bearings, ~25% section loss', topic: 'bridge', at: [0.7, 0.15, 0.35] },
-  { text: 'Rust bleed onto the concrete pedestal, Pier 2', topic: 'bridge', at: [0.45, 0.1, 0.45] },
-  { text: 'Substation Gamma · transformer inspection', topic: 'power', at: [-0.75, 0.5, -0.3] },
-  { text: 'Pipeline North-7 · pressure instability', topic: 'water', at: [-0.45, -0.6, 0.25] },
+  { text: 'Pier 3 · crack 0.12 mm', topic: 'bridge', at: [0.5, 0.5, 0.2] },
+  { text: 'Pier 2 · ~25% section loss', topic: 'bridge', at: [0.85, 0.12, 0.35] },
+  { text: 'Pier 2 · rust bleed', topic: 'bridge', at: [0.35, -0.05, 0.45] },
+  { text: 'substation reports', topic: 'power', at: [-0.75, 0.6, -0.3] },
+  { text: 'pipeline reports', topic: 'water', at: [-0.45, -0.7, 0.25] },
 ];
 const QUERY_TEXT = 'cracks or corrosion on bridge bearings';
 const QUERY_AT: Vec3 = [0.6, 0.22, 0.32];
@@ -350,7 +397,7 @@ function VectorShape({ lit }: { lit: boolean }) {
             <octahedronGeometry args={[0.05, 0]} />
             <meshBasicMaterial color={d.topic === 'bridge' ? RED : DEEP} toneMapped={false} />
           </mesh>
-          <Label text={d.text} position={[d.at[0], d.at[1] + 0.11, d.at[2]]} size={0.075} color={d.topic === 'bridge' ? RED : DIM} />
+          <Label text={d.text} position={[d.at[0], d.at[1] + 0.12, d.at[2]]} size={d.topic === 'bridge' ? 0.11 : 0.08} color={d.topic === 'bridge' ? RED : DIM} weight={d.topic === 'bridge' ? 600 : 500} />
         </group>
       ))}
       <group ref={q} visible={false}>
@@ -358,7 +405,7 @@ function VectorShape({ lit }: { lit: boolean }) {
           <sphereGeometry args={[0.06, 16, 16]} />
           <meshBasicMaterial color="#ffffff" toneMapped={false} />
         </mesh>
-        <Label text={`“${QUERY_TEXT}”`} position={[0, -0.13, 0]} size={0.085} color={INK} weight={600} plate />
+        <Label text={`“${QUERY_TEXT}”`} position={[0, -0.15, 0]} size={0.12} color={INK} weight={600} plate />
       </group>
       <mesh ref={ring} position={QUERY_AT} visible={false}>
         <sphereGeometry args={[1, 24, 16]} />
@@ -373,7 +420,7 @@ function VectorShape({ lit }: { lit: boolean }) {
           <Line key={i} points={[QUERY_AT, cloud[i].p]} color={RED} lineWidth={1.2} transparent opacity={0.6} />
         ))}
       </group>
-      <Label text="384 numbers per text · shown in 3" position={[0.1, 1.15, -0.8]} size={0.08} color={DIM} mono />
+      <Label text="384 numbers per text · shown in 3" position={[0.1, 1.15, -0.8]} size={0.075} color={DIM} mono />
     </group>
   );
 }
