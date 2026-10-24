@@ -58,7 +58,7 @@ export const chapter0: SceneDef[] = [
   {
     id: '0.7',
     chapter: 0,
-    title: 'The hero asset',
+    title: 'One bridge, two problems',
     shot: 'bridge',
     world: { pins: 'all', graph: HB, bridge: true, markers: true },
     overlay: 'BridgeMarkers',

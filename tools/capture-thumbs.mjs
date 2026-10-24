@@ -20,7 +20,7 @@ await withBrowser(async (page) => {
   for (const id of ids) {
     await page.go(id);
     // inspection pages push in after the walk; long camera moves take up to ~5 s
-    await wait(['0.4', '2.1', '2.13', '2.14'].includes(id) ? 9000 : 6500);
+    await wait(['0.4', '3.1a', '3.1b', '3.1c', '3.13', '3.14'].includes(id) ? 9000 : 6500);
     writeFileSync(new URL(`${id}.jpg`, out), await page.shot(0.2, 78));
     console.log('preview', id);
   }
