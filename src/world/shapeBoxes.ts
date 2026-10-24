@@ -8,5 +8,11 @@ export const SHAPE_BOX: Record<DataKind, [number, number, number, number]> = {
   table: [-1.25, 1.62, -0.62, 0.92],
   json: [-1.6, 1.4, -1.25, 1.08],
   graph: [-4.0, 3.3, -1.4, 1.25],
-  vectors: [-2.3, 2.3, -1.1, 1.1],
+  vectors: [-1.55, 1.55, -1.15, 1.15],
+};
+
+/** 0.4's smaller panels: the graph shows only the bridge's own four links */
+export const COMPACT_BOX: Record<DataKind, [number, number, number, number]> = {
+  ...SHAPE_BOX,
+  graph: [-2.05, 2.05, -1.05, 1.0],
 };

@@ -7,6 +7,7 @@ import { HandoffCard } from './HandoffCard';
 import { JumpMenu } from './JumpMenu';
 import { CameraEditor } from './CameraEditor';
 import { useCameraStore } from '../engine/camera';
+import { Rich } from './Rich';
 
 const CHAPTER_LABEL = ['The city', 'RAG to Agents', 'Agent Memory'];
 
@@ -63,7 +64,7 @@ export function Overlay() {
       {/* presenter script under the page; CC (or S) hides it */}
       {scene.script && scriptOpen && (
         <div className="script" aria-label="presenter script">
-          {scene.script}
+          <Rich text={scene.script} />
         </div>
       )}
 

@@ -48,8 +48,18 @@ body,
   pointer-events: auto;
 }
 
-code,
+/* names (assets, people, ids) read in the body font, set a little heavier (owner: the mono looked childish on stage);
+   only real code keeps the mono */
 .mono {
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+code,
+.code,
+.beat-code,
+.dio-json,
+.beat__notebook {
   font-family: var(--font-mono);
 }
 
@@ -116,7 +126,7 @@ code,
   color: var(--ink-dim);
   pointer-events: none;
 }
-.strip__chapter { text-transform: uppercase; letter-spacing: 0.14em; font-size: 15px; color: var(--red); font-weight: 600; font-family: var(--font-mono); }
+.strip__chapter { text-transform: uppercase; letter-spacing: 0.08em; font-size: 15px; color: var(--red); font-weight: 700; font-family: var(--font-body); }
 .strip__sep { width: 1px; height: 26px; background: var(--line); }
 .strip__id { color: var(--ink-dim); font-size: 22px; }
 .strip__title { color: var(--ink); font-weight: 600; font-size: 26px; }
@@ -175,7 +185,7 @@ code,
 .jump__title { font-size: 30px; font-weight: 600; color: var(--ink); }
 .jump__close { width: 56px; height: 56px; border-radius: 50%; border: 1px solid var(--line); background: none; color: var(--ink); font-size: 24px; cursor: pointer; }
 .jump__chapter { margin-top: 18px; }
-.jump__chapter-name { margin: 0 0 6px; font-size: 16px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red); font-weight: 600; font-family: var(--font-mono); }
+.jump__chapter-name { margin: 0 0 6px; font-size: 16px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--red); font-weight: 700; font-family: var(--font-body); }
 .jump__section { margin: 10px 0 18px; }
 .jump__section-name { margin: 0 0 10px; font-size: 19px; font-weight: 600; color: var(--ink-dim); }
 .jump__grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; }
@@ -306,7 +316,7 @@ code,
   position: absolute; right: 48px; top: 110px; width: 780px; max-height: 720px; overflow: hidden;
   padding: 26px 30px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); backdrop-filter: blur(8px);
 }
-.beat__kicker { display: flex; align-items: center; gap: 14px; font-size: 14px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red); font-weight: 600; margin-bottom: 18px; font-family: var(--font-mono); }
+.beat__kicker { display: flex; align-items: center; gap: 14px; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--red); font-weight: 700; margin-bottom: 18px; font-family: var(--font-body); }
 .beat__tag { padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-dim); letter-spacing: 0.06em; text-transform: none; font-weight: 400; }
 .beat__message {
   position: absolute; left: 48px; right: 48px; bottom: 190px; text-align: center; font-size: 34px; line-height: 1.3; color: var(--ink); font-weight: 600;
@@ -345,7 +355,7 @@ code,
   padding: 14px 22px; border-radius: 10px; background: rgba(15, 20, 28, 0.82); color: #f3f1ec;
   font-size: 22px; line-height: 1.45; text-align: center; pointer-events: none;
 }
-.stepper__btn--text { font: 600 22px/1 var(--font-mono); padding: 0; letter-spacing: 0.04em; color: var(--ink-dim); }
+.stepper__btn--text { font: 700 22px/1 var(--font-body); padding: 0; letter-spacing: 0.02em; color: var(--ink-dim); }
 .stepper__btn--text.is-on { color: var(--ink); border-color: var(--teal); }
 .place-label { white-space: nowrap; padding: 6px 12px; border-radius: 8px; background: var(--panel-strong); border-left: 3px solid var(--red); color: var(--ink); font-size: 16px; transform: translateY(-24px); }
 /* the strip sits over the city now (no sky behind it): give it a backing */
@@ -402,3 +412,16 @@ code,
 .qb__red { color: var(--red); }
 .q3d__text b { color: var(--teal); font-weight: 700; }
 .q3d__who { font-weight: 600; }
+
+/* the presenter's emphasis (overlay/Rich.tsx): teal for the idea, red for the one thing to look at */
+.hl { color: var(--teal); font-weight: 700; }
+.hl-red { color: var(--red); font-weight: 700; }
+.script .hl { color: #6fdced; }
+.script .hl-red { color: #ff9a85; }
+
+/* a speaking card in the sky (1.1: the question in, the bare model's guess out) */
+.sky-card { width: 460px; padding: 14px 18px; border-radius: 12px; background: var(--panel-strong); border-left: 4px solid var(--tone, var(--teal)); box-shadow: 0 6px 24px rgba(0,0,0,0.18); transition: opacity 0.5s ease; }
+.sky-card.tone-teal { --tone: var(--teal); }
+.sky-card.tone-grey { --tone: #9aa1aa; }
+.sky-card__who { font-size: 14px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 6px; }
+.sky-card__text { font-size: 22px; line-height: 1.35; color: var(--ink); }

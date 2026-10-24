@@ -10,7 +10,7 @@ import { layoutCloud, nearestK } from './vectorLayout';
 import { SkyShapes } from './SkyShapes';
 import { SkyLab2, type Lab2Act } from './SkyLab2';
 import { NeuralNet } from './NeuralNet';
-import type { Vec3 } from './shots';
+import { SHOTS, type Vec3 } from './shots';
 
 /**
  * The sky stage: where the AI ideas are explained, floating above City Operations Control Center
@@ -32,16 +32,33 @@ export type SkyAct = 'model' | 'embed' | 'envelope' | 'shapes' | 'brain' | Lab2A
 const OPS = assetPosition('City Operations Control Center');
 export const SKY_ANCHOR: Vec3 = [OPS.x, 9, OPS.z];
 const A = SKY_ANCHOR;
-const MODEL: Vec3 = [A[0] - 3.4, A[1], A[2]];
-const DB: Vec3 = [A[0] + 2.6, A[1] - 1.4, A[2]];
-const CLOUD: Vec3 = [A[0] + 3.2, A[1] + 3.6, A[2]];
+// the data flows left to right: the database and its vector space on the left, the language model on the right
+const MODEL: Vec3 = [A[0] + 3.0, A[1] + 0.3, A[2]];
+const MODEL_SCALE = 1.25;
+const DB: Vec3 = [A[0] - 2.8, A[1] - 1.4, A[2]];
+const CLOUD: Vec3 = [A[0] - 2.6, A[1] + 3.6, A[2]];
 const CLOUD_SCALE = 0.075;
-const ENVELOPE: Vec3 = [A[0] - 0.4, A[1] + 1.6, A[2]];
+const ENVELOPE: Vec3 = [A[0] + 0.1, A[1] + 1.4, A[2]];
+/** the sky camera's right: the network faces the camera, so its first layer (input) is on the left */
+const RIGHT: Vec3 = (() => {
+  const [p, q] = [SHOTS.sky.position, SHOTS.sky.target];
+  const f = [q[0] - p[0], q[2] - p[2]];
+  const l = Math.hypot(f[0], f[1]) || 1;
+  return [-f[1] / l, 0, f[0] / l];
+})();
+const along = (p: Vec3, k: number): Vec3 => [p[0] + RIGHT[0] * k, p[1], p[2] + RIGHT[2] * k];
+/** where words enter the model (its first layer) and where the answer leaves (its last) */
+const MODEL_IN = along(MODEL, -1.35 * MODEL_SCALE);
+const MODEL_OUT = along(MODEL, 1.35 * MODEL_SCALE);
 const OPS_TOP: Vec3 = [OPS.x, 1.2, OPS.z];
 /** the question as a point in the cloud's own space (near the "structural" cluster) */
 const QUERY: Vec3 = [8, 6, -4];
 
 const LAB2_ACTS: (SkyAct | null)[] = ['overflow', 'tools', 'unified', 'note'];
+
+/** 1.1 · the bare model (draft wording until the notebook's recorded run is in): a fluent answer that knows nothing of the city */
+const BARE_Q = '“What do we know about Harbor Bridge, and what should I do about Pier 3?”';
+const BARE_A = '“I don’t have information about a Harbor Bridge in your city. In general, any crack in a bridge pier should be inspected by a qualified engineer…”';
 
 const ease = (t: number) => {
   const c = Math.max(0, Math.min(1, t));
@@ -101,18 +118,23 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
   // envelope act: 5 points fly in (0.8-2.0 s), the envelope travels to the model (2.4-3.6 s), the answer comes down (3.8 s)
   const fly = act === 'envelope' ? ease((t - 800) / 1200) : 0;
   const travel = act === 'envelope' ? ease((t - 2400) / 1200) : 0;
-  const envPos: Vec3 = [ENVELOPE[0] + (MODEL[0] + 0.9 - ENVELOPE[0]) * travel, ENVELOPE[1] + (MODEL[1] + 0.2 - ENVELOPE[1]) * travel, ENVELOPE[2]];
+  // the envelope goes to the model's first layer and is taken in there
+  const dock = along(MODEL_IN, -0.45);
+  const envPos: Vec3 = [ENVELOPE[0] + (dock[0] - ENVELOPE[0]) * travel, ENVELOPE[1] + (dock[1] - ENVELOPE[1]) * travel, ENVELOPE[2] + (dock[2] - ENVELOPE[2]) * travel];
+  const intake = act === 'envelope' ? 1 - ease((t - 3500) / 400) : 1;
 
   return (
-    <group name="sky-stage" visible={visible}>
+    <>
+      {/* 0.5's board sits outside the grow-in: its pieces hand over from 0.4 without a hidden frame */}
+      {act === 'shapes' && <SkyShapes red={theme.red} />}
+      <group name="sky-stage" visible={visible}>
       {/* scale about the anchor so the stage grows out of its own centre */}
       <group position={A}>
         <group ref={root}>
           <group position={[-A[0], -A[1], -A[2]]}>
-            {(act === 'model' || act === 'embed' || act === 'envelope') && <ModelOrb position={MODEL} lit={act === 'envelope' && t > 3600} doubt={act === 'model' && t > 2600} producing={(act === 'model' && t > 2300) || (act === 'envelope' && t > 3600)} labelled={visible} scale={1.25} />}
+            {(act === 'model' || act === 'embed' || act === 'envelope') && <ModelOrb position={MODEL} lit={act === 'envelope' && t > 3800} doubt={act === 'model' && t > 2600} producing={(act === 'model' && t > 2300) || (act === 'envelope' && t > 3800)} labelled={visible} scale={MODEL_SCALE} />}
             {act === 'brain' && <ModelOrb position={[A[0], A[1] + 0.4, A[2]]} lit doubt={false} producing labelled={visible} scale={2.2} />}
             {act && LAB2_ACTS.includes(act) && <SkyLab2 act={act as Lab2Act} center={[A[0], A[1] + 0.2, A[2]]} t={t} red={theme.red} opsTop={OPS_TOP} />}
-            {act === 'shapes' && <SkyShapes red={theme.red} />}
             {hasDb && <SkyDatabase color={theme.red} appearMs={0} t={t} />}
             {hasDb && (
               <group position={CLOUD} scale={CLOUD_SCALE}>
@@ -127,7 +149,9 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
                     <meshBasicMaterial color={theme.red} toneMapped={false} />
                   </mesh>
                 ))}
-                <Envelope position={envPos} sealed={fly >= 1} />
+                <group scale={Math.max(0.001, intake)}>
+                  <Envelope position={envPos} sealed={fly >= 1} />
+                </group>
                 {visible && <SkyLabel position={[ENVELOPE[0], ENVELOPE[1] + 0.9, ENVELOPE[2]]} text="5 documents + the question · context is data, not instructions" show={t > 1800 && travel < 0.2} />}
               </>
             )}
@@ -135,14 +159,17 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
         </group>
       </group>
       {/* flows between the city and the stage (outside the scaled group so they stay anchored to the city) */}
-      {visible && act === 'model' && <FlowArc key="q-up" from={OPS_TOP} to={MODEL} lift={1.5} radius={0.05} durationMs={1600} delayMs={700} fadeMs={900} color="#ffffff" />}
+      {visible && act === 'model' && <FlowArc key="q-up" from={OPS_TOP} to={MODEL_IN} lift={1.5} radius={0.05} durationMs={1600} delayMs={700} fadeMs={900} color="#ffffff" />}
       {visible && act === 'embed' &&
         sources.map((s, i) => <FlowArc key={`doc-${i}`} from={s} to={DB} lift={2.5} radius={0.04} durationMs={1300} delayMs={500 + i * 180} fadeMs={600} color={theme.data} />)}
-      {visible && act === 'envelope' && <FlowArc key="answer" from={MODEL} to={OPS_TOP} lift={1.2} radius={0.06} durationMs={1500} delayMs={3800} persist color={theme.data} />}
-      {visible && <SkyLabel position={[MODEL[0], MODEL[1] - 1.3, MODEL[2]]} text="the language model · knows the world, not your city" show={act === 'model' && t > 2600} tone="grey" />}
+      {visible && act === 'envelope' && <FlowArc key="answer" from={MODEL_OUT} to={OPS_TOP} lift={0.2} radius={0.06} durationMs={1500} delayMs={4600} persist color={theme.data} />}
+      {/* 1.1: the inspector's question goes in bare, and a general guess comes out */}
+      {visible && act === 'model' && <SkyCard position={[OPS_TOP[0], OPS_TOP[1] + 2.2, OPS_TOP[2]]} who="the question" text={BARE_Q} show={t > 200 && t < 2600} />}
+      {visible && act === 'model' && <SkyCard position={[MODEL[0], MODEL[1] - 2.3, MODEL[2]]} who="the language model · a guess" text={BARE_A} show={t > 3900} tone="grey" />}
       {visible && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="Oracle AI Database · 384 numbers per text" show={act === 'embed' && t > 2800} />}
       {visible && <SkyLabel position={[OPS_TOP[0], OPS_TOP[1] + 0.8, OPS_TOP[2]]} text="answer from the envelope only" show={act === 'envelope' && t > 5300} />}
-    </group>
+      </group>
+    </>
   );
 }
 
@@ -206,6 +233,18 @@ function SkyLabel({ position, text, show, tone = 'teal' }: { position: Vec3; tex
     <Html position={position} center zIndexRange={[16, 0]} style={{ pointerEvents: 'none' }}>
       <div className={`sky-label tone-${tone}`} style={{ opacity: show ? 1 : 0 }}>
         {text}
+      </div>
+    </Html>
+  );
+}
+
+/** a small card in the sky: who is speaking, and the words */
+function SkyCard({ position, who, text, show, tone = 'teal' }: { position: Vec3; who: string; text: string; show: boolean; tone?: 'teal' | 'grey' }) {
+  return (
+    <Html position={position} center zIndexRange={[16, 0]} style={{ pointerEvents: 'none' }}>
+      <div className={`sky-card tone-${tone}`} style={{ opacity: show ? 1 : 0 }}>
+        <div className="sky-card__who">{who}</div>
+        <div className="sky-card__text">{text}</div>
       </div>
     </Html>
   );

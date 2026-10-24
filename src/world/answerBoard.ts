@@ -41,11 +41,11 @@ type Rect = { x0: number; x1: number; y0: number; y1: number };
  * The scale and placement that fit a shape's whole box inside a screen rectangle, centred. `at(x, y)` is
  * the world point at a screen position, at the depth the shape floats (any camera).
  */
-export function fitShapeIn(kind: DataKind, c: Rect, at: (x: number, y: number) => Vec3) {
+export function fitShapeIn(kind: DataKind, c: Rect, at: (x: number, y: number) => Vec3, box = SHAPE_BOX[kind]) {
   const o = at(0, 0);
   const ux = dist(o, at(1, 0)); // world units per screen unit, sideways and up
   const uy = dist(o, at(0, 1));
-  const [x0, x1, y0, y1] = SHAPE_BOX[kind];
+  const [x0, x1, y0, y1] = box;
   const scale = Math.min(((c.x1 - c.x0) * ux) / (x1 - x0), ((c.y1 - c.y0) * uy) / (y1 - y0));
   const cx = (c.x0 + c.x1) / 2;
   const cy = (c.y0 + c.y1) / 2;

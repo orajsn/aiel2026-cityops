@@ -3,9 +3,8 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
 import { DataShape } from './DataShapes';
-import { SILOS } from './BridgeQuestion';
+import { SILO_LAYOUT, cardGeometry } from './BridgeQuestion';
 import { BOARD, BOARD_DEPTH, STACK_AT, boardPoint, fitShape, type Panel } from './answerBoard';
-import { screenPoint } from './frame';
 import { useSceneStore } from '../engine/store';
 import { SHOTS } from './shots';
 import type { Vec3 } from './shots';
@@ -26,7 +25,8 @@ export const LAND_MS = (i: number) => 2100 + i * 350;
  * 0.5 · the answer. Four panels around one Oracle AI Database, framed from the sky camera: each piece of
  * data the inspector's question needs flies up from its separate place by the bridge (0.4) into its own
  * panel, where it plays. Everything stays inside its panel; the words are drawn over the shapes, never
- * behind a panel. Placed in world units (the sky stage's scale is 1 once it has grown in).
+ * behind a panel. Drawn outside the sky stage's grow-in, in world units: each piece starts exactly where and
+ * how 0.4 left it (same size, same angle), and 0.4's panels fade rather than vanish, so the hand-over does not blink.
  */
 export function SkyShapes({ red }: { red: string }) {
   const settled = useSceneStore((s) => s.settled);
@@ -39,14 +39,27 @@ export function SkyShapes({ red }: { red: string }) {
     return new THREE.Quaternion().setFromRotationMatrix(m);
   }, [cam]);
   const stack = boardPoint(STACK_AT.x, STACK_AT.y);
+  const [dbT, setDbT] = useState(0);
+  const mounted = useRef(performance.now());
+  const leaving = useRef<(THREE.MeshBasicMaterial | null)[]>([]);
+  const oldCards = useMemo(() => SILO_LAYOUT().cards.map(cardGeometry), []);
   useFrame(() => {
     if (settled && t0.current === null) t0.current = performance.now();
     clock.current = t0.current === null ? 0 : performance.now() - t0.current;
+    if (clock.current < 1200) setDbT(clock.current);
+    // 0.4's panels fade out as the camera leaves the bridge
+    const fade = 0.93 * (1 - ease((performance.now() - mounted.current) / 700));
+    leaving.current.forEach((m) => m && (m.opacity = fade));
   });
   return (
     <group name="answer-board">
+      {oldCards.map((g, i) => (
+        <mesh key={i} geometry={g} renderOrder={5}>
+          <meshBasicMaterial ref={(m) => (leaving.current[i] = m)} color="#f7f5f1" transparent opacity={0.93} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
+        </mesh>
+      ))}
       <group position={stack} quaternion={facing} scale={0.62}>
-        <Stack red={red} t={9999} />
+        <Stack red={red} t={settled ? dbT : 0} />
       </group>
       {BOARD.map((p, i) => (
         <PanelPiece key={p.kind} p={p} i={i} clock={clock} facing={facing} stack={stack} />
@@ -57,12 +70,11 @@ export function SkyShapes({ red }: { red: string }) {
 
 function PanelPiece({ p, i, clock, facing, stack }: { p: Panel; i: number; clock: { current: number }; facing: THREE.Quaternion; stack: Vec3 }) {
   const fit = useMemo(() => fitShape(p.kind, p), [p]);
-  // where the piece was on 0.4: its own place beside the bridge
-  const from = useMemo<Vec3>(() => {
-    const s = SILOS.find((x) => x.kind === p.kind)!;
-    const c = SHOTS.pier3.push ?? SHOTS.pier3;
-    return screenPoint(c.position, c.target, (s.x0 + s.x1) / 2, (s.y0 + s.y1) / 2, 0.34);
-  }, [p]);
+  // exactly how the piece sat on 0.4, in its own panel beside the bridge
+  const from = useMemo(() => {
+    const l = SILO_LAYOUT();
+    return { at: l.fits[i].origin, scale: l.fits[i].scale, q: l.facing };
+  }, [i]);
   // the panel: a solid card behind the shape (deeper than any part of it), the same rectangle on screen
   const card = useMemo(() => {
     const d = BOARD_DEPTH + 1.2;
@@ -81,21 +93,22 @@ function PanelPiece({ p, i, clock, facing, stack }: { p: Panel; i: number; clock
   const mat = useRef<THREE.MeshBasicMaterial>(null);
   const linkRef = useRef<THREE.Group>(null);
   const q = useMemo(() => new THREE.Quaternion(), []);
-  const [lit, setLit] = useState(false);
+  const [landed, setLanded] = useState(false);
   useFrame(() => {
     const t = clock.current;
     const k = slide((t - 300 - i * 350) / 1800);
     const o = fit.origin;
+    const f = from.at;
     if (g.current) {
-      g.current.position.set(from[0] + (o[0] - from[0]) * k, from[1] + (o[1] - from[1]) * k + Math.sin(Math.PI * k) * 1.5, from[2] + (o[2] - from[2]) * k);
-      g.current.scale.setScalar(Math.max(0.001, 0.03 + (fit.scale - 0.03) * k));
-      g.current.quaternion.copy(q.identity().slerp(facing, k));
+      g.current.position.set(f[0] + (o[0] - f[0]) * k, f[1] + (o[1] - f[1]) * k + Math.sin(Math.PI * k) * 1.5, f[2] + (o[2] - f[2]) * k);
+      g.current.scale.setScalar(Math.max(0.001, from.scale + (fit.scale - from.scale) * k));
+      g.current.quaternion.copy(q.copy(from.q).slerp(facing, k));
     }
     if (mat.current) mat.current.opacity = 0.96 * ease((t - LAND_MS(i) + 500) / 500);
     if (linkRef.current) linkRef.current.visible = t > LAND_MS(i);
-    // the piece starts to play once it has landed
+    // the vectors start their search once they have landed (the other shapes play from the start, never restart)
     const on = t > LAND_MS(i);
-    if (on !== lit) setLit(on);
+    if (on !== landed) setLanded(on);
   });
   return (
     <group>
@@ -105,8 +118,8 @@ function PanelPiece({ p, i, clock, facing, stack }: { p: Panel; i: number; clock
       <group ref={linkRef} visible={false}>
         <Line points={link} color="#1B8A9C" lineWidth={1.6} transparent opacity={0.75} />
       </group>
-      <group ref={g} scale={0.001}>
-        <DataShape kind={p.kind} lit={lit} title={false} story />
+      <group ref={g} position={from.at} quaternion={from.q} scale={from.scale}>
+        <DataShape kind={p.kind} lit={p.kind !== 'vectors'} title={false} story search={landed} />
       </group>
     </group>
   );

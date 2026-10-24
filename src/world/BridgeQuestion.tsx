@@ -5,6 +5,7 @@ import { Html, Line } from '@react-three/drei';
 import { DataShape, Label, type DataKind } from './DataShapes';
 import { screenPoint } from './frame';
 import { fitShapeIn } from './answerBoard';
+import { COMPACT_BOX } from './shapeBoxes';
 import { SHOTS, type Vec3 } from './shots';
 
 /**
@@ -30,36 +31,39 @@ const ease = (t: number) => {
   return 1 - Math.pow(1 - c, 3);
 };
 
-export function BridgeQuestion() {
-  const cam = SHOTS.pier3.push ?? SHOTS.pier3;
-  const at = (x: number, y: number, d = DEPTH) => screenPoint(cam.position, cam.target, x, y, d);
-  const ask: Vec3 = at(-0.3, 0.6);
-  // shapes square to the camera, like the panels
-  const facing = useMemo(
-    () => new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(new THREE.Vector3(...cam.position), new THREE.Vector3(...cam.target), new THREE.Vector3(0, 1, 0))),
-    [cam],
-  );
-  // one solid panel per system, slightly behind its shape
-  const panels = useMemo(
-    () =>
-      SILOS.map((s) => {
+const cam = SHOTS.pier3.push ?? SHOTS.pier3;
+const at = (x: number, y: number, d = DEPTH) => screenPoint(cam.position, cam.target, x, y, d);
+
+/**
+ * Where 0.4 puts each piece: fitted inside its panel (the graph in its compact form), square to the camera,
+ * and each panel's corners. 0.5 starts each piece's flight from exactly this pose, so nothing jumps.
+ */
+export const SILO_LAYOUT = (() => {
+  let cache: { facing: THREE.Quaternion; fits: ReturnType<typeof fitShapeIn>[]; cards: Vec3[][] } | null = null;
+  return () =>
+    (cache ??= {
+      facing: new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(new THREE.Vector3(...cam.position), new THREE.Vector3(...cam.target), new THREE.Vector3(0, 1, 0))),
+      fits: SILOS.map((s) => fitShapeIn(s.kind, { x0: s.x0 + PAD, x1: s.x1 - PAD, y0: s.y0 + NAME_H, y1: s.y1 - PAD }, (x, y) => at(x, y), COMPACT_BOX[s.kind])),
+      cards: SILOS.map((s) => {
         const d = DEPTH + 0.03;
-        const c = [at(s.x0, s.y1, d), at(s.x1, s.y1, d), at(s.x1, s.y0, d), at(s.x0, s.y0, d)];
-        const g = new THREE.BufferGeometry();
-        g.setAttribute('position', new THREE.Float32BufferAttribute(c.flat(), 3));
-        g.setIndex([0, 3, 1, 1, 3, 2]);
-        return g;
+        return [at(s.x0, s.y1, d), at(s.x1, s.y1, d), at(s.x1, s.y0, d), at(s.x0, s.y0, d)];
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+    });
+})();
+
+export function cardGeometry(c: Vec3[]) {
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(c.flat(), 3));
+  g.setIndex([0, 3, 1, 1, 3, 2]);
+  return g;
+}
+
+export function BridgeQuestion() {
+  const ask: Vec3 = at(-0.3, 0.6);
+  const { facing, fits, cards } = SILO_LAYOUT();
+  // one solid panel per system, slightly behind its shape
+  const panels = useMemo(() => cards.map(cardGeometry), [cards]);
   const panelMats = useRef<(THREE.MeshBasicMaterial | null)[]>([]);
-  // each shape fitted inside its panel, its system's name in the band below it
-  const fits = useMemo(
-    () => SILOS.map((s) => fitShapeIn(s.kind, { x0: s.x0 + PAD, x1: s.x1 - PAD, y0: s.y0 + NAME_H, y1: s.y1 - PAD }, (x, y) => at(x, y))),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
   // the clock starts when the camera reaches the close-up (the move in from the city takes several seconds)
   const camera = useThree((st) => st.camera);
   const start = useRef<number | null>(null);
@@ -105,12 +109,12 @@ export function BridgeQuestion() {
             <Line points={[ask, tip]} color="#9aa1aa" lineWidth={1.4} dashed dashSize={0.006} gapSize={0.004} transparent opacity={0.85 * show} />
             {reach > 0.98 && (
               <group position={stop} scale={0.03}>
-                <Label text="✕" position={[0, 0, 0]} size={0.3} color="#e2604c" weight={700} />
+                <Label text="✕" position={[0, 0, 0]} size={0.3} color="#e2604c" weight={700} halo />
               </group>
             )}
             <group position={fits[i].origin} quaternion={facing} ref={(g) => (shapes.current[i] = g)} scale={0.0001}>
               {/* the reports sit still here: the inspector cannot search them */}
-              <DataShape kind={s.kind} lit={s.kind !== 'vectors'} title={false} story />
+              <DataShape kind={s.kind} lit={s.kind !== 'vectors'} title={false} story compact />
             </group>
             <group position={at(cx, s.y0 + NAME_H / 2)} scale={0.03}>
               <Label text={s.system} position={[0, 0, 0]} size={0.24} weight={700} color="#1f2a33" accent="#1B8A9C" plate />

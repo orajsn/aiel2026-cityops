@@ -59,7 +59,7 @@ export function labelLayout({ designSize, parentScale, distance, fovDeg }: { des
  * room, so it never piles onto its neighbours. `size` is the space the shape gives it, in its own units.
  */
 /** `accent`: the words after the last " · " are drawn in this colour (the name stays in `color`) */
-export function Label({ text, position, size = 0.16, color = INK, weight = 500, mono = false, plate = false, halo = true, accent }: { text: string; position: Vec3; size?: number; color?: string; weight?: number; mono?: boolean; plate?: boolean; halo?: boolean; accent?: string }) {
+export function Label({ text, position, size = 0.16, color = INK, weight = 500, mono = false, plate = false, halo = false, accent }: { text: string; position: Vec3; size?: number; color?: string; weight?: number; mono?: boolean; plate?: boolean; halo?: boolean; accent?: string }) {
   const { tex, aspect } = useMemo(() => {
     const px = 64;
     const font = `${weight} ${px}px ${mono ? '"JetBrains Mono", monospace' : 'Inter, sans-serif'}`;
@@ -125,14 +125,17 @@ export function Label({ text, position, size = 0.16, color = INK, weight = 500, 
   );
 }
 
-/** `story` (0.5): the vectors play the whole story, a report becoming a point and a question finding its neighbours */
-export function DataShape({ kind, lit = false, title = true, caption, story = false }: { kind: DataKind; lit?: boolean; title?: boolean; caption?: string; story?: boolean }) {
+/**
+ * `story`: the panel form (0.4, 0.5): the vectors centred, and `search` runs one similarity search on them.
+ * `compact` (0.4's small panels): the graph shows only the bridge's own links.
+ */
+export function DataShape({ kind, lit = false, title = true, caption, story = false, search = false, compact = false }: { kind: DataKind; lit?: boolean; title?: boolean; caption?: string; story?: boolean; search?: boolean; compact?: boolean }) {
   return (
     <group>
       {kind === 'table' && <TableShape lit={lit} />}
       {kind === 'json' && <JsonShape lit={lit} />}
-      {kind === 'graph' && <GraphShape lit={lit} />}
-      {kind === 'vectors' && (story ? <VectorStory play={lit} /> : <VectorShape lit={lit} />)}
+      {kind === 'graph' && <GraphShape lit={lit} compact={compact} />}
+      {kind === 'vectors' && (story ? <VectorSearch search={search} /> : <VectorShape lit={lit} />)}
       {title && <Label text={caption ?? TITLES[kind]} position={[0, -1.35, 0]} size={0.24} weight={700} color={INK} accent={DEEP} plate />}
     </group>
   );
@@ -173,7 +176,7 @@ function TableShape({ lit }: { lit: boolean }) {
               <boxGeometry args={[cols[c], 0.24, 0.06]} />
               <meshBasicMaterial color={DEEP} toneMapped={false} />
             </mesh>
-            <Label text={h} position={[0, 0, 0.05]} size={0.13} color="#ffffff" weight={600} mono halo={false} />
+            <Label text={h} position={[0, 0, 0.05]} size={0.14} color="#ffffff" weight={700} />
           </group>
         ))}
       </group>
@@ -255,17 +258,26 @@ const GRAPH_AT: Record<string, Vec3> = {
   'Harbor Seawall East': [1.1, -1.0, 0.1],
 };
 
-function useGraph() {
+/** 0.4's small panel: only the four links that say what the bridge depends on */
+const GRAPH_COMPACT: Record<string, Vec3> = {
+  [HB]: [0, 0, 0],
+  'Substation Gamma': [-1.1, 0.6, 0.1],
+  'Harbor Bridge Sensor Array A': [1.1, 0.6, 0.1],
+  'City Operations Control Center': [-1.1, -0.65, 0.1],
+  'Harbor Seawall East': [1.1, -0.65, 0.1],
+};
+
+function useGraph(compact: boolean) {
   return useMemo(() => {
-    const pos = new Map<string, Vec3>(Object.entries(GRAPH_AT));
+    const pos = new Map<string, Vec3>(Object.entries(compact ? GRAPH_COMPACT : GRAPH_AT));
     const edges = CONNECTIONS.filter((c) => pos.has(c.from) && pos.has(c.to));
     const ring = [...new Set(edges.filter((c) => c.to === HB || c.from === HB).map((c) => (c.to === HB ? c.from : c.to)))];
     return { edges, pos, ring };
-  }, []);
+  }, [compact]);
 }
 
-function GraphShape({ lit }: { lit: boolean }) {
-  const { edges, pos, ring } = useGraph();
+function GraphShape({ lit, compact = false }: { lit: boolean; compact?: boolean }) {
+  const { edges, pos, ring } = useGraph(compact);
   const pulses = useRef<THREE.Group>(null);
   const spin = useRef<THREE.Group>(null);
   useFrame(({ clock }, dt) => {
@@ -289,12 +301,13 @@ function GraphShape({ lit }: { lit: boolean }) {
         const a = pos.get(e.from)!;
         const b = pos.get(e.to)!;
         const first = e.from === HB || e.to === HB;
-        // a link's name sits halfway along it (the bridge's own links: one hop out the names would crowd)
-        const mid: Vec3 = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 + 0.14, (a[2] + b[2]) / 2 + 0.05];
+        // a link's name sits halfway along it, on the outer side (the bridge's own links: one hop out the names would crowd)
+        const my = (a[1] + b[1]) / 2;
+        const mid: Vec3 = [(a[0] + b[0]) / 2, my + (my >= 0 ? 0.14 : -0.14), (a[2] + b[2]) / 2 + 0.05];
         return (
           <group key={i}>
             <Line points={[a, b]} color={first ? TEAL : '#8fbfca'} lineWidth={first ? 2.2 : 1.4} />
-            {first && <Label text={e.type} position={mid} size={0.15} color={DEEP} weight={600} mono />}
+            {first && <Label text={e.type} position={mid} size={0.17} color={DEEP} weight={700} />}
           </group>
         );
       })}
@@ -307,7 +320,8 @@ function GraphShape({ lit }: { lit: boolean }) {
               <sphereGeometry args={[hb ? 0.15 : near ? 0.09 : 0.065, 24, 24]} />
               <meshStandardMaterial color={hb ? RED : near ? DEEP : '#7fb3bf'} emissive={hb ? RED : DEEP} emissiveIntensity={hb ? 0.35 : 0.15} />
             </mesh>
-            <Label text={short(id)} position={[0, hb || id === 'Emergency Operations Center' || p[1] > 0.1 ? 0.28 : -0.25, 0]} size={hb ? 0.21 : near ? 0.17 : 0.15} color={hb ? RED : INK} weight={hb ? 700 : 600} />
+            {/* the bridge is the hub: its name sits on it, on a pill, so no link crosses the words */}
+            <Label text={short(id)} position={[0, hb ? 0 : id === 'Emergency Operations Center' || p[1] > 0.1 ? 0.26 : -0.26, 0.1]} size={hb ? 0.21 : near ? 0.18 : 0.16} color={hb ? RED : INK} weight={hb ? 700 : 600} plate={hb} />
           </group>
         );
       })}
@@ -437,162 +451,96 @@ function VectorShape({ lit }: { lit: boolean }) {
   );
 }
 
-/* ---------- vectors, the whole story (0.5): a report becomes a point; a question finds its neighbours ---------- */
+/* ---------- vectors in a panel (0.4, 0.5): reports stored by meaning; on 0.5 one search runs ---------- */
 
-/** the space sits on the right of the shape, the story's words on the left */
-const SPACE: Vec3 = [1.2, -0.05, 0];
-const STORY_CLUSTERS: { name: string; at: Vec3; color: string }[] = [
-  { name: 'bridge reports', at: [0.4, 0.4, 0.1], color: TEAL },
-  { name: 'substation reports', at: [-0.6, 0.45, -0.2], color: '#7fa6d6' },
-  { name: 'pipeline reports', at: [-0.4, -0.55, 0.15], color: '#8bc4a5' },
-  { name: '', at: [0.6, -0.5, -0.3], color: '#b9c3cc' },
+const CLUSTERS: { name: string; at: Vec3; color: string; label: number }[] = [
+  { name: 'bridge reports', at: [0.45, 0.35, 0.1], color: TEAL, label: 0.42 },
+  { name: 'substation reports', at: [-0.7, 0.32, -0.2], color: '#7fa6d6', label: -0.42 },
+  { name: 'pipeline reports', at: [-0.2, -0.62, 0.15], color: '#8bc4a5', label: -0.42 },
+  { name: '', at: [0.8, -0.55, -0.3], color: '#b9c3cc', label: 0 },
 ];
-/** the three bridge reports the search finds, in the order it ranks them; the first is the one we embed */
-const FOUND: { text: string; at: Vec3 }[] = [
-  { text: 'Pier 3 · crack 0.12 mm', at: [0.32, 0.54, 0.15] },
-  { text: 'Pier 2 · ~25% section loss', at: [0.6, 0.32, 0.05] },
-  { text: 'Pier 2 · rust bleed', at: [0.2, 0.26, 0.25] },
+/** the bridge reports nearest the question: what the search finds */
+const NEAREST: Vec3[] = [
+  [0.36, 0.5, 0.15],
+  [0.66, 0.28, 0.05],
+  [0.24, 0.24, 0.25],
 ];
-const ASK: Vec3 = [0.4, 0.38, 0.14];
-const COL = -1.25; // the story column
-const STRIP_AT: Vec3 = [COL, -0.12, 0];
-const STORY_MS = 15000;
-const add = (a: Vec3, b: Vec3): Vec3 => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
-const lerp3 = (a: Vec3, b: Vec3, k: number, lift = 0): Vec3 => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k + Math.sin(Math.PI * k) * lift, a[2] + (b[2] - a[2]) * k];
-/** 0 -> 1 from `a`, back to 0 at `b` */
-const win = (t: number, a: number, b: number, fade = 300) => Math.min(ease((t - a) / fade), 1 - ease((t - b) / fade));
+const QUERY: Vec3 = [0.45, 0.36, 0.14];
+const SEARCH_MS = 7000;
 
-function VectorStory({ play }: { play: boolean }) {
+/**
+ * The reports as points in a space of meaning, similar reports close together. With `search` (0.5) one
+ * similarity search loops: the question drops in as a point, a sphere grows around it, and the nearest
+ * reports light up. Centred on its group, like every shape.
+ */
+function VectorSearch({ search }: { search: boolean }) {
   const cloud = useMemo(() => {
     let s = 11;
     const r = () => ((s = (s * 16807) % 2147483647) / 2147483647);
     const g = () => (r() + r() + r() - 1.5) * 0.34;
     return Array.from({ length: 120 }, (_, i) => {
-      const c = STORY_CLUSTERS[i % STORY_CLUSTERS.length];
-      return { p: add(c.at, [g(), g() * 0.8, g()]), color: c.color };
+      const c = CLUSTERS[i % CLUSTERS.length];
+      return { p: [c.at[0] + g(), c.at[1] + g() * 0.8, c.at[2] + g()] as Vec3, color: c.color };
     });
   }, []);
-  // 24 of the 384 numbers, drawn as bars
-  const bars = useMemo(() => {
-    let s = 5;
-    const r = () => ((s = (s * 16807) % 2147483647) / 2147483647);
-    return Array.from({ length: 24 }, () => r() * 2 - 1);
-  }, []);
   const start = useRef(performance.now());
-  useEffect(() => void (start.current = performance.now()), [play]);
-  const report = useRef<THREE.Group>(null);
+  useEffect(() => void (start.current = performance.now()), [search]);
   const question = useRef<THREE.Group>(null);
-  const model = useRef<THREE.Group>(null);
-  const strip = useRef<THREE.Group>(null);
-  const dot = useRef<THREE.Mesh>(null);
-  const landed = useRef<THREE.Mesh>(null);
   const ask = useRef<THREE.Mesh>(null);
   const reach = useRef<THREE.Mesh>(null);
   const found = useRef<THREE.Group>(null);
-  const list = useRef<THREE.Group>(null);
   useFrame(() => {
-    const t = play ? (performance.now() - start.current) % STORY_MS : 0;
-    const show = (g: THREE.Object3D | null, k: number) => {
-      if (!g) return;
-      g.visible = k > 0.01;
-      g.scale.setScalar(Math.max(0.001, k));
-    };
-    // 1 · a report (0-4.4 s): its words, the embedding model, its 384 numbers, then one point flies into the space
-    show(report.current, play ? win(t, 0, 4200) : 0);
-    // 2 · the question (4.8 s on): the same steps, then the search
-    show(question.current, play ? win(t, 4800, STORY_MS - 400) : 0);
-    const a = t < 4600 ? 0 : 4800;
-    show(model.current, play ? win(t, a + 600, a + 2700) : 0);
-    if (strip.current) {
-      const grow = ease((t - a - 1100) / 600);
-      const squeeze = ease((t - a - 2500) / 400);
-      strip.current.visible = play && grow > 0.01 && squeeze < 0.99;
-      strip.current.scale.set(Math.max(0.001, grow * (1 - squeeze)), Math.max(0.001, grow), 1);
+    const t = search ? (performance.now() - start.current) % SEARCH_MS : 0;
+    // the question appears, drops into the space (0-1.1 s), the sphere grows (1.1-2.1 s), the nearest light (2.1 s), all fade at the end
+    const out = 1 - ease((t - SEARCH_MS + 700) / 500);
+    if (question.current) {
+      const k = ease(t / 400) * out;
+      question.current.visible = search && k > 0.01;
+      question.current.scale.setScalar(Math.max(0.001, k));
     }
-    const fly = ease((t - a - 2800) / 1100);
-    if (dot.current) {
-      dot.current.visible = play && t > a + 2700 && fly < 1;
-      dot.current.position.set(...lerp3(STRIP_AT, add(SPACE, a ? ASK : FOUND[0].at), fly, 0.5));
+    if (ask.current) {
+      const drop = ease((t - 300) / 800);
+      ask.current.visible = search && t > 300 && out > 0.01;
+      ask.current.position.set(QUERY[0], QUERY[1] + (1 - drop) * 0.55, QUERY[2]);
     }
-    // the report's point stays where it landed; the question's point stays and reaches out to its neighbours
-    if (landed.current) landed.current.visible = play && t > 3900;
-    if (ask.current) ask.current.visible = play && t > 8700;
     if (reach.current) {
-      const k = ease((t - 8800) / 900);
-      reach.current.visible = play && k > 0.01;
-      reach.current.scale.setScalar(0.02 + k * 0.36);
+      const k = ease((t - 1100) / 1000) * out;
+      reach.current.visible = search && k > 0.01;
+      reach.current.scale.setScalar(0.02 + k * 0.34);
     }
-    if (found.current) found.current.visible = play && t > 9700;
-    show(list.current, play ? win(t, 9900, STORY_MS - 400) : 0);
+    if (found.current) found.current.visible = search && t > 2100 && out > 0.5;
   });
   return (
     <group>
-      {/* the space: the reports already stored, grouped by meaning */}
-      <group position={SPACE}>
-        {cloud.map((c, i) => (
-          <mesh key={i} position={c.p}>
-            <octahedronGeometry args={[0.045, 0]} />
-            <meshBasicMaterial color={c.color} toneMapped={false} />
-          </mesh>
-        ))}
-        {STORY_CLUSTERS.filter((c) => c.name).map((c) => (
-          <Label key={c.name} text={c.name} position={[c.at[0], c.at[1] + (c.name === 'bridge reports' ? 0.42 : -0.42), c.at[2]]} size={0.19} color={DIM} weight={600} />
-        ))}
-        <mesh ref={landed} position={FOUND[0].at} visible={false}>
-          <octahedronGeometry args={[0.07, 0]} />
-          <meshBasicMaterial color={DEEP} toneMapped={false} />
+      {cloud.map((c, i) => (
+        <mesh key={i} position={c.p}>
+          <octahedronGeometry args={[0.045, 0]} />
+          <meshBasicMaterial color={c.color} toneMapped={false} />
         </mesh>
-        <mesh ref={ask} position={ASK} visible={false}>
-          <sphereGeometry args={[0.065, 16, 16]} />
-          <meshBasicMaterial color="#ffffff" toneMapped={false} />
-        </mesh>
-        <mesh ref={reach} position={ASK} visible={false}>
-          <sphereGeometry args={[1, 24, 16]} />
-          <meshBasicMaterial color={TEAL} wireframe transparent opacity={0.4} toneMapped={false} />
-        </mesh>
-        <group ref={found} visible={false}>
-          {FOUND.map((f, i) => (
-            <group key={f.text}>
-              <mesh position={f.at}>
-                <octahedronGeometry args={[0.075, 0]} />
-                <meshBasicMaterial color={RED} toneMapped={false} />
-              </mesh>
-              <Line points={[ASK, f.at]} color={RED} lineWidth={2} />
-            </group>
-          ))}
-        </group>
+      ))}
+      {CLUSTERS.filter((c) => c.name).map((c) => (
+        <Label key={c.name} text={c.name} position={[c.at[0], c.at[1] + c.label, c.at[2]]} size={0.19} color={DIM} weight={600} />
+      ))}
+      <group ref={question} position={[0, 0.98, 0.2]} visible={false}>
+        <Label text="“cracks or corrosion on bridge bearings”" position={[0, 0, 0]} size={0.17} color={DEEP} weight={700} plate />
       </group>
-
-      {/* the story column */}
-      <group ref={report} position={[COL, 0.72, 0]} visible={false}>
-        <Label text="1 · a report" position={[0, 0.3, 0]} size={0.19} color={DIM} weight={600} />
-        <Label text="Pier 3 · hairline crack, 0.12 mm" position={[0, 0, 0]} size={0.2} color={INK} weight={700} plate />
-      </group>
-      <group ref={question} position={[COL, 0.72, 0]} visible={false}>
-        <Label text="2 · the question" position={[0, 0.3, 0]} size={0.19} color={DIM} weight={600} />
-        <Label text="“cracks or corrosion" position={[0, 0, 0]} size={0.21} color={DEEP} weight={700} />
-        <Label text="on bridge bearings”" position={[0, -0.25, 0]} size={0.21} color={DEEP} weight={700} />
-      </group>
-      <group ref={model} position={[COL, 0.22, 0]} visible={false}>
-        <Label text="↓ ALL_MINILM_L12_V2" position={[0, 0, 0]} size={0.18} color={DEEP} weight={600} mono />
-      </group>
-      <group ref={strip} position={STRIP_AT} visible={false}>
-        {bars.map((v, i) => (
-          <mesh key={i} position={[-0.69 + i * 0.06, v * 0.09, 0]}>
-            <boxGeometry args={[0.04, Math.abs(v) * 0.18 + 0.02, 0.02]} />
-            <meshBasicMaterial color={v > 0 ? TEAL : '#9aa6b2'} toneMapped={false} />
-          </mesh>
-        ))}
-        <Label text="384 numbers" position={[0, -0.32, 0]} size={0.19} color={INK} weight={700} mono />
-      </group>
-      <mesh ref={dot} visible={false}>
-        <sphereGeometry args={[0.07, 16, 16]} />
-        <meshBasicMaterial color={TEAL} toneMapped={false} />
+      <mesh ref={ask} visible={false}>
+        <sphereGeometry args={[0.065, 16, 16]} />
+        <meshBasicMaterial color="#ffffff" toneMapped={false} />
       </mesh>
-      <group ref={list} position={[COL, -0.05, 0]} visible={false}>
-        <Label text="nearest = most similar" position={[0, 0.2, 0]} size={0.19} color={DIM} weight={600} />
-        {FOUND.map((f, i) => (
-          <Label key={f.text} text={`${i + 1}  ${f.text}`} position={[0, -0.1 - i * 0.28, 0]} size={0.19} color={RED} weight={700} />
+      <mesh ref={reach} position={QUERY} visible={false}>
+        <sphereGeometry args={[1, 24, 16]} />
+        <meshBasicMaterial color={TEAL} wireframe transparent opacity={0.4} toneMapped={false} />
+      </mesh>
+      <group ref={found} visible={false}>
+        {NEAREST.map((p, i) => (
+          <group key={i}>
+            <mesh position={p}>
+              <octahedronGeometry args={[0.08, 0]} />
+              <meshBasicMaterial color={RED} toneMapped={false} />
+            </mesh>
+            <Line points={[QUERY, p]} color={RED} lineWidth={2} />
+          </group>
         ))}
       </group>
     </group>

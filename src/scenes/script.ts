@@ -4,24 +4,24 @@
  */
 export const SCRIPT: Record<string, string> = {
   // Chapter 0 · The city
-  '0.1': 'This is Bangkok, our city for the afternoon. Everything you will build today runs its operations team. This is the city. Tonight we run it.',
-  '0.2': 'Every pin is a piece of infrastructure: bridges, substations, pipelines, sensors. Twenty-eight assets. Each one has a record, a spec sheet, a history, and neighbours.',
-  '0.3': 'Every day the city writes about itself: 308 logs, 60 reports, 220 findings, all flowing into the City Operations Control Center. Most of it is free text written by inspectors.',
-  '0.4': 'Meet our inspector on Pier 3 of Harbor Bridge. The question is simple: what do we know about this bridge, and what should I do? The answer exists. In four shapes, in four places. The inspector has none of them.',
-  '0.5': 'To answer the inspector we need four things: the asset record, its spec sheet, what it depends on, and similar past reports. Four shapes of data. And one Oracle AI Database holds all four. Not four databases to sync.',
-  '0.6': 'And this is the language model. It writes an answer one word at a time: that wave of light is it producing. It knows the world, not our city. Ours is small and runs on a CPU, so each answer takes thirty to sixty seconds. Today is about what we give it.',
-  '0.7': 'Harbor Bridge is our hero, linked to the substation that powers it, the sensors that watch it and the Ops Center that coordinates it. Two things will go wrong on this bridge today. The first one, we handle with an agent. The second, with memory.',
+  '0.1': 'This is **Bangkok**, our city for the afternoon. Everything you will build today runs its **operations team**. This is the city. Tonight we run it.',
+  '0.2': 'Every pin is a piece of infrastructure: bridges, substations, pipelines, sensors. **Twenty-eight assets**. Each one has **a record, a spec sheet, a history, and neighbours**.',
+  '0.3': 'Every day the city writes about itself: **308 logs, 60 reports, 220 findings**, all flowing into the City Operations Control Center. Most of it is **free text** written by inspectors.',
+  '0.4': 'Meet our inspector on Pier 3 of Harbor Bridge. The question is simple: **what do we know about this bridge, and what should I do?** The answer exists. In **four shapes**, in **four places**. The inspector has !!none of them!!.',
+  '0.5': 'To answer the inspector we need four things: **the asset record**, **its spec sheet**, **what it depends on**, and **similar past reports**. Four shapes of data. And **one Oracle AI Database** holds all four. Not four databases to sync.',
+  '0.6': 'And this is the language model. It writes an answer **one word at a time**: that wave of light is it producing. It knows **the world**, not !!our city!!. Ours is small and runs on a CPU, so each answer takes **thirty to sixty seconds**. Today is about **what we give it**.',
+  '0.7': 'Harbor Bridge is our hero, linked to the substation that powers it, the sensors that watch it and the Ops Center that coordinates it. Two things will go wrong on this bridge today. The first one, we handle with **an agent**. The second, with **memory**.',
 
   // Chapter 1 · RAG to Agents
-  '1.1': 'The operator types the inspector’s question straight into the model. It has never heard of this city. A model knows the world. It does not know your city.',
-  '1.2': 'So we turn text into numbers: 384 of them per text, computed by ALL_MINILM_L12_V2 inside the database. The question becomes a point among 600, and its five nearest neighbours light up. Similar meaning lands close together.',
-  '1.3': 'Now we put those five documents in an envelope with the question, sealed with one rule: context is data, not instructions. The model answers from the envelope only. Give the model the evidence and it stops guessing.',
-  '1.4': 'But a real operations question is three questions at once: what is this asset, what is connected to it, what happened before. One envelope cannot hold that. RAG answers one question. Operations ask three at once.',
-  '1.5': 'So we give the model tools, each wired to one place in the database, and a procedure: the triage SOP, with its thresholds. Remember this line: section loss over 25 percent. The model only sees each card’s name and description. Docstrings are prompt engineering.',
-  '1.6': 'One tool runs one query that returns all four shapes together: the row, the JSON, the graph edges and the ranked evidence, in one brief. No ETL, no sync, one transaction.',
-  '1.7': 'Now the Pier 3 report arrives. The agent recalls, pulls the incident brief, writes down what it learned, and answers. The agent chooses its tools. The procedure keeps it honest.',
-  '1.8': 'At the end it leaves a sticky note: one row in the database, keyed to Harbor Bridge, embedded on write. A memory, but a thin one.',
-  '1.9': 'Three questions, three patterns. RAG: what does the record say. Workflow: triage predictably. Agent: reason and tell me what to do. And the second marker is still waiting on Pier 2. At three o’clock we give it a real memory.',
+  '1.1': 'The operator types the inspector’s question straight into the model. It answers fluently, and **it is a guess**: it has never heard of Harbor Bridge. A model knows **the world**. It does not know !!your city!!.',
+  '1.2': 'So we turn text into numbers: **384 of them per text**, computed by ALL_MINILM_L12_V2 inside the database. The question becomes a point among 600, and its **five nearest neighbours** light up. **Similar meaning lands close together.**',
+  '1.3': 'Now we put those five documents in an envelope with the question, sealed with one rule: **context is data, not instructions**. The model answers from the envelope only. **Give the model the evidence and it stops guessing.**',
+  '1.4': 'But a real operations question is three questions at once: what is this asset, what is connected to it, what happened before. One envelope cannot hold that. RAG answers **one question**. Operations ask **three at once**.',
+  '1.5': 'So we give the model tools, each wired to one place in the database, and a procedure: the triage SOP, with its thresholds. Remember this line: !!section loss over 25 percent!!. The model only sees each card’s name and description. **Docstrings are prompt engineering.**',
+  '1.6': 'One tool runs one query that returns **all four shapes together**: the row, the JSON, the graph edges and the ranked evidence, in one brief. **No ETL, no sync, one transaction.**',
+  '1.7': 'Now the Pier 3 report arrives. The agent recalls, pulls the incident brief, writes down what it learned, and answers. **The agent chooses its tools. The procedure keeps it honest.**',
+  '1.8': 'At the end it leaves a sticky note: **one row in the database**, keyed to Harbor Bridge, embedded on write. A memory, but **a thin one**.',
+  '1.9': 'Three questions, three patterns. **RAG**: what does the record say. **Workflow**: triage predictably. **Agent**: reason and tell me what to do. And the second marker is still waiting on Pier 2. At three o’clock we give it **a real memory**.',
 
   // Chapter 2 · Agent Memory
   '2.0': 'Welcome back to the same city. Same city, same database, same bridge. Now, memory.',

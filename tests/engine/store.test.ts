@@ -35,3 +35,16 @@ test('jumpTo known id sets index and current()', () => {
   expect(useSceneStore.getState().index).toBe(1);
   expect(useSceneStore.getState().current().id).toBe('b');
 });
+
+test('a page change is never settled: the new page waits for its camera (no one-frame flash of its overlay)', () => {
+  const s = useSceneStore.getState();
+  s.setScenes([
+    { id: 'a', chapter: 0, title: 'A', shot: 'city' },
+    { id: 'b', chapter: 0, title: 'B', shot: 'city' },
+  ]);
+  for (const move of [() => useSceneStore.getState().next(), () => useSceneStore.getState().prev(), () => useSceneStore.getState().jumpTo('b')]) {
+    useSceneStore.getState().setSettled(true);
+    move();
+    expect(useSceneStore.getState().settled).toBe(false);
+  }
+});

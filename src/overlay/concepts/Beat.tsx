@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { Rich } from '../Rich';
 
 const EASE = [0.2, 0.8, 0.2, 1] as const;
 
@@ -41,7 +42,9 @@ export function Beat({ kicker, visual, message, notebook }: BeatProps) {
         <div className="beat__kicker">
           {kicker}
         </div>
-        <div className="beat__headline">“{message}”</div>
+        <div className="beat__headline">
+          “<Rich text={message} />”
+        </div>
         <VisualView v={visual} />
         {notebook && <div className="beat__notebook mono">notebook · {notebook}</div>}
       </motion.div>

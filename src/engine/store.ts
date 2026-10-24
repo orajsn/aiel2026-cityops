@@ -36,16 +36,17 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   setScenes: (scenes) => set({ scenes, index: 0 }),
   next: () => {
     const { index, scenes } = get();
-    if (index < scenes.length - 1) set({ index: index + 1, direction: 1 });
+    // a new page is not settled until its camera arrives (else its overlay flashes for a frame)
+    if (index < scenes.length - 1) set({ index: index + 1, direction: 1, settled: false });
   },
   prev: () => {
     const { index } = get();
-    if (index > 0) set({ index: index - 1, direction: -1 });
+    if (index > 0) set({ index: index - 1, direction: -1, settled: false });
   },
   jumpTo: (id) => {
     const { scenes, index } = get();
     const i = scenes.findIndex((s) => s.id === id);
-    if (i >= 0) set({ index: i, direction: i >= index ? 1 : -1 });
+    if (i >= 0 && i !== index) set({ index: i, direction: i >= index ? 1 : -1, settled: false });
   },
   current: () => get().scenes[get().index] ?? EMPTY,
   setCounters: (counters) => set({ counters }),
