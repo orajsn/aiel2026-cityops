@@ -62,3 +62,6 @@ export const UNIFIED_PANELS: { kind: 'table' | 'json' | 'graph' | 'vectors'; x0:
 ];
 /** where the one brief stands (screen), under the model */
 export const BRIEF_AT = { x: 0.65, y: -0.4 };
+
+/** Lab 2 page 4: the folder of references, left of centre */
+export const FOLDER = at(-2.2, 1.2);

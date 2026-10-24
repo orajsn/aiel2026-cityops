@@ -35,12 +35,15 @@ const b13 = beat(1, '2.3', 'Grounding', 'sky', {
   message: 'Give the model **the evidence** and it stops guessing.',
 }, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'envelope' });
 
-const b14 = beat(1, '2.4', 'One envelope is not enough', 'sky', {
-  kicker: 'The maturity ladder',
-  notebook: 'rag_to_agents_lab.ipynb · Section 2 (optional trace)',
-  visual: { kind: 'none' },
-  message: 'RAG answers **one question**. Operations ask **three at once**.',
-}, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'overflow' });
+const b14: SceneDef = {
+  id: '2.4',
+  chapter: 1,
+  title: 'One folder is not enough',
+  shot: 'sky',
+  world: { pins: 'all', sky: 'overflow' },
+  overlay: 'Overflow',
+  overlayProps: { message: '**One folder answers one question.** Operations ask **three at once**.' },
+};
 
 const b15: SceneDef = {
   id: '2.5',

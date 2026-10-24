@@ -454,3 +454,21 @@ code,
 .uq .board__head { font-size: 22px; gap: 10px; }
 .uq .board__shape { font-size: 17px; }
 .uq__tick { width: 26px; height: 26px; border-radius: 50%; background: var(--red); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; flex: none; }
+
+/* Lab 2 page 4 · one folder is not enough (Overflow.tsx) */
+.ov { position: absolute; inset: 0; pointer-events: none; }
+.ov__q { position: absolute; transform: translate(-50%, -50%); padding: 12px 20px; border-radius: 12px; background: var(--panel-strong); box-shadow: 0 6px 20px rgba(0,0,0,0.14); font-size: 24px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.ov__x { position: absolute; transform: translate(-50%, -50%); width: 34px; height: 34px; border-radius: 50%; background: var(--red); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; }
+.ov__pill { position: absolute; transform: translate(-50%, -50%); padding: 8px 18px; border-radius: 999px; background: var(--panel-strong); font-size: 22px; color: var(--ink); white-space: nowrap; }
+.ov__pill b { color: var(--teal); font-weight: 700; }
+.ov__card { position: absolute; box-sizing: border-box; padding: 16px 22px; border-radius: 14px; background: var(--panel-strong); box-shadow: 0 6px 20px rgba(0,0,0,0.14); display: flex; flex-direction: column; gap: 8px; }
+.ov__card--teal { border-top: 5px solid var(--teal); }
+.ov__card--red { border-top: 5px solid var(--red); }
+.ov__kicker { font-size: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--teal); }
+.ov__kicker--red { color: var(--red); }
+.ov__text { font-size: 24px; line-height: 1.3; color: var(--ink); }
+.ov__needs { font-size: 20px; line-height: 1.35; color: var(--ink-dim); }
+.ov__needs b { color: var(--red); font-weight: 700; }
+.ov__verdict { font-size: 22px; font-weight: 700; }
+.ov__verdict--teal { color: var(--teal); }
+.ov__verdict--red { color: var(--red); }

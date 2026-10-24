@@ -10,8 +10,10 @@ import { layoutCloud, nearestK } from './vectorLayout';
 import { SkyShapes } from './SkyShapes';
 import { SkyLab2, type Lab2Act } from './SkyLab2';
 import { NeuralNet } from './NeuralNet';
+import { ReferenceFolder } from './ReferenceFolder';
+import { Rich } from '../overlay/Rich';
 import type { Vec3 } from './shots';
-import { SKY_ANCHOR, MODEL, MODEL_SCALE, MODEL_IN, MODEL_OUT, DB, CLOUD, ENVELOPE, OPS_TOP, along, DB_WIDE, MODEL_WIDE, MODEL_WIDE_IN, BRIEF_AT } from './skyPlaces';
+import { SKY_ANCHOR, MODEL, MODEL_SCALE, MODEL_IN, MODEL_OUT, DB, CLOUD, ENVELOPE, OPS_TOP, along, DB_WIDE, MODEL_WIDE, MODEL_WIDE_IN, BRIEF_AT, FOLDER } from './skyPlaces';
 import { UnifiedBoard } from './UnifiedBoard';
 import { boardPoint } from './answerBoard';
 
@@ -30,7 +32,7 @@ import { boardPoint } from './answerBoard';
  *  - shapes:   what the inspector's answer needs: four panels (table, JSON, graph, vectors) around one Oracle AI Database;
  *  - brain:    the small model alone, centre stage.
  */
-export type SkyAct = 'model' | 'embed' | 'envelope' | 'shapes' | 'brain' | 'tools' | 'unified' | Lab2Act;
+export type SkyAct = 'model' | 'embed' | 'envelope' | 'shapes' | 'brain' | 'tools' | 'unified' | 'overflow' | Lab2Act;
 
 export { SKY_ANCHOR } from './skyPlaces';
 const A = SKY_ANCHOR;
@@ -38,7 +40,7 @@ const CLOUD_SCALE = 0.075;
 /** the question as a point in the cloud's own space (near the "structural" cluster) */
 const QUERY: Vec3 = [8, 6, -4];
 
-const LAB2_ACTS: (SkyAct | null)[] = ['overflow', 'note'];
+const LAB2_ACTS: (SkyAct | null)[] = ['note'];
 /** Lab 2 pages 5 and 6: the database far left, the model far right (skyPlaces), the tools or the four shapes between */
 const WIDE_ACTS: (SkyAct | null)[] = ['tools', 'unified'];
 
@@ -51,10 +53,10 @@ const BARE_Q = '“What recent issues have been reported on Harbor Bridge?”';
 const QUESTION_AT: Vec3 = along([MODEL_IN[0], MODEL[1] + 0.7, MODEL_IN[2]], -2.5);
 /** the answer stands to the right of the model's last layer */
 const ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 0.9, MODEL_OUT[2]], 0.5);
-const BARE_A = '“I don’t have any reports about a Harbor Bridge in your city. In general, bridges can show cracking, corrosion or bearing wear…”';
+const BARE_A = '“!!I don’t have any reports!! about a Harbor Bridge in your city. In general, bridges can show cracking, corrosion or bearing wear…”';
 /** Lab 2 page 3: the answer comes out of the model's last layer, built from the references (draft wording, no recorded run) */
 const RAG_ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 1.4, MODEL_OUT[2]], 0.5);
-const RAG_A = '“Harbor Bridge has two recent findings: a hairline crack near a bearing plate, 0.12 mm, and surface corrosion on a bearing assembly, about 25% section loss. From the five reports retrieved.”';
+const RAG_A = '“Harbor Bridge has **two recent findings**: a **hairline crack** near a bearing plate, !!0.12 mm!!, and **surface corrosion** on a bearing assembly, !!about 25% section loss!!. From the **five reports retrieved**.”';
 
 const ease = (t: number) => {
   const c = Math.max(0, Math.min(1, t));
@@ -147,6 +149,12 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
         <group ref={root}>
           <group position={[-A[0], -A[1], -A[2]]}>
             {(act === 'model' || act === 'embed' || act === 'envelope') && <ModelOrb position={MODEL} lit={act === 'envelope' && t > 3800} doubt={act === 'model' && t > 2600} producing={(act === 'model' && t > 2300) || (act === 'envelope' && t > 3800)} labelled={visible} scale={MODEL_SCALE} />}
+            {/* page 4: one folder of references; it swells as three questions pile in, and still does not take them */}
+            {act === 'overflow' && (
+              <group position={FOLDER} scale={2.0}>
+                <ReferenceFolder sheets={[true, true, true, true, true]} strain={ease((t - 1400) / 1600)} />
+              </group>
+            )}
             {act === 'brain' && <ModelOrb position={[A[0], A[1] + 0.4, A[2]]} lit doubt={false} producing labelled={visible} scale={2.2} />}
             {act && LAB2_ACTS.includes(act) && <SkyLab2 act={act as Lab2Act} center={[A[0], A[1] + 0.2, A[2]]} t={t} red={theme.red} opsTop={OPS_TOP} />}
             {hasDb && <SkyDatabase color={theme.red} appearMs={0} t={t} />}
@@ -165,8 +173,8 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
                     <meshBasicMaterial color={theme.red} toneMapped={false} />
                   </mesh>
                 ))}
-                <group position={envPos} scale={1.4}>
-                  <PaperStack position={[0, 0, 0]} sheets={nearWorld.map((_, i) => t > 1150 + i * 230)} opacity={intake} />
+                <group position={envPos} scale={1.5}>
+                  <ReferenceFolder sheets={nearWorld.map((_, i) => t > 1150 + i * 230)} opacity={intake} />
                 </group>
                 {visible && <SkyLabel position={[ENVELOPE[0], ENVELOPE[1] + 0.9, ENVELOPE[2]]} text="5 references + the question · context is data, not instructions" show={t > 1800 && travel < 0.2} />}
               </>
@@ -227,26 +235,6 @@ function SkyDatabase({ color, t, position = DB }: { color: string; appearMs: num
   );
 }
 
-/** the references: sheets of paper piling up flat as the retrieved reports arrive, the question (a red line) on top */
-function PaperStack({ position, sheets, opacity = 1 }: { position: Vec3; sheets: boolean[]; opacity?: number }) {
-  const n = sheets.filter(Boolean).length;
-  return (
-    <group position={position} visible={opacity > 0.01}>
-      {sheets.map((on, i) => (
-        <mesh key={i} position={[(i % 2) * 0.05 - 0.025, i * 0.055, (i % 3) * 0.03 - 0.03]} rotation={[0, (i % 2 ? -1 : 1) * 0.12 * (i % 3), 0]} visible={on} castShadow>
-          <boxGeometry args={[0.95, 0.035, 0.68]} />
-          <meshStandardMaterial color={i % 2 ? '#f3eee2' : '#faf7ef'} roughness={0.85} transparent opacity={opacity} />
-        </mesh>
-      ))}
-      {/* the question, a red line on the top sheet */}
-      <mesh position={[0, n * 0.055 - 0.035, 0]} rotation={[-Math.PI / 2, 0, 0]} visible={n > 0}>
-        <planeGeometry args={[0.5, 0.07]} />
-        <meshBasicMaterial color="#C74634" transparent opacity={opacity} toneMapped={false} />
-      </mesh>
-    </group>
-  );
-}
-
 function SkyLabel({ position, text, show, tone = 'teal' }: { position: Vec3; text: string; show: boolean; tone?: 'teal' | 'grey' }) {
   return (
     <Html position={position} center zIndexRange={[16, 0]} style={{ pointerEvents: 'none' }}>
@@ -257,7 +245,6 @@ function SkyLabel({ position, text, show, tone = 'teal' }: { position: Vec3; tex
   );
 }
 
-/** a small card in the sky: who is speaking, and the words */
 /** a sky card's box on the stage (styles.css .sky-card: 460 px wide plus padding), used to keep it on screen */
 const CARD_W = 500;
 const CARD_H = 210;
@@ -283,7 +270,9 @@ function SkyCard({ position, who, text, show, tone = 'teal', anchor = 'center' }
     <Html position={position} calculatePosition={place} zIndexRange={[16, 0]} style={{ pointerEvents: 'none', transform: anchor === 'left' ? 'translate(0, -50%)' : 'translate(-50%, -50%)' }}>
       <div className={`sky-card tone-${tone}`} style={{ opacity: show ? 1 : 0 }}>
         <div className="sky-card__who">{who}</div>
-        <div className="sky-card__text">{text}</div>
+        <div className="sky-card__text">
+          <Rich text={text} />
+        </div>
       </div>
     </Html>
   );
