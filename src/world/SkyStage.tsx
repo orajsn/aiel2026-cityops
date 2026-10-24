@@ -52,6 +52,9 @@ const QUESTION_AT: Vec3 = along([MODEL_IN[0], MODEL[1] + 0.7, MODEL_IN[2]], -2.5
 /** the answer stands to the right of the model's last layer */
 const ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 0.5, MODEL_OUT[2]], 2.5);
 const BARE_A = '“I don’t have any reports about a Harbor Bridge in your city. In general, bridges can show cracking, corrosion or bearing wear…”';
+/** Lab 2 page 3: the answer comes out of the model's last layer, built from the references (draft wording, no recorded run) */
+const RAG_ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 1.4, MODEL_OUT[2]], 0.5);
+const RAG_A = '“Harbor Bridge has two recent findings: a hairline crack near a bearing plate, 0.12 mm, and surface corrosion on a bearing assembly, about 25% section loss. From the five reports retrieved.”';
 
 const ease = (t: number) => {
   const c = Math.max(0, Math.min(1, t));
@@ -123,7 +126,8 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
   const embedded = act === 'envelope' || (act === 'embed' && t > 2600);
   const showQuery = act === 'envelope' || (act === 'embed' && t > 4200);
 
-  // envelope act: 5 points fly in (0.8-2.0 s), the envelope travels to the model (2.4-3.6 s), the answer comes down (3.8 s)
+  // page 3: the 5 references fly in and stack up (0.8-2.2 s), the stack goes into the model's first layer (2.4-3.6 s)
+  // and is taken in there; the model writes, and the answer stands at its last layer (5.2 s)
   const fly = act === 'envelope' ? ease((t - 800) / 1200) : 0;
   const travel = act === 'envelope' ? ease((t - 2400) / 1200) : 0;
   // the envelope goes to the model's first layer and is taken in there
@@ -156,13 +160,15 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
             {act === 'envelope' && (
               <>
                 {nearWorld.map((p, i) => (
-                  <mesh key={i} position={[p[0] + (envPos[0] - p[0]) * fly, p[1] + (envPos[1] - p[1]) * fly, p[2] + (envPos[2] - p[2]) * fly]} visible={travel < 0.05}>
+                  <mesh key={i} position={[p[0] + (envPos[0] - p[0]) * fly, p[1] + (envPos[1] - p[1]) * fly, p[2] + (envPos[2] - p[2]) * fly]} visible={travel < 0.05 && t < 1150 + i * 230}>
                     <sphereGeometry args={[0.09, 10, 10]} />
                     <meshBasicMaterial color={theme.red} toneMapped={false} />
                   </mesh>
                 ))}
-                <Envelope position={envPos} sealed={fly >= 1} opacity={intake} />
-                {visible && <SkyLabel position={[ENVELOPE[0], ENVELOPE[1] + 0.9, ENVELOPE[2]]} text="5 documents + the question · context is data, not instructions" show={t > 1800 && travel < 0.2} />}
+                <group position={envPos} scale={1.4}>
+                  <PaperStack position={[0, 0, 0]} sheets={nearWorld.map((_, i) => t > 1150 + i * 230)} opacity={intake} />
+                </group>
+                {visible && <SkyLabel position={[ENVELOPE[0], ENVELOPE[1] + 0.9, ENVELOPE[2]]} text="5 references + the question · context is data, not instructions" show={t > 1800 && travel < 0.2} />}
               </>
             )}
           </group>
@@ -175,12 +181,11 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       {/* page 6: the query comes up from the Ops Center into the database; the brief goes into the model's first layer */}
       {visible && act === 'unified' && <FlowArc key="query" from={OPS_TOP} to={[DB_WIDE[0], DB_WIDE[1] + 0.5, DB_WIDE[2]]} lift={1.2} radius={0.05} durationMs={1200} delayMs={200} fadeMs={800} color="#ffffff" />}
       {visible && act === 'unified' && <FlowArc key="brief" from={boardPoint(BRIEF_AT.x, BRIEF_AT.y + 0.17)} to={MODEL_WIDE_IN} lift={0.3} radius={0.05} durationMs={1200} delayMs={4600} persist color="#C74634" />}
-      {visible && act === 'envelope' && <FlowArc key="answer" from={MODEL_OUT} to={OPS_TOP} lift={0.2} radius={0.06} durationMs={1500} delayMs={4600} persist color={theme.data} />}
       {/* 1.1: the inspector's question goes in bare, and a general guess comes out */}
       {visible && act === 'model' && <SkyCard position={QUESTION_AT} who="the question" text={BARE_Q} show={t > 200} />}
       {visible && act === 'model' && <SkyCard position={ANSWER_AT} who="the language model · answer" text={BARE_A} show={t > 3900} tone="grey" />}
       {visible && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="Oracle AI Database · 384 numbers per text" show={act === 'embed' && t > 2800} />}
-      {visible && <SkyLabel position={[OPS_TOP[0], OPS_TOP[1] + 0.8, OPS_TOP[2]]} text="answer from the envelope only" show={act === 'envelope' && t > 5300} />}
+      {visible && act === 'envelope' && <SkyCard position={RAG_ANSWER_AT} who="the language model · answer, from the references" text={RAG_A} show={t > 5200} anchor="left" />}
       </group>
     </>
   );
@@ -222,20 +227,21 @@ function SkyDatabase({ color, t, position = DB }: { color: string; appearMs: num
   );
 }
 
-function Envelope({ position, sealed, opacity = 1 }: { position: Vec3; sealed: boolean; opacity?: number }) {
+/** the references: sheets of paper piling up flat as the retrieved reports arrive, the question (a red line) on top */
+function PaperStack({ position, sheets, opacity = 1 }: { position: Vec3; sheets: boolean[]; opacity?: number }) {
+  const n = sheets.filter(Boolean).length;
   return (
     <group position={position} visible={opacity > 0.01}>
-      <mesh castShadow>
-        <boxGeometry args={[0.9, 0.6, 0.08]} />
-        <meshStandardMaterial color="#f4f1ea" roughness={0.8} transparent opacity={opacity} />
-      </mesh>
-      <mesh position={[0, 0.05, 0.05]} rotation={[0, 0, Math.PI / 4]} scale={[1, 1, 1]} visible={sealed}>
-        <boxGeometry args={[0.5, 0.5, 0.01]} />
-        <meshStandardMaterial color="#e6dfd0" roughness={0.8} transparent opacity={opacity} />
-      </mesh>
-      <mesh position={[0, -0.02, 0.07]} visible={sealed}>
-        <circleGeometry args={[0.08, 20]} />
-        <meshBasicMaterial color="#C74634" transparent opacity={opacity} />
+      {sheets.map((on, i) => (
+        <mesh key={i} position={[(i % 2) * 0.05 - 0.025, i * 0.055, (i % 3) * 0.03 - 0.03]} rotation={[0, (i % 2 ? -1 : 1) * 0.12 * (i % 3), 0]} visible={on} castShadow>
+          <boxGeometry args={[0.95, 0.035, 0.68]} />
+          <meshStandardMaterial color={i % 2 ? '#f3eee2' : '#faf7ef'} roughness={0.85} transparent opacity={opacity} />
+        </mesh>
+      ))}
+      {/* the question, a red line on the top sheet */}
+      <mesh position={[0, n * 0.055 - 0.035, 0]} rotation={[-Math.PI / 2, 0, 0]} visible={n > 0}>
+        <planeGeometry args={[0.5, 0.07]} />
+        <meshBasicMaterial color="#C74634" transparent opacity={opacity} toneMapped={false} />
       </mesh>
     </group>
   );
@@ -252,9 +258,10 @@ function SkyLabel({ position, text, show, tone = 'teal' }: { position: Vec3; tex
 }
 
 /** a small card in the sky: who is speaking, and the words */
-function SkyCard({ position, who, text, show, tone = 'teal' }: { position: Vec3; who: string; text: string; show: boolean; tone?: 'teal' | 'grey' }) {
+function SkyCard({ position, who, text, show, tone = 'teal', anchor = 'center' }: { position: Vec3; who: string; text: string; show: boolean; tone?: 'teal' | 'grey'; anchor?: 'center' | 'left' }) {
   return (
-    <Html position={position} center zIndexRange={[16, 0]} style={{ pointerEvents: 'none' }}>
+    // anchor 'left': the card's left edge sits at the point (an answer standing right of the model's last layer)
+    <Html position={position} center={anchor === 'center'} zIndexRange={[16, 0]} style={{ pointerEvents: 'none', transform: anchor === 'left' ? 'translate(0, -50%)' : undefined }}>
       <div className={`sky-card tone-${tone}`} style={{ opacity: show ? 1 : 0 }}>
         <div className="sky-card__who">{who}</div>
         <div className="sky-card__text">{text}</div>

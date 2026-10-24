@@ -29,7 +29,7 @@ const b12 = beat(1, '2.2', 'Text becomes a point', 'sky', {
 }, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'embed' });
 
 const b13 = beat(1, '2.3', 'Grounding', 'sky', {
-  kicker: 'RAG · the envelope',
+  kicker: 'RAG · the references',
   notebook: 'rag_to_agents_lab.ipynb · Section 1.7 to 1.9, raw RAG and LangChain',
   visual: { kind: 'none' },
   message: 'Give the model **the evidence** and it stops guessing.',
