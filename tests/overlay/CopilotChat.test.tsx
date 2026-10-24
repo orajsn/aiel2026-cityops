@@ -4,7 +4,7 @@ import { chapter2 } from '../../src/scenes/chapter2';
 
 const items: ChatItem[] = [
   { divider: 'Day 1 · Evelyn_H_Mercer' },
-  { from: 'person', text: 'Rust at Pier 2.' },
+  { from: 'person', text: 'Rust on the pier.' },
   { from: 'copilot', text: 'Noted.' },
 ];
 

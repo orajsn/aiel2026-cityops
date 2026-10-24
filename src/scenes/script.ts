@@ -24,8 +24,8 @@ export const SCRIPT: Record<string, string> = {
   '2.9': 'Three questions, three patterns. **RAG**: what does the record say. **Workflow**: triage predictably. **Agent**: reason and tell me what to do. And **the rust** is still waiting on the bridge. At three o’clock we give it **a real memory**.',
 
   // Chapter 2 · Agent Memory
-  '3.0': 'We are back at Harbor Bridge, because the problem has not gone away: the rust at Pier 2 is still there. Two inspectors will look at it on different days. Evelyn Mercer comes first, Jordan Vance comes next. What should Vance know before he starts?',
-  '3.1a': 'Day 1. Evelyn Mercer is at Pier 2. She tells the copilot what she found, what she advises and what needs follow-up. The copilot says: noted.',
+  '3.0': 'We are back at Harbor Bridge, because the problem has not gone away: the rust is still there. Two inspectors will look at it on different days. Evelyn Mercer comes first, Jordan Vance comes next. What should Vance know before he starts?',
+  '3.1a': 'Day 1. Evelyn Mercer is at the rust. She tells the copilot what she found, what she advises and what needs follow-up. The copilot says: noted.',
   '3.1b': 'Then the chat closes. Mercer goes home, and everything she told the copilot goes with the session. Nothing carried over.',
   '3.1c': 'Day 2. Jordan Vance comes to the same rust and asks what happened here. The copilot has nothing. Same questions again, the earlier advice is missing, and the follow-up is out of view. The records may still exist. The next visit needs a way to find and use the relevant history.',
   '3.2': 'An agent needs several kinds of memory. Short-term on the desk: the context window and the session. Long-term on the shelves: procedures, episodes, facts. And a shared shelf everyone can read. Several kinds of memory, doing different jobs, in one store.',
@@ -39,9 +39,9 @@ export const SCRIPT: Record<string, string> = {
   '3.10': 'To find the right findings we search by meaning, then put up walls: only Harbor Bridge, only corrosion. Vector similarity and relational filters in one SQL statement.',
   '3.11': 'Three keys decide who sees what: user, agent and thread. Vance cannot open Mercer’s private door, but he finds her guideline in the shared hall. This is a SQL WHERE clause, not a Python filter.',
   '3.12': 'Here is one copilot turn, step by step, and the context card it builds: a summary, the topics, the relevant information and the recent messages. This is the prompt the model actually receives.',
-  '3.13': 'Day 1. Mercer at Pier 2: about 25 percent section loss, rust bleed. She logs the finding: corrosion, medium, grade C, repair within 60 days, and her guideline lands on the shared shelf for Harbor Bridge. This is what the next inspector inherits.',
+  '3.13': 'Day 1. Mercer at the rust: about 25 percent section loss, rust bleed. She logs the finding: corrosion, medium, grade C, repair within 60 days, and her guideline lands on the shared shelf for Harbor Bridge. This is what the next inspector inherits.',
   '3.14': 'Day 2. Vance stands at the same pier. He has never met Mercer. Two beams reach back: her logged finding and the pooled guideline, while his own thread stays private. No human handoff. The finding and the distilled memory carried it.',
-  '3.15': 'Same question, asked twice. Without memory: a generic answer. With memory: Pier 2, about 25 percent, grade C, 60 days, Mercer, Day 1. Same model. Same question. Only the memory differs.',
+  '3.15': 'Same question, asked twice. Without memory: a generic answer. With memory: the rust, about 25 percent, grade C, 60 days, Mercer, Day 1. Same model. Same question. Only the memory differs.',
   '3.16': 'And here both labs meet. This afternoon’s rule says act when section loss passes 25 percent. Today’s finding says about 25 percent. This afternoon the agent had the rule. Now it has the history. Together they make the call.',
   '3.17': 'Three things to take home: memory is the foundation, scope is governance, and it all lives in one converged database. The rule from this afternoon, the history from today. The same database held both. Now scan the code for the quiz.',
 };

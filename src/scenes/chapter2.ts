@@ -14,7 +14,7 @@ const NB = 'notebook_student_ollama.ipynb';
 
 /**
  * 2.0 · Back at the bridge (owner, 25 Oct: no recap; we come back because the problem is still there).
- * Only Pier 2 lights up. The cast and the question are the Lab 3 deck's slide 5.
+ * Only the rust lights up (no pier numbers on screen, owner 25 Oct). The cast and the question are the Lab 3 deck's slide 5.
  */
 const b20: SceneDef = {
   id: '3.0',
@@ -25,25 +25,25 @@ const b20: SceneDef = {
   overlay: 'Cast',
   overlayProps: {
     kicker: 'Lab 3 · Agent Memory',
-    message: 'We are back at Harbor Bridge. !!The rust at Pier 2!! is still there.',
+    message: 'We are back at Harbor Bridge. !!The rust!! is still there.',
     heading: 'One bridge. Two inspectors.',
     people: [
-      { initials: 'EM', name: 'Evelyn_H_Mercer', when: 'First visit', text: 'Checks Pier 2 and records what she sees.' },
-      { initials: 'JV', name: 'Jordan_Vance', when: 'Next visit', text: 'Returns to the same pier to see what has changed.' },
+      { initials: 'EM', name: 'Evelyn_H_Mercer', when: 'First visit', text: 'Checks the rust and records what she sees.' },
+      { initials: 'JV', name: 'Jordan_Vance', when: 'Next visit', text: 'Returns to the same rust to see what has changed.' },
     ],
     question: 'What should **Vance** know before he starts?',
   } satisfies CastProps as unknown as Record<string, unknown>,
 };
 
 /**
- * 2.1 · The agent that forgets, in three clicks at the Pier 2 corrosion (owner, 24 Oct): Day 1 Mercer tells
+ * 3.1 · The agent that forgets, in three clicks at the rust (owner, 24 Oct): Day 1 Mercer tells
  * the copilot (the AI agent) what she found, the chat closes and her messages empty out, Day 2 Vance asks
  * at the same pier and the copilot has nothing. Shown as a chat window: the inspector on the right, the
  * copilot on the left (owner). Words from the Lab 3 deck, slides 5, 6 and 9. The camera closes in on 2.1a
  * and holds there.
  */
 const MERCER_SAYS: { text: string; missing: string }[] = [
-  { text: 'Rust at Pier 2, about 25% section loss.', missing: 'Same questions. Again.' },
+  { text: 'Rust on the pier, about 25% section loss.', missing: 'Same questions. Again.' },
   { text: 'My advice: repair within 60 days.', missing: 'Earlier advice is missing' },
   { text: 'Follow-up: work to plan.', missing: 'And the follow-up?' },
 ];
@@ -59,7 +59,7 @@ const chat = (id: string, title: string, shot: string, props: CopilotChatProps, 
 });
 
 const b21a = chat('3.1a', 'The agent that forgets · Day 1', 'pier2-inspect', {
-  kicker: 'Day 1 · Pier 2',
+  kicker: 'Day 1 · the rust',
   message: 'Mercer tells the copilot what she found.',
   items: [
     { divider: 'Day 1 · Evelyn_H_Mercer' },
@@ -216,12 +216,12 @@ const b212 = beat(2, '3.12', 'The copilot turn', 'ops', {
   notebook: `${NB} · Part 6, TODO 6`,
 }, { ops: true });
 
-const b213 = beat(2, '3.13', 'Day 1: Mercer at Pier 2', 'pier2-inspect', {
+const b213 = beat(2, '3.13', 'Day 1: Mercer at the rust', 'pier2-inspect', {
   kicker: 'Day 1',
   visual: {
     kind: 'chat',
     lines: [
-      { who: 'Evelyn_H_Mercer · Pier 2', text: '~25% section loss, rust bleed.', tone: 'teal' },
+      { who: 'Evelyn_H_Mercer · the rust', text: '~25% section loss, rust bleed.', tone: 'teal' },
       { who: 'finding logged', text: 'corrosion · medium · grade C · repair within 60 days', tone: 'red' },
       { who: 'shared shelf · user_id="Harbor Bridge"', text: 'her guideline lands here', tone: 'amber' },
     ],
@@ -235,7 +235,7 @@ const b214 = beat(2, '3.14', 'Day 2: Vance at the same pier', 'pier2-inspect', {
   visual: {
     kind: 'chat',
     lines: [
-      { who: 'Jordan_Vance · Pier 2', text: 'Asks at the same pier.', tone: 'teal' },
+      { who: 'Jordan_Vance · the same rust', text: 'Asks about the same rust.', tone: 'teal' },
       { who: 'beam 1 · the logged finding', text: 'score 0.289 · grade C', tone: 'red' },
       { who: 'beam 2 · the pooled guideline', text: 'from the shared shelf', tone: 'amber' },
       { who: 'his private thread', text: 'stays his own', tone: 'grey' },
@@ -250,14 +250,14 @@ const b215 = beat(2, '3.15', 'With and without memory', 'pier2', {
   visual: {
     kind: 'compare',
     left: { title: 'Without memory', lines: ['A generic answer.'], tone: 'grey' },
-    right: { title: 'With memory', lines: ['Pier 2 · ~25%', 'grade C · 60 days', 'Evelyn_H_Mercer · Day 1'], tone: 'teal' },
+    right: { title: 'With memory', lines: ['the rust · ~25%', 'grade C · 60 days', 'Evelyn_H_Mercer · Day 1'], tone: 'teal' },
   },
   message: 'Same model. Same question. Only the memory differs.',
   notebook: 'the four-row comparison from the deck',
 }, { bridge: true, markers: true });
 
 const b216 = beat(2, '3.16', 'Where both labs meet', 'pier2', {
-  kicker: 'Pier 2',
+  kicker: 'The rust',
   visual: {
     kind: 'compare',
     left: { title: 'Lab 2 · the rule', lines: ['SOP: section loss > 25%'], tone: 'teal' },
