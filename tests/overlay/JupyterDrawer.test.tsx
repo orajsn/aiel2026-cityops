@@ -121,3 +121,14 @@ test('notebook text: bold that contains an asterisk (CITY_*) still renders bold,
   expect(bold).toEqual(['Run the cell below to wipe everything CITY_*, then re-run from Part 2.', 'restart the kernel']);
   expect(container.textContent).not.toContain('**');
 });
+
+test('iPad: the drawer adds no full-screen layer over the page buttons, and its notebook scrolls by finger', async () => {
+  const css = (await import('../../src/styles.css?raw')).default as string;
+  const rule = (sel: string) => css.match(new RegExp(`\n${sel.replace('.', '\.')} \{([^}]*)\}`))?.[1] ?? '';
+  // the wrapper is a zero-size anchor: only the handle and the open panel take touches
+  expect(rule('.jd')).toMatch(/width: 0/);
+  expect(rule('.jd')).toMatch(/height: 0/);
+  expect(rule('.jd')).not.toMatch(/inset: 0/);
+  expect(rule('.jd__nb')).toMatch(/touch-action: pan-y/);
+  expect(rule('.jd__nb')).toMatch(/overscroll-behavior: contain/);
+});
