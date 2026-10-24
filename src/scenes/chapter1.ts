@@ -59,7 +59,6 @@ const b16 = beat(1, '1.6', 'One query, four shapes', 'sky', {
 const b17 = beat(1, '1.7', 'The agent loop', 'bridge', {
   kicker: 'Agent · the Pier 3 report arrives',
   notebook: 'rag_to_agents_lab.ipynb · Section 5, the agent and the Pier 3 report',
-  tag: 'fictional scenario',
   visual: { kind: 'flow', steps: ['recall', 'get_asset_incident_brief', 'remember', 'final'], loop: true, hot: [1] },
   message: 'The agent chooses its tools. The procedure keeps it honest.',
 }, { bridge: true, markers: true });

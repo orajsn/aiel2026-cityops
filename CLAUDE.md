@@ -15,7 +15,7 @@ A deterministic, offline, click-through 3D web experience for two Oracle LiveLab
 ## Rules that never change
 
 - The Jupyter notebooks are never modified. Data names on screen are exactly what the notebooks print: `Harbor Bridge`, `Substation Gamma`, `Pipeline North-7`, `Evelyn_H_Mercer`, `Jordan_Vance`, `CITY_MESSAGE`, `CITY_MEMORY`, `CITY_INSPECTION_FINDING`, `ALL_MINILM_L12_V2`, `llama3.2`. Rendered in JetBrains Mono.
-- Never write "Kirkland", "MEA", "MWA" or "BMA". Every incident overlay shows the tag "fictional scenario".
+- Never write "Kirkland", "MEA", "MWA" or "BMA". No "fictional scenario" tags anywhere (owner, 24 Oct: everyone already knows).
 - Offline: no runtime network calls; fonts and models are bundled.
 - Navigation: ArrowRight next, ArrowLeft back, J jump menu, N presenter notes, L language (en/th). Every scene reachable by `#scene=<id>`.
 - Colours: background `#0B0E14`, Oracle Red `#C74634` (the only warm accent), core teal `#1B8A9C`, everything else cool greys. Fonts: Inter, Noto Sans Thai, JetBrains Mono.

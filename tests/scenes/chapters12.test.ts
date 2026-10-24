@@ -26,11 +26,8 @@ test('every shot and overlay referenced by chapters 1 and 2 exists', () => {
   }
 });
 
-test('incident beats carry the fictional scenario tag', () => {
-  for (const id of ['1.7', '2.13', '2.14']) {
-    const s = [...chapter1, ...chapter2].find((x) => x.id === id)!;
-    expect((s.overlayProps as { tag?: string }).tag).toBe('fictional scenario');
-  }
+test('no page says "fictional scenario" (owner: everyone already knows)', () => {
+  expect(JSON.stringify(SCENES)).not.toMatch(/fictional/i);
 });
 
 test('SCENES runs chapter 0, then 1, then 2', () => {

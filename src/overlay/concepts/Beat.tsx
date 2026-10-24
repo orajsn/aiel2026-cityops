@@ -22,7 +22,6 @@ export interface BeatProps {
   message: string;
   /** where the same thing lives in the notebook */
   notebook?: string;
-  tag?: 'fictional scenario';
 }
 
 const item = (i: number) => ({
@@ -35,13 +34,12 @@ const item = (i: number) => ({
  * Rough storyboard beat: one plain infographic panel, the presenter's line, and the notebook pointer.
  * Built to see the sequence; each beat gets its own scene treatment later.
  */
-export function Beat({ kicker, visual, message, notebook, tag }: BeatProps) {
+export function Beat({ kicker, visual, message, notebook }: BeatProps) {
   return (
     <div className="beat">
       <motion.div className={`beat__panel${visual.kind === 'none' ? ' beat__panel--compact' : ''}`} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, ease: EASE }}>
         <div className="beat__kicker">
           {kicker}
-          {tag && <span className="beat__tag">{tag}</span>}
         </div>
         <div className="beat__headline">“{message}”</div>
         <VisualView v={visual} />

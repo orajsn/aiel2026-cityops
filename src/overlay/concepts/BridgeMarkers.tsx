@@ -24,7 +24,6 @@ export function BridgeMarkers() {
         <div>surface corrosion · ~25% section loss · next session</div>
         <div className="markers__lab">Lab 3 · an agent with memory</div>
       </motion.div>
-      <div className="tag">fictional scenario</div>
     </div>
   );
 }

@@ -322,7 +322,6 @@ function Inspection({ pier, who }: { pier: 'pier3' | 'pier2'; who: Who }) {
             {red ? 'Pier 3 · crack' : 'Pier 2 · corrosion'}
           </div>
           <div className="marker-label__sub">{red ? 'hairline crack · 0.12 mm' : 'surface corrosion · ~25% section loss'}</div>
-          <div className="marker-label__sub">fictional scenario</div>
         </div>
       </Html>
     </group>

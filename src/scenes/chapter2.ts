@@ -8,7 +8,6 @@ import { beat } from './chapter1';
 
 const HB = 'Harbor Bridge';
 const NB = 'notebook_student_ollama.ipynb';
-const FICTION = 'fictional scenario' as const;
 
 const b20 = beat(2, '2.0', 'Recap: the city', 'bridge', {
   kicker: 'Lab 3 · three-minute recap',
@@ -156,7 +155,6 @@ const b212 = beat(2, '2.12', 'The copilot turn', 'ops', {
 
 const b213 = beat(2, '2.13', 'Day 1: Mercer at Pier 2', 'pier2-inspect', {
   kicker: 'Day 1',
-  tag: FICTION,
   visual: {
     kind: 'chat',
     lines: [
@@ -171,7 +169,6 @@ const b213 = beat(2, '2.13', 'Day 1: Mercer at Pier 2', 'pier2-inspect', {
 
 const b214 = beat(2, '2.14', 'Day N: Vance at the same pier', 'pier2-inspect', {
   kicker: 'Day N · never met Mercer',
-  tag: FICTION,
   visual: {
     kind: 'chat',
     lines: [

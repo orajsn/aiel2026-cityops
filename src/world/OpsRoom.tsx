@@ -203,7 +203,7 @@ function useWallTextures(): THREE.CanvasTexture[] {
   return textures;
 }
 
-function frame(ctx: CanvasRenderingContext2D, title: string, tag?: string) {
+function frame(ctx: CanvasRenderingContext2D, title: string) {
   ctx.fillStyle = NAVY;
   ctx.fillRect(0, 0, W, H);
   ctx.strokeStyle = 'rgba(43,179,200,0.35)';
@@ -212,11 +212,6 @@ function frame(ctx: CanvasRenderingContext2D, title: string, tag?: string) {
   ctx.fillStyle = TEAL;
   ctx.font = '600 34px "JetBrains Mono", monospace';
   ctx.fillText(title, 40, 66);
-  if (tag) {
-    ctx.fillStyle = DIM;
-    ctx.font = '26px "JetBrains Mono", monospace';
-    ctx.fillText(tag, W - 40 - ctx.measureText(tag).width, 66);
-  }
 }
 
 const RIVER = (riverJson as [number, number][]).map(([la, lo]) => project(la, lo));
@@ -259,7 +254,7 @@ function drawMap(ctx: CanvasRenderingContext2D, time: number) {
 }
 
 function drawIncidents(ctx: CanvasRenderingContext2D, time: number) {
-  frame(ctx, 'INCIDENTS', 'fictional scenario');
+  frame(ctx, 'INCIDENTS');
   const rows: [string, string, string][] = [
     [RED, 'Harbor Bridge · Pier 3', 'hairline crack · 0.12 mm · this afternoon'],
     [TEAL, 'Harbor Bridge · Pier 2', 'surface corrosion · ~25% section loss · next session'],
