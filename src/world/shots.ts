@@ -11,6 +11,8 @@ export interface Shot {
   ease?: 'inOut' | 'out';
   /** the place this shot is about; tests check it stays on screen, left of the panel */
   subject?: Vec3;
+  /** after arriving, wait `delayMs` and then ease in slowly to this closer view (e.g. once the inspector reaches the damage) */
+  push?: { position: Vec3; target: Vec3; delayMs: number; durationMs: number };
 }
 
 /**
@@ -39,6 +41,13 @@ const OPS = assetPosition('City Operations Control Center');
 const HB = fromBridgeLocal(0, 0);
 const PIER3 = fromBridgeLocal(BRIDGE.platform.x, BRIDGE.platform.z);
 const PIER2 = fromBridgeLocal(BRIDGE.piers[1], 0);
+const CRACK = fromBridgeLocal(BRIDGE.damage.crack.x, BRIDGE.damage.crack.z);
+const RUST = fromBridgeLocal(BRIDGE.damage.corrosion.x, BRIDGE.damage.corrosion.z);
+
+/** a shot that, once there, pushes in slowly to `close` */
+function withPush(shot: Shot, close: Shot, delayMs: number, durationMs = 2600): Shot {
+  return { ...shot, push: { position: close.position, target: close.target, delayMs, durationMs } };
+}
 
 export const SHOTS: Record<ShotId, Shot> = {
   /** the opening: low over the river by the bridge, before rising over the city */
@@ -48,14 +57,17 @@ export const SHOTS: Record<ShotId, Shot> = {
   /** the sky stage over the Ops Center, where the AI ideas are explained (SkyStage.tsx), the Ops Center below */
   // lower and more forward than the city cameras so the stage is seen from the side; the haze shows at the top
   sky: northShot([OPS.x, 9, OPS.z], 17, 22, -0.18, 2200, -20, -1),
-  /** City Operations Control Center, where the operator and the copilot work */
-  ops: northShot([OPS.x, 0.5, OPS.z], 22, 42, -0.1, 2200, -15, 2.2),
+  /** close on the control room over the Ops Center (OpsRoom.tsx, floor at y 2.6): over the operators' shoulders to the video wall */
+  ops: northShot([OPS.x, 3.3, OPS.z - 0.4], 9, 36, -0.38, 2200, -8),
   /** Harbor Bridge whole, low in the frame, the city behind it */
   bridge: northShot([HB.x, 0.3, HB.z], 14, 42, -0.1, 2200, 0, 2.8),
   /** Pier 3 and its maintenance platform: the inspector, the crack (Lab 2); left of the question bubble */
-  pier3: northShot([PIER3.x, BRIDGE.platform.y, PIER3.z], 3.8, 42, -0.4, 2200),
+  // arrive on Pier 3, then close in on the crack once the inspector has walked up to it
+  pier3: withPush(northShot([PIER3.x, BRIDGE.platform.y, PIER3.z], 3.8, 42, -0.4, 2200), northShot([CRACK.x - 0.02, BRIDGE.damage.crack.y, CRACK.z], 0.75, 24, -0.32, 0, 10), 900),
   /** Pier 2: the corrosion, Mercer and Vance (Lab 3) */
   pier2: northShot([PIER2.x, 0.2, PIER2.z], 3.8, 42, -0.1, 1800),
+  /** Pier 2 when someone inspects it: arrive, then close in on the corrosion */
+  'pier2-inspect': withPush(northShot([PIER2.x, 0.2, PIER2.z], 3.8, 42, -0.1, 1800), northShot([RUST.x - 0.02, BRIDGE.damage.corrosion.y, RUST.z], 0.75, 24, -0.32, 0, 10), 1200),
   'core-dive': { position: [30, 60, 560], target: [-20, -96, -10], durationMs: 2500, ease: 'inOut' },
   'core-face-tables': { position: [-250, -120, 270], target: [-270, -180, 0], durationMs: 1400, ease: 'inOut' },
   'core-face-json': { position: [-125, -120, 270], target: [-145, -180, 0], durationMs: 1400, ease: 'inOut' },

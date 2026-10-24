@@ -54,12 +54,16 @@ export function edgeVisibility(x: number, z: number): number {
   );
 }
 
+/** How far the whole city fades into the haze (0 = clear): pages that focus on something else dim it. Shared by every map material. */
+export const CITY_DIM = { value: 0 };
+
 /** Blend every map material towards the fog colour near the map's edge, after fog is applied. */
 function addEdgeFade(mat: THREE.Material) {
   mat.onBeforeCompile = (shader) => {
     shader.uniforms.uEdgeRect = {
       value: new THREE.Vector4(BKK.x, BKK.z, MODEL_HALF_X * BKK.scale, MODEL_HALF_Z * BKK.scale),
     };
+    shader.uniforms.uCityDim = CITY_DIM;
     shader.uniforms.uEdgeFade = { value: new THREE.Vector4(EDGE_FADE.west, EDGE_FADE.east, EDGE_FADE.north, EDGE_FADE.south) };
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>
@@ -70,7 +74,8 @@ vEdgeXZ = (modelMatrix * vec4(transformed, 1.0)).xz;`);
       .replace('#include <common>', `#include <common>
 varying vec2 vEdgeXZ;
 uniform vec4 uEdgeRect;
-uniform vec4 uEdgeFade;`)
+uniform vec4 uEdgeFade;
+uniform float uCityDim;`)
       .replace(
         '#include <fog_fragment>',
         `#include <fog_fragment>
@@ -81,7 +86,7 @@ uniform vec4 uEdgeFade;`)
             min(smoothstep(0.0, 1.0, clamp(edgeLo.x / uEdgeFade.x, 0.0, 1.0)), smoothstep(0.0, 1.0, clamp(edgeHi.x / uEdgeFade.y, 0.0, 1.0))),
             min(smoothstep(0.0, 1.0, clamp(edgeLo.y / uEdgeFade.z, 0.0, 1.0)), smoothstep(0.0, 1.0, clamp(edgeHi.y / uEdgeFade.w, 0.0, 1.0)))
           );
-          gl_FragColor.rgb = mix(fogColor, gl_FragColor.rgb, edgeK);
+          gl_FragColor.rgb = mix(fogColor, gl_FragColor.rgb, edgeK * (1.0 - uCityDim));
         #endif`,
       );
   };

@@ -21,6 +21,18 @@ test('every city page frames only the city: no sky, no map edge', () => {
   expect(bad).toEqual([]);
 });
 
+test('the slow push-ins after arriving also show only city, the whole way in', () => {
+  const bad: string[] = [];
+  for (const [id, sh] of Object.entries(SHOTS)) {
+    if (!sh.push) continue;
+    for (const t of [0.25, 0.5, 0.75, 1]) {
+      const m = interpolateShot(sh, { ...sh.push, durationMs: 1 } as typeof sh, t);
+      if (frameCityScore(m.position, m.target) < 0.97) bad.push(`${id} at ${t}`);
+    }
+  }
+  expect(bad).toEqual([]);
+});
+
 test('every camera move between city pages stays on the city the whole way', () => {
   const bad: string[] = [];
   SCENES.forEach((s, i) => {
@@ -47,7 +59,7 @@ test('on pages with the right-hand panel, the place the page is about sits left 
 
 test('the camera only moves when the story changes place: five places and the sky stage, at most 16 city moves in 38 pages', () => {
   const places = new Set(SCENES.filter((s) => isCity(s.shot)).map((s) => s.shot));
-  expect([...places].sort()).toEqual(['bridge', 'city', 'ops', 'pier2', 'pier3', 'sky']);
+  expect([...places].sort()).toEqual(['bridge', 'city', 'ops', 'pier2', 'pier2-inspect', 'pier3', 'sky']);
   let moves = 0;
   SCENES.forEach((s, i) => {
     if (i > 0 && SCENES[i - 1].shot !== s.shot && isCity(s.shot) && isCity(SCENES[i - 1].shot)) moves++;
@@ -55,7 +67,9 @@ test('the camera only moves when the story changes place: five places and the sk
   expect(moves).toBeLessThanOrEqual(16);
 });
 
-test('every page at the Ops Center names it', () => {
-  const bad = SCENES.filter((s) => (s.shot === 'ops' || s.shot === 'sky') && !((s.world as { highlight?: string[] })?.highlight ?? []).includes('City Operations Control Center')).map((s) => s.id);
-  expect(bad).toEqual([]);
+test('every page at the Ops Center shows the control room; sky pages name the Ops Center below', () => {
+  const w = (s: (typeof SCENES)[number]) => (s.world ?? {}) as { ops?: boolean; highlight?: string[] };
+  expect(SCENES.filter((s) => s.shot === 'ops' && !w(s).ops).map((s) => s.id)).toEqual([]);
+  expect(SCENES.filter((s) => s.shot !== 'ops' && w(s).ops).map((s) => s.id)).toEqual([]);
+  expect(SCENES.filter((s) => s.shot === 'sky' && !(w(s).highlight ?? []).includes('City Operations Control Center')).map((s) => s.id)).toEqual([]);
 });

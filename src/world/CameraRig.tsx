@@ -51,7 +51,7 @@ export function CameraRig() {
   useFrame(() => {
     const tw = tween.current;
     if (!tw) return;
-    const t = (performance.now() - tw.start) / tw.to.durationMs;
+    const t = Math.max(0, (performance.now() - tw.start) / tw.to.durationMs);
     const pose = interpolateShot(tw.from, tw.to, t);
     camera.position.set(...pose.position);
     target.current = pose.target;
@@ -59,6 +59,15 @@ export function CameraRig() {
     if (t >= 1) {
       tween.current = null;
       setSettled(true);
+      // a slow push-in once there (not when the owner saved a hand-set angle for this page)
+      const push = tw.to.push;
+      if (push && !useCameraStore.getState().overrides[useSceneStore.getState().current().id]) {
+        tween.current = {
+          from: { position: pose.position, target: pose.target, durationMs: 0 },
+          to: { position: push.position, target: push.target, durationMs: push.durationMs, ease: 'inOut' },
+          start: performance.now() + push.delayMs,
+        };
+      }
     }
   });
 

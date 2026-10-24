@@ -9,12 +9,12 @@ function obstacles(): [number, number, number, number][] {
     const x = BRIDGE.piers[i];
     for (const s of [-1, 1]) out.push([x - BRIDGE.legW / 2, x + BRIDGE.legW / 2, s * BRIDGE.legZ - BRIDGE.legD / 2, s * BRIDGE.legZ + BRIDGE.legD / 2]);
   }
-  const p = BRIDGE.platform;
-  out.push([p.x - p.w / 2, p.x + p.w / 2, p.z - p.d / 2, p.z + p.d / 2]);
+  for (const p of BRIDGE.platforms) out.push([p.x - p.w / 2, p.x + p.w / 2, p.z - p.d / 2, p.z + p.d / 2]);
   return out;
 }
 
-test('no boat ever sails through a pier, a tower leg or the Pier 3 platform', () => {
+test('no boat ever sails through a pier, a tower leg or an inspection platform (Pier 3 and Pier 2)', () => {
+  expect(BRIDGE.platforms.map((p) => p.x)).toEqual([BRIDGE.piers[2], BRIDGE.piers[1]]);
   const obs = obstacles();
   let underBridge = 0;
   for (const b of BOATS) {
@@ -34,7 +34,7 @@ test('no boat ever sails through a pier, a tower leg or the Pier 3 platform', ()
 });
 
 test('boats pass under the deck and the platform with room to spare', () => {
-  expect(BOAT_TOP_Y).toBeLessThan(BRIDGE.platform.y - 0.03);
+  for (const p of BRIDGE.platforms) expect(BOAT_TOP_Y).toBeLessThan(p.y - 0.03);
   expect(BOAT_TOP_Y).toBeLessThan(BRIDGE.clearanceY - 0.05);
 });
 

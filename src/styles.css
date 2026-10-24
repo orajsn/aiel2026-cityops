@@ -360,3 +360,8 @@ code,
 .cam-edit button.is-primary { background: var(--teal); border-color: var(--teal); }
 .cam-edit__note { font-size: 15px; color: #9fe0b4; }
 .stepper__btn--text { font-size: 18px; }
+
+/* 0.4: the question sits right of centre (the crack is on the left third); its line and tag clear of the bars */
+.qb__bubble, .qb__arrows, .qb__shape { left: 64%; }
+.qb__line { bottom: 150px; }
+.qb .tag { top: 110px; bottom: auto; }

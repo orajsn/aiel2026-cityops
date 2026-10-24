@@ -37,13 +37,23 @@ export const BRIDGE = {
   piers: [-0.75, -0.48, -0.2, 0.2, 0.45, 0.68],
   pierW: 0.7 * S,
   pierD: 1.4 * S,
-  /** the two towers stand on Pier 2 and Pier 5 */
-  pylonPiers: [1, 4],
+  /** the two towers stand on the outer piers (1 and 6), by the banks, clear of the inspection platforms */
+  pylonPiers: [0, 5],
   legW: 0.5 * S,
   legD: 0.36 * S,
   legZ: (DECK_W / 2 + 0.25) * S,
-  /** maintenance platform bolted to the north face of Pier 3 */
+  /** maintenance platform bolted to the camera-side face of Pier 3 (kept for older callers: platforms[0]) */
   platform: { x: -0.2, w: 0.9 * S, d: 0.9 * S, z: 0.7 * S + 0.45 * S, y: (DECK_Y - 0.95) * S },
+  /** inspection platforms: Pier 3 (the crack, Lab 2) and Pier 2 (the corrosion, Lab 3) */
+  platforms: [
+    { x: -0.2, w: 0.9 * S, d: 0.9 * S, z: 0.7 * S + 0.45 * S, y: (DECK_Y - 0.95) * S },
+    { x: -0.48, w: 0.9 * S, d: 0.9 * S, z: 0.7 * S + 0.45 * S, y: (DECK_Y - 0.95) * S },
+  ],
+  /** where the damage is, on the pier shaft face the platform looks at (bridge-local world units) */
+  damage: {
+    crack: { x: -0.2, y: (DECK_Y - 0.62) * S, z: 0.7 * S },
+    corrosion: { x: -0.48, y: (DECK_Y - 0.7) * S, z: 0.7 * S },
+  },
   /** underside of the pier caps, the lowest part of the deck */
   clearanceY: (DECK_Y - 0.3 - 0.12) * S,
   /** boat lanes through the main span between Pier 3 and Pier 4, one per direction */

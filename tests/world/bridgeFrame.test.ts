@@ -38,3 +38,22 @@ test('the ramps come down onto the ground of each bank, not into it or above it'
   expect(BRIDGE.footY.west).toBeCloseTo(0.062, 2);
   expect(BRIDGE.footY.east).toBeCloseTo(0.116, 2);
 });
+
+test('the damage sits on the pier faces the inspection platforms look at', async () => {
+  const { BRIDGE } = await import('../../src/world/bridgeFrame');
+  const [p3, p2] = BRIDGE.platforms;
+  expect(BRIDGE.damage.crack.x).toBe(p3.x);
+  expect(BRIDGE.damage.corrosion.x).toBe(p2.x);
+  // on the face of the pier shaft, at the eye level of someone standing on the platform (below the pier cap)
+  for (const d of [BRIDGE.damage.crack, BRIDGE.damage.corrosion]) {
+    expect(d.z).toBeCloseTo(BRIDGE.pierD / 2, 6);
+    expect(d.y).toBeGreaterThan(p3.y);
+    expect(d.y).toBeLessThan(BRIDGE.clearanceY);
+  }
+});
+
+test('no tower stands on a pier that has an inspection platform (its leg would hide the inspector)', async () => {
+  const { BRIDGE } = await import('../../src/world/bridgeFrame');
+  const towerX = BRIDGE.pylonPiers.map((i) => BRIDGE.piers[i]);
+  for (const p of BRIDGE.platforms) for (const x of towerX) expect(Math.abs(p.x - x)).toBeGreaterThan(p.w);
+});

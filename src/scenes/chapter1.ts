@@ -40,7 +40,7 @@ const b14 = beat(1, '1.4', 'One envelope is not enough', 'ops', {
   notebook: 'rag_to_agents_lab.ipynb · Section 2 (optional trace)',
   visual: { kind: 'cards', cols: 4, items: [{ title: 'Chatbot', tone: 'grey' }, { title: 'RAG', tone: 'teal' }, { title: 'Workflow', tone: 'teal' }, { title: 'Agent', tone: 'red' }] },
   message: 'RAG answers one question. Operations ask three at once.',
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
 const b15 = beat(1, '1.5', 'The toolbelt', 'ops', {
   kicker: 'Tools on the Ops Center wall',
@@ -56,7 +56,7 @@ const b15 = beat(1, '1.5', 'The toolbelt', 'ops', {
     ],
   },
   message: 'The model only sees each card’s name and description. Docstrings are prompt engineering.',
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
 const b16 = beat(1, '1.6', 'One query, four shapes', 'ops', {
   kicker: 'UNIFIED_SQL',
@@ -72,7 +72,7 @@ const b16 = beat(1, '1.6', 'One query, four shapes', 'ops', {
     ],
   },
   message: 'No ETL, no sync, one transaction.',
-}, { pins: 'all', graph: HB, highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
 const b17 = beat(1, '1.7', 'The agent loop', 'bridge', {
   kicker: 'Agent · the Pier 3 report arrives',
@@ -87,7 +87,7 @@ const b18 = beat(1, '1.8', 'A sticky note', 'ops', {
   notebook: 'rag_to_agents_lab.ipynb · Section 5.8 and 6.1',
   visual: { kind: 'cards', cols: 1, items: [{ title: 'One row keyed to Harbor Bridge', sub: 'embedded on write' }] },
   message: 'A memory, but a thin one.',
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
 const b19 = beat(1, '1.9', 'Three questions', 'pier2', {
   kicker: 'Closing Lab 2',

@@ -16,7 +16,7 @@ const b20 = beat(2, '2.0', 'Recap: the city', 'bridge', {
   message: 'Same city, same database, same bridge. Now, memory.',
 }, { pins: 'all', graph: HB, bridge: true, markers: true });
 
-const b21 = beat(2, '2.1', 'The agent that forgets', 'pier2', {
+const b21 = beat(2, '2.1', 'The agent that forgets', 'pier2-inspect', {
   kicker: 'No memory',
   visual: {
     kind: 'chat',
@@ -28,7 +28,7 @@ const b21 = beat(2, '2.1', 'The agent that forgets', 'pier2', {
   },
   message: 'Every session is a first date.',
   notebook: `${NB} · motivation for Part 3 and the Day N cell`,
-}, { bridge: true });
+}, { bridge: true, inspect: { pier: 'pier2', who: 'character-female-a' } });
 
 const b22 = beat(2, '2.2', 'The memory map', 'ops', {
   kicker: 'Kinds of memory',
@@ -43,34 +43,34 @@ const b22 = beat(2, '2.2', 'The memory map', 'ops', {
   },
   message: 'Several kinds of memory, doing different jobs, in one store.',
   notebook: 'CITY_MEMORY holds fact, preference, guideline and memory records',
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
 const b23 = beat(2, '2.3', 'The glass', 'ops', {
   kicker: 'The context window',
   visual: { kind: 'list', items: ['Overflow', 'Noise', 'The lost “size 9” detail', 'The right fact at the wrong turn'] },
   message: 'The context window is the model’s whole world, and it is a curation problem.',
   notebook: 'the Part 6 context card is the cure',
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
 const b24 = beat(2, '2.4', 'Three dials', 'ops', {
   kicker: 'What flows into the glass',
   visual: { kind: 'cards', cols: 3, items: [{ title: 'Memory engineering' }, { title: 'Context engineering' }, { title: 'Harness engineering' }] },
   message: 'Three disciplines, one job: the right tokens in, the wrong ones out.',
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
 const b25 = beat(2, '2.5', 'The loop with memory', 'ops', {
   kicker: 'Read, act, write',
   visual: { kind: 'flow', steps: ['Read memory at the start of the turn', 'The Lab 2 loop: model ↔ tools', 'Write memory at the end of the turn', 'The database under it'], loop: true, hot: [0, 2] },
   message: 'One store, one memory manager, any harness.',
   notebook: `${NB} · Part 1, TODO 1`,
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
 const b26 = beat(2, '2.6', 'One connection', 'ops', {
   kicker: 'The copilot plugs into the database',
   visual: { kind: 'cards', cols: 2, items: [{ title: 'Copilot', sub: 'one connection' }, { title: 'ALL_MINILM_L12_V2', sub: 'still there from this afternoon' }] },
   message: 'Same 384 numbers as this afternoon, computed inside the database, no API key.',
   notebook: `${NB} · TODO 2 (report_event), peek_sdk_tables`,
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
 const b27 = beat(2, '2.7', 'The write path', 'ops', {
   kicker: 'CITY_MESSAGE → CITY_MEMORY',
@@ -87,7 +87,7 @@ const b27 = beat(2, '2.7', 'The write path', 'ops', {
   },
   message: 'The agent does not store what you said. It stores what it learned.',
   notebook: `${NB} · Part 3, the extractor`,
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
 const b28 = beat(2, '2.8', 'Scope is the key', 'ops', {
   kicker: 'Search by scope',
@@ -98,7 +98,7 @@ const b28 = beat(2, '2.8', 'Scope is the key', 'ops', {
   },
   message: 'Records inherit the scope of the thread that wrote them.',
   notebook: `${NB} · TODO 3`,
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
 const b29 = beat(2, '2.9', 'The system of record', 'ops', {
   kicker: 'CITY_INSPECTION_FINDING',
@@ -109,7 +109,7 @@ const b29 = beat(2, '2.9', 'The system of record', 'ops', {
   },
   message: 'Memory is what the agent learns. Findings are what the city records.',
   notebook: `${NB} · Part 4, TODO 4`,
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
 const b210 = beat(2, '2.10', 'Vector search with walls', 'city', {
   kicker: 'Similarity + filters',
@@ -142,7 +142,7 @@ const b211 = beat(2, '2.11', 'Private doors, shared hall', 'ops', {
   },
   message: 'This is a SQL WHERE clause, not a Python filter.',
   notebook: `${NB} · Part 5`,
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
 const b212 = beat(2, '2.12', 'The copilot turn', 'ops', {
   kicker: 'The context card',
@@ -152,9 +152,9 @@ const b212 = beat(2, '2.12', 'The copilot turn', 'ops', {
   },
   message: 'This is the prompt the model actually receives.',
   notebook: `${NB} · Part 6, TODO 6`,
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { ops: true });
 
-const b213 = beat(2, '2.13', 'Day 1: Mercer at Pier 2', 'pier2', {
+const b213 = beat(2, '2.13', 'Day 1: Mercer at Pier 2', 'pier2-inspect', {
   kicker: 'Day 1',
   tag: FICTION,
   visual: {
@@ -167,9 +167,9 @@ const b213 = beat(2, '2.13', 'Day 1: Mercer at Pier 2', 'pier2', {
   },
   message: 'This is what the next inspector inherits.',
   notebook: `${NB} · Day 1, three cells`,
-}, { bridge: true, markers: true });
+}, { bridge: true, inspect: { pier: 'pier2', who: 'character-female-a' } });
 
-const b214 = beat(2, '2.14', 'Day N: Vance at the same pier', 'pier2', {
+const b214 = beat(2, '2.14', 'Day N: Vance at the same pier', 'pier2-inspect', {
   kicker: 'Day N · never met Mercer',
   tag: FICTION,
   visual: {
@@ -183,7 +183,7 @@ const b214 = beat(2, '2.14', 'Day N: Vance at the same pier', 'pier2', {
   },
   message: 'No human handoff. The finding and the distilled memory carried it.',
   notebook: `${NB} · Day N`,
-}, { bridge: true, markers: true });
+}, { bridge: true, inspect: { pier: 'pier2', who: 'character-male-d' } });
 
 const b215 = beat(2, '2.15', 'With and without memory', 'pier2', {
   kicker: 'Same question twice',

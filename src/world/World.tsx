@@ -12,6 +12,9 @@ import { DatabaseDiorama, type Face } from './DatabaseDiorama';
 import { GraphLines, edgesFor } from './GraphLines';
 import { VectorField, type VectorFieldProps } from './VectorField';
 import { SkyStage, type SkyAct } from './SkyStage';
+import { OpsRoom } from './OpsRoom';
+import { CITY_DIM } from './BangkokCity';
+import { useFrame } from '@react-three/fiber';
 
 export interface WorldProps {
   pins?: AssetType[] | 'all';
@@ -21,10 +24,13 @@ export interface WorldProps {
   graph?: boolean | string;
   vectors?: Omit<VectorFieldProps, 'position'>;
   bridge?: boolean;
-  inspector?: boolean;
+  /** someone inspecting the damage on a pier (HarborBridge.tsx) */
+  inspect?: { pier: 'pier3' | 'pier2'; who: string };
   markers?: boolean;
   /** which AI idea the sky stage over the Ops Center is showing (none = hidden) */
   sky?: SkyAct;
+  /** close-up of the Ops Center control room, with the city faded behind it */
+  ops?: boolean;
 }
 
 export function World() {
@@ -50,7 +56,17 @@ export function World() {
       )}
       {w.vectors && <VectorField {...w.vectors} position={[0, -80, 40]} />}
       <SkyStage act={w.sky ?? null} />
+      <OpsRoom show={!!w.ops} />
+      <CityDimmer dim={w.ops ? 0.62 : 0} />
       <Effects />
     </>
   );
+}
+
+/** eases the city's fade into the haze towards `dim` (0 = clear) */
+function CityDimmer({ dim }: { dim: number }) {
+  useFrame((_, dt) => {
+    CITY_DIM.value += (dim - CITY_DIM.value) * Math.min(1, dt * 2.5);
+  });
+  return null;
 }
