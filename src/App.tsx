@@ -38,7 +38,7 @@ export default function App() {
           shadows
           dpr={[1, 1.5]}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
-          camera={{ position: [10, 150, 170], fov: 45, near: 0.5, far: 4000 }}
+          camera={{ position: [10, 150, 170], fov: 45, near: 0.1, far: 4000 }}
           style={{ position: 'absolute', inset: 0 }}
           // dev only: lets a verification script render full-size captures from any camera
           onCreated={(state) => {

@@ -34,7 +34,7 @@ export const chapter0: SceneDef[] = [
     title: 'The question on the bridge',
     shot: 'pier3',
     // the inspector walks to the crack on Pier 3 and puts a torch on it
-    world: { bridge: true, inspect: { pier: 'pier3', who: 'character-male-b' } },
+    world: { bridge: true, inspect: { pier: 'pier3', who: 'character-male-b' }, question: true },
     overlay: 'QuestionBubble',
   },
   {

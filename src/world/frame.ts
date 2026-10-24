@@ -54,3 +54,10 @@ export function projectToScreen(pos: Vec3, target: Vec3, p: Vec3): { x: number; 
   const z = dot(d, f);
   return { x: dot(d, r) / (z * TAN_X), y: dot(d, u) / (z * TAN_Y), front: z > 0 };
 }
+
+/** The world point at screen position (x, y in -1..1) and `depth` along the view of a camera. */
+export function screenPoint(pos: Vec3, target: Vec3, x: number, y: number, depth: number): Vec3 {
+  const { f, r, u } = basis(pos, target);
+  const d: V = [f[0] + r[0] * x * TAN_X + u[0] * y * TAN_Y, f[1] + r[1] * x * TAN_X + u[1] * y * TAN_Y, f[2] + r[2] * x * TAN_X + u[2] * y * TAN_Y];
+  return [pos[0] + d[0] * depth, pos[1] + d[1] * depth, pos[2] + d[2] * depth];
+}

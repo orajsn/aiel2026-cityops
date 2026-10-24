@@ -13,6 +13,7 @@ import { GraphLines, edgesFor } from './GraphLines';
 import { VectorField, type VectorFieldProps } from './VectorField';
 import { SkyStage, type SkyAct } from './SkyStage';
 import { OpsRoom } from './OpsRoom';
+import { BridgeQuestion } from './BridgeQuestion';
 import { CITY_DIM } from './BangkokCity';
 import { useFrame } from '@react-three/fiber';
 
@@ -31,6 +32,8 @@ export interface WorldProps {
   sky?: SkyAct;
   /** close-up of the Ops Center control room, with the city faded behind it */
   ops?: boolean;
+  /** 0.4: the inspector's question and the four shapes of data, in 3D beside the pier */
+  question?: boolean;
 }
 
 export function World() {
@@ -57,6 +60,7 @@ export function World() {
       {w.vectors && <VectorField {...w.vectors} position={[0, -80, 40]} />}
       <SkyStage act={w.sky ?? null} />
       <OpsRoom show={!!w.ops} />
+      {w.question && <BridgeQuestion key={scene?.id} />}
       <CityDimmer dim={w.ops ? 0.62 : 0} />
       <Effects />
     </>
