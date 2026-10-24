@@ -61,6 +61,10 @@ const LAB2_ACTS: (SkyAct | null)[] = ['overflow', 'tools', 'unified', 'note'];
  * (the notebooks keep no recorded outputs): fluent, general, and knows nothing of the city.
  */
 const BARE_Q = '“What recent issues have been reported on Harbor Bridge?”';
+/** the question stands on the left, the guess on the right, and both stay until the next page (owner: give people time to read) */
+const QUESTION_AT: Vec3 = [A[0] - 2.9, A[1] + 1.1, A[2]];
+/** the answer stands to the right of the model's last layer */
+const ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 0.3, MODEL_OUT[2]], 3.4);
 const BARE_A = '“I don’t have any reports about a Harbor Bridge in your city. In general, bridges can show cracking, corrosion or bearing wear…”';
 
 const ease = (t: number) => {
@@ -68,15 +72,30 @@ const ease = (t: number) => {
   return c < 0.5 ? 4 * c * c * c : 1 - Math.pow(-2 * c + 2, 3) / 2;
 };
 
-/** ms since `act` last changed, ticking every frame */
+/** the longest act animation; after this the stage holds still and React stops re-rendering it */
+const ACT_MS = 12000;
+
+/**
+ * ms since `act` last changed. Re-rendering the stage on every frame rebuilt lines and tubes sixty times
+ * a second (the app crawled after a minute), so it ticks at most 30 times a second and stops at ACT_MS;
+ * anything that keeps moving after that (the model's wave, the vector search) animates in its own useFrame.
+ */
 function useActClock(act: SkyAct | null) {
   const start = useRef(performance.now());
+  const last = useRef(0);
   const [t, setT] = useState(0);
   useEffect(() => {
     start.current = performance.now();
+    last.current = 0;
     setT(0);
   }, [act]);
-  useFrame(() => setT(performance.now() - start.current));
+  useFrame(() => {
+    const now = performance.now();
+    const elapsed = now - start.current;
+    if (elapsed > ACT_MS + 100 || now - last.current < 33) return;
+    last.current = now;
+    setT(Math.min(elapsed, ACT_MS + 100));
+  });
   return t;
 }
 
@@ -161,13 +180,13 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
         </group>
       </group>
       {/* flows between the city and the stage (outside the scaled group so they stay anchored to the city) */}
-      {visible && act === 'model' && <FlowArc key="q-up" from={OPS_TOP} to={MODEL_IN} lift={1.5} radius={0.05} durationMs={1600} delayMs={700} fadeMs={900} color="#ffffff" />}
+      {visible && act === 'model' && <FlowArc key="q-up" from={[QUESTION_AT[0] + 1.0, QUESTION_AT[1] - 0.2, QUESTION_AT[2]]} to={MODEL_IN} lift={0.6} radius={0.05} durationMs={1600} delayMs={900} fadeMs={900} color="#ffffff" />}
       {visible && act === 'embed' &&
         sources.map((s, i) => <FlowArc key={`doc-${i}`} from={s} to={DB} lift={2.5} radius={0.04} durationMs={1300} delayMs={500 + i * 180} fadeMs={600} color={theme.data} />)}
       {visible && act === 'envelope' && <FlowArc key="answer" from={MODEL_OUT} to={OPS_TOP} lift={0.2} radius={0.06} durationMs={1500} delayMs={4600} persist color={theme.data} />}
       {/* 1.1: the inspector's question goes in bare, and a general guess comes out */}
-      {visible && act === 'model' && <SkyCard position={[OPS_TOP[0], OPS_TOP[1] + 2.2, OPS_TOP[2]]} who="the question" text={BARE_Q} show={t > 200 && t < 2600} />}
-      {visible && act === 'model' && <SkyCard position={[MODEL[0], MODEL[1] - 2.3, MODEL[2]]} who="the language model · a guess" text={BARE_A} show={t > 3900} tone="grey" />}
+      {visible && act === 'model' && <SkyCard position={QUESTION_AT} who="the question" text={BARE_Q} show={t > 200} />}
+      {visible && act === 'model' && <SkyCard position={ANSWER_AT} who="the language model · answer" text={BARE_A} show={t > 3900} tone="grey" />}
       {visible && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="Oracle AI Database · 384 numbers per text" show={act === 'embed' && t > 2800} />}
       {visible && <SkyLabel position={[OPS_TOP[0], OPS_TOP[1] + 0.8, OPS_TOP[2]]} text="answer from the envelope only" show={act === 'envelope' && t > 5300} />}
       </group>

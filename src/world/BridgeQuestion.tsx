@@ -63,6 +63,7 @@ export function BridgeQuestion() {
   const { facing, fits, cards } = SILO_LAYOUT();
   // one solid panel per system, slightly behind its shape
   const panels = useMemo(() => cards.map(cardGeometry), [cards]);
+  useEffect(() => () => panels.forEach((g) => g.dispose()), [panels]);
   const panelMats = useRef<(THREE.MeshBasicMaterial | null)[]>([]);
   // the clock starts when the camera reaches the close-up (the move in from the city takes several seconds)
   const camera = useThree((st) => st.camera);

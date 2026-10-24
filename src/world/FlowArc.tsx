@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { arcCurve } from './arc';
@@ -39,8 +39,11 @@ export function FlowArc({
   persist = false,
   onDone,
 }: FlowArcProps) {
-  const curve = useMemo(() => arcCurve(from, to, lift), [from, to, lift]);
+  // keyed on the coordinates, not the arrays: callers pass fresh arrays on every render, and a tube per
+  // frame that is never freed is a GPU leak (the app crawled after a minute)
+  const curve = useMemo(() => arcCurve(from, to, lift), [from[0], from[1], from[2], to[0], to[1], to[2], lift]); // eslint-disable-line react-hooks/exhaustive-deps
   const tube = useMemo(() => new THREE.TubeGeometry(curve, SEG, radius, 5, false), [curve, radius]);
+  useEffect(() => () => tube.dispose(), [tube]);
   const indexCount = tube.index ? tube.index.count : 0;
   const col = useMemo(() => new THREE.Color(color), [color]);
 

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
@@ -43,6 +43,7 @@ export function SkyShapes({ red }: { red: string }) {
   const mounted = useRef(performance.now());
   const leaving = useRef<(THREE.MeshBasicMaterial | null)[]>([]);
   const oldCards = useMemo(() => SILO_LAYOUT().cards.map(cardGeometry), []);
+  useEffect(() => () => oldCards.forEach((g) => g.dispose()), [oldCards]);
   useFrame(() => {
     if (settled && t0.current === null) t0.current = performance.now();
     clock.current = t0.current === null ? 0 : performance.now() - t0.current;
@@ -84,6 +85,7 @@ function PanelPiece({ p, i, clock, facing, stack }: { p: Panel; i: number; clock
     g.setIndex([0, 3, 1, 1, 3, 2]);
     return g;
   }, [p]);
+  useEffect(() => () => card.dispose(), [card]);
   // the link from the database to the panel's inner edge
   const link = useMemo<[Vec3, Vec3]>(() => {
     const inner = p.x0 > 0 ? p.x0 : p.x1;
