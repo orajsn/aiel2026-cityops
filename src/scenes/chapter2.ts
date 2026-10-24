@@ -5,8 +5,12 @@ import type { MemoryMapProps } from '../overlay/concepts/MemoryMap';
 import type { GlassProps } from '../overlay/concepts/Glass';
 import type { DisciplinesProps } from '../overlay/concepts/Disciplines';
 import type { MemoryLoopProps } from '../overlay/concepts/MemoryLoop';
+import type { HandsOnProps, ScopeProps } from '../overlay/concepts/HandsOn';
 import type { Who } from '../world/Person';
 import { beat } from './chapter1';
+// bundled, not in public/: the dev server only serves public files it saw at start-up
+import mercerPortrait from '../assets/portraits/mercer.png';
+import vancePortrait from '../assets/portraits/vance.png';
 
 /**
  * Chapter 2 · Agent Memory (Lab 3, notebook_student_ollama.ipynb). Rough pass: one scene per Storyboard row,
@@ -32,9 +36,9 @@ const b20: SceneDef = {
     message: 'We are back at Harbor Bridge. !!The rust!! is still there.',
     heading: 'One bridge. Two inspectors.',
     people: [
-      // owner, 25 Oct: just the names, no initials badge
-      { name: 'Mercer', when: 'First visit', text: 'Checks the rust and records what she sees.' },
-      { name: 'Vance', when: 'Next visit', text: 'Returns to the same rust to see what has changed.' },
+      // owner, 25 Oct: just the names, no initials badge; a portrait of their own 3D character beside each
+      { name: 'Mercer', portrait: mercerPortrait, when: 'First visit', text: 'Checks the rust and records what she sees.' },
+      { name: 'Vance', portrait: vancePortrait, when: 'Next visit', text: 'Returns to the same rust to see what has changed.' },
     ],
     question: 'What should **Vance** know before he starts?',
   } satisfies CastProps as unknown as Record<string, unknown>,
@@ -141,67 +145,27 @@ const b24 = atRust('3.4', 'Three disciplines', 'Disciplines', { kicker: 'Three d
 const b25a = atRust('3.5a', 'The loop with memory', 'MemoryLoop', { kicker: 'The agent loop, with memory wired in', step: 1, message: 'This afternoon’s loop, with memory **read at the start** and **written at the end**.', notebook: `${NB} · Part 1, TODO 1` } satisfies MemoryLoopProps, 'loop');
 const b25b = atRust('3.5b', 'The loop with memory', 'MemoryLoop', { kicker: 'The agent loop, with memory wired in', step: 2, message: 'One store, one memory manager, **any harness**.' } satisfies MemoryLoopProps, 'loop');
 
-const b26 = beat(2, '3.6', 'One connection', 'ops', {
-  kicker: 'The copilot plugs into the database',
-  visual: { kind: 'cards', cols: 2, items: [{ title: 'Copilot', sub: 'one connection' }, { title: 'ALL_MINILM_L12_V2', sub: 'still there from this afternoon' }] },
-  message: 'Same 384 numbers as this afternoon, computed inside the database, no API key.',
-  notebook: `${NB} · TODO 2 (report_event), peek_sdk_tables`,
-}, { ops: true });
+/**
+ * Lab 3 pages 15 to 19 (3.6-3.10), the notebook's Parts 1 to 5, in the Ops room (owner, 25 Oct; sketches agreed
+ * in chat). The camera moves once, at 3.6, and holds; only the panel on the right changes.
+ */
+const atOps = (id: string, title: string, overlay: string, props: object, group?: string): SceneDef => ({
+  id,
+  chapter: 2,
+  title,
+  shot: 'ops',
+  world: { ops: true },
+  overlay,
+  overlayGroup: group,
+  overlayProps: props as Record<string, unknown>,
+});
 
-const b27 = beat(2, '3.7', 'The write path', 'ops', {
-  kicker: 'CITY_MESSAGE → CITY_MEMORY',
-  visual: {
-    kind: 'cards',
-    cols: 2,
-    items: [
-      { title: 'CITY_MESSAGE', sub: 'the whole message, filed', tone: 'grey' },
-      { title: 'fact', tone: 'blue' },
-      { title: 'preference', tone: 'green' },
-      { title: 'guideline', tone: 'amber' },
-      { title: 'memory', tone: 'grey' },
-    ],
-  },
-  message: 'The agent does not store what you said. It stores what it learned.',
-  notebook: `${NB} · Part 3, the extractor`,
-}, { ops: true });
-
-const b28 = beat(2, '3.8', 'Scope is the key', 'ops', {
-  kicker: 'Search by scope',
-  visual: {
-    kind: 'compare',
-    left: { title: 'user_id=None', lines: ['the search beam returns empty'], tone: 'grey' },
-    right: { title: 'user_id="inspector_demo"', lines: ['the cards light'], tone: 'teal' },
-  },
-  message: 'Records inherit the scope of the thread that wrote them.',
-  notebook: `${NB} · TODO 3`,
-}, { ops: true });
-
-const b29 = beat(2, '3.9', 'The system of record', 'ops', {
-  kicker: 'CITY_INSPECTION_FINDING',
-  visual: {
-    kind: 'cards',
-    cols: 3,
-    items: [{ title: 'category' }, { title: 'severity' }, { title: 'grade' }, { title: 'recommendation' }, { title: 'embedding' }, { title: 'Mercer logs one', sub: 'deliberately', tone: 'red' }],
-  },
-  message: 'Memory is what the agent learns. Findings are what the city records.',
-  notebook: `${NB} · Part 4, TODO 4`,
-}, { ops: true });
-
-const b210 = beat(2, '3.10', 'Vector search with walls', 'city', {
-  kicker: 'Similarity + filters',
-  visual: {
-    kind: 'cards',
-    cols: 2,
-    items: [
-      { title: 'VECTOR_DISTANCE', sub: 'the nearest findings light up' },
-      { title: '(:bind IS NULL OR col = :bind)', sub: 'the walls' },
-      { title: 'asset = Harbor Bridge', sub: 'wall 1', tone: 'red' },
-      { title: 'category = corrosion', sub: 'wall 2', tone: 'red' },
-    ],
-  },
-  message: 'Vector similarity and relational filters in one SQL statement.',
-  notebook: `${NB} · TODO 5`,
-}, { pins: 'all', highlight: [HB] });
+const b26 = atOps('3.6', 'One connection', 'OneConnection', { kicker: 'Lab 3 · Part 1', message: 'The copilot needs **one connection**: the database.', notebook: `${NB} · Part 1 and TODO 1` } satisfies HandsOnProps);
+const b27 = atOps('3.7', 'The write path', 'WritePath', { kicker: 'Lab 3 · Part 3', message: 'The agent does not store what you said. It stores **what it learned**.', notebook: `${NB} · Part 3, TODO 2 (report_event), peek_sdk_tables` } satisfies HandsOnProps);
+const b28a = atOps('3.8a', 'Scope is the key', 'Scope', { kicker: 'Lab 3 · Part 3, TODO 3', step: 1, message: 'Search the memories with **no user id**: nothing comes back.', notebook: `${NB} · TODO 3` } satisfies ScopeProps, 'scope');
+const b28b = atOps('3.8b', 'Scope is the key', 'Scope', { kicker: 'Lab 3 · Part 3, TODO 3', step: 2, message: 'Records inherit the **scope** of the thread that wrote them.', notebook: `${NB} · TODO 3` } satisfies ScopeProps, 'scope');
+const b29 = atOps('3.9', 'The system of record', 'SystemOfRecord', { kicker: 'Lab 3 · Part 4', message: 'Memory is what the agent learns. Findings are what **the city records**.', notebook: `${NB} · Part 4, TODO 4` } satisfies HandsOnProps);
+const b210 = atOps('3.10', 'Vector search with walls', 'VectorWalls', { kicker: 'Lab 3 · Part 4, TODO 5', message: 'Vector similarity and relational filters in **one SQL statement**.', notebook: `${NB} · TODO 5` } satisfies HandsOnProps);
 
 const b211 = beat(2, '3.11', 'Private doors, shared hall', 'ops', {
   kicker: 'Three keys',
@@ -303,7 +267,8 @@ export const chapter2: SceneDef[] = [
   b25b,
   b26,
   b27,
-  b28,
+  b28a,
+  b28b,
   b29,
   b210,
   b211,

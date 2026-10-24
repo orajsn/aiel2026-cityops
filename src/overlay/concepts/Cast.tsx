@@ -6,6 +6,8 @@ const EASE = [0.2, 0.8, 0.2, 1] as const;
 export interface CastMember {
   /** the name as the room knows it, e.g. "Mercer" */
   name: string;
+  /** a head-and-shoulders picture of their own 3D character (src/assets/portraits, made by tools/portrait.mjs) */
+  portrait?: string;
   /** e.g. "First visit" */
   when: string;
   text: string;
@@ -45,6 +47,14 @@ export function Cast({ kicker, message, heading, people, question }: CastProps) 
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: at(i), duration: 0.45, ease: EASE }}
             >
+              {p.portrait && (
+                <img
+                  src={p.portrait}
+                  alt={p.name}
+                  data-portrait={p.name}
+                  style={{ flex: 'none', width: 104, height: 104, borderRadius: '50%', border: '3px solid var(--teal)', background: 'rgba(27, 138, 156, 0.16)', objectFit: 'cover' }}
+                />
+              )}
               <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <span style={{ fontSize: 15, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-dim)', fontWeight: 600 }}>{p.when}</span>
                 <span style={{ fontSize: 28, color: 'var(--teal)', fontWeight: 700 }}>{p.name}</span>

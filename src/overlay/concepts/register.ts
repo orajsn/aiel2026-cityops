@@ -15,6 +15,7 @@ import { UnifiedQuery } from './UnifiedQuery';
 import { Glass } from './Glass';
 import { Disciplines } from './Disciplines';
 import { MemoryLoop } from './MemoryLoop';
+import { OneConnection, WritePath, Scope, SystemOfRecord, VectorWalls } from './HandsOn';
 
 registerOverlay('TitleCard', TitleCard);
 registerOverlay('PinLegend', PinLegend);
@@ -32,3 +33,8 @@ registerOverlay('UnifiedQuery', UnifiedQuery);
 registerOverlay('Glass', Glass);
 registerOverlay('Disciplines', Disciplines);
 registerOverlay('MemoryLoop', MemoryLoop);
+registerOverlay('OneConnection', OneConnection);
+registerOverlay('WritePath', WritePath);
+registerOverlay('Scope', Scope);
+registerOverlay('SystemOfRecord', SystemOfRecord);
+registerOverlay('VectorWalls', VectorWalls);
