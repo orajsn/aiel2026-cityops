@@ -2,6 +2,9 @@ import type { SceneDef } from '../engine/types';
 import type { CastProps } from '../overlay/concepts/Cast';
 import type { CopilotChatProps } from '../overlay/concepts/CopilotChat';
 import type { MemoryMapProps } from '../overlay/concepts/MemoryMap';
+import type { GlassProps } from '../overlay/concepts/Glass';
+import type { DisciplinesProps } from '../overlay/concepts/Disciplines';
+import type { MemoryLoopProps } from '../overlay/concepts/MemoryLoop';
 import type { Who } from '../world/Person';
 import { beat } from './chapter1';
 
@@ -29,8 +32,9 @@ const b20: SceneDef = {
     message: 'We are back at Harbor Bridge. !!The rust!! is still there.',
     heading: 'One bridge. Two inspectors.',
     people: [
-      { initials: 'EM', name: 'Evelyn_H_Mercer', when: 'First visit', text: 'Checks the rust and records what she sees.' },
-      { initials: 'JV', name: 'Jordan_Vance', when: 'Next visit', text: 'Returns to the same rust to see what has changed.' },
+      // owner, 25 Oct: just the names, no initials badge
+      { name: 'Mercer', when: 'First visit', text: 'Checks the rust and records what she sees.' },
+      { name: 'Vance', when: 'Next visit', text: 'Returns to the same rust to see what has changed.' },
     ],
     question: 'What should **Vance** know before he starts?',
   } satisfies CastProps as unknown as Record<string, unknown>,
@@ -115,25 +119,27 @@ const b22c = map('3.2c', 3, 'Three kinds: **how to do the job**, **what happened
 const b22d = map('3.2d', 4, 'Each kind lives in its own layer.');
 const b22e = map('3.2e', 5, 'And a **shared memory**, so the next inspector can use it too.', 'CITY_MEMORY holds fact, preference, guideline and memory records');
 
-const b23 = beat(2, '3.3', 'The glass', 'ops', {
-  kicker: 'The context window',
-  visual: { kind: 'list', items: ['Overflow', 'Noise', 'The lost “size 9” detail', 'The right fact at the wrong turn'] },
-  message: 'The context window is the model’s whole world, and it is a curation problem.',
-  notebook: 'the Part 6 context card is the cure',
-}, { ops: true });
+/**
+ * 3.3 to 3.5 · the glass, three disciplines, the loop (owner, 25 Oct), from the Lab 3 deck's slides 24 to 34.
+ * The camera still holds at the rust with Vance there: the story has not changed place, these pages explain
+ * what he should have had. Multi-click pages share one panel (overlayGroup).
+ */
+const atRust = (id: string, title: string, overlay: string, props: object, group?: string): SceneDef => ({
+  id,
+  chapter: 2,
+  title,
+  shot: 'pier2-close',
+  world: { bridge: true, inspect: { pier: 'pier2', who: 'character-male-d' } },
+  overlay,
+  overlayGroup: group,
+  overlayProps: props as Record<string, unknown>,
+});
 
-const b24 = beat(2, '3.4', 'Three dials', 'ops', {
-  kicker: 'What flows into the glass',
-  visual: { kind: 'cards', cols: 3, items: [{ title: 'Memory engineering' }, { title: 'Context engineering' }, { title: 'Harness engineering' }] },
-  message: 'Three disciplines, one job: the right tokens in, the wrong ones out.',
-}, { ops: true });
-
-const b25 = beat(2, '3.5', 'The loop with memory', 'ops', {
-  kicker: 'Read, act, write',
-  visual: { kind: 'flow', steps: ['Read memory at the start of the turn', 'The Lab 2 loop: model ↔ tools', 'Write memory at the end of the turn', 'The database under it'], loop: true, hot: [0, 2] },
-  message: 'One store, one memory manager, any harness.',
-  notebook: `${NB} · Part 1, TODO 1`,
-}, { ops: true });
+const b23a = atRust('3.3a', 'The glass', 'Glass', { kicker: 'The context window', step: 1, message: 'The context window is **all the model sees**.' } satisfies GlassProps, 'glass');
+const b23b = atRust('3.3b', 'The glass', 'Glass', { kicker: 'The context window', step: 2, message: 'The context window is a **curation problem**.', notebook: 'the Part 6 context card is the cure' } satisfies GlassProps, 'glass');
+const b24 = atRust('3.4', 'Three disciplines', 'Disciplines', { kicker: 'Three disciplines, one goal', message: 'One job: the **right tokens in**, the wrong ones out.' } satisfies DisciplinesProps);
+const b25a = atRust('3.5a', 'The loop with memory', 'MemoryLoop', { kicker: 'The agent loop, with memory wired in', step: 1, message: 'This afternoon’s loop, with memory **read at the start** and **written at the end**.', notebook: `${NB} · Part 1, TODO 1` } satisfies MemoryLoopProps, 'loop');
+const b25b = atRust('3.5b', 'The loop with memory', 'MemoryLoop', { kicker: 'The agent loop, with memory wired in', step: 2, message: 'One store, one memory manager, **any harness**.' } satisfies MemoryLoopProps, 'loop');
 
 const b26 = beat(2, '3.6', 'One connection', 'ops', {
   kicker: 'The copilot plugs into the database',
@@ -290,9 +296,11 @@ export const chapter2: SceneDef[] = [
   b22c,
   b22d,
   b22e,
-  b23,
+  b23a,
+  b23b,
   b24,
-  b25,
+  b25a,
+  b25b,
   b26,
   b27,
   b28,

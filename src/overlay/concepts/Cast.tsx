@@ -4,9 +4,7 @@ import { Rich } from '../Rich';
 const EASE = [0.2, 0.8, 0.2, 1] as const;
 
 export interface CastMember {
-  /** two letters for the round badge */
-  initials: string;
-  /** the name exactly as the notebook prints it */
+  /** the name as the room knows it, e.g. "Mercer" */
   name: string;
   /** e.g. "First visit" */
   when: string;
@@ -25,8 +23,7 @@ export interface CastProps {
 }
 
 /**
- * Who the story is about, as on the Lab 3 deck's slide 5: a round badge, the name, when they come and
- * what they do, one row each, then the question that sets up the next pages.
+ * Who the story is about, as on the Lab 3 deck's slide 5: the name, when they come and what they do, one row each, then the question that sets up the next pages.
  */
 export function Cast({ kicker, message, heading, people, question }: CastProps) {
   const at = (i: number) => 0.3 + i * 0.4;
@@ -48,14 +45,9 @@ export function Cast({ kicker, message, heading, people, question }: CastProps) 
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: at(i), duration: 0.45, ease: EASE }}
             >
-              <span
-                style={{ flex: 'none', width: 58, height: 58, borderRadius: '50%', border: '3px solid var(--teal)', color: 'var(--teal)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 21, fontWeight: 700 }}
-              >
-                {p.initials}
-              </span>
               <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <span style={{ fontSize: 15, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-dim)', fontWeight: 600 }}>{p.when}</span>
-                <span style={{ fontSize: 23, color: 'var(--teal)', fontWeight: 700 }}>{p.name}</span>
+                <span style={{ fontSize: 28, color: 'var(--teal)', fontWeight: 700 }}>{p.name}</span>
                 <span style={{ fontSize: 21, color: 'var(--ink)', lineHeight: 1.35 }}>{p.text}</span>
               </span>
             </motion.div>

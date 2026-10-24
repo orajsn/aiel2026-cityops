@@ -1,8 +1,6 @@
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
-import { Rich } from '../Rich';
-
-const EASE = [0.2, 0.8, 0.2, 1] as const;
+import { EASE, WidePanel } from './WidePanel';
 
 export interface MemoryMapProps {
   kicker: string;
@@ -52,28 +50,7 @@ export function MemoryMap({ kicker, message, step, notebook }: MemoryMapProps) {
     ) : null;
 
   return (
-    <div className="beat">
-      {/* the scene steps back behind the map */}
-      <motion.div style={{ position: 'absolute', inset: 0, background: 'rgba(11, 14, 20, 0.38)' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }} />
-      {/* centred by a plain wrapper (the panel's own entrance animation owns its transform), and above the
-          3D labels (zIndexRange 30), which would otherwise draw over the map; below Camera mode (40) */}
-      <div style={{ position: 'absolute', left: 0, right: 0, top: 104, display: 'flex', justifyContent: 'center', zIndex: 35 }}>
-      <motion.div
-        className="beat__panel"
-        data-testid="memory-map"
-        data-step={step}
-        style={{ position: 'relative', right: 'auto', top: 'auto', width: 1480, maxHeight: 'none' }}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: EASE }}
-      >
-        <div className="beat__kicker">{kicker}</div>
-        <AnimatePresence mode="wait">
-          <motion.div key={message} className="beat__headline" style={{ marginBottom: 10 }} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.35, ease: EASE }}>
-            <Rich text={message} />
-          </motion.div>
-        </AnimatePresence>
-
+    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="memory-map" step={step}>
         <svg viewBox="0 0 1400 600" width="100%" style={{ display: 'block', overflow: 'visible', fontFamily: 'inherit' }} role="img" aria-label="Classification of agent memory">
           <defs>
             <marker id="mm-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -121,10 +98,7 @@ export function MemoryMap({ kicker, message, step, notebook }: MemoryMapProps) {
           {P(5, 1, <Box x={560} y={490} w={250} h={50} {...TEAL} lines={['Shared memory']} size={20} />)}
         </svg>
 
-        {notebook && <div className="beat__notebook">notebook · {notebook}</div>}
-      </motion.div>
-      </div>
-    </div>
+    </WidePanel>
   );
 }
 

@@ -10,6 +10,9 @@ import { Beat } from './Beat';
 import { CopilotChat } from './CopilotChat';
 import { Cast } from './Cast';
 import { MemoryMap } from './MemoryMap';
+import { Glass } from './Glass';
+import { Disciplines } from './Disciplines';
+import { MemoryLoop } from './MemoryLoop';
 
 registerOverlay('TitleCard', TitleCard);
 registerOverlay('PinLegend', PinLegend);
@@ -22,3 +25,6 @@ registerOverlay('Beat', Beat);
 registerOverlay('CopilotChat', CopilotChat);
 registerOverlay('Cast', Cast);
 registerOverlay('MemoryMap', MemoryMap);
+registerOverlay('Glass', Glass);
+registerOverlay('Disciplines', Disciplines);
+registerOverlay('MemoryLoop', MemoryLoop);
