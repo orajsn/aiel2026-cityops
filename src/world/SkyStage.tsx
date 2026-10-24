@@ -56,9 +56,12 @@ const QUERY: Vec3 = [8, 6, -4];
 
 const LAB2_ACTS: (SkyAct | null)[] = ['overflow', 'tools', 'unified', 'note'];
 
-/** 1.1 · the bare model (draft wording until the notebook's recorded run is in): a fluent answer that knows nothing of the city */
-const BARE_Q = '“What do we know about Harbor Bridge, and what should I do about Pier 3?”';
-const BARE_A = '“I don’t have information about a Harbor Bridge in your city. In general, any crack in a bridge pier should be inspected by a qualified engineer…”';
+/**
+ * 1.1 · the bare model. The question is the lab's own (rag_to_agents_lab, scenario 1); the answer is a draft
+ * (the notebooks keep no recorded outputs): fluent, general, and knows nothing of the city.
+ */
+const BARE_Q = '“What recent issues have been reported on Harbor Bridge?”';
+const BARE_A = '“I don’t have any reports about a Harbor Bridge in your city. In general, bridges can show cracking, corrosion or bearing wear…”';
 
 const ease = (t: number) => {
   const c = Math.max(0, Math.min(1, t));
