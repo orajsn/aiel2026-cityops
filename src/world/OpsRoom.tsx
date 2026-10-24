@@ -279,7 +279,7 @@ function drawIncidents(ctx: CanvasRenderingContext2D, time: number) {
   }
   ctx.fillStyle = DIM;
   ctx.font = '28px "JetBrains Mono", monospace';
-  ctx.fillText('copilot · llama3.2 · ready', 40, H - 46);
+  ctx.fillText('copilot · language model · ready', 40, H - 46);
 }
 
 function drawToday(ctx: CanvasRenderingContext2D) {

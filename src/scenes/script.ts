@@ -9,11 +9,7 @@ export const SCRIPT: Record<string, string> = {
   '0.3': 'Every day the city writes about itself: 308 logs, 60 reports, 220 findings, all flowing into the City Operations Control Center. Most of it is free text written by inspectors.',
   '0.4': 'Meet our inspector on Pier 3 of Harbor Bridge. The question is simple: what do we know about this bridge, and what should I do? The answer exists. In four shapes, in four places. The inspector has none of them.',
   '0.5': 'To answer the inspector we need four things: the asset record, its spec sheet, what it depends on, and similar past reports. Four shapes of data. And one Oracle AI Database holds all four. Not four databases to sync.',
-  '0.5a': 'First shape: tables. The asset record, CITY_ASSET and friends, rows and columns, the way the city has always kept its books.',
-  '0.5b': 'Second shape: JSON. Every asset has a spec sheet with different keys, and we read it with plain dot notation in SQL.',
-  '0.5c': 'Third shape: the graph. Which substation powers the bridge, which sensors watch it. Asking who is connected to whom is one query.',
-  '0.5d': 'Fourth shape: vectors. Every narrative becomes a point, and similar meaning lands close together. Same database, same transaction.',
-  '0.6': 'And this is our model: llama3.2, three billion parameters, on a CPU. Each answer takes thirty to sixty seconds. Our model is deliberately small and slow. The lab is about what you give the model, not the model.',
+  '0.6': 'And this is the language model. It writes an answer one word at a time: that wave of light is it producing. It knows the world, not our city. Ours is small and runs on a CPU, so each answer takes thirty to sixty seconds. Today is about what we give it.',
   '0.7': 'Harbor Bridge is our hero, linked to the substation that powers it, the sensors that watch it and the Ops Center that coordinates it. Two things will go wrong on this bridge today. The first one, we handle with an agent. The second, with memory.',
 
   // Chapter 1 · RAG to Agents

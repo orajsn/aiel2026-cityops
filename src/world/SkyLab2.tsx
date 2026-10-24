@@ -5,6 +5,7 @@ import { Line } from '@react-three/drei';
 import { ASSETS, project } from '../content/geo';
 import { FlowArc } from './FlowArc';
 import { Stack } from './SkyShapes';
+import { NeuralNet } from './NeuralNet';
 import { layoutCloud } from './vectorLayout';
 import type { Vec3 } from './shots';
 
@@ -130,10 +131,10 @@ function Tools({ c, t, red }: { c: Vec3; t: number; red: string }) {
   const tools = ['get_asset_incident_brief', 'recall', 'remember'];
   return (
     <group>
-      <mesh position={model}>
-        <sphereGeometry args={[0.7, 32, 32]} />
-        <meshStandardMaterial color="#1B8A9C" emissive="#1B8A9C" emissiveIntensity={0.25} roughness={0.35} />
-      </mesh>
+      {/* the language model, thinking with its tools */}
+      <group position={model} scale={0.6}>
+        <NeuralNet producing />
+      </group>
       <group position={db}>
         <Stack red={red} t={9999} />
       </group>

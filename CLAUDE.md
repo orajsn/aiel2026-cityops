@@ -14,7 +14,7 @@ A deterministic, offline, click-through 3D web experience for two Oracle LiveLab
 
 ## Rules that never change
 
-- The Jupyter notebooks are never modified. Data names on screen are exactly what the notebooks print: `Harbor Bridge`, `Substation Gamma`, `Pipeline North-7`, `Evelyn_H_Mercer`, `Jordan_Vance`, `CITY_MESSAGE`, `CITY_MEMORY`, `CITY_INSPECTION_FINDING`, `ALL_MINILM_L12_V2`, `llama3.2`. Rendered in JetBrains Mono.
+- The Jupyter notebooks are never modified. Data names on screen are exactly what the notebooks print: `Harbor Bridge`, `Substation Gamma`, `Pipeline North-7`, `Evelyn_H_Mercer`, `Jordan_Vance`, `CITY_MESSAGE`, `CITY_MEMORY`, `CITY_INSPECTION_FINDING`, `ALL_MINILM_L12_V2`. Rendered in JetBrains Mono. The model is never named on screen (owner, 24 Oct): it is "the language model", drawn as a 3D neural network with a wave of light running through its layers while it produces (`src/world/NeuralNet.tsx`).
 - Never write "Kirkland", "MEA", "MWA" or "BMA". No "fictional scenario" tags anywhere (owner, 24 Oct: everyone already knows).
 - Offline: no runtime network calls; fonts and models are bundled.
 - Navigation: ArrowRight next, ArrowLeft back, J jump menu, N presenter notes, L language (en/th). Every scene reachable by `#scene=<id>`.

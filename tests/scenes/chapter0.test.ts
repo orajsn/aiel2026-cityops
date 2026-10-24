@@ -22,13 +22,11 @@ test('every shot and overlay referenced by chapter 0 exists', () => {
   }
 });
 
-test('the database pages sit on the sky stage, one page lighting each of the four shapes', () => {
-  const pages = chapter0.filter((s) => s.id.startsWith('0.5') || s.id === '0.6');
-  expect(pages.every((s) => s.shot === 'sky')).toBe(true);
+test('the database is one page on the sky stage with all four shapes (owner: not split into four steps)', () => {
+  expect(chapter0.filter((s) => s.id.startsWith('0.5')).map((s) => s.id)).toEqual(['0.5']);
+  expect(chapter0.find((s) => s.id === '0.5')!.shot).toBe('sky');
   expect(chapter0.find((s) => s.id === '0.5')!.world?.sky).toBe('shapes');
   expect(chapter0.find((s) => s.id === '0.6')!.world?.sky).toBe('brain');
-  const faces = chapter0.filter((s) => s.id.startsWith('0.5') && s.id !== '0.5').map((s) => s.world?.sky);
-  expect(faces).toEqual(['tables', 'json', 'graph', 'vectors']);
 });
 
 test('the recap subset is marked', () => {
@@ -49,4 +47,10 @@ test('0.3 frames the place the document flow lands, clear of the counters panel'
   expect(p.x).toBeLessThan(0.4); // the counters panel covers the right fifth
   expect(Math.abs(p.y)).toBeLessThan(0.7);
   expect((s.world as { highlight?: string[] }).highlight).toContain('City Operations Control Center');
+});
+
+test('the model is never named on screen or in the script: it is the language model (owner)', async () => {
+  const { SCRIPT } = await import('../../src/scenes/script');
+  expect(JSON.stringify(SCENES)).not.toMatch(/\bllama/i);
+  expect(JSON.stringify(SCRIPT)).not.toMatch(/\bllama/i);
 });

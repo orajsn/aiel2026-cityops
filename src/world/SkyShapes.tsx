@@ -1,106 +1,112 @@
-import { useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { Billboard, Line } from '@react-three/drei';
-import { DataShape, Label, type DataKind } from './DataShapes';
+import { Line } from '@react-three/drei';
+import { DataShape } from './DataShapes';
 import { SILOS } from './BridgeQuestion';
+import { BOARD, BOARD_DEPTH, STACK_AT, boardPoint, fitShape, type Panel } from './answerBoard';
 import { screenPoint } from './frame';
+import { useSceneStore } from '../engine/store';
 import { SHOTS } from './shots';
 import type { Vec3 } from './shots';
-
-export type Face = 'tables' | 'json' | 'graph' | 'vectors';
-
-
-/** where each shape floats around the database (overview), and the data kind it shows */
-const SLOTS: Record<Face, { at: Vec3; kind: DataKind }> = {
-  tables: { at: [-5.6, 0.9, 0], kind: 'table' },
-  json: { at: [-2.8, 3.6, -0.4], kind: 'json' },
-  graph: { at: [2.8, 3.6, -0.4], kind: 'graph' },
-  vectors: { at: [5.6, 0.9, 0], kind: 'vectors' },
-};
-const FACES = Object.keys(SLOTS) as Face[];
-/** where the lit shape comes to, in front of the database */
-const FRONT: Vec3 = [0, 1.9, 3.8];
 
 const ease = (t: number) => {
   const c = Math.max(0, Math.min(1, t));
   return 1 - Math.pow(1 - c, 3);
 };
+const slide = (t: number) => {
+  const c = Math.max(0, Math.min(1, t));
+  return c < 0.5 ? 4 * c * c * c : 1 - Math.pow(-2 * c + 2, 3) / 2;
+};
+
+/** when each piece lands in its panel, ms after the camera settles (the panel names in CoreCaption follow it) */
+export const LAND_MS = (i: number) => 2100 + i * 350;
 
 /**
- * One Oracle AI Database in the sky with its four shapes around it, each a real 3D object filled with
- * the lab's data (DataShapes.tsx), each wired to the same red stack. `face` brings one forward and plays
- * it (0.5a to 0.5d); none = the overview (0.5). All local units around `center`.
+ * 0.5 · the answer. Four panels around one Oracle AI Database, framed from the sky camera: each piece of
+ * data the inspector's question needs flies up from its separate place by the bridge (0.4) into its own
+ * panel, where it plays. Everything stays inside its panel; the words are drawn over the shapes, never
+ * behind a panel. Placed in world units (the sky stage's scale is 1 once it has grown in).
  */
-export function SkyShapes({ center, face, t, red }: { center: Vec3; face: Face | null; t: number; red: string }) {
-  // where each piece was on 0.4 (its separate place beside the bridge), in this group's own units
-  const from = (f: Face): Vec3 => {
-    const kind = SLOTS[f].kind;
-    const s = SILOS.find((x) => x.kind === kind)!;
-    const cam = SHOTS.pier3.push ?? SHOTS.pier3;
-    const w = screenPoint(cam.position, cam.target, (s.x0 + s.x1) / 2, (s.y0 + s.y1) / 2, 0.34);
-    return [w[0] - center[0], w[1] - center[1], w[2] - center[2]];
-  };
+export function SkyShapes({ red }: { red: string }) {
+  const settled = useSceneStore((s) => s.settled);
+  const t0 = useRef<number | null>(null);
+  const clock = useRef(0);
+  const cam = SHOTS.sky;
+  // every shape faces the sky camera, square to the screen
+  const facing = useMemo(() => {
+    const m = new THREE.Matrix4().lookAt(new THREE.Vector3(...cam.position), new THREE.Vector3(...cam.target), new THREE.Vector3(0, 1, 0));
+    return new THREE.Quaternion().setFromRotationMatrix(m);
+  }, [cam]);
+  const stack = boardPoint(STACK_AT.x, STACK_AT.y);
+  useFrame(() => {
+    if (settled && t0.current === null) t0.current = performance.now();
+    clock.current = t0.current === null ? 0 : performance.now() - t0.current;
+  });
   return (
-    <group position={center} name="sky-shapes">
-      <Stack red={red} t={face ? 9999 : t} />
-      {FACES.map((f, i) => (
-        <Slot key={f} f={f} i={i} face={face} t={t} from={from(f)} />
+    <group name="answer-board">
+      <group position={stack} quaternion={facing} scale={0.62}>
+        <Stack red={red} t={9999} />
+      </group>
+      {BOARD.map((p, i) => (
+        <PanelPiece key={p.kind} p={p} i={i} clock={clock} facing={facing} stack={stack} />
       ))}
-      {!face && <Label text="Oracle AI Database" position={[0, -1.75, 0.6]} size={0.26} color={red} weight={700} plate />}
     </group>
   );
 }
 
-function Slot({ f, i, face, t, from }: { f: Face; i: number; face: Face | null; t: number; from: Vec3 }) {
+function PanelPiece({ p, i, clock, facing, stack }: { p: Panel; i: number; clock: { current: number }; facing: THREE.Quaternion; stack: Vec3 }) {
+  const fit = useMemo(() => fitShape(p.kind, p), [p]);
+  // where the piece was on 0.4: its own place beside the bridge
+  const from = useMemo<Vec3>(() => {
+    const s = SILOS.find((x) => x.kind === p.kind)!;
+    const c = SHOTS.pier3.push ?? SHOTS.pier3;
+    return screenPoint(c.position, c.target, (s.x0 + s.x1) / 2, (s.y0 + s.y1) / 2, 0.34);
+  }, [p]);
+  // the panel: a solid card behind the shape (deeper than any part of it), the same rectangle on screen
+  const card = useMemo(() => {
+    const d = BOARD_DEPTH + 1.2;
+    const c = [boardPoint(p.x0, p.y1, d), boardPoint(p.x1, p.y1, d), boardPoint(p.x1, p.y0, d), boardPoint(p.x0, p.y0, d)];
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(c.flat(), 3));
+    g.setIndex([0, 3, 1, 1, 3, 2]);
+    return g;
+  }, [p]);
+  // the link from the database to the panel's inner edge
+  const link = useMemo<[Vec3, Vec3]>(() => {
+    const inner = p.x0 > 0 ? p.x0 : p.x1;
+    return [stack, boardPoint(inner, (p.y0 + p.y1) / 2)];
+  }, [p, stack]);
   const g = useRef<THREE.Group>(null);
-  const cur = useRef({ p: from, s: 0.03 });
-  // 0.5 opens with the pieces flying up from their separate places by the bridge and docking here
-  const docking = useRef(face === null);
-  useFrame((_, dt) => {
-    const lit = face === f;
-    if (docking.current && face === null) {
-      // starts once the camera has risen to the stage (~5 s from the pier), so the docking is seen
-      const k = ease((t - 5200 - i * 450) / 2200);
-      const to = SLOTS[f].at;
-      const arc = Math.sin(Math.PI * k) * 3;
-      cur.current.p = [from[0] + (to[0] - from[0]) * k, from[1] + (to[1] - from[1]) * k + arc, from[2] + (to[2] - from[2]) * k];
-      cur.current.s = 0.03 + (1.15 - 0.03) * k;
-      if (g.current) {
-        g.current.position.set(...cur.current.p);
-        g.current.scale.setScalar(cur.current.s);
-      }
-      if (k >= 1) docking.current = false;
-      return;
-    }
-    docking.current = false;
-    const appear = 1;
-    const goal: Vec3 = lit ? FRONT : SLOTS[f].at;
-    // on a shape's own page the other three step away entirely: one thing to read
-    const goalS = (lit ? 2.6 : face ? 0 : 1.15) * appear;
-    const k = Math.min(1, dt * 3.5);
-    cur.current.p = [cur.current.p[0] + (goal[0] - cur.current.p[0]) * k, cur.current.p[1] + (goal[1] - cur.current.p[1]) * k, cur.current.p[2] + (goal[2] - cur.current.p[2]) * k];
-    cur.current.s += (goalS - cur.current.s) * k;
+  const mat = useRef<THREE.MeshBasicMaterial>(null);
+  const linkRef = useRef<THREE.Group>(null);
+  const q = useMemo(() => new THREE.Quaternion(), []);
+  const [lit, setLit] = useState(false);
+  useFrame(() => {
+    const t = clock.current;
+    const k = slide((t - 300 - i * 350) / 1800);
+    const o = fit.origin;
     if (g.current) {
-      g.current.position.set(...cur.current.p);
-      g.current.scale.setScalar(Math.max(0.001, cur.current.s));
+      g.current.position.set(from[0] + (o[0] - from[0]) * k, from[1] + (o[1] - from[1]) * k + Math.sin(Math.PI * k) * 1.5, from[2] + (o[2] - from[2]) * k);
+      g.current.scale.setScalar(Math.max(0.001, 0.03 + (fit.scale - 0.03) * k));
+      g.current.quaternion.copy(q.identity().slerp(facing, k));
     }
+    if (mat.current) mat.current.opacity = 0.96 * ease((t - LAND_MS(i) + 500) / 500);
+    if (linkRef.current) linkRef.current.visible = t > LAND_MS(i);
+    // the piece starts to play once it has landed
+    const on = t > LAND_MS(i);
+    if (on !== lit) setLit(on);
   });
-  const lit = face === f;
   return (
     <group>
-      {!face && t > 7400 + i * 450 && <Line points={[[0, 0.3, 0], SLOTS[f].at]} color="#1B8A9C" lineWidth={1.5} transparent opacity={0.7} />}
-      <group ref={g}>
-        {/* the shape in focus gets a solid backing so the city photo does not show through its words */}
-        {lit && (
-          <Billboard position={[0, -0.15, -0.9]}>
-            <mesh renderOrder={1}>
-              <planeGeometry args={[3.4, 3.1]} />
-              <meshBasicMaterial color="#f7f5f1" transparent opacity={0.97} depthWrite={false} toneMapped={false} />
-            </mesh>
-          </Billboard>
-        )}
-        <DataShape kind={SLOTS[f].kind} lit={lit} />
+      <mesh geometry={card} renderOrder={1}>
+        <meshBasicMaterial ref={mat} color="#f7f5f1" transparent opacity={0} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
+      </mesh>
+      <group ref={linkRef} visible={false}>
+        <Line points={link} color="#1B8A9C" lineWidth={1.6} transparent opacity={0.75} />
+      </group>
+      <group ref={g} scale={0.001}>
+        <DataShape kind={p.kind} lit={lit} title={false} story />
       </group>
     </group>
   );

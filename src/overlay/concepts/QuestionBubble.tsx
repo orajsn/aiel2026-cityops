@@ -8,7 +8,7 @@ export function QuestionBubble() {
   return (
     <div className="qb">
       <motion.div className="qb__line" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 7.5 }}>
-        The answer exists. In four shapes, in four places. The inspector has none of them.
+        The answer <b>exists</b>. In <b className="qb__teal">four shapes</b>, in <b className="qb__teal">four places</b>. The inspector has <b className="qb__red">none of them</b>.
       </motion.div>
     </div>
   );

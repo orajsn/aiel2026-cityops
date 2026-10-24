@@ -244,13 +244,15 @@ code,
 
 /* 0.6 small brain */
 .brain { position: absolute; right: 48px; top: 50%; transform: translateY(-50%); }
-.brain__card { width: 400px; padding: 22px 24px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; backdrop-filter: blur(8px); }
+.brain__card { width: 480px; padding: 26px 28px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; backdrop-filter: blur(8px); }
 .brain__kicker { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-dim); }
-.brain__name { font-size: 40px; color: #fff; margin: 4px 0 8px; }
-.brain__facts { display: flex; gap: 12px; font-size: 12px; color: var(--ink-dim); margin-bottom: 10px; }
+.brain__name { font-size: 40px; font-weight: 600; color: #fff; margin: 0 0 12px; }
+.brain__facts { list-style: none; margin: 0; padding: 0; }
+.brain__facts li { padding: 10px 0; border-top: 1px solid var(--line); font-size: 24px; color: var(--ink); }
+.brain__facts b, .brain__line b { color: var(--teal); font-weight: 700; }
 .brain__gauge { display: block; margin: 0 auto; }
 .brain__speed { text-align: center; font-size: 15px; color: #fff; margin-top: -8px; }
-.brain__line { margin-top: 14px; font-size: 17px; color: var(--ink); line-height: 1.45; border-left: 2px solid var(--red); padding-left: 10px; }
+.brain__line { margin-top: 14px; font-size: 24px; color: var(--ink); line-height: 1.45; border-left: 2px solid var(--red); padding-left: 10px; }
 
 /* 0.7 markers */
 .markers { position: absolute; right: 48px; top: 110px; width: 440px; }
@@ -371,7 +373,7 @@ code,
 
 /* 0.4: the question sits right of centre (the crack is on the left third); its line and tag clear of the bars */
 .qb__bubble, .qb__arrows, .qb__shape { left: 64%; }
-.qb__line { bottom: 150px; }
+.qb__line { bottom: 150px; font-size: 26px; }
 .qb .tag { top: 110px; bottom: auto; }
 /* 0.4: the inspector's question, anchored in 3D */
 .q3d { width: 520px; padding: 16px 20px; border-radius: 14px; background: var(--panel-strong); border: 1px solid var(--line); box-shadow: 0 6px 24px rgba(0,0,0,0.18); text-align: center; }
@@ -384,3 +386,19 @@ code,
 .needs__what { flex: 1; }
 .needs__shape { font-size: 16px; color: var(--ink-dim); }
 .needs__all { margin-top: 16px; padding: 12px 16px; border-radius: 10px; background: rgba(199, 70, 52, 0.1); border-left: 4px solid var(--red); font-size: 24px; font-weight: 600; color: var(--ink); }
+
+/* 0.5 · the answer board: panel names over the 3D panels, the database line in the centre column */
+.board { position: absolute; inset: 0; pointer-events: none; }
+.board__head { position: absolute; display: flex; align-items: center; gap: 12px; font-size: 26px; color: #1f2a33; }
+.board__tick { width: 32px; height: 32px; border-radius: 50%; background: var(--teal); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 19px; font-weight: 700; flex: none; }
+.board__need { flex: 1; font-weight: 700; }
+.board__shape { font-size: 20px; font-weight: 600; color: var(--teal); }
+.board__db { position: absolute; left: 50%; transform: translateX(-50%); width: 420px; text-align: center; display: flex; flex-direction: column; gap: 10px; }
+.board__dbname { align-self: center; font-size: 28px; font-weight: 700; color: var(--red); background: rgba(255, 255, 255, 0.94); border-radius: 999px; padding: 6px 20px; }
+.board__all { font-size: 22px; line-height: 1.4; color: #1f2a33; background: rgba(255, 255, 255, 0.92); border-radius: 12px; padding: 10px 14px; }
+.board__all b { color: var(--teal); }
+.qb__line b { font-weight: 700; }
+.qb__teal { color: var(--teal); }
+.qb__red { color: var(--red); }
+.q3d__text b { color: var(--teal); font-weight: 700; }
+.q3d__who { font-weight: 600; }

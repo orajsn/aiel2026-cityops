@@ -7,8 +7,9 @@ import { useUiStore } from '../engine/ui';
 import { FlowArc } from './FlowArc';
 import { VectorField } from './VectorField';
 import { layoutCloud, nearestK } from './vectorLayout';
-import { SkyShapes, type Face } from './SkyShapes';
+import { SkyShapes } from './SkyShapes';
 import { SkyLab2, type Lab2Act } from './SkyLab2';
+import { NeuralNet } from './NeuralNet';
 import type { Vec3 } from './shots';
 
 /**
@@ -23,11 +24,10 @@ import type { Vec3 } from './shots';
  *  - envelope: those 5 fly into an envelope with the question, the envelope goes to the model,
  *              and the answer comes down to the Ops Center.
  * Acts (the city, 0.5 to 0.6):
- *  - shapes:   one Oracle AI Database with its four shapes around it (table, JSON, graph, vectors);
- *  - tables / json / graph / vectors: the same, with that shape lit;
+ *  - shapes:   what the inspector's answer needs: four panels (table, JSON, graph, vectors) around one Oracle AI Database;
  *  - brain:    the small model alone, centre stage.
  */
-export type SkyAct = 'model' | 'embed' | 'envelope' | 'shapes' | Face | 'brain' | Lab2Act;
+export type SkyAct = 'model' | 'embed' | 'envelope' | 'shapes' | 'brain' | Lab2Act;
 
 const OPS = assetPosition('City Operations Control Center');
 export const SKY_ANCHOR: Vec3 = [OPS.x, 9, OPS.z];
@@ -41,7 +41,6 @@ const OPS_TOP: Vec3 = [OPS.x, 1.2, OPS.z];
 /** the question as a point in the cloud's own space (near the "structural" cluster) */
 const QUERY: Vec3 = [8, 6, -4];
 
-const SHAPE_ACTS: (SkyAct | null)[] = ['shapes', 'tables', 'json', 'graph', 'vectors'];
 const LAB2_ACTS: (SkyAct | null)[] = ['overflow', 'tools', 'unified', 'note'];
 
 const ease = (t: number) => {
@@ -110,10 +109,10 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       <group position={A}>
         <group ref={root}>
           <group position={[-A[0], -A[1], -A[2]]}>
-            {(act === 'model' || act === 'embed' || act === 'envelope') && <ModelOrb position={MODEL} lit={act === 'envelope' && t > 3600} doubt={act === 'model' && t > 2600} labelled={visible} />}
-            {act === 'brain' && <ModelOrb position={[A[0], A[1] + 0.4, A[2]]} lit={false} doubt={false} labelled={visible} scale={1.6} />}
+            {(act === 'model' || act === 'embed' || act === 'envelope') && <ModelOrb position={MODEL} lit={act === 'envelope' && t > 3600} doubt={act === 'model' && t > 2600} producing={(act === 'model' && t > 2300) || (act === 'envelope' && t > 3600)} labelled={visible} scale={1.25} />}
+            {act === 'brain' && <ModelOrb position={[A[0], A[1] + 0.4, A[2]]} lit doubt={false} producing labelled={visible} scale={2.2} />}
             {act && LAB2_ACTS.includes(act) && <SkyLab2 act={act as Lab2Act} center={[A[0], A[1] + 0.2, A[2]]} t={t} red={theme.red} opsTop={OPS_TOP} />}
-            {act && SHAPE_ACTS.includes(act) && <SkyShapes center={[A[0], A[1] + 0.2, A[2]]} face={act === 'shapes' ? null : (act as Face)} t={t} red={theme.red} />}
+            {act === 'shapes' && <SkyShapes red={theme.red} />}
             {hasDb && <SkyDatabase color={theme.red} appearMs={0} t={t} />}
             {hasDb && (
               <group position={CLOUD} scale={CLOUD_SCALE}>
@@ -140,40 +139,25 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       {visible && act === 'embed' &&
         sources.map((s, i) => <FlowArc key={`doc-${i}`} from={s} to={DB} lift={2.5} radius={0.04} durationMs={1300} delayMs={500 + i * 180} fadeMs={600} color={theme.data} />)}
       {visible && act === 'envelope' && <FlowArc key="answer" from={MODEL} to={OPS_TOP} lift={1.2} radius={0.06} durationMs={1500} delayMs={3800} persist color={theme.data} />}
-      {visible && <SkyLabel position={[MODEL[0], MODEL[1] - 1.3, MODEL[2]]} text="llama3.2 · knows the world, not your city" show={act === 'model' && t > 2600} tone="grey" />}
+      {visible && <SkyLabel position={[MODEL[0], MODEL[1] - 1.3, MODEL[2]]} text="the language model · knows the world, not your city" show={act === 'model' && t > 2600} tone="grey" />}
       {visible && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="Oracle AI Database · 384 numbers per text" show={act === 'embed' && t > 2800} />}
       {visible && <SkyLabel position={[OPS_TOP[0], OPS_TOP[1] + 0.8, OPS_TOP[2]]} text="answer from the envelope only" show={act === 'envelope' && t > 5300} />}
     </group>
   );
 }
 
-/** the model: a pale orb with a slow ring; grey with a question mark when it has nothing to go on, teal when it has the evidence */
-function ModelOrb({ position, lit, doubt, labelled, scale = 1 }: { position: Vec3; lit: boolean; doubt: boolean; labelled: boolean; scale?: number }) {
-  const ring = useRef<THREE.Mesh>(null);
-  const mat = useRef<THREE.MeshStandardMaterial>(null);
-  const col = useMemo(() => new THREE.Color(), []);
-  useFrame(({ clock }) => {
-    if (ring.current) ring.current.rotation.z = clock.elapsedTime * 0.4;
-    if (mat.current) {
-      col.set(lit ? '#1B8A9C' : doubt ? '#9aa1aa' : '#e8eef2');
-      mat.current.color.lerp(col, 0.06);
-      mat.current.emissive.copy(mat.current.color).multiplyScalar(0.35);
-    }
-  });
+/**
+ * The language model: a 3D neural network (NeuralNet.tsx). A wave of light runs through its layers while it
+ * writes an answer; grey when it has nothing to go on, teal when it has the evidence.
+ */
+function ModelOrb({ position, lit, doubt, labelled, producing, scale = 1 }: { position: Vec3; lit: boolean; doubt: boolean; labelled: boolean; producing: boolean; scale?: number }) {
   return (
     <group position={position} scale={scale}>
-      <mesh castShadow>
-        <sphereGeometry args={[0.75, 32, 32]} />
-        <meshStandardMaterial ref={mat} color="#e8eef2" roughness={0.35} metalness={0.1} />
-      </mesh>
-      <mesh ref={ring} rotation={[Math.PI / 2.4, 0, 0]}>
-        <torusGeometry args={[1.15, 0.025, 8, 64]} />
-        <meshBasicMaterial color="#1B8A9C" transparent opacity={0.7} />
-      </mesh>
+      <NeuralNet producing={producing} doubt={!lit} />
       {/* HTML does not inherit 3D visibility: only mount the name while the stage is up */}
       {labelled && (
-        <Html position={[0, 1.25, 0]} center zIndexRange={[16, 0]} style={{ pointerEvents: 'none' }}>
-          <div className="sky-name mono">{doubt ? 'llama3.2 · ?' : 'llama3.2'}</div>
+        <Html position={[0, 1.15, 0]} center zIndexRange={[16, 0]} style={{ pointerEvents: 'none' }}>
+          <div className="sky-name">{doubt ? 'language model · ?' : 'language model'}</div>
         </Html>
       )}
     </group>
