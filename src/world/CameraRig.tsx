@@ -1,8 +1,12 @@
 import { useEffect, useRef } from 'react';
+import type * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useSceneStore } from '../engine/store';
 import { shotForScene, useCameraStore } from '../engine/camera';
 import { SHOTS, interpolateShot, moveDuration, type Shot, type Vec3 } from './shots';
+
+/** near clipping plane: close-ups (0.4's data shapes) sit 0.3 units from the camera */
+export const NEAR = 0.1;
 
 /**
  * Flies the camera from its live pose to the current page's camera: the owner's saved angle for the
@@ -15,6 +19,16 @@ export function CameraRig() {
   const setSettled = useSceneStore((s) => s.setSettled);
   const editing = useCameraStore((s) => s.editing);
   const saved = useCameraStore((s) => (scene ? s.overrides[scene.id] : undefined));
+
+  // close-ups put things ~0.3 units from the lens: keep the near plane small even if the canvas was created
+  // with an older setting (a live code update does not recreate the camera)
+  useEffect(() => {
+    const cam = camera as THREE.PerspectiveCamera;
+    if (cam.near !== NEAR) {
+      cam.near = NEAR;
+      cam.updateProjectionMatrix();
+    }
+  }, [camera]);
 
   const target = useRef<Vec3>([0, 0, 0]);
   const tween = useRef<{ from: Shot; to: Shot; start: number } | null>(null);

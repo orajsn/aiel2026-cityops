@@ -49,3 +49,10 @@ test('database shots look at the diorama under the city, not at empty sky above 
   expect(Math.abs(SHOTS['core-face-tables'].target[0] - shapeX('tables'))).toBeLessThan(30);
   expect(Math.abs(SHOTS['core-face-vectors'].target[0] - shapeX('vectors'))).toBeLessThan(30);
 });
+
+test("0.4's shapes sit beyond the camera's near clipping plane", async () => {
+  const { NEAR } = await import('../../src/world/CameraRig');
+  const src = (await import('../../src/world/BridgeQuestion.tsx?raw')).default as string;
+  const depth = Number(/const DEPTH = ([\d.]+)/.exec(src)![1]);
+  expect(depth).toBeGreaterThan(NEAR * 2);
+});

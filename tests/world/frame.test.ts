@@ -73,3 +73,13 @@ test('every page at the Ops Center shows the control room; sky pages name the Op
   expect(SCENES.filter((s) => s.shot !== 'ops' && w(s).ops).map((s) => s.id)).toEqual([]);
   expect(SCENES.filter((s) => s.shot === 'sky' && !(w(s).highlight ?? []).includes('City Operations Control Center')).map((s) => s.id)).toEqual([]);
 });
+
+test('screenPoint is the inverse of projectToScreen', async () => {
+  const { screenPoint } = await import('../../src/world/frame');
+  const pos: [number, number, number] = [3, 4, 5];
+  const tgt: [number, number, number] = [0, 0, 0];
+  const p = screenPoint(pos, tgt, 0.4, -0.3, 2);
+  const s = projectToScreen(pos, tgt, p);
+  expect(s.x).toBeCloseTo(0.4, 6);
+  expect(s.y).toBeCloseTo(-0.3, 6);
+});
