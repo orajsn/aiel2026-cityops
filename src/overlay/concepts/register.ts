@@ -8,6 +8,7 @@ import { SmallBrain } from './SmallBrain';
 import { BridgeMarkers } from './BridgeMarkers';
 import { Beat } from './Beat';
 import { CopilotChat } from './CopilotChat';
+import { Cast } from './Cast';
 
 registerOverlay('TitleCard', TitleCard);
 registerOverlay('PinLegend', PinLegend);
@@ -18,3 +19,4 @@ registerOverlay('SmallBrain', SmallBrain);
 registerOverlay('BridgeMarkers', BridgeMarkers);
 registerOverlay('Beat', Beat);
 registerOverlay('CopilotChat', CopilotChat);
+registerOverlay('Cast', Cast);

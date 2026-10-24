@@ -23,7 +23,7 @@ const STEEL = '#e9e2d2';
  * inspection platforms on Pier 3 and Pier 2 with the damage on the pier faces, the inspector, and
  * the two incident markers. Always part of the city; `inspect` and `markers` only add the story props.
  */
-export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: 'pier3' | 'pier2'; who: Who; leave?: boolean }; markers?: boolean }) {
+export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: 'pier3' | 'pier2'; who: Who; leave?: boolean }; markers?: boolean | 'pier2' }) {
   const f0 = useMemo(() => harborBridgeFrame(), []);
   // work in structure units inside a group scaled by S, so spans still match the world
   const f = useMemo(() => ({ ...f0, water: f0.water / S, ramp: f0.ramp / S }), [f0]);
@@ -181,15 +181,17 @@ export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: '
         </group>
       ))}
       {/* the damage is always there; it glows when the story is about it */}
-      <Crack alert={markers || inspect?.pier === 'pier3'} />
-      <Corrosion alert={markers || inspect?.pier === 'pier2'} />
+      <Crack alert={markers === true || inspect?.pier === 'pier3'} />
+      <Corrosion alert={!!markers || inspect?.pier === 'pier2'} />
       {inspect && <Inspection key={`${inspect.pier}-${inspect.who}${inspect.leave ? '-leave' : ''}`} pier={inspect.pier} who={inspect.who} leave={!!inspect.leave} />}
-      {markers && (
+      {markers === true && (
         <>
           <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={10} />
           <Marker x={pier2} y={DECK_Y} label="Pier 2" sub="corrosion · next session" color={theme.data} delayMs={3000} labelY={3.2} />
         </>
       )}
+      {/* 2.0: only the problem Lab 3 comes back for */}
+      {markers === 'pier2' && <Marker x={pier2} y={DECK_Y} label="Pier 2" sub="corrosion · still open" color={theme.data} delayMs={900} labelY={3.2} />}
     </group>
   );
 }

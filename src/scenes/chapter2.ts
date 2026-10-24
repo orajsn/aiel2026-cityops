@@ -1,4 +1,5 @@
 import type { SceneDef } from '../engine/types';
+import type { CastProps } from '../overlay/concepts/Cast';
 import type { CopilotChatProps } from '../overlay/concepts/CopilotChat';
 import type { Who } from '../world/Person';
 import { beat } from './chapter1';
@@ -11,11 +12,28 @@ import { beat } from './chapter1';
 const HB = 'Harbor Bridge';
 const NB = 'notebook_student_ollama.ipynb';
 
-const b20 = beat(2, '2.0', 'Recap: the city', 'bridge', {
-  kicker: 'Lab 3 · three-minute recap',
-  visual: { kind: 'list', items: ['The city (0.1)', 'The database (0.5)', 'The hero asset: Harbor Bridge (0.7)'] },
-  message: 'Same city, same database, same bridge. Now, memory.',
-}, { pins: 'all', graph: HB, bridge: true, markers: true });
+/**
+ * 2.0 · Back at the bridge (owner, 25 Oct: no recap; we come back because the problem is still there).
+ * Only Pier 2 lights up. The cast and the question are the Lab 3 deck's slide 5.
+ */
+const b20: SceneDef = {
+  id: '2.0',
+  chapter: 2,
+  title: 'Back at the bridge',
+  shot: 'bridge',
+  world: { bridge: true, markers: 'pier2' },
+  overlay: 'Cast',
+  overlayProps: {
+    kicker: 'Lab 3 · Agent Memory',
+    message: 'We are back at Harbor Bridge. !!The rust at Pier 2!! is still there.',
+    heading: 'One bridge. Two inspectors.',
+    people: [
+      { initials: 'EM', name: 'Evelyn_H_Mercer', when: 'First visit', text: 'Checks Pier 2 and records what she sees.' },
+      { initials: 'JV', name: 'Jordan_Vance', when: 'Next visit', text: 'Returns to the same pier to see what has changed.' },
+    ],
+    question: 'What should **Vance** know before he starts?',
+  } satisfies CastProps as unknown as Record<string, unknown>,
+};
 
 /**
  * 2.1 · The agent that forgets, in three clicks at the Pier 2 corrosion (owner, 24 Oct): Day 1 Mercer tells

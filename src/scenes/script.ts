@@ -24,7 +24,7 @@ export const SCRIPT: Record<string, string> = {
   '1.9': 'Three questions, three patterns. **RAG**: what does the record say. **Workflow**: triage predictably. **Agent**: reason and tell me what to do. And the second marker is still waiting on Pier 2. At three o’clock we give it **a real memory**.',
 
   // Chapter 2 · Agent Memory
-  '2.0': 'Welcome back to the same city. Same city, same database, same bridge. Now, memory.',
+  '2.0': 'We are back at Harbor Bridge, because the problem has not gone away: the rust at Pier 2 is still there. Two inspectors will look at it on different days. Evelyn Mercer comes first, Jordan Vance comes next. What should Vance know before he starts?',
   '2.1a': 'Day 1. Evelyn Mercer is at Pier 2. She tells the copilot what she found, what she advises and what needs follow-up. The copilot says: noted.',
   '2.1b': 'Then the chat closes. Mercer goes home, and everything she told the copilot goes with the session. Nothing carried over.',
   '2.1c': 'Day 2. Jordan Vance comes to the same rust and asks what happened here. The copilot has nothing. Same questions again, the earlier advice is missing, and the follow-up is out of view. The records may still exist. The next visit needs a way to find and use the relevant history.',
