@@ -124,7 +124,8 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
   // the envelope goes to the model's first layer and is taken in there
   const dock = along(MODEL_IN, -0.45);
   const envPos: Vec3 = [ENVELOPE[0] + (dock[0] - ENVELOPE[0]) * travel, ENVELOPE[1] + (dock[1] - ENVELOPE[1]) * travel, ENVELOPE[2] + (dock[2] - ENVELOPE[2]) * travel];
-  const intake = act === 'envelope' ? 1 - ease((t - 3500) / 400) : 1;
+  // once it has arrived there it fades away in place (a scale would shrink it towards the world origin: a warp)
+  const intake = act === 'envelope' ? 1 - ease((t - 3600) / 600) : 1;
 
   return (
     <>
@@ -152,9 +153,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
                     <meshBasicMaterial color={theme.red} toneMapped={false} />
                   </mesh>
                 ))}
-                <group scale={Math.max(0.001, intake)}>
-                  <Envelope position={envPos} sealed={fly >= 1} />
-                </group>
+                <Envelope position={envPos} sealed={fly >= 1} opacity={intake} />
                 {visible && <SkyLabel position={[ENVELOPE[0], ENVELOPE[1] + 0.9, ENVELOPE[2]]} text="5 documents + the question · context is data, not instructions" show={t > 1800 && travel < 0.2} />}
               </>
             )}
@@ -212,20 +211,20 @@ function SkyDatabase({ color, t }: { color: string; appearMs: number; t: number 
   );
 }
 
-function Envelope({ position, sealed }: { position: Vec3; sealed: boolean }) {
+function Envelope({ position, sealed, opacity = 1 }: { position: Vec3; sealed: boolean; opacity?: number }) {
   return (
-    <group position={position}>
+    <group position={position} visible={opacity > 0.01}>
       <mesh castShadow>
         <boxGeometry args={[0.9, 0.6, 0.08]} />
-        <meshStandardMaterial color="#f4f1ea" roughness={0.8} />
+        <meshStandardMaterial color="#f4f1ea" roughness={0.8} transparent opacity={opacity} />
       </mesh>
       <mesh position={[0, 0.05, 0.05]} rotation={[0, 0, Math.PI / 4]} scale={[1, 1, 1]} visible={sealed}>
         <boxGeometry args={[0.5, 0.5, 0.01]} />
-        <meshStandardMaterial color="#e6dfd0" roughness={0.8} />
+        <meshStandardMaterial color="#e6dfd0" roughness={0.8} transparent opacity={opacity} />
       </mesh>
       <mesh position={[0, -0.02, 0.07]} visible={sealed}>
         <circleGeometry args={[0.08, 20]} />
-        <meshBasicMaterial color="#C74634" />
+        <meshBasicMaterial color="#C74634" transparent opacity={opacity} />
       </mesh>
     </group>
   );
