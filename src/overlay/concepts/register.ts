@@ -9,6 +9,7 @@ import { BridgeMarkers } from './BridgeMarkers';
 import { Beat } from './Beat';
 import { CopilotChat } from './CopilotChat';
 import { Cast } from './Cast';
+import { MemoryMap } from './MemoryMap';
 
 registerOverlay('TitleCard', TitleCard);
 registerOverlay('PinLegend', PinLegend);
@@ -20,3 +21,4 @@ registerOverlay('BridgeMarkers', BridgeMarkers);
 registerOverlay('Beat', Beat);
 registerOverlay('CopilotChat', CopilotChat);
 registerOverlay('Cast', Cast);
+registerOverlay('MemoryMap', MemoryMap);

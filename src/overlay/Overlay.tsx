@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useProgress } from '@react-three/drei';
 import { useSceneStore } from '../engine/store';
@@ -28,7 +29,13 @@ export function Overlay() {
   const jumpOpen = useUiStore((s) => s.jumpOpen);
   const scriptOpen = useUiStore((s) => s.scriptOpen);
   const cameraEditing = useCameraStore((s) => s.editing);
+  // the panel group on screen now: a page in the same group keeps it up while its camera settles
+  const shownKey = useRef<string | null>(null);
   if (!scene) return null;
+
+  const panelKey = scene.overlayGroup ?? scene.id;
+  const showPanel = !!scene.overlay && (settled || (!!scene.overlayGroup && shownKey.current === panelKey));
+  shownKey.current = showPanel ? panelKey : settled ? null : shownKey.current;
 
   const Comp = scene.overlay ? OVERLAYS[scene.overlay] : null;
 
@@ -47,9 +54,9 @@ export function Overlay() {
       </div>
 
       <AnimatePresence mode="wait">
-        {settled && scene.overlay && (
+        {showPanel && (
           <motion.div
-            key={scene.id}
+            key={panelKey}
             className="overlay-layer"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

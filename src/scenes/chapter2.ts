@@ -1,6 +1,7 @@
 import type { SceneDef } from '../engine/types';
 import type { CastProps } from '../overlay/concepts/Cast';
 import type { CopilotChatProps } from '../overlay/concepts/CopilotChat';
+import type { MemoryMapProps } from '../overlay/concepts/MemoryMap';
 import type { Who } from '../world/Person';
 import { beat } from './chapter1';
 
@@ -92,20 +93,27 @@ const b21c = chat('3.1c', 'The agent that forgets · Day 2', 'pier2-close', {
   notebook: `${NB} · motivation for Part 3 and the Day N cell`,
 }, { who: 'character-male-d' });
 
-const b22 = beat(2, '3.2', 'The memory map', 'ops', {
-  kicker: 'Kinds of memory',
-  visual: {
-    kind: 'cards',
-    cols: 3,
-    items: [
-      { title: 'Short-term (the desk)', sub: 'context window · session · working memory · semantic cache', tone: 'grey' },
-      { title: 'Long-term (the shelves)', sub: 'procedural · episodic · semantic', tone: 'teal' },
-      { title: 'Shared shelf', sub: 'what every inspector can read', tone: 'teal' },
-    ],
-  },
-  message: 'Several kinds of memory, doing different jobs, in one store.',
-  notebook: 'CITY_MEMORY holds fact, preference, guideline and memory records',
-}, { ops: true });
+/**
+ * 3.2 · The memory map, in five clicks built exactly like the Lab 3 deck's slides 19 to 23 (owner, 25 Oct).
+ * The camera stays at the rust with Vance there, since the map answers "what should Vance know?"; the five
+ * pages share one panel, so each click only adds its part.
+ */
+const map = (id: string, step: MemoryMapProps['step'], message: string, notebook?: string): SceneDef => ({
+  id,
+  chapter: 2,
+  title: 'The memory map',
+  shot: 'pier2-close',
+  world: { bridge: true, inspect: { pier: 'pier2', who: 'character-male-d' } },
+  overlay: 'MemoryMap',
+  overlayGroup: 'memory-map',
+  overlayProps: { kicker: 'Kinds of memory', step, message, notebook } satisfies MemoryMapProps as unknown as Record<string, unknown>,
+});
+
+const b22a = map('3.2a', 1, '**Short-term memory**: what the agent holds right now.');
+const b22b = map('3.2b', 2, '**Long-term memory**: what it keeps between visits.');
+const b22c = map('3.2c', 3, 'Three kinds: **how to do the job**, **what happened**, **what is true**.');
+const b22d = map('3.2d', 4, 'Each kind lives in its own layer.');
+const b22e = map('3.2e', 5, 'And a **shared memory**, so the next inspector can use it too.', 'CITY_MEMORY holds fact, preference, guideline and memory records');
 
 const b23 = beat(2, '3.3', 'The glass', 'ops', {
   kicker: 'The context window',
@@ -277,7 +285,11 @@ export const chapter2: SceneDef[] = [
   b21a,
   b21b,
   b21c,
-  b22,
+  b22a,
+  b22b,
+  b22c,
+  b22d,
+  b22e,
   b23,
   b24,
   b25,

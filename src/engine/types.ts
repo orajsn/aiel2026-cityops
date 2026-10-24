@@ -25,6 +25,11 @@ export interface SceneDef {
   world?: Record<string, unknown>;
   overlay?: OverlayKey;
   overlayProps?: Record<string, unknown>;
+  /**
+   * Pages in a row with the same group keep one panel on screen and only pass it new props (a diagram
+   * that builds up click by click), instead of fading the panel out and in on every page.
+   */
+  overlayGroup?: string;
   card?: HandoffCard;
   recap?: RecapRef;
   recapMode?: boolean;
