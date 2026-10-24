@@ -57,7 +57,7 @@ export function UnifiedQuery({ message }: { message?: string }) {
           ))}
         </ul>
       </motion.div>
-      <motion.div className="qb__line" style={{ left: px(-0.62), transform: 'none' }} {...fade(5.2)}>
+      <motion.div className="qb__line" {...fade(5.2)}>
         <Rich text={message ?? '**One call, four data models, one transaction.** No ETL, no sync jobs, no stale copies.'} />
       </motion.div>
     </div>

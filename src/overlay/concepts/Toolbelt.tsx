@@ -73,7 +73,7 @@ export function Toolbelt({ message }: { message?: string }) {
         </div>
         <div className="tb__red">{SOP_THRESHOLD}</div>
       </motion.div>
-      <motion.div className="qb__line" style={{ left: px(0.33), transform: 'none' }} {...fade(4.2)}>
+      <motion.div className="qb__line" {...fade(4.2)}>
         <Rich text={message ?? '**Tools** are what the agent can do. **The skill** is how you want it done.'} />
       </motion.div>
       {/* keeps the model's bottom clear: nothing is drawn here */}

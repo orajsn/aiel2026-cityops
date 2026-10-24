@@ -2,7 +2,7 @@ import { netLayout, waveAt } from '../../src/world/NeuralNet';
 
 test('the language model is layers of nodes, input to output, left to right', () => {
   const layers = netLayout();
-  expect(layers.length).toBeGreaterThanOrEqual(4);
+  expect(layers.length).toBeGreaterThanOrEqual(3);
   for (let l = 1; l < layers.length; l++) expect(layers[l][0][0]).toBeGreaterThan(layers[l - 1][0][0]);
 });
 

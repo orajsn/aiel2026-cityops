@@ -42,13 +42,15 @@ export function Overlay() {
   return (
     <>
       <div className="strip">
+        {/* the Oracle logo shares the strip's white panel (owner: on its own it sat on the city) */}
+        <span className="strip__logo" role="img" aria-label="Oracle" />
+        <span className="strip__sep" />
         <span className="strip__chapter">{CHAPTER_LABEL[scene.chapter]}</span>
         <span className="strip__sep" />
         <span className="strip__id mono">{pageNumber(scene.id)}</span>
         <span className="strip__sep" />
         <span className="strip__title">{scene.title}</span>
       </div>
-      <div className="logo-slot" aria-hidden />
       <div className="counter mono">
         {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
       </div>

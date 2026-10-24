@@ -38,12 +38,30 @@ function cameraOverrides(): Plugin {
   };
 }
 
+/**
+ * A change to a scene module reloads the page instead of hot-swapping it: hot-swapped three.js objects pile
+ * up on the GPU in an open tab (the owner's tab crawled again after a run of edits). HTML overlays and
+ * styles still hot-swap.
+ */
+function fullReloadForScene(): Plugin {
+  return {
+    name: 'full-reload-for-scene',
+    handleHotUpdate({ file, server }) {
+      if (/[\/]src[\/](world|engine)[\/]/.test(file)) {
+        server.ws.send({ type: 'full-reload', path: '*' });
+        return [];
+      }
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [react(), cameraOverrides()],
   base: './',
   build: { assetsInlineLimit: 0 },
   // the saved-angles file changes while presenting: do not reload the page when it does. Polling: on this
   // machine the file-change events were sometimes missed and the server kept serving stale code.
+  plugins: [react(), cameraOverrides(), fullReloadForScene()],
   server: { port: 5174, strictPort: true, watch: { ignored: ['**/src/content/cameraOverrides.json', '**/public/**', '**/.claude/**'], usePolling: true, interval: 400 }, allowedHosts: TUNNEL_HOSTS },
   test: {
     environment: 'jsdom',

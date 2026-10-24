@@ -7,7 +7,8 @@ import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import type { Vec3 } from './shots';
 
 /** nodes per layer, input to output */
-const LAYERS = [4, 7, 7, 7, 4];
+// fewer nodes and links than a real one (owner: the full mesh was too messy to read in 3D)
+const LAYERS = [2, 3, 3, 2];
 const WIDTH = 2.6;
 const HEIGHT = 1.5;
 /** a wave crosses all the layers in this long, then the next word starts */
@@ -25,7 +26,7 @@ export function netLayout(): Vec3[][] {
   return LAYERS.map((n, l) => {
     const x = -WIDTH / 2 + (l / (LAYERS.length - 1)) * WIDTH;
     return Array.from({ length: n }, (_, i) => {
-      const y = n === 1 ? 0 : -HEIGHT / 2 + (i / (n - 1)) * HEIGHT * (n / 7);
+      const y = n === 1 ? 0 : -HEIGHT / 2 + (i / (n - 1)) * HEIGHT * (n / 3);
       return [x, y, Math.cos((i / Math.max(1, n - 1) - 0.5) * Math.PI) * 0.25] as Vec3;
     });
   });
@@ -55,15 +56,27 @@ export function NeuralNet({ producing, doubt = false }: { producing: boolean; do
     const g = new LineSegmentsGeometry();
     g.setPositions(edges.flatMap((e) => [...e.a, ...e.b]));
     g.setColors(new Float32Array(edges.length * 6).fill(0.4));
-    const m = new LineMaterial({ vertexColors: true, linewidth: 1.6, transparent: true, opacity: 0.75, toneMapped: false });
+    const m = new LineMaterial({ vertexColors: true, linewidth: 2, transparent: true, opacity: 0.9, toneMapped: false });
     return new LineSegments2(g, m);
   }, [edges]);
+  // a white outline under every link (owner: the network must read against the city): the same geometry,
+  // drawn wider and pushed back a touch so the coloured line sits on top of it
+  const halo = useMemo(() => {
+    const m = new LineMaterial({ color: 0xffffff, linewidth: 5, transparent: true, opacity: 0.9, toneMapped: false, polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 2 });
+    const h = new LineSegments2(lines.geometry, m);
+    h.renderOrder = -1;
+    return h;
+  }, [lines]);
   const size = useThree((st) => st.size);
-  useEffect(() => void lines.material.resolution.set(size.width, size.height), [lines, size]);
-  useEffect(() => () => (lines.geometry.dispose(), lines.material.dispose()), [lines]);
+  useEffect(() => {
+    lines.material.resolution.set(size.width, size.height);
+    halo.material.resolution.set(size.width, size.height);
+  }, [lines, halo, size]);
+  useEffect(() => () => (lines.geometry.dispose(), lines.material.dispose(), halo.material.dispose()), [lines, halo]);
   const root = useRef<THREE.Group>(null);
   const parentQ = useMemo(() => new THREE.Quaternion(), []);
   const dots = useRef<THREE.InstancedMesh>(null);
+  const rims = useRef<THREE.InstancedMesh>(null);
   const word = useRef<THREE.Mesh>(null);
   const start = useRef(performance.now());
   const dummy = useMemo(() => new THREE.Object3D(), []);
@@ -91,10 +104,12 @@ export function NeuralNet({ producing, doubt = false }: { producing: boolean; do
         dummy.scale.setScalar(1 + k * 0.6);
         dummy.updateMatrix();
         m.setMatrixAt(i, dummy.matrix);
+        rims.current?.setMatrixAt(i, dummy.matrix);
         m.setColorAt(i, col.copy(BASE).lerp(tint, Math.min(1, k * 1.4)).lerp(GLOW, k * k * 0.6));
       });
       m.instanceMatrix.needsUpdate = true;
       if (m.instanceColor) m.instanceColor.needsUpdate = true;
+      if (rims.current) rims.current.instanceMatrix.needsUpdate = true;
     }
     const c = (lines.geometry.getAttribute('instanceColorStart') as THREE.InterleavedBufferAttribute).data;
     const arr = c.array as Float32Array;
@@ -116,9 +131,15 @@ export function NeuralNet({ producing, doubt = false }: { producing: boolean; do
   });
   return (
     <group ref={root}>
+      <primitive object={halo} />
       <primitive object={lines} />
+      {/* a white rim around every node: a larger sphere showing only its back half, so it reads as an outline */}
+      <instancedMesh ref={rims} args={[undefined, undefined, nodes.length]} frustumCulled={false}>
+        <sphereGeometry args={[0.1, 16, 16]} />
+        <meshBasicMaterial color="#ffffff" side={THREE.BackSide} toneMapped={false} />
+      </instancedMesh>
       <instancedMesh ref={dots} args={[undefined, undefined, nodes.length]} frustumCulled={false}>
-        <sphereGeometry args={[0.06, 16, 16]} />
+        <sphereGeometry args={[0.072, 16, 16]} />
         <meshBasicMaterial toneMapped={false} />
       </instancedMesh>
       <mesh ref={word} visible={false}>

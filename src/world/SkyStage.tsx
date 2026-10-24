@@ -50,7 +50,7 @@ const BARE_Q = '“What recent issues have been reported on Harbor Bridge?”';
 /** the question stands on the left, the guess on the right, and both stay until the next page (owner: give people time to read) */
 const QUESTION_AT: Vec3 = along([MODEL_IN[0], MODEL[1] + 0.7, MODEL_IN[2]], -2.5);
 /** the answer stands to the right of the model's last layer */
-const ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 0.5, MODEL_OUT[2]], 2.5);
+const ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 0.9, MODEL_OUT[2]], 0.5);
 const BARE_A = '“I don’t have any reports about a Harbor Bridge in your city. In general, bridges can show cracking, corrosion or bearing wear…”';
 /** Lab 2 page 3: the answer comes out of the model's last layer, built from the references (draft wording, no recorded run) */
 const RAG_ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 1.4, MODEL_OUT[2]], 0.5);
@@ -183,7 +183,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       {visible && act === 'unified' && <FlowArc key="brief" from={boardPoint(BRIEF_AT.x, BRIEF_AT.y + 0.17)} to={MODEL_WIDE_IN} lift={0.3} radius={0.05} durationMs={1200} delayMs={4600} persist color="#C74634" />}
       {/* 1.1: the inspector's question goes in bare, and a general guess comes out */}
       {visible && act === 'model' && <SkyCard position={QUESTION_AT} who="the question" text={BARE_Q} show={t > 200} />}
-      {visible && act === 'model' && <SkyCard position={ANSWER_AT} who="the language model · answer" text={BARE_A} show={t > 3900} tone="grey" />}
+      {visible && act === 'model' && <SkyCard position={ANSWER_AT} who="the language model · answer" text={BARE_A} show={t > 3900} tone="grey" anchor="left" />}
       {visible && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="Oracle AI Database · 384 numbers per text" show={act === 'embed' && t > 2800} />}
       {visible && act === 'envelope' && <SkyCard position={RAG_ANSWER_AT} who="the language model · answer, from the references" text={RAG_A} show={t > 5200} anchor="left" />}
       </group>
@@ -258,10 +258,29 @@ function SkyLabel({ position, text, show, tone = 'teal' }: { position: Vec3; tex
 }
 
 /** a small card in the sky: who is speaking, and the words */
+/** a sky card's box on the stage (styles.css .sky-card: 460 px wide plus padding), used to keep it on screen */
+const CARD_W = 500;
+const CARD_H = 210;
+const EDGE = 24;
+const cardPos = new THREE.Vector3();
+
+/**
+ * A speaking card in the sky: who is speaking, and the words. Anchored at its centre, or by its left edge
+ * ('left': an answer standing right of the model's last layer). Whatever the camera does, the card stays
+ * inside the stage: its screen position is clamped before it is placed (owner: words ran off the screen).
+ */
 function SkyCard({ position, who, text, show, tone = 'teal', anchor = 'center' }: { position: Vec3; who: string; text: string; show: boolean; tone?: 'teal' | 'grey'; anchor?: 'center' | 'left' }) {
+  const place = (el: THREE.Object3D, camera: THREE.Camera, size: { width: number; height: number }): [number, number] => {
+    cardPos.setFromMatrixPosition(el.matrixWorld).project(camera);
+    let x = ((cardPos.x + 1) / 2) * size.width;
+    let y = ((-cardPos.y + 1) / 2) * size.height;
+    const left = anchor === 'left' ? 0 : CARD_W / 2;
+    x = Math.min(Math.max(x, EDGE + left), size.width - EDGE - (CARD_W - left));
+    y = Math.min(Math.max(y, EDGE + CARD_H / 2), size.height - 150 - CARD_H / 2); // 150: the script bar
+    return [x, y];
+  };
   return (
-    // anchor 'left': the card's left edge sits at the point (an answer standing right of the model's last layer)
-    <Html position={position} center={anchor === 'center'} zIndexRange={[16, 0]} style={{ pointerEvents: 'none', transform: anchor === 'left' ? 'translate(0, -50%)' : undefined }}>
+    <Html position={position} calculatePosition={place} zIndexRange={[16, 0]} style={{ pointerEvents: 'none', transform: anchor === 'left' ? 'translate(0, -50%)' : 'translate(-50%, -50%)' }}>
       <div className={`sky-card tone-${tone}`} style={{ opacity: show ? 1 : 0 }}>
         <div className="sky-card__who">{who}</div>
         <div className="sky-card__text">{text}</div>
@@ -269,3 +288,4 @@ function SkyCard({ position, who, text, show, tone = 'teal', anchor = 'center' }
     </Html>
   );
 }
+
