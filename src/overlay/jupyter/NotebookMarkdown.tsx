@@ -10,10 +10,10 @@ function inline(text: string): ReactNode[] {
   });
 }
 
-/** `mark` tints whole lines (the TODO lines people type into); tokens are split at line ends for that */
-export function PythonCode({ source, mark }: { source: string; mark?: (line: string) => boolean }) {
+/** `marked` tints whole lines (the TODO lines people type into); tokens are split at line ends for that */
+export function PythonCode({ source, marked }: { source: string; marked?: Set<number> }) {
   const tokens = highlightPython(source);
-  if (!mark) {
+  if (!marked?.size) {
     return <pre className="jd__code">{tokens.map((t, i) => (t.kind === 'plain' ? t.text : <span key={i} className={`py-${t.kind}`}>{t.text}</span>))}</pre>;
   }
   const lines: { text: string; kind: string }[][] = [[]];
@@ -26,7 +26,7 @@ export function PythonCode({ source, mark }: { source: string; mark?: (line: str
   return (
     <pre className="jd__code">
       {lines.map((line, i) => (
-        <span key={i} className={`jd__line${mark(line.map((p) => p.text).join('')) ? ' jd__line--mark' : ''}`}>
+        <span key={i} className={`jd__line${marked.has(i) ? ' jd__line--mark' : ''}`}>
           {line.map((p, j) => (p.kind === 'plain' ? p.text : <span key={j} className={`py-${p.kind}`}>{p.text}</span>))}
           {'\n'}
         </span>

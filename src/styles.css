@@ -476,11 +476,14 @@ code,
 /* Lab guide · the Jupyter drawer (src/overlay/jupyter). The inside looks like JupyterLab's light theme on purpose:
    it is the screen the audience has open. Teal marks the cells to run, red only the TODO. */
 .jd { position: absolute; inset: 0; pointer-events: none; z-index: 38; }
-.jd__tab { pointer-events: auto; position: absolute; left: 48px; top: 470px; display: flex; align-items: center; gap: 14px; padding: 14px 22px 14px 16px; border: 0; border-radius: 14px; background: var(--panel-strong); color: var(--ink); box-shadow: 0 8px 26px rgba(0,0,0,0.28); border-left: 5px solid var(--teal); cursor: pointer; font-family: var(--font-body); text-align: left; }
-.jd__tab:hover { transform: translateX(4px); }
-.jd__tab-text { display: flex; flex-direction: column; gap: 2px; }
-.jd__tab-text b { font-size: 22px; font-weight: 700; }
-.jd__tab-text span { font-size: 15px; color: var(--ink-dim); }
+/* the handle sits on the screen's left edge, 56 px wide, so it never covers a page's panels or labels */
+.jd__tab { pointer-events: auto; position: absolute; left: 0; top: 360px; width: 56px; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 16px 0; border: 0; border-radius: 0 14px 14px 0; background: var(--teal); color: #fff; box-shadow: 0 8px 26px rgba(0,0,0,0.3); cursor: pointer; font-family: var(--font-body); }
+.jd__tab:hover { filter: brightness(1.12); }
+.jd__tab .jd__logo { background: #fff; width: 30px; height: 30px; }
+.jd__tab .jd__logo::after { border-left-color: var(--teal); left: 11px; top: 8px; border-left-width: 11px; border-top-width: 7px; border-bottom-width: 7px; }
+.jd__tab-text { writing-mode: vertical-rl; transform: rotate(180deg); display: flex; flex-direction: row; align-items: center; gap: 12px; white-space: nowrap; }
+.jd__tab-text b { font-size: 21px; font-weight: 700; }
+.jd__tab-text span { font-size: 15px; opacity: 0.85; }
 .jd__logo { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); position: relative; flex: none; }
 .jd__logo::after { content: ''; position: absolute; left: 13px; top: 10px; border-left: 12px solid #fff; border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
 .jd__bar .jd__logo { width: 24px; height: 24px; }
@@ -549,3 +552,4 @@ code,
 .jd__line--mark { background: rgba(199,70,52,0.1); box-shadow: inset 3px 0 0 var(--red); margin: 0 -12px; padding: 0 12px; }
 .jd__nb .jd__cell { scroll-margin-top: 8px; }
 .jd__say { margin: 0 0 6px; }
+.jd__optional { color: var(--ink-dim); font-weight: 600; }

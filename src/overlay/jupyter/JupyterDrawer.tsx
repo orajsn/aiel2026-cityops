@@ -1,19 +1,16 @@
 import { useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { LAB_STOPS, stopCells, type StopCell } from '../../content/labStops';
+import { LAB_STOPS, stopCells, todoLines, type StopCell } from '../../content/labStops';
 import { NotebookMarkdown, PythonCode } from './NotebookMarkdown';
 
 /** cells longer than this show their first lines and fold the rest */
 const FOLD_AT = 16;
 const FOLD_SHOW = 10;
 
-/** the lines of a TODO cell where people type: the TODO comment down to `pass` */
-const isTypeHere = (line: string) => /#\s*(TODO \d|YOUR CODE HERE)|^\s*#\s*return it as|^\s*pass\s*$/.test(line);
-
 const BADGE: Record<string, string> = { run: 'run', todo: 'fill in, then run', check: 'checkpoint', skip: 'skip' };
 
 /**
- * The lab guide's Jupyter drawer. On a page with a stop (src/content/labStops.ts) a tab waits on the left edge;
+ * The lab guide's Jupyter drawer. On a page with a stop (src/content/labStops.ts) a handle waits on the screen's left edge;
  * opening it slides in a JupyterLab-looking notebook: the same cells the audience has open, in order, with the
  * ones to run numbered, the TODO marked, and the line each prints when it worked. "Next cell" walks the room
  * through them one by one.
@@ -28,7 +25,9 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
 
   const cells = stopCells(stop);
   const runs = cells.filter((c) => c.run);
-  const last = [...runs].reverse().find((c) => c.mark?.expect);
+  // the room is done when the last cell has run: its success line if it prints one
+  const last = runs[runs.length - 1];
+  const cellWord = runs.length === 1 ? 'cell' : 'cells';
 
   const goTo = (run: number) => {
     setFocus(run);
@@ -39,11 +38,14 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
   return (
     <div className="jd" data-testid="jupyter-drawer">
       {!open && (
-        <motion.button type="button" className="jd__tab" aria-label="Run in Jupyter" onClick={() => setOpen(true)} initial={{ x: -40, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.6, duration: 0.4 }}>
+        <motion.button type="button" className="jd__tab" aria-label="Run in Jupyter" onClick={() => setOpen(true)} initial={{ x: -56, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.6, duration: 0.4 }}>
           <span className="jd__logo" aria-hidden />
           <span className="jd__tab-text">
             <b>Run in Jupyter</b>
-            <span>{runs.length} cells · {stop.minutes}</span>
+            <span>
+              {runs.length} {cellWord} · {stop.minutes}
+              {stop.optional ? ' · optional' : ''}
+            </span>
           </span>
         </motion.button>
       )}
@@ -61,11 +63,17 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
             <div className="jd__brief">
               <div className="jd__where">{stop.where}</div>
               <div className="jd__todo-line">
-                Run <b>{runs.length} cells</b>, top to bottom.
-                {last && (
+                {stop.optional && <span className="jd__optional">Optional section: run it if there is time. </span>}
+                Run <b>
+                  {runs.length} {cellWord}
+                </b>
+                , top to bottom.{' '}
+                {last?.mark?.expect ? (
                   <>
-                    {' '}Done when you see <span className="jd__ok">✓ {last.mark!.expect}</span>
+                    Done when you see <span className="jd__ok">✓ {last.mark.expect}</span>
                   </>
+                ) : (
+                  <>Done when cell {last?.run} has run.</>
                 )}
               </div>
               <div className="jd__steps">
@@ -130,7 +138,7 @@ function Cell({ c, focused, folded, onUnfold, onPick, refFn }: { c: StopCell; fo
         )}
         {c.mark?.say && <div className="jd__say">{c.mark.say}</div>}
         <div className="jd__input">
-          <PythonCode source={shown} mark={role === 'todo' ? isTypeHere : undefined} />
+          <PythonCode source={shown} marked={role === 'todo' ? todoLines(shown.split('\n'), c.mark!.todo!) : undefined} />
           {folded && (
             <button type="button" className="jd__fold" onClick={(e) => (e.stopPropagation(), onUnfold())}>
               ▾ {lines.length - FOLD_SHOW} more lines
