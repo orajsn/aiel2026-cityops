@@ -8,6 +8,7 @@ import { FlowArc } from './FlowArc';
 import { VectorField } from './VectorField';
 import { layoutCloud, nearestK } from './vectorLayout';
 import { SkyShapes, type Face } from './SkyShapes';
+import { SkyLab2, type Lab2Act } from './SkyLab2';
 import type { Vec3 } from './shots';
 
 /**
@@ -26,7 +27,7 @@ import type { Vec3 } from './shots';
  *  - tables / json / graph / vectors: the same, with that shape lit;
  *  - brain:    the small model alone, centre stage.
  */
-export type SkyAct = 'model' | 'embed' | 'envelope' | 'shapes' | Face | 'brain';
+export type SkyAct = 'model' | 'embed' | 'envelope' | 'shapes' | Face | 'brain' | Lab2Act;
 
 const OPS = assetPosition('City Operations Control Center');
 export const SKY_ANCHOR: Vec3 = [OPS.x, 9, OPS.z];
@@ -41,6 +42,7 @@ const OPS_TOP: Vec3 = [OPS.x, 1.2, OPS.z];
 const QUERY: Vec3 = [8, 6, -4];
 
 const SHAPE_ACTS: (SkyAct | null)[] = ['shapes', 'tables', 'json', 'graph', 'vectors'];
+const LAB2_ACTS: (SkyAct | null)[] = ['overflow', 'tools', 'unified', 'note'];
 
 const ease = (t: number) => {
   const c = Math.max(0, Math.min(1, t));
@@ -110,6 +112,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
           <group position={[-A[0], -A[1], -A[2]]}>
             {(act === 'model' || act === 'embed' || act === 'envelope') && <ModelOrb position={MODEL} lit={act === 'envelope' && t > 3600} doubt={act === 'model' && t > 2600} labelled={visible} />}
             {act === 'brain' && <ModelOrb position={[A[0], A[1] + 0.4, A[2]]} lit={false} doubt={false} labelled={visible} scale={1.6} />}
+            {act && LAB2_ACTS.includes(act) && <SkyLab2 act={act as Lab2Act} center={[A[0], A[1] + 0.2, A[2]]} t={t} red={theme.red} opsTop={OPS_TOP} />}
             {act && SHAPE_ACTS.includes(act) && <SkyShapes center={[A[0], A[1] + 0.2, A[2]]} face={act === 'shapes' ? null : (act as Face)} t={t} red={theme.red} />}
             {hasDb && <SkyDatabase color={theme.red} appearMs={0} t={t} />}
             {hasDb && (

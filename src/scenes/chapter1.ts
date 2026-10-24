@@ -35,44 +35,26 @@ const b13 = beat(1, '1.3', 'Grounding', 'sky', {
   message: 'Give the model the evidence and it stops guessing.',
 }, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'envelope' });
 
-const b14 = beat(1, '1.4', 'One envelope is not enough', 'ops', {
+const b14 = beat(1, '1.4', 'One envelope is not enough', 'sky', {
   kicker: 'The maturity ladder',
   notebook: 'rag_to_agents_lab.ipynb · Section 2 (optional trace)',
-  visual: { kind: 'cards', cols: 4, items: [{ title: 'Chatbot', tone: 'grey' }, { title: 'RAG', tone: 'teal' }, { title: 'Workflow', tone: 'teal' }, { title: 'Agent', tone: 'red' }] },
+  visual: { kind: 'none' },
   message: 'RAG answers one question. Operations ask three at once.',
-}, { ops: true });
+}, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'overflow' });
 
-const b15 = beat(1, '1.5', 'The toolbelt', 'ops', {
-  kicker: 'Tools on the Ops Center wall',
+const b15 = beat(1, '1.5', 'The toolbelt', 'sky', {
+  kicker: 'The toolbelt',
   notebook: 'rag_to_agents_lab.ipynb · Section 3, tools and INCIDENT_TRIAGE_SKILL',
-  visual: {
-    kind: 'cards',
-    cols: 2,
-    items: [
-      { title: 'get_asset_incident_brief', sub: 'one place in the database' },
-      { title: 'recall', sub: 'one place in the database' },
-      { title: 'remember', sub: 'one place in the database' },
-      { title: 'INCIDENT_TRIAGE_SKILL', sub: 'SOP clipboard · section loss > 25%', tone: 'red' },
-    ],
-  },
+  visual: { kind: 'none' },
   message: 'The model only sees each card’s name and description. Docstrings are prompt engineering.',
-}, { ops: true });
+}, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'tools' });
 
-const b16 = beat(1, '1.6', 'One query, four shapes', 'ops', {
+const b16 = beat(1, '1.6', 'One query, four shapes', 'sky', {
   kicker: 'UNIFIED_SQL',
   notebook: 'rag_to_agents_lab.ipynb · Section 4, UNIFIED_SQL',
-  visual: {
-    kind: 'cards',
-    cols: 2,
-    items: [
-      { title: 'asset', sub: 'the row' },
-      { title: 'specifications', sub: 'the JSON' },
-      { title: 'graph_context', sub: 'the graph edges' },
-      { title: 'ranked_evidence', sub: 'the ranked vectors' },
-    ],
-  },
+  visual: { kind: 'none' },
   message: 'No ETL, no sync, one transaction.',
-}, { ops: true });
+}, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'unified' });
 
 const b17 = beat(1, '1.7', 'The agent loop', 'bridge', {
   kicker: 'Agent · the Pier 3 report arrives',
@@ -82,12 +64,12 @@ const b17 = beat(1, '1.7', 'The agent loop', 'bridge', {
   message: 'The agent chooses its tools. The procedure keeps it honest.',
 }, { bridge: true, markers: true });
 
-const b18 = beat(1, '1.8', 'A sticky note', 'ops', {
+const b18 = beat(1, '1.8', 'A sticky note', 'sky', {
   kicker: 'store_incident',
   notebook: 'rag_to_agents_lab.ipynb · Section 5.8 and 6.1',
-  visual: { kind: 'cards', cols: 1, items: [{ title: 'One row keyed to Harbor Bridge', sub: 'embedded on write' }] },
+  visual: { kind: 'none' },
   message: 'A memory, but a thin one.',
-}, { ops: true });
+}, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'note' });
 
 const b19 = beat(1, '1.9', 'Three questions', 'pier2', {
   kicker: 'Closing Lab 2',

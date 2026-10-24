@@ -67,7 +67,7 @@ export function SkyShapes({ center, face, t, red }: { center: Vec3; face: Face |
 }
 
 /** the red stack: three discs rising one after another */
-function Stack({ red, t }: { red: string; t: number }) {
+export function Stack({ red, t }: { red: string; t: number }) {
   return (
     <group position={[0, -1.1, 0]}>
       {[0, 1, 2].map((i) => {
