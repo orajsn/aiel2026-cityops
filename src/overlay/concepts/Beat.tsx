@@ -10,7 +10,9 @@ export type Visual =
   | { kind: 'cards'; items: { title: string; sub?: string; tone?: Tone }[]; cols?: number }
   | { kind: 'compare'; left: { title: string; lines: string[]; tone?: Tone }; right: { title: string; lines: string[]; tone?: Tone } }
   | { kind: 'list'; items: string[]; ordered?: boolean }
-  | { kind: 'code'; lines: string[] };
+  | { kind: 'code'; lines: string[] }
+  /** the 3D scene carries the idea; the panel only names it */
+  | { kind: 'none' };
 
 export interface BeatProps {
   /** small label above the panel, e.g. "The toolbelt" */
@@ -36,7 +38,7 @@ const item = (i: number) => ({
 export function Beat({ kicker, visual, message, notebook, tag }: BeatProps) {
   return (
     <div className="beat">
-      <motion.div className="beat__panel" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, ease: EASE }}>
+      <motion.div className={`beat__panel${visual.kind === 'none' ? ' beat__panel--compact' : ''}`} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, ease: EASE }}>
         <div className="beat__kicker">
           {kicker}
           {tag && <span className="beat__tag">{tag}</span>}
@@ -112,6 +114,8 @@ function VisualView({ v }: { v: Visual }) {
         </Tag>
       );
     }
+    case 'none':
+      return null;
     case 'code':
       return (
         <motion.pre className="beat-code mono" {...item(0)}>

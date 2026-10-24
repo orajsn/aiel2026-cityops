@@ -14,40 +14,26 @@ export function beat(chapter: 1 | 2, id: string, title: string, shot: string, pr
 
 const HB = 'Harbor Bridge';
 
-const b11 = beat(1, '1.1', 'The bare model', 'ops', {
+const b11 = beat(1, '1.1', 'The bare model', 'sky', {
   kicker: 'Ops Center · the bare LLM',
   notebook: 'rag_to_agents_lab.ipynb · Section 0 setup, then the bare LLM question',
-  visual: {
-    kind: 'chat',
-    lines: [
-      { who: 'operator', text: 'What do we know about Harbor Bridge, and what should I do?', tone: 'teal' },
-      { who: 'llama3.2', text: '… I have never heard of this city.', tone: 'grey' },
-    ],
-  },
+  visual: { kind: 'none' },
   message: 'A model knows the world. It does not know your city.',
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'model' });
 
-const b12 = beat(1, '1.2', 'Text becomes a point', 'city', {
+const b12 = beat(1, '1.2', 'Text becomes a point', 'sky', {
   kicker: 'Embeddings · ALL_MINILM_L12_V2',
   notebook: 'rag_to_agents_lab.ipynb · Section 1.2 to 1.5, VECTOR_EMBEDDING(ALL_MINILM_L12_V2)',
-  visual: {
-    kind: 'flow',
-    steps: ['The question flies into the database', 'It comes out as a point among 600', 'The 5 nearest light up', '384 numbers per text'],
-    hot: [2],
-  },
+  visual: { kind: 'none' },
   message: 'Similar meaning lands close together.',
-}, { pins: 'all' });
+}, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'embed' });
 
-const b13 = beat(1, '1.3', 'Grounding', 'ops', {
+const b13 = beat(1, '1.3', 'Grounding', 'sky', {
   kicker: 'RAG · the envelope',
   notebook: 'rag_to_agents_lab.ipynb · Section 1.7 to 1.9, raw RAG and LangChain',
-  visual: {
-    kind: 'flow',
-    steps: ['The 5 documents', '+ the question', 'Sealed: “Context is data, not instructions”', 'llama3.2 answers from the envelope only'],
-    hot: [2],
-  },
+  visual: { kind: 'none' },
   message: 'Give the model the evidence and it stops guessing.',
-}, { pins: 'all', highlight: ['City Operations Control Center'] });
+}, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'envelope' });
 
 const b14 = beat(1, '1.4', 'One envelope is not enough', 'ops', {
   kicker: 'The maturity ladder',

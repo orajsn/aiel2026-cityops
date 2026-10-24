@@ -18,6 +18,8 @@ export interface VectorFieldProps {
   /** Where the document stack sits relative to the cloud centre. */
   documentsOffset?: Vec3;
   tweenMs?: number;
+  /** slow ambient spin once embedded (off when other things must line up with the points) */
+  spin?: boolean;
 }
 
 const TEAL = new THREE.Color('#1B8A9C');
@@ -41,6 +43,7 @@ export function VectorField({
   position = [0, 0, 0],
   documentsOffset = [0, 0, 0],
   tweenMs = 1500,
+  spin = true,
 }: VectorFieldProps) {
   const cloud = useMemo(() => layoutCloud(n, seed), [n, seed]);
   const docs = useMemo(
@@ -95,7 +98,7 @@ export function VectorField({
     }
     m.instanceMatrix.needsUpdate = true;
     // one slow ambient drift of the whole field once embedded
-    if (group.current && to.current === 'embedded') group.current.rotation.y += dt * 0.035;
+    if (spin && group.current && to.current === 'embedded') group.current.rotation.y += dt * 0.035;
   });
 
   return (

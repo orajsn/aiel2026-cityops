@@ -275,7 +275,7 @@ code,
 :root[data-theme='light'] .qb__shape { background: var(--panel); border-radius: 8px; padding: 6px 4px; }
 /* (the strip keeps its backing in both themes: it sits over the city) */
 :root[data-theme='light'] .tag { background: var(--panel); }
-:root[data-theme='light'] .title { left: 48px; bottom: 100px; padding: 36px 44px; }
+:root[data-theme='light'] .title { left: 48px; bottom: 150px; padding: 36px 44px; }
 
 /* database diorama labels */
 .dio-label { font-size: 19px; font-weight: 500; color: var(--ink-dim); white-space: nowrap; letter-spacing: 0.02em; transition: color 300ms; }
@@ -341,3 +341,9 @@ code,
 /* the strip sits over the city now (no sky behind it): give it a backing */
 .strip { padding: 10px 18px; border-radius: 10px; background: var(--panel); backdrop-filter: blur(6px); }
 .beat__headline { font-size: 30px; line-height: 1.3; font-weight: 600; color: var(--ink); margin-bottom: 18px; }
+
+/* sky stage labels */
+.sky-name { white-space: nowrap; padding: 4px 10px; border-radius: 6px; background: var(--panel-strong); color: var(--ink); font-size: 15px; }
+.sky-label { white-space: nowrap; padding: 6px 12px; border-radius: 8px; background: var(--panel-strong); border-left: 3px solid var(--tone); color: var(--ink); font-size: 16px; transition: opacity 0.5s ease; }
+/* compact beat panel: the 3D carries the idea, the panel only names it */
+.beat__panel--compact { width: 560px; padding: 20px 24px; }

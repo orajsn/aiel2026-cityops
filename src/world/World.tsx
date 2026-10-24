@@ -10,6 +10,7 @@ import { DataStream } from './DataStream';
 import { DatabaseDiorama, type Face } from './DatabaseDiorama';
 import { GraphLines, edgesFor } from './GraphLines';
 import { VectorField, type VectorFieldProps } from './VectorField';
+import { SkyStage, type SkyAct } from './SkyStage';
 
 export interface WorldProps {
   pins?: AssetType[] | 'all';
@@ -21,6 +22,8 @@ export interface WorldProps {
   bridge?: boolean;
   inspector?: boolean;
   markers?: boolean;
+  /** which AI idea the sky stage over the Ops Center is showing (none = hidden) */
+  sky?: SkyAct;
 }
 
 export function World() {
@@ -44,6 +47,7 @@ export function World() {
         />
       )}
       {w.vectors && <VectorField {...w.vectors} position={[0, -80, 40]} />}
+      <SkyStage act={w.sky ?? null} />
       <Effects />
     </>
   );

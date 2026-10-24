@@ -43,8 +43,10 @@ const PIER2 = fromBridgeLocal(BRIDGE.piers[1], 0);
 export const SHOTS: Record<ShotId, Shot> = {
   /** the opening: low over the river by the bridge, before rising over the city */
   arrive: northShot([HB.x, 0.3, HB.z], 10, 36, 0, 0, 0, 2),
-  /** the city around the Ops Center: the river, the old town, the pins; the flow lands near the middle */
-  city: northShot([OPS.x, 0.5, OPS.z], 34, 56, 0, 2600, -20, 3.4),
+  /** the city: ICONSIAM across the river, the Silom and Sathorn towers, the Ops Center; low enough that the towers show their sides */
+  city: northShot([-26, 0, -36], 30, 44, 0, 2600, -15),
+  /** the sky stage over the Ops Center, where the AI ideas are explained (SkyStage.tsx), the Ops Center below */
+  sky: northShot([OPS.x, 9, OPS.z], 14, 48, -0.18, 2200, -20), // stage a little left: the point cloud must clear the panel
   /** City Operations Control Center, where the operator and the copilot work */
   ops: northShot([OPS.x, 0.5, OPS.z], 22, 42, -0.1, 2200, -15, 2.2),
   /** Harbor Bridge whole, low in the frame, the city behind it */

@@ -43,9 +43,9 @@ test('on pages with the right-hand panel, the place the page is about sits left 
   expect(bad).toEqual([]);
 });
 
-test('the camera only moves when the story changes place: five places, at most 16 city moves in 38 pages', () => {
+test('the camera only moves when the story changes place: five places and the sky stage, at most 16 city moves in 38 pages', () => {
   const places = new Set(SCENES.filter((s) => isCity(s.shot)).map((s) => s.shot));
-  expect([...places].sort()).toEqual(['bridge', 'city', 'ops', 'pier2', 'pier3']);
+  expect([...places].sort()).toEqual(['bridge', 'city', 'ops', 'pier2', 'pier3', 'sky']);
   let moves = 0;
   SCENES.forEach((s, i) => {
     if (i > 0 && SCENES[i - 1].shot !== s.shot && isCity(s.shot) && isCity(SCENES[i - 1].shot)) moves++;
@@ -54,6 +54,6 @@ test('the camera only moves when the story changes place: five places, at most 1
 });
 
 test('every page at the Ops Center names it', () => {
-  const bad = SCENES.filter((s) => s.shot === 'ops' && !((s.world as { highlight?: string[] })?.highlight ?? []).includes('City Operations Control Center')).map((s) => s.id);
+  const bad = SCENES.filter((s) => (s.shot === 'ops' || s.shot === 'sky') && !((s.world as { highlight?: string[] })?.highlight ?? []).includes('City Operations Control Center')).map((s) => s.id);
   expect(bad).toEqual([]);
 });

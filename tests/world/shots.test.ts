@@ -25,7 +25,7 @@ test('inOut easing passes through the midpoint at t = 0.5', () => {
 
 test('the named shots exist', () => {
   for (const id of [
-    'arrive', 'city', 'ops', 'bridge', 'pier3', 'pier2', 'core-dive',
+    'arrive', 'city', 'sky', 'ops', 'bridge', 'pier3', 'pier2', 'core-dive',
     'core-face-tables', 'core-face-json', 'core-face-graph', 'core-face-vectors', 'vector-field',
   ])
     expect(SHOTS[id]).toBeDefined();
