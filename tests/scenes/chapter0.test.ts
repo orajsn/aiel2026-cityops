@@ -54,3 +54,11 @@ test('the model is never named on screen or in the script: it is the language mo
   expect(JSON.stringify(SCENES)).not.toMatch(/\bllama/i);
   expect(JSON.stringify(SCRIPT)).not.toMatch(/\bllama/i);
 });
+
+test('pages are numbered 1, 2, 3 inside each part (Introduction, Lab 2, Lab 3), not by chapter code', async () => {
+  const { pageNumber } = await import('../../src/scenes/index');
+  for (const c of [0, 1, 2]) {
+    const pages = SCENES.filter((s) => s.chapter === c);
+    expect(pages.map((s) => pageNumber(s.id))).toEqual(pages.map((_, i) => i + 1));
+  }
+});

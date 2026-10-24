@@ -341,9 +341,9 @@ function GraphShape({ lit, compact = false }: { lit: boolean; compact?: boolean 
 
 /** report text from the lab notebooks, grouped by what it is about; the bridge-bearing ones sit together */
 const DOCS: { text: string; topic: 'bridge' | 'power' | 'water' | 'other'; at: Vec3 }[] = [
-  { text: 'Pier 3 · crack 0.12 mm', topic: 'bridge', at: [0.5, 0.5, 0.2] },
-  { text: 'Pier 2 · ~25% section loss', topic: 'bridge', at: [0.85, 0.12, 0.35] },
-  { text: 'Pier 2 · rust bleed', topic: 'bridge', at: [0.35, -0.05, 0.45] },
+  { text: 'crack · 0.12 mm', topic: 'bridge', at: [0.5, 0.5, 0.2] },
+  { text: 'rust · ~25% section loss', topic: 'bridge', at: [0.85, 0.12, 0.35] },
+  { text: 'rust bleed', topic: 'bridge', at: [0.35, -0.05, 0.45] },
   { text: 'substation reports', topic: 'power', at: [-0.75, 0.6, -0.3] },
   { text: 'pipeline reports', topic: 'water', at: [-0.45, -0.7, 0.25] },
 ];

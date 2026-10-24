@@ -28,7 +28,7 @@ test('the copilot types before it answers, and messages come in one after anothe
 test('2.1: Day 1 is filled, the chat closes and empties, Day 2 finds the same three messages empty', () => {
   const page = (id: string) => (chapter2.find((s) => s.id === id)!.overlayProps as { items: ChatItem[] }).items;
   const states = (id: string) => page(id).filter((i) => 'from' in i && i.from === 'person').map((i) => ('state' in i ? i.state ?? 'shown' : 'shown'));
-  expect(states('2.1a')).toEqual(['shown', 'shown', 'shown']);
-  expect(states('2.1b')).toEqual(['emptying', 'emptying', 'emptying']);
-  expect(states('2.1c')).toEqual(['empty', 'empty', 'empty', 'shown']);
+  expect(states('3.1a')).toEqual(['shown', 'shown', 'shown']);
+  expect(states('3.1b')).toEqual(['emptying', 'emptying', 'emptying']);
+  expect(states('3.1c')).toEqual(['empty', 'empty', 'empty', 'shown']);
 });

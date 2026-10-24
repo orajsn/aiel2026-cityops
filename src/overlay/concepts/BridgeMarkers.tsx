@@ -15,12 +15,12 @@ export function BridgeMarkers() {
         <div><i style={{ background: '#FFFFFF' }} /> <span className="mono">City Operations Control Center</span> coordinates it</div>
       </motion.div>
       <motion.div className="markers__incident is-red" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 2.0, duration: 0.5, ease: EASE }}>
-        <div className="markers__pier mono">Pier 3</div>
+        <div className="markers__pier mono">The crack</div>
         <div>hairline crack · 0.12 mm · this afternoon</div>
         <div className="markers__lab">Lab 2 · an agent with tools</div>
       </motion.div>
       <motion.div className="markers__incident" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 3.2, duration: 0.5, ease: EASE }}>
-        <div className="markers__pier mono">Pier 2</div>
+        <div className="markers__pier mono">The rust</div>
         <div>surface corrosion · ~25% section loss · next session</div>
         <div className="markers__lab">Lab 3 · an agent with memory</div>
       </motion.div>

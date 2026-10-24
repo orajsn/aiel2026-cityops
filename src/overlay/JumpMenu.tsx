@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useSceneStore } from '../engine/store';
 import { useUiStore } from '../engine/ui';
 import { CHAPTER_NAME, SECTIONS } from '../scenes/sections';
+import { pageNumber } from '../scenes';
 
 /**
  * Page overview (Pages button or J): every page as a preview with its name under it, grouped by
@@ -46,7 +47,7 @@ export function JumpMenu() {
                         ref={here ? current : undefined}
                         type="button"
                         className={`jump__card${here ? ' current' : ''}`}
-                        aria-label={`${id} ${s.title}`}
+                        aria-label={`${CHAPTER_NAME[s.chapter]} ${pageNumber(id)} ${s.title}`}
                         onClick={() => {
                           jumpTo(id);
                           close();
@@ -55,11 +56,11 @@ export function JumpMenu() {
                         <span className="jump__thumb">
                           <img
                             src={`./thumbs/${id}.jpg`}
-                            alt={`Preview of page ${id}`}
+                            alt={`Preview of ${CHAPTER_NAME[s.chapter]} page ${pageNumber(id)}`}
                             loading="lazy"
                             onError={(e) => ((e.currentTarget as HTMLImageElement).style.visibility = 'hidden')}
                           />
-                          <span className="jump__id mono">{id}</span>
+                          <span className="jump__id mono">{pageNumber(id)}</span>
                         </span>
                         <span className="jump__name">{s.title}</span>
                       </button>

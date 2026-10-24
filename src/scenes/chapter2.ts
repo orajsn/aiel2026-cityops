@@ -17,7 +17,7 @@ const NB = 'notebook_student_ollama.ipynb';
  * Only Pier 2 lights up. The cast and the question are the Lab 3 deck's slide 5.
  */
 const b20: SceneDef = {
-  id: '2.0',
+  id: '3.0',
   chapter: 2,
   title: 'Back at the bridge',
   shot: 'bridge',
@@ -58,7 +58,7 @@ const chat = (id: string, title: string, shot: string, props: CopilotChatProps, 
   overlayProps: props as unknown as Record<string, unknown>,
 });
 
-const b21a = chat('2.1a', 'The agent that forgets · Day 1', 'pier2-inspect', {
+const b21a = chat('3.1a', 'The agent that forgets · Day 1', 'pier2-inspect', {
   kicker: 'Day 1 · Pier 2',
   message: 'Mercer tells the copilot what she found.',
   items: [
@@ -68,7 +68,7 @@ const b21a = chat('2.1a', 'The agent that forgets · Day 1', 'pier2-inspect', {
   ],
 }, { who: 'character-female-a' });
 
-const b21b = chat('2.1b', 'The agent that forgets · the chat closes', 'pier2-close', {
+const b21b = chat('3.1b', 'The agent that forgets · the chat closes', 'pier2-close', {
   kicker: 'The chat closes',
   message: 'Nothing carried over.',
   items: [
@@ -79,7 +79,7 @@ const b21b = chat('2.1b', 'The agent that forgets · the chat closes', 'pier2-cl
   ],
 }, { who: 'character-female-a', leave: true });
 
-const b21c = chat('2.1c', 'The agent that forgets · Day 2', 'pier2-close', {
+const b21c = chat('3.1c', 'The agent that forgets · Day 2', 'pier2-close', {
   kicker: 'Day 2 · the same pier',
   message: 'The records may still exist. The next visit needs a way to find and use the relevant history.',
   items: [
@@ -92,7 +92,7 @@ const b21c = chat('2.1c', 'The agent that forgets · Day 2', 'pier2-close', {
   notebook: `${NB} · motivation for Part 3 and the Day N cell`,
 }, { who: 'character-male-d' });
 
-const b22 = beat(2, '2.2', 'The memory map', 'ops', {
+const b22 = beat(2, '3.2', 'The memory map', 'ops', {
   kicker: 'Kinds of memory',
   visual: {
     kind: 'cards',
@@ -107,34 +107,34 @@ const b22 = beat(2, '2.2', 'The memory map', 'ops', {
   notebook: 'CITY_MEMORY holds fact, preference, guideline and memory records',
 }, { ops: true });
 
-const b23 = beat(2, '2.3', 'The glass', 'ops', {
+const b23 = beat(2, '3.3', 'The glass', 'ops', {
   kicker: 'The context window',
   visual: { kind: 'list', items: ['Overflow', 'Noise', 'The lost “size 9” detail', 'The right fact at the wrong turn'] },
   message: 'The context window is the model’s whole world, and it is a curation problem.',
   notebook: 'the Part 6 context card is the cure',
 }, { ops: true });
 
-const b24 = beat(2, '2.4', 'Three dials', 'ops', {
+const b24 = beat(2, '3.4', 'Three dials', 'ops', {
   kicker: 'What flows into the glass',
   visual: { kind: 'cards', cols: 3, items: [{ title: 'Memory engineering' }, { title: 'Context engineering' }, { title: 'Harness engineering' }] },
   message: 'Three disciplines, one job: the right tokens in, the wrong ones out.',
 }, { ops: true });
 
-const b25 = beat(2, '2.5', 'The loop with memory', 'ops', {
+const b25 = beat(2, '3.5', 'The loop with memory', 'ops', {
   kicker: 'Read, act, write',
   visual: { kind: 'flow', steps: ['Read memory at the start of the turn', 'The Lab 2 loop: model ↔ tools', 'Write memory at the end of the turn', 'The database under it'], loop: true, hot: [0, 2] },
   message: 'One store, one memory manager, any harness.',
   notebook: `${NB} · Part 1, TODO 1`,
 }, { ops: true });
 
-const b26 = beat(2, '2.6', 'One connection', 'ops', {
+const b26 = beat(2, '3.6', 'One connection', 'ops', {
   kicker: 'The copilot plugs into the database',
   visual: { kind: 'cards', cols: 2, items: [{ title: 'Copilot', sub: 'one connection' }, { title: 'ALL_MINILM_L12_V2', sub: 'still there from this afternoon' }] },
   message: 'Same 384 numbers as this afternoon, computed inside the database, no API key.',
   notebook: `${NB} · TODO 2 (report_event), peek_sdk_tables`,
 }, { ops: true });
 
-const b27 = beat(2, '2.7', 'The write path', 'ops', {
+const b27 = beat(2, '3.7', 'The write path', 'ops', {
   kicker: 'CITY_MESSAGE → CITY_MEMORY',
   visual: {
     kind: 'cards',
@@ -151,7 +151,7 @@ const b27 = beat(2, '2.7', 'The write path', 'ops', {
   notebook: `${NB} · Part 3, the extractor`,
 }, { ops: true });
 
-const b28 = beat(2, '2.8', 'Scope is the key', 'ops', {
+const b28 = beat(2, '3.8', 'Scope is the key', 'ops', {
   kicker: 'Search by scope',
   visual: {
     kind: 'compare',
@@ -162,7 +162,7 @@ const b28 = beat(2, '2.8', 'Scope is the key', 'ops', {
   notebook: `${NB} · TODO 3`,
 }, { ops: true });
 
-const b29 = beat(2, '2.9', 'The system of record', 'ops', {
+const b29 = beat(2, '3.9', 'The system of record', 'ops', {
   kicker: 'CITY_INSPECTION_FINDING',
   visual: {
     kind: 'cards',
@@ -173,7 +173,7 @@ const b29 = beat(2, '2.9', 'The system of record', 'ops', {
   notebook: `${NB} · Part 4, TODO 4`,
 }, { ops: true });
 
-const b210 = beat(2, '2.10', 'Vector search with walls', 'city', {
+const b210 = beat(2, '3.10', 'Vector search with walls', 'city', {
   kicker: 'Similarity + filters',
   visual: {
     kind: 'cards',
@@ -189,7 +189,7 @@ const b210 = beat(2, '2.10', 'Vector search with walls', 'city', {
   notebook: `${NB} · TODO 5`,
 }, { pins: 'all', highlight: [HB] });
 
-const b211 = beat(2, '2.11', 'Private doors, shared hall', 'ops', {
+const b211 = beat(2, '3.11', 'Private doors, shared hall', 'ops', {
   kicker: 'Three keys',
   visual: {
     kind: 'cards',
@@ -206,7 +206,7 @@ const b211 = beat(2, '2.11', 'Private doors, shared hall', 'ops', {
   notebook: `${NB} · Part 5`,
 }, { ops: true });
 
-const b212 = beat(2, '2.12', 'The copilot turn', 'ops', {
+const b212 = beat(2, '3.12', 'The copilot turn', 'ops', {
   kicker: 'The context card',
   visual: {
     kind: 'code',
@@ -216,7 +216,7 @@ const b212 = beat(2, '2.12', 'The copilot turn', 'ops', {
   notebook: `${NB} · Part 6, TODO 6`,
 }, { ops: true });
 
-const b213 = beat(2, '2.13', 'Day 1: Mercer at Pier 2', 'pier2-inspect', {
+const b213 = beat(2, '3.13', 'Day 1: Mercer at Pier 2', 'pier2-inspect', {
   kicker: 'Day 1',
   visual: {
     kind: 'chat',
@@ -230,7 +230,7 @@ const b213 = beat(2, '2.13', 'Day 1: Mercer at Pier 2', 'pier2-inspect', {
   notebook: `${NB} · Day 1, three cells`,
 }, { bridge: true, inspect: { pier: 'pier2', who: 'character-female-a' } });
 
-const b214 = beat(2, '2.14', 'Day 2: Vance at the same pier', 'pier2-inspect', {
+const b214 = beat(2, '3.14', 'Day 2: Vance at the same pier', 'pier2-inspect', {
   kicker: 'Day 2 · never met Mercer',
   visual: {
     kind: 'chat',
@@ -245,7 +245,7 @@ const b214 = beat(2, '2.14', 'Day 2: Vance at the same pier', 'pier2-inspect', {
   notebook: `${NB} · Day N`,
 }, { bridge: true, inspect: { pier: 'pier2', who: 'character-male-d' } });
 
-const b215 = beat(2, '2.15', 'With and without memory', 'pier2', {
+const b215 = beat(2, '3.15', 'With and without memory', 'pier2', {
   kicker: 'Same question twice',
   visual: {
     kind: 'compare',
@@ -256,7 +256,7 @@ const b215 = beat(2, '2.15', 'With and without memory', 'pier2', {
   notebook: 'the four-row comparison from the deck',
 }, { bridge: true, markers: true });
 
-const b216 = beat(2, '2.16', 'Where both labs meet', 'pier2', {
+const b216 = beat(2, '3.16', 'Where both labs meet', 'pier2', {
   kicker: 'Pier 2',
   visual: {
     kind: 'compare',
@@ -266,7 +266,7 @@ const b216 = beat(2, '2.16', 'Where both labs meet', 'pier2', {
   message: 'This afternoon the agent had the rule. Now it has the history. Together they make the call.',
 }, { bridge: true, markers: true });
 
-const b217 = beat(2, '2.17', 'Takeaways', 'bridge', {
+const b217 = beat(2, '3.17', 'Takeaways', 'bridge', {
   kicker: 'Three takeaways',
   visual: { kind: 'list', ordered: true, items: ['Memory is the foundation.', 'Scope is governance.', 'One converged database.', 'Quiz: 5 min, 80% to pass, badge (QR code here)'] },
   message: 'The rule from this afternoon, the history from today. The same database held both.',

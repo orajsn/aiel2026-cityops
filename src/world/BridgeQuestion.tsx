@@ -90,7 +90,7 @@ export function BridgeQuestion() {
     <group name="bridge-question">
       <Html position={ask} center zIndexRange={[25, 0]} style={{ pointerEvents: 'none' }}>
         <div className="q3d" style={{ opacity: askIn, transform: `translateY(${(1 - askIn) * 10}px)` }}>
-          <div className="q3d__who">inspector · Harbor Bridge · Pier 3</div>
+          <div className="q3d__who">inspector · Harbor Bridge · the crack</div>
           <div className="q3d__text">“What do we <b>know</b> about this bridge, and what should I <b>do</b>?”</div>
         </div>
       </Html>

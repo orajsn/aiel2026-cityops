@@ -256,8 +256,8 @@ function drawMap(ctx: CanvasRenderingContext2D, time: number) {
 function drawIncidents(ctx: CanvasRenderingContext2D, time: number) {
   frame(ctx, 'INCIDENTS');
   const rows: [string, string, string][] = [
-    [RED, 'Harbor Bridge · Pier 3', 'hairline crack · 0.12 mm · this afternoon'],
-    [TEAL, 'Harbor Bridge · Pier 2', 'surface corrosion · ~25% section loss · next session'],
+    [RED, 'Harbor Bridge · the crack', 'hairline crack · 0.12 mm · Lab 2'],
+    [TEAL, 'Harbor Bridge · the rust', 'surface corrosion · ~25% section loss · Lab 3'],
   ];
   rows.forEach(([c, a, b], i) => {
     const y = 150 + i * 170;

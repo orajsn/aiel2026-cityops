@@ -216,7 +216,7 @@ function Note({ c, t, red, center }: { c: Vec3; t: number; red: string; center: 
         <Stack red={red} t={9999} />
       </group>
       <group position={p} rotation={[0, 0, (1 - k) * 0.3]}>
-        <TextCard title="store_incident" lines={['Harbor Bridge · Pier 3', 'one row · embedded on write']} sticky tone={AMBER} width={1.8} position={[0, 0, 0]} />
+        <TextCard title="store_incident" lines={['Harbor Bridge · the crack', 'one row · embedded on write']} sticky tone={AMBER} width={1.8} position={[0, 0, 0]} />
       </group>
       {/* the note's only link: a thin line to Harbor Bridge */}
       {t > 2300 && <FlowArc from={add(db, [0, 0.3, 0])} to={local([hbp.x, 1.1, hbp.z], center)} lift={1} radius={0.02} durationMs={1500} persist color={TEAL} />}

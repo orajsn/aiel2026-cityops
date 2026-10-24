@@ -5,8 +5,8 @@ import { SHOTS } from '../../src/world/shots';
 import { OVERLAYS } from '../../src/overlay/registry';
 
 // one story beat per Storyboard row (doc tab "Storyboard"), in order
-const CH1_BEATS = ['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9'];
-const CH2_BEATS = ['2.0', '2.1a', '2.1b', '2.1c', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7', '2.8', '2.9', '2.10', '2.11', '2.12', '2.13', '2.14', '2.15', '2.16', '2.17'];
+const CH1_BEATS = ['2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7', '2.8', '2.9'];
+const CH2_BEATS = ['3.0', '3.1a', '3.1b', '3.1c', '3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14', '3.15', '3.16', '3.17'];
 
 const beats = (ch: typeof chapter1) => ch.map((s) => s.id);
 

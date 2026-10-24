@@ -186,12 +186,12 @@ export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: '
       {inspect && <Inspection key={`${inspect.pier}-${inspect.who}${inspect.leave ? '-leave' : ''}`} pier={inspect.pier} who={inspect.who} leave={!!inspect.leave} />}
       {markers === true && (
         <>
-          <Marker x={pier3} y={DECK_Y} label="Pier 3" sub="crack · this afternoon" color={theme.red} delayMs={1800} labelY={10} />
-          <Marker x={pier2} y={DECK_Y} label="Pier 2" sub="corrosion · next session" color={theme.data} delayMs={3000} labelY={3.2} />
+          <Marker x={pier3} y={DECK_Y} label="The crack" sub="Lab 2 · this afternoon" color={theme.red} delayMs={1800} labelY={10} />
+          <Marker x={pier2} y={DECK_Y} label="The rust" sub="Lab 3 · next session" color={theme.data} delayMs={3000} labelY={3.2} />
         </>
       )}
       {/* 2.0: only the problem Lab 3 comes back for */}
-      {markers === 'pier2' && <Marker x={pier2} y={DECK_Y} label="Pier 2" sub="corrosion · still open" color={theme.data} delayMs={900} labelY={3.2} />}
+      {markers === 'pier2' && <Marker x={pier2} y={DECK_Y} label="The rust" sub="Lab 3 · still open" color={theme.data} delayMs={900} labelY={3.2} />}
     </group>
   );
 }
@@ -337,7 +337,7 @@ function Inspection({ pier, who, leave = false }: { pier: 'pier3' | 'pier2'; who
       <Html position={[d.x / S + DAMAGE_SHIFT - 0.45, d.y / S + 0.2, d.z / S]} zIndexRange={[30, 0]} style={{ pointerEvents: 'none', transform: 'translate(-100%, -50%)' }}>
         <div ref={label} className="marker-label" style={{ borderColor: red ? '#e2604c' : '#2bb3c8', opacity: 0 }}>
           <div className="marker-label__pier mono" style={{ color: red ? '#e2604c' : '#2bb3c8' }}>
-            {red ? 'Pier 3 · crack' : 'Pier 2 · corrosion'}
+            {red ? 'The crack' : 'The rust'}
           </div>
           <div className="marker-label__sub">{red ? 'hairline crack · 0.12 mm' : 'surface corrosion · ~25% section loss'}</div>
         </div>

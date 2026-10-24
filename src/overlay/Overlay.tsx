@@ -8,8 +8,10 @@ import { JumpMenu } from './JumpMenu';
 import { CameraEditor } from './CameraEditor';
 import { useCameraStore } from '../engine/camera';
 import { Rich } from './Rich';
+import { pageNumber } from '../scenes';
 
-const CHAPTER_LABEL = ['The city', 'RAG to Agents', 'Agent Memory'];
+// named for the event's agenda (owner): the intro, then Lab 2 and Lab 3; pages are numbered the same way (0.x, 2.x, 3.x)
+const CHAPTER_LABEL = ['Introduction', 'Lab 2 · RAG to Agents', 'Lab 3 · Agent Memory'];
 
 /** The map is ~70 MB: say so while it downloads instead of showing an empty sky. */
 function MapLoading() {
@@ -35,7 +37,7 @@ export function Overlay() {
       <div className="strip">
         <span className="strip__chapter">{CHAPTER_LABEL[scene.chapter]}</span>
         <span className="strip__sep" />
-        <span className="strip__id mono">{scene.id}</span>
+        <span className="strip__id mono">{pageNumber(scene.id)}</span>
         <span className="strip__sep" />
         <span className="strip__title">{scene.title}</span>
       </div>
