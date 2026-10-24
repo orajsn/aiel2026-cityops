@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import type { CSSProperties } from 'react';
+import { Rich } from '../Rich';
 
 const EASE = [0.2, 0.8, 0.2, 1] as const;
 
@@ -14,7 +15,7 @@ export interface ForgetSlot {
 
 export interface ForgetSlotsProps {
   kicker: string;
-  /** the one line the presenter lands */
+  /** the one line the presenter lands; **teal** and !!red!! marks as in Rich.tsx */
   message: string;
   /**
    * filled: Day 1, the notes appear one by one (2.1a)
@@ -56,7 +57,7 @@ export function ForgetSlots({ kicker, message, state, slots, chat = [], footnote
     <div className="beat">
       <motion.div className="beat__panel" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, ease: EASE }}>
         <div className="beat__kicker">{kicker}</div>
-        <div className="beat__headline">“{message}”</div>
+        <div className="beat__headline">“<Rich text={message} />”</div>
 
         {chat.length > 0 && (
           <div className="beat-chat" style={{ marginBottom: 16 }}>
@@ -70,7 +71,9 @@ export function ForgetSlots({ kicker, message, state, slots, chat = [], footnote
                 style={{ padding: '10px 16px' }}
               >
                 <div className="beat-chat__who mono">{l.who}</div>
-                <div className="beat-chat__text" style={{ fontSize: 22 }}>{l.text}</div>
+                <div className="beat-chat__text" style={{ fontSize: 22 }}>
+                  <Rich text={l.text} />
+                </div>
               </motion.div>
             ))}
           </div>
