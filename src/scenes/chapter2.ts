@@ -1,5 +1,5 @@
 import type { SceneDef } from '../engine/types';
-import type { ForgetSlotsProps } from '../overlay/concepts/ForgetSlots';
+import type { CopilotChatProps } from '../overlay/concepts/CopilotChat';
 import type { Who } from '../world/Person';
 import { beat } from './chapter1';
 
@@ -18,48 +18,58 @@ const b20 = beat(2, '2.0', 'Recap: the city', 'bridge', {
 }, { pins: 'all', graph: HB, bridge: true, markers: true });
 
 /**
- * 2.1 · The agent that forgets, in three clicks at the Pier 2 corrosion (owner, 24 Oct): Day 1 Mercer leaves
- * three notes with the copilot, the chat closes and the notes empty out, Day 2 Vance finds three empty slots.
- * Words from the Lab 3 deck, slides 5, 6 and 9. The camera closes in on 2.1a and holds there.
+ * 2.1 · The agent that forgets, in three clicks at the Pier 2 corrosion (owner, 24 Oct): Day 1 Mercer tells
+ * the copilot (the AI agent) what she found, the chat closes and her messages empty out, Day 2 Vance asks
+ * at the same pier and the copilot has nothing. Shown as a chat window: the inspector on the right, the
+ * copilot on the left (owner). Words from the Lab 3 deck, slides 5, 6 and 9. The camera closes in on 2.1a
+ * and holds there.
  */
-const FORGET_SLOTS: ForgetSlotsProps['slots'] = [
-  { title: 'What she found', text: 'rust, ~25% loss', missing: 'Same questions. Again.' },
-  { title: 'Her advice', text: 'repair in 60 days', missing: 'Earlier advice is missing' },
-  { title: 'Follow-up', text: 'work to plan', missing: 'And the follow-up?' },
+const MERCER_SAYS: { text: string; missing: string }[] = [
+  { text: 'Rust at Pier 2, about 25% section loss.', missing: 'Same questions. Again.' },
+  { text: 'My advice: repair within 60 days.', missing: 'Earlier advice is missing' },
+  { text: 'Follow-up: work to plan.', missing: 'And the follow-up?' },
 ];
 
-const forget = (id: string, title: string, shot: string, props: Omit<ForgetSlotsProps, 'slots'>, inspect: { who: Who; leave?: boolean }): SceneDef => ({
+const chat = (id: string, title: string, shot: string, props: CopilotChatProps, inspect: { who: Who; leave?: boolean }): SceneDef => ({
   id,
   chapter: 2,
   title,
   shot,
   world: { bridge: true, inspect: { pier: 'pier2', ...inspect } },
-  overlay: 'ForgetSlots',
-  overlayProps: { ...props, slots: FORGET_SLOTS } as unknown as Record<string, unknown>,
+  overlay: 'CopilotChat',
+  overlayProps: props as unknown as Record<string, unknown>,
 });
 
-const b21a = forget('2.1a', 'The agent that forgets · Day 1', 'pier2-inspect', {
+const b21a = chat('2.1a', 'The agent that forgets · Day 1', 'pier2-inspect', {
   kicker: 'Day 1 · Pier 2',
   message: 'Mercer tells the copilot what she found.',
-  state: 'filled',
-  chat: [{ who: 'Evelyn_H_Mercer', text: 'Rust at Pier 2. My finding, my advice, the follow-up.', tone: 'teal' }],
-  footnote: 'copilot · “Noted.”',
+  items: [
+    { divider: 'Day 1 · Evelyn_H_Mercer' },
+    ...MERCER_SAYS.map((m) => ({ from: 'person' as const, text: m.text })),
+    { from: 'copilot', text: 'Noted.' },
+  ],
 }, { who: 'character-female-a' });
 
-const b21b = forget('2.1b', 'The agent that forgets · the chat closes', 'pier2-close', {
+const b21b = chat('2.1b', 'The agent that forgets · the chat closes', 'pier2-close', {
   kicker: 'The chat closes',
   message: 'Nothing carried over.',
-  state: 'emptying',
-  footnote: 'Mercer leaves. The session ends.',
+  items: [
+    { divider: 'Day 1 · Evelyn_H_Mercer' },
+    ...MERCER_SAYS.map((m) => ({ from: 'person' as const, text: m.text, state: 'emptying' as const })),
+    { from: 'copilot', text: 'Noted.', state: 'emptying' },
+    { divider: 'Mercer leaves · the session ends' },
+  ],
 }, { who: 'character-female-a', leave: true });
 
-const b21c = forget('2.1c', 'The agent that forgets · Day 2', 'pier2-close', {
+const b21c = chat('2.1c', 'The agent that forgets · Day 2', 'pier2-close', {
   kicker: 'Day 2 · the same pier',
   message: 'The records may still exist. The next visit needs a way to find and use the relevant history.',
-  state: 'missing',
-  chat: [
-    { who: 'Jordan_Vance', text: 'What happened at this pier?', tone: 'teal' },
-    { who: 'copilot', text: 'I have no earlier information. What do you see?', tone: 'grey' },
+  items: [
+    { divider: 'Day 1 · not kept' },
+    ...MERCER_SAYS.map((m) => ({ from: 'person' as const, text: m.text, state: 'empty' as const, label: m.missing })),
+    { divider: 'Day 2 · Jordan_Vance' },
+    { from: 'person', text: 'What happened at this pier?' },
+    { from: 'copilot', text: 'I have no earlier information. What do you see?' },
   ],
   notebook: `${NB} · motivation for Part 3 and the Day N cell`,
 }, { who: 'character-male-d' });
