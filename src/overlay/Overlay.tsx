@@ -79,6 +79,14 @@ export function Overlay() {
         </button>
         <button
           type="button"
+          className={`stepper__btn stepper__btn--text${jumpOpen ? ' is-on' : ''}`}
+          aria-label="All pages"
+          onClick={() => useUiStore.getState().toggleJump()}
+        >
+          ▦
+        </button>
+        <button
+          type="button"
           className={`stepper__btn stepper__btn--text${cameraEditing ? ' is-on' : ''}`}
           aria-label={cameraEditing ? 'Leave Camera mode' : 'Camera mode'}
           onClick={() => useCameraStore.getState().setEditing(!cameraEditing)}

@@ -1,0 +1,23 @@
+/** Story sections for the page overview: each chapter split into the parts of its story, pages in order. */
+export interface Section {
+  chapter: 0 | 1 | 2;
+  name: string;
+  pages: string[];
+}
+
+export const CHAPTER_NAME = ['Chapter 0 · The city', 'Chapter 1 · RAG to Agents', 'Chapter 2 · Agent Memory'];
+
+export const SECTIONS: Section[] = [
+  { chapter: 0, name: 'The city and its data', pages: ['0.1', '0.2', '0.3'] },
+  { chapter: 0, name: 'The question on the bridge', pages: ['0.4'] },
+  { chapter: 0, name: 'One database, four shapes', pages: ['0.5', '0.5a', '0.5b', '0.5c', '0.5d', '0.6'] },
+  { chapter: 0, name: 'The hero asset', pages: ['0.7'] },
+  { chapter: 1, name: 'Why a bare model is not enough', pages: ['1.1', '1.2', '1.3'] },
+  { chapter: 1, name: 'From RAG to an agent', pages: ['1.4', '1.5', '1.6', '1.7', '1.8'] },
+  { chapter: 1, name: 'Closing Lab 2', pages: ['1.9'] },
+  { chapter: 2, name: 'The agent that forgets', pages: ['2.0', '2.1'] },
+  { chapter: 2, name: 'How memory works', pages: ['2.2', '2.3', '2.4', '2.5', '2.6'] },
+  { chapter: 2, name: 'Writing and finding memories', pages: ['2.7', '2.8', '2.9', '2.10', '2.11', '2.12'] },
+  { chapter: 2, name: 'Back on the bridge', pages: ['2.13', '2.14', '2.15', '2.16'] },
+  { chapter: 2, name: 'Takeaways', pages: ['2.17'] },
+];
