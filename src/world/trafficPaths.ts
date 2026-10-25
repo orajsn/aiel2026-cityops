@@ -15,6 +15,8 @@ export interface Vehicle {
   dir: 1 | -1;
   /** 0..1, picks a colour */
   tint: number;
+  /** the route's size setting (cars) */
+  size?: number;
 }
 
 export function makePath(points: RoutePoint[]): Path {
@@ -91,4 +93,9 @@ export function placeVehicles(paths: Path[], count: number, speedMin: number, sp
     }
   });
   return out;
+}
+
+/** every route with its own count, speed range and size: `settings[i]` belongs to `paths[i]` */
+export function placeOnRoutes(paths: Path[], settings: { count: number; speedMin: number; speedMax: number; size: number }[], seed: number): Vehicle[] {
+  return paths.flatMap((p, i) => placeVehicles([p], settings[i]?.count ?? 0, settings[i]?.speedMin ?? 1, settings[i]?.speedMax ?? 1, seed + i * 7919).map((v) => ({ ...v, route: i, size: settings[i]?.size ?? 1 })));
 }

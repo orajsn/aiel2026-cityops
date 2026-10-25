@@ -10,7 +10,7 @@ test('a saved traffic file is cleaned: counts and speeds clamped, bad points and
   expect(t.boats.speedMin).toBeLessThanOrEqual(t.boats.speedMax);
   expect(t.boats.speedMax).toBeLessThanOrEqual(LIMITS.speed[1]);
   expect(t.boats.size).toBe(LIMITS.size[0]);
-  expect(t.boats.routes).toEqual([{ points: [[1, 2], [5, 6]] }]);
+  expect(t.boats.routes.map((r) => r.points)).toEqual([[[1, 2], [5, 6]]]);
   expect(t.cars.count).toBe(0);
   expect(t.cars.routes).toEqual([]);
 });
@@ -72,4 +72,26 @@ test('vehicles are spread over the routes by length, each with its own speed ins
   }
   expect(new Set(a.map((v) => v.dir)).size).toBe(2);
   expect(placeVehicles([], 10, 3, 6, 7)).toEqual([]);
+});
+
+test('a file saved before routes had their own settings: the old total is shared by route length, with the old speeds and size', async () => {
+  const { normalizeTraffic } = await import('../../src/content/traffic');
+  const t = normalizeTraffic({ cars: { count: 40, speedMin: 5, speedMax: 8, size: 3, routes: [{ points: [[0, 0], [30, 0]] }, { points: [[0, 0], [10, 0]] }] } });
+  expect(t.cars.routes.map((r) => r.count)).toEqual([30, 10]);
+  for (const r of t.cars.routes) expect([r.speedMin, r.speedMax, r.size]).toEqual([5, 8, 3]);
+  // a route with its own settings keeps them
+  const u = normalizeTraffic({ cars: { count: 40, routes: [{ points: [[0, 0], [5, 0]], count: 7, speedMin: 2, speedMax: 9, size: 6 }] } });
+  expect(u.cars.routes[0]).toMatchObject({ count: 7, speedMin: 2, speedMax: 9, size: 6 });
+  // boats keep true scale whatever is asked
+  expect(normalizeTraffic({ boats: { routes: [{ points: [[0, 0], [5, 0]], size: 8 }] } }).boats.routes[0].size).toBe(1);
+});
+
+test('every route gets exactly its own number of vehicles, speeds inside its own range, and its own size', async () => {
+  const { placeOnRoutes } = await import('../../src/world/trafficPaths');
+  const paths = [makePath([[0, 0], [30, 0]]), makePath([[0, 0], [10, 0]])];
+  const v = placeOnRoutes(paths, [{ count: 3, speedMin: 1, speedMax: 2, size: 2 }, { count: 9, speedMin: 8, speedMax: 9, size: 6 }], 5);
+  expect(v.filter((x) => x.route === 0)).toHaveLength(3);
+  expect(v.filter((x) => x.route === 1)).toHaveLength(9);
+  for (const x of v.filter((y) => y.route === 0)) expect([x.size, x.speed <= speedUnits(2) + 1e-9]).toEqual([2, true]);
+  for (const x of v.filter((y) => y.route === 1)) expect([x.size, x.speed >= speedUnits(8) - 1e-9]).toEqual([6, true]);
 });

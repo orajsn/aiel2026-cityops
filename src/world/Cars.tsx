@@ -3,9 +3,9 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { drivableRoutes, useTrafficStore } from '../engine/traffic';
 import { roadHeight } from './roadHeight';
-import { makePath, placeVehicles, travel } from './trafficPaths';
+import { makePath, placeOnRoutes, travel } from './trafficPaths';
 
-/** a car in metres (body 1.8 x 4.4, cabin on top); 1 map unit is about 108 m */
+/** a car in metres (body 1.8 x 4.4, cabin on top); 1 map unit is about 108 m; each route sets its cars' size */
 const M = 1 / 108;
 /** Traffic mode's size 1..8: 1 = true scale (invisible from city height), each step adds four times that */
 export const carScale = (size: number) => M * (1 + (size - 1) * 4);
@@ -20,7 +20,8 @@ export function Cars() {
   const fleet = useTrafficStore((s) => s.config.cars);
   const routes = useMemo(() => drivableRoutes(fleet), [fleet]);
   const paths = useMemo(() => routes.map((r) => makePath(r.points)), [routes]);
-  const cars = useMemo(() => placeVehicles(paths, fleet.count, fleet.speedMin, fleet.speedMax, 41), [paths, fleet.count, fleet.speedMin, fleet.speedMax]);
+  // each route has its own count, speed range and size
+  const cars = useMemo(() => placeOnRoutes(paths, routes, 41), [paths, routes]);
   const body = useRef<THREE.InstancedMesh>(null);
   const cabin = useRef<THREE.InstancedMesh>(null);
   const geo = useMemo(() => ({ body: new THREE.BoxGeometry(1.8, 0.7, 4.4), cabin: new THREE.BoxGeometry(1.6, 0.6, 2.2) }), []);
@@ -38,9 +39,9 @@ export function Cars() {
 
   useFrame(({ clock }) => {
     if (!body.current || !cabin.current || !cars.length) return;
-    const k = carScale(fleet.size);
-    tmp.s.set(k, k, k);
     cars.forEach((v, i) => {
+      const k = carScale(v.size ?? 1);
+      tmp.s.set(k, k, k);
       const at = travel(paths[v.route], v, clock.elapsedTime);
       // on Harbor Bridge the deck, anywhere else the ground
       const y = roadHeight(at.x, at.z);

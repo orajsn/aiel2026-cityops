@@ -6,7 +6,7 @@ import { BRIDGE, fromBridgeLocal, harborBridgeFrame, toBridgeLocal } from './bri
 import { terrainHeight } from './terrain';
 import { speedUnits } from '../content/traffic';
 import { drivableRoutes, useTrafficStore } from '../engine/traffic';
-import { makePath, placeVehicles, travel, type Path, type Vehicle } from './trafficPaths';
+import { makePath, placeOnRoutes, travel, type Path, type Vehicle } from './trafficPaths';
 
 export interface BoatSpec {
   t: number;
@@ -102,7 +102,8 @@ export function Boats() {
   const routes = useMemo(() => drivableRoutes(fleet), [fleet]);
   const river = useMemo(() => riverBoats(fleet.count, fleet.speedMin, fleet.speedMax), [fleet.count, fleet.speedMin, fleet.speedMax]);
   const paths = useMemo(() => routes.map((r) => makePath(r.points)), [routes]);
-  const onRoutes = useMemo(() => placeVehicles(paths, fleet.count, fleet.speedMin, fleet.speedMax, 23), [paths, fleet.count, fleet.speedMin, fleet.speedMax]);
+  // each drawn route has its own count and speed range; the river boats use the fleet's own
+  const onRoutes = useMemo(() => placeOnRoutes(paths, routes, 23), [paths, routes]);
   return (
     <group name="boats">
       {routes.length

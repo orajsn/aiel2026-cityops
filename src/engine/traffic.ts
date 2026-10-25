@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import trafficJson from '../content/traffic.json';
-import { LIMITS, normalizeTraffic, type Fleet, type RoutePoint, type TrafficConfig, type TrafficKind } from '../content/traffic';
+import { LIMITS, normalizeTraffic, type Fleet, type RoutePoint, type RouteSettings, type TrafficConfig, type TrafficKind, type TrafficRoute } from '../content/traffic';
 import { at } from './base';
 
 /**
@@ -23,11 +23,12 @@ interface TrafficState {
   setEditing(v: boolean): void;
   setKind(k: TrafficKind): void;
   select(i: number): void;
-  setFleet(kind: TrafficKind, patch: Partial<Omit<Fleet, 'routes'>>): void;
+  /** the picked route's count, speeds and size; with no route picked, the starting values for the next route (and the river boats) */
+  setFleet(kind: TrafficKind, patch: Partial<RouteSettings>): void;
   addPoint(p: RoutePoint): void;
   undoPoint(): void;
   newRoute(): void;
-  addRoutes(kind: TrafficKind, routes: { points: RoutePoint[] }[]): void;
+  addRoutes(kind: TrafficKind, routes: TrafficRoute[]): void;
   selectPoint(p: { route: number; index: number } | null): void;
   movePoint(p: RoutePoint): void;
   deletePoint(): void;
@@ -47,19 +48,24 @@ export const useTrafficStore = create<TrafficState>((set, get) => ({
   setKind: (kind) => set({ kind, route: get().config[kind].routes.length - 1, point: null }),
   select: (route) => set({ route }),
   setFleet: (kind, patch) => {
-    const config = normalizeTraffic({ ...get().config, [kind]: { ...get().config[kind], ...patch } });
-    // keep min <= max while one slider passes the other
-    if (patch.speedMin !== undefined && patch.speedMin > get().config[kind].speedMax) config[kind].speedMax = config[kind].speedMin = patch.speedMin;
-    if (patch.speedMax !== undefined && patch.speedMax < get().config[kind].speedMin) config[kind].speedMin = config[kind].speedMax = patch.speedMax;
-    set({ config, dirty: true });
+    const { config, route } = get();
+    const fleet = config[kind];
+    const target = route >= 0 && route < fleet.routes.length ? fleet.routes[route] : fleet;
+    const next = { ...target, ...patch };
+    // keep slowest <= fastest while one slider passes the other
+    if (patch.speedMin !== undefined && patch.speedMin > target.speedMax) next.speedMax = patch.speedMin;
+    if (patch.speedMax !== undefined && patch.speedMax < target.speedMin) next.speedMin = patch.speedMax;
+    const raw = target === fleet ? { ...fleet, ...next } : { ...fleet, routes: fleet.routes.map((r, i) => (i === route ? { ...r, ...next } : r)) };
+    set({ config: normalizeTraffic({ ...config, [kind]: raw }), dirty: true });
   },
   addPoint: (p) => {
     const { config, kind } = get();
     let route = get().route;
-    const routes = config[kind].routes.map((r) => ({ points: [...r.points] }));
+    const routes = config[kind].routes.map((r) => ({ ...r, points: [...r.points] }));
     if (route < 0 || route >= routes.length) {
       if (routes.length >= LIMITS.routes) return;
-      routes.push({ points: [] });
+      const { count, speedMin, speedMax, size } = config[kind];
+      routes.push({ points: [], count, speedMin, speedMax, size });
       route = routes.length - 1;
     }
     if (routes[route].points.length >= LIMITS.points) return;
@@ -69,7 +75,7 @@ export const useTrafficStore = create<TrafficState>((set, get) => ({
   undoPoint: () => {
     const { config, kind, route } = get();
     if (route < 0) return;
-    const routes = config[kind].routes.map((r) => ({ points: [...r.points] }));
+    const routes = config[kind].routes.map((r) => ({ ...r, points: [...r.points] }));
     routes[route]?.points.pop();
     if (routes[route] && routes[route].points.length === 0) {
       routes.splice(route, 1);
@@ -83,7 +89,7 @@ export const useTrafficStore = create<TrafficState>((set, get) => ({
   movePoint: (p) => {
     const { config, kind, point } = get();
     if (!point) return;
-    const routes = config[kind].routes.map((r) => ({ points: [...r.points] }));
+    const routes = config[kind].routes.map((r) => ({ ...r, points: [...r.points] }));
     if (!routes[point.route]?.points[point.index]) return;
     routes[point.route].points[point.index] = [Math.round(p[0] * 1000) / 1000, Math.round(p[1] * 1000) / 1000];
     set({ config: { ...config, [kind]: { ...config[kind], routes } }, dirty: true });
@@ -91,7 +97,7 @@ export const useTrafficStore = create<TrafficState>((set, get) => ({
   deletePoint: () => {
     const { config, kind, point } = get();
     if (!point) return;
-    const routes = config[kind].routes.map((r) => ({ points: [...r.points] }));
+    const routes = config[kind].routes.map((r) => ({ ...r, points: [...r.points] }));
     routes[point.route]?.points.splice(point.index, 1);
     let route = point.route;
     if (routes[point.route] && routes[point.route].points.length === 0) {

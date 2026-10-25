@@ -23,7 +23,7 @@ test('drawing: the first tap starts a route, taps add points, New route starts a
     s.addPoint([-38, -21]);
     s.addPoint([-36, -22]);
   });
-  expect(useTrafficStore.getState().config.cars.routes).toEqual([{ points: [[-40, -20], [-38, -21], [-36, -22]] }]);
+  expect(useTrafficStore.getState().config.cars.routes.map((r) => r.points)).toEqual([[[-40, -20], [-38, -21], [-36, -22]]]);
   act(() => {
     s.newRoute();
     s.addPoint([-50, -30]);
@@ -161,4 +161,38 @@ test('unsaved routes are kept in this browser and come back after a reload or a 
   expect(await persistTraffic()).toBe('project');
   expect(localStorage.getItem(DRAFT_KEY)).toBeNull();
   vi.unstubAllGlobals();
+});
+
+test('the sliders change only the picked route; with no route picked they set what the next new route starts with', () => {
+  act(() => setTrafficMode(true));
+  const s = useTrafficStore.getState();
+  act(() => {
+    s.addPoint([-40, -20]);
+    s.addPoint([-38, -21]);
+    useTrafficStore.getState().newRoute();
+    useTrafficStore.getState().addPoint([-50, -30]);
+    useTrafficStore.getState().addPoint([-52, -31]);
+  });
+  const { getByLabelText, getByText, getByRole } = render(<TrafficEditor />);
+  // route 2 is picked (being drawn): its own count and size
+  expect(getByText('Route 2')).toBeInTheDocument();
+  fireEvent.change(getByLabelText('How many'), { target: { value: '25' } });
+  fireEvent.change(getByLabelText('Car size'), { target: { value: '6' } });
+  let cars = useTrafficStore.getState().config.cars;
+  expect(cars.routes[1]).toMatchObject({ count: 25, size: 6 });
+  expect(cars.routes[0].count).not.toBe(25);
+  // pick route 1: the sliders show and change route 1
+  fireEvent.click(getByRole('button', { name: 'Route 1' }));
+  fireEvent.change(getByLabelText('Fastest speed'), { target: { value: '9' } });
+  cars = useTrafficStore.getState().config.cars;
+  expect(cars.routes[0].speedMax).toBe(9);
+  expect(cars.routes[1].speedMax).not.toBe(9);
+  // no route picked: the values are where the next route starts
+  act(() => useTrafficStore.getState().newRoute());
+  fireEvent.change(getByLabelText('How many'), { target: { value: '17' } });
+  act(() => {
+    useTrafficStore.getState().addPoint([-60, -40]);
+    useTrafficStore.getState().addPoint([-61, -41]);
+  });
+  expect(useTrafficStore.getState().config.cars.routes[2].count).toBe(17);
 });
