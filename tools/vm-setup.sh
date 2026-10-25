@@ -84,6 +84,7 @@ WorkingDirectory=$APP
 Environment=PATH=$(dirname "$NODE"):/usr/local/bin:/usr/bin:/bin
 Environment=CITYOPS_BASE=$BASE
 Environment=CITYOPS_BEHIND_LOGIN=1
+Environment=CITYOPS_AUTOCOMMIT=1
 ExecStart=/usr/bin/bash -c 'exec "$NODE" node_modules/vite/bin/vite.js --host 127.0.0.1 --port 8082 --strictPort'
 Restart=on-failure
 RestartSec=5

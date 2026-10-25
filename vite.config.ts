@@ -21,6 +21,17 @@ const local = (url: string) => (BASE !== '/' && url.startsWith(BASE) ? `/${url.s
 /** on the VM the dev server only listens on 127.0.0.1 behind nginx's login, so every request there is the owner's */
 const BEHIND_LOGIN = process.env.CITYOPS_BEHIND_LOGIN === '1';
 
+/**
+ * On the VM (CITYOPS_AUTOCOMMIT=1) every save the owner makes there (traffic, camera angles) is committed and pushed
+ * to the VM's git, so the Lab 2 and Lab 3 sessions get it with their next pull and the working copy stays clean
+ * for the next deploy.
+ */
+function commitSave(file: string, what: string) {
+  if (process.env.CITYOPS_AUTOCOMMIT !== '1') return;
+  const cwd = fileURLToPath(new URL('.', import.meta.url));
+  spawn('bash', ['-c', `git add -- "$1" && git commit -q -m "$2" -- "$1" && git push -q origin HEAD:main`, 'commit-save', file, `${what} saved by the owner on the VM`], { cwd, stdio: 'ignore' }).on('error', () => {});
+}
+
 /** Camera mode → Save: write the owner's saved angles into the project (dev server only). */
 function cameraOverrides(): Plugin {
   const file = fileURLToPath(new URL('./src/content/cameraOverrides.json', import.meta.url));
@@ -49,6 +60,7 @@ function cameraOverrides(): Plugin {
           try {
             const data = JSON.parse(body);
             writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`);
+            commitSave(file, 'Camera angles');
             res.writeHead(200).end('ok');
           } catch {
             res.writeHead(400).end('bad json');
@@ -62,8 +74,7 @@ function cameraOverrides(): Plugin {
 /**
  * Traffic mode → Save: GET/POST /__traffic reads and writes src/content/traffic.json (dev server only). Every save is
  * cleaned by normalizeTraffic (counts, speeds and points clamped, size-limited) and the previous file is kept as
- * traffic.prev.json. Unlike camera saves this works through the public links too: the owner draws on the iPad
- * through the VM's HTTPS link, and the data is only routes and numbers. The file is not watched, so a save never
+ * traffic.prev.json. On the VM everything sits behind nginx's login. The file is not watched, so a save never
  * reloads a page someone is presenting from.
  */
 function trafficSaves(): Plugin {
@@ -91,6 +102,7 @@ function trafficSaves(): Plugin {
             const clean = normalizeTraffic(JSON.parse(body));
             if (existsSync(file)) writeFileSync(prev, readFileSync(file));
             writeFileSync(file, `${JSON.stringify(clean, null, 2)}\n`);
+            commitSave(file, 'Traffic');
             res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify(clean));
           } catch {
             res.writeHead(400).end('bad json');
