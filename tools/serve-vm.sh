@@ -8,7 +8,7 @@ if systemctl list-unit-files cityops-dev.service > /dev/null 2>&1 && [ -f /etc/s
   sudo systemctl restart cityops-dev.service
   sleep 5
   systemctl is-active cityops-dev.service
-  curl -s -o /dev/null -w "dev server -> %{http_code}\n" --max-time 10 http://127.0.0.1:8082/
+  curl -s -o /dev/null -w "dev server -> %{http_code}\n" --max-time 10 http://127.0.0.1:8082/aiexperiencelive2026/
 else
   echo "the cityops-dev service is not set up yet: see tools/vm-setup.sh"
   exit 1
