@@ -9,8 +9,36 @@ import { makePath, placeOnRoutes, travel } from './trafficPaths';
 const M = 1 / 108;
 /** Traffic mode's size 1..8: 1 = true scale (invisible from city height), each step adds four times that */
 export const carScale = (size: number) => M * (1 + (size - 1) * 4);
-/** cool body colours, the Oracle palette's greys and whites with a little teal (no red: red is for alerts) */
-const COLOURS = ['#e9edf1', '#c9d1d9', '#8b96a3', '#5d6a78', '#f4f1ea', '#1B8A9C'].map((c) => new THREE.Color(c));
+/**
+ * Body colours as a real street has them (owner, 25 Oct: more variety): mostly white, silver, grey and black,
+ * then muted blues, greens, a taxi green-yellow, sand and brown. No red, pink or orange: red is for alerts.
+ * `weight` is how often each comes up.
+ */
+const MIX: [string, number][] = [
+  ['#f4f5f6', 5], // white
+  ['#e9e4da', 2], // pearl
+  ['#c3c9cf', 4], // silver
+  ['#8b96a3', 3], // grey
+  ['#4d5662', 3], // dark grey
+  ['#1e2024', 4], // black
+  ['#25395c', 2], // navy
+  ['#3f6fb0', 2], // blue
+  ['#1B8A9C', 1], // teal
+  ['#2f5d4a', 1], // dark green
+  ['#b8cc3a', 1], // taxi green-yellow
+  ['#e2c044', 1], // yellow
+  ['#c8bb96', 1], // sand
+  ['#6b5644', 1], // brown
+];
+export const CAR_COLOURS = MIX.map(([c]) => c);
+const WEIGHTS = MIX.reduce((a, [, w]) => a + w, 0);
+/** the colour for a car's tint (0..1, from its seeded random) */
+export function carColour(tint: number): string {
+  let left = Math.min(0.999999, Math.max(0, tint)) * WEIGHTS;
+  for (const [c, w] of MIX) if ((left -= w) < 0) return c;
+  return MIX[0][0];
+}
+const WHITE = new THREE.Color('#ffffff');
 
 /**
  * Cars on the routes drawn in Traffic mode (none until a car route is drawn). All of them are one instanced
@@ -32,7 +60,7 @@ export function Cars() {
   useEffect(() => {
     for (const mesh of [body.current, cabin.current]) {
       if (!mesh) continue;
-      cars.forEach((v, i) => mesh.setColorAt(i, mesh === cabin.current ? COLOURS[0] : COLOURS[Math.floor(v.tint * COLOURS.length) % COLOURS.length]));
+      cars.forEach((v, i) => mesh.setColorAt(i, mesh === cabin.current ? WHITE : new THREE.Color(carColour(v.tint))));
       if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     }
   }, [cars]);
