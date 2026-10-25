@@ -66,7 +66,7 @@ export function Roads() {
     return m;
   }, [built]);
 
-  const light = theme.name === 'light';
+  const light = theme.name !== 'night';
   return (
     <group name="roads">
       {built.kerb && (

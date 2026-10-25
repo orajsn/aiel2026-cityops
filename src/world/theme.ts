@@ -1,8 +1,16 @@
 /**
  * Every colour and light level the world uses, in one place, so the look can switch
- * between the light Redwood illustration style and the dark night style with the T key.
+ * between the skies in Settings (or the T key): the warm afternoon of the light Redwood illustration style,
+ * a clear blue midday sky, and the dark night style.
  */
-export type ThemeName = 'light' | 'night';
+export type ThemeName = 'light' | 'clear' | 'night';
+
+/** the order the T key goes through, and the names Settings shows */
+export const SKIES: { id: ThemeName; label: string }[] = [
+  { id: 'light', label: 'Afternoon' },
+  { id: 'clear', label: 'Clear blue' },
+  { id: 'night', label: 'Night' },
+];
 
 export interface Theme {
   name: ThemeName;
@@ -67,6 +75,36 @@ export const THEMES: Record<ThemeName, Theme> = {
     red: '#C74634',
     coreBody: '#C74634',
   },
+  // owner, 25 Oct: a clear blue sky as an option; the overlays keep the light panels
+  clear: {
+    name: 'clear',
+    bg: '#CFE2F0',
+    skyTop: '#6FA8DC',
+    skyHorizon: '#D4E6F3',
+    fogDensity: 0.0032,
+    ground: '#E4E2DA',
+    slabEdge: '#CFCBC0',
+    base: '#E6E6E2',
+    grid: false,
+    waterBase: '#4F95C2',
+    waterGlow: '#D8ECF8',
+    buildingTint: '#FFFFFF',
+    buildingEdges: false,
+    ambient: 0.5,
+    hemiSky: '#CFE4FF',
+    hemiGround: '#B3AFA8',
+    hemi: 0.8,
+    sun: '#FFF6E8',
+    sunIntensity: 2.2,
+    shadows: true,
+    bloom: false,
+    toneMapped: false,
+    pin: '#1B8A9C',
+    pinHero: '#C74634',
+    data: '#1B8A9C',
+    red: '#C74634',
+    coreBody: '#C74634',
+  },
   night: {
     name: 'night',
     bg: '#0B0E14',
@@ -103,7 +141,7 @@ const KEY = 'cityops.theme';
 export function storedTheme(): ThemeName {
   try {
     const v = window.localStorage.getItem(KEY);
-    return v === 'night' ? 'night' : 'light';
+    return v === 'night' || v === 'clear' ? v : 'light';
   } catch {
     return 'light';
   }
@@ -119,5 +157,5 @@ export function storeTheme(t: ThemeName): void {
 
 /** Mirror the theme onto the document so the CSS overlays follow. */
 export function applyThemeToDocument(t: ThemeName): void {
-  document.documentElement.setAttribute('data-theme', t);
+  document.documentElement.setAttribute('data-theme', t === 'night' ? 'night' : 'light');
 }

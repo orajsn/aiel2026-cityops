@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { applyThemeToDocument, storeTheme, storedTheme, THEMES, type Theme, type ThemeName } from '../world/theme';
+import { applyThemeToDocument, SKIES, storeTheme, storedTheme, THEMES, type Theme, type ThemeName } from '../world/theme';
 
 export interface UiState {
   jumpOpen: boolean;
@@ -54,5 +54,8 @@ export const useUiStore = create<UiState>((set, get) => ({
     applyThemeToDocument(t);
     set({ themeName: t, theme: THEMES[t] });
   },
-  toggleTheme: () => get().setTheme(get().themeName === 'light' ? 'night' : 'light'),
+  toggleTheme: () => {
+    const i = SKIES.findIndex((k) => k.id === get().themeName);
+    get().setTheme(SKIES[(i + 1) % SKIES.length].id);
+  },
 }));

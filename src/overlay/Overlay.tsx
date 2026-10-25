@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useProgress } from '@react-three/drei';
 import { useSceneStore } from '../engine/store';
@@ -12,6 +12,7 @@ import { TrafficEditor, setTrafficMode } from './TrafficEditor';
 import { useTrafficStore } from '../engine/traffic';
 import { useCameraStore } from '../engine/camera';
 import { Rich } from './Rich';
+import { SettingsPanel } from './SettingsPanel';
 import { pageNumber } from '../scenes';
 
 // named for the event's agenda (owner): the intro, then Lab 2 and Lab 3; pages are numbered the same way (0.x, 2.x, 3.x)
@@ -33,6 +34,7 @@ export function Overlay() {
   const scriptOpen = useUiStore((s) => s.scriptOpen);
   const cameraEditing = useCameraStore((s) => s.editing);
   const trafficEditing = useTrafficStore((s) => s.editing);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   // the panel group on screen now: a page in the same group keeps it up while its camera settles
   const shownKey = useRef<string | null>(null);
   if (!scene) return null;
@@ -91,8 +93,19 @@ export function Overlay() {
         </div>
       )}
 
+      {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} />}
+
       {/* touch navigation: the iPad has no arrow keys */}
       <nav className="stepper" aria-label="Scene navigation">
+        <button
+          type="button"
+          className={`stepper__btn stepper__btn--text stepper__btn--gear${settingsOpen ? ' is-on' : ''}`}
+          aria-label="Settings"
+          aria-expanded={settingsOpen}
+          onClick={() => setSettingsOpen((o) => !o)}
+        >
+          ⚙
+        </button>
         <button
           type="button"
           className={`stepper__btn stepper__btn--text${scriptOpen ? ' is-on' : ''}`}

@@ -63,7 +63,7 @@ export function River() {
   useEffect(() => {
     mat.uniforms.uBase.value.set(theme.waterBase);
     mat.uniforms.uGlow.value.set(theme.waterGlow);
-    mat.uniforms.uStrength.value = theme.name === 'light' ? 1.6 : 1;
+    mat.uniforms.uStrength.value = theme.name !== 'night' ? 1.6 : 1;
   }, [mat, theme]);
   useFrame((_, dt) => {
     mat.uniforms.uTime.value += dt;
