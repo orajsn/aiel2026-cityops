@@ -71,7 +71,11 @@
             -46.943,
             -86.323
           ]
-        ]
+        ],
+        "count": 12,
+        "speedMin": 7.5,
+        "speedMax": 10,
+        "size": 1
       }
     ]
   },
@@ -139,7 +143,11 @@
             0.705,
             -70.72
           ]
-        ]
+        ],
+        "count": 9,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       },
       {
         "points": [
@@ -183,7 +191,11 @@
             -14.436,
             -88.976
           ]
-        ]
+        ],
+        "count": 15,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       },
       {
         "points": [
@@ -215,7 +227,11 @@
             -26.726,
             -20.197
           ]
-        ]
+        ],
+        "count": 5,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       },
       {
         "points": [
@@ -247,7 +263,11 @@
             -51.384,
             -21.337
           ]
-        ]
+        ],
+        "count": 6,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       },
       {
         "points": [
@@ -271,7 +291,11 @@
             -60.484,
             -64.992
           ]
-        ]
+        ],
+        "count": 13,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       },
       {
         "points": [
@@ -419,7 +443,11 @@
             11.91,
             -55.181
           ]
-        ]
+        ],
+        "count": 15,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       },
       {
         "points": [
@@ -431,7 +459,11 @@
             -35.047,
             -39.06
           ]
-        ]
+        ],
+        "count": 10,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       },
       {
         "points": [
@@ -467,7 +499,11 @@
             -52.832,
             -38.83
           ]
-        ]
+        ],
+        "count": 7,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       },
       {
         "points": [
@@ -567,7 +603,11 @@
             -40.729,
             -20.209
           ]
-        ]
+        ],
+        "count": 21,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       },
       {
         "points": [
@@ -727,7 +767,11 @@
             -53.243,
             -38.484
           ]
-        ]
+        ],
+        "count": 12,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       },
       {
         "points": [
@@ -767,7 +811,11 @@
             -80.645,
             -91.555
           ]
-        ]
+        ],
+        "count": 4,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       },
       {
         "points": [
@@ -807,7 +855,11 @@
             -68.381,
             -62.514
           ]
-        ]
+        ],
+        "count": 8,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       },
       {
         "points": [
@@ -883,7 +935,11 @@
             -50.06,
             -91.323
           ]
-        ]
+        ],
+        "count": 16,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       },
       {
         "points": [
@@ -1011,7 +1067,11 @@
             12.01,
             -58.125
           ]
-        ]
+        ],
+        "count": 10,
+        "speedMin": 5,
+        "speedMax": 8,
+        "size": 2
       }
     ]
   }
