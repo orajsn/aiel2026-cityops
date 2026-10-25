@@ -4,8 +4,11 @@
  * src/content/traffic.json through the dev server (/__traffic). Pure data and rules, shared by the app and
  * vite.config.ts (which cleans every save with normalizeTraffic before writing it).
  *
- * With no boat route drawn, boats follow the real river (src/world/Boats.tsx) as they always have.
+ * With no boat route drawn, boats follow the real river (src/world/Boats.tsx) as they always have. Cars start on
+ * Harbor Bridge's two lanes (owner, 25 Oct: "I really want the car to go above the bridge").
  */
+import { bridgeLanes } from '../world/bridgeFrame';
+
 export type TrafficKind = 'boats' | 'cars';
 export type RoutePoint = [number, number];
 export interface TrafficRoute {
@@ -40,7 +43,8 @@ export const LIMITS = {
 export const DEFAULT_TRAFFIC: TrafficConfig = {
   // today's five river boats, at today's speed (1.7 to 2.4 map units a second)
   boats: { count: 5, speedMin: 9, speedMax: 10, size: 1, routes: [] },
-  cars: { count: 40, speedMin: 5, speedMax: 8, size: 3, routes: [] },
+  // a size the deck takes: two lanes, clear of the lamp posts (tests/world/bridgeRoad.test.ts)
+  cars: { count: 12, speedMin: 3, speedMax: 5, size: 2, routes: bridgeLanes() },
 };
 
 /** speed 1..10 as map units a second (1 unit is about 108 m): 1 = 0.2, 10 = about 2.1 */
@@ -79,7 +83,8 @@ function cleanFleet(v: unknown, kind: TrafficKind): Fleet {
     speedMax: Math.max(a, b),
     // boats stay true to scale: bigger ones would hit Harbor Bridge (tests/world/Boats.test.ts)
     size: kind === 'boats' ? 1 : clamp(f.size, LIMITS.size[0], LIMITS.size[1], d.size),
-    routes: cleanRoutes(f.routes),
+    // no routes entry at all: the defaults; an empty list saved on purpose stays empty
+    routes: f.routes === undefined ? d.routes : cleanRoutes(f.routes),
   };
 }
 

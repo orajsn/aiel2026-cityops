@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { LIMITS, type TrafficKind } from '../content/traffic';
 import { persistTraffic, useTrafficStore } from '../engine/traffic';
 import { useCameraStore } from '../engine/camera';
+import { bridgeLanes } from '../world/bridgeFrame';
 
 const NAME: Record<TrafficKind, string> = { boats: 'Boats', cars: 'Cars' };
 
@@ -58,6 +59,11 @@ export function TrafficEditor() {
         <button type="button" onClick={() => st.newRoute()}>
           + New route
         </button>
+        {kind === 'cars' && (
+          <button type="button" onClick={() => st.addRoutes('cars', bridgeLanes())} title="Two lanes over Harbor Bridge, one each way, street to street">
+            + Bridge lanes
+          </button>
+        )}
         <button type="button" onClick={() => st.undoPoint()} disabled={route < 0}>
           Undo point
         </button>

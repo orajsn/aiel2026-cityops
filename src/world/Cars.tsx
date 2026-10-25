@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { drivableRoutes, useTrafficStore } from '../engine/traffic';
-import { terrainHeight } from './terrain';
+import { roadHeight } from './roadHeight';
 import { makePath, placeVehicles, travel } from './trafficPaths';
 
 /** a car in metres (body 1.8 x 4.4, cabin on top); 1 map unit is about 108 m */
@@ -42,7 +42,8 @@ export function Cars() {
     tmp.s.set(k, k, k);
     cars.forEach((v, i) => {
       const at = travel(paths[v.route], v, clock.elapsedTime);
-      const y = terrainHeight(at.x, at.z);
+      // on Harbor Bridge the deck, anywhere else the ground
+      const y = roadHeight(at.x, at.z);
       tmp.q.setFromAxisAngle(tmp.y, at.angle);
       tmp.p.set(at.x, y + 0.35 * k + 0.002, at.z);
       tmp.m.compose(tmp.p, tmp.q, tmp.s);

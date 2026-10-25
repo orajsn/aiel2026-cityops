@@ -3,13 +3,12 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
 import { useUiStore } from '../engine/ui';
-import { BRIDGE, BRIDGE_S, DECK_W, DECK_Y, harborBridgeFrame } from './bridgeFrame';
+import { BRIDGE, BRIDGE_S, DECK_T, DECK_W, DECK_Y, harborBridgeFrame } from './bridgeFrame';
 import { Person, type Who } from './Person';
 import type { Vec3 } from './shots';
 
 /** structure scale: the map is real scale (1 unit ~ 108 m); the bridge is drawn a few times larger than life so it reads */
 const S = BRIDGE_S;
-const DECK_T = 0.36;
 const PYLON_H = 11;
 
 const CONCRETE = '#d9d4c9';

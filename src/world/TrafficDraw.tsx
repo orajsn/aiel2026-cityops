@@ -4,25 +4,12 @@ import { useThree } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
 import { useTrafficStore } from '../engine/traffic';
 import type { TrafficKind } from '../content/traffic';
-import { terrainHeight } from './terrain';
+import { groundPoint, roadHeight } from './roadHeight';
 
 const LIFT = 0.06;
 /** what a tap must not land on to count as a tap on the map: controls, the toolbars and the pages' cards and panels */
 export const SOLID = 'button, input, select, textarea, label, a, [role="toolbar"], [role="dialog"], .stepper, .strip, .script, .jd__panel, .jd__tab, [class*="panel"], [class*="card"], [class*="__q"], [class*="pill"]';
 const COLOUR: Record<TrafficKind, string> = { boats: '#2bb3c8', cars: '#f4f1ea' };
-
-/** where a click lands on the map: the ray meets the ground (refined twice on the terrain's height) */
-export function groundPoint(ray: THREE.Ray): [number, number] | null {
-  let h = 0;
-  const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-  const hit = new THREE.Vector3();
-  for (let i = 0; i < 3; i++) {
-    plane.constant = -h;
-    if (!ray.intersectPlane(plane, hit)) return null;
-    h = terrainHeight(hit.x, hit.z);
-  }
-  return [hit.x, hit.z];
-}
 
 /**
  * Traffic mode in the scene: every route as a line on the map (the one being drawn brighter, with its points),
@@ -72,7 +59,7 @@ export function TrafficDraw() {
     const out: { key: string; pts: [number, number, number][]; colour: string; active: boolean }[] = [];
     (['boats', 'cars'] as TrafficKind[]).forEach((k) =>
       config[k].routes.forEach((r, i) =>
-        out.push({ key: `${k}${i}`, pts: r.points.map(([x, z]) => [x, terrainHeight(x, z) + LIFT, z]), colour: COLOUR[k], active: k === kind && i === route }),
+        out.push({ key: `${k}${i}`, pts: r.points.map(([x, z]) => [x, roadHeight(x, z) + LIFT, z]), colour: COLOUR[k], active: k === kind && i === route }),
       ),
     );
     return out;

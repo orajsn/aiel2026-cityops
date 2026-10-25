@@ -2,7 +2,7 @@ import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { RIVER_CURVE } from './river';
-import { BRIDGE, fromBridgeLocal, toBridgeLocal } from './bridgeFrame';
+import { BRIDGE, fromBridgeLocal, harborBridgeFrame, toBridgeLocal } from './bridgeFrame';
 import { terrainHeight } from './terrain';
 import { speedUnits } from '../content/traffic';
 import { drivableRoutes, useTrafficStore } from '../engine/traffic';
@@ -30,6 +30,22 @@ function spec(t: number, speed: number, side: number, kind: 'ferry' | 'barge'): 
   const d = kind === 'ferry' ? FERRY : BARGE;
   return { t, speed, side, kind, width: d.w * BOAT_SCALE, length: d.l * BOAT_SCALE };
 }
+
+/**
+ * Boats on routes drawn in Traffic mode never hit Harbor Bridge (owner, 25 Oct): near the bridge each one is eased
+ * into a lane through the open main span (between Pier 3 and Pier 4), like the river boats, and let go again
+ * after it. `angle` is the boat's heading (atan2(dx, dz)); the lane follows the way it crosses.
+ */
+export function steerAtBridge(x: number, z: number, angle: number): { x: number; z: number } {
+  const { lx, lz } = toBridgeLocal(x, z);
+  const w = 1 - smooth(0.7, 1.6, Math.abs(lz));
+  if (w <= 0) return { x, z };
+  const f = BRIDGE_FRAME_YAW();
+  const crossing = Math.sin(angle) * Math.sin(f) + Math.cos(angle) * Math.cos(f);
+  const lane = crossing >= 0 ? BRIDGE.lanes[0] : BRIDGE.lanes[1];
+  return fromBridgeLocal(lx + (lane - lx) * w, lz);
+}
+const BRIDGE_FRAME_YAW = () => harborBridgeFrame().yaw;
 
 /** the river centreline's length (map units); river boats move in t (0..1) along it */
 const RIVER_LENGTH = RIVER_CURVE.getLength();
@@ -96,14 +112,19 @@ export function Boats() {
   );
 }
 
-/** a boat on a drawn route */
+/** a boat on a drawn route, steered clear of Harbor Bridge's piers; it faces the way it actually moves */
 function RouteBoat({ vehicle, path, kind }: { vehicle: Vehicle; path: Path; kind: 'ferry' | 'barge' }) {
   const g = useRef<THREE.Group>(null);
+  const prev = useMemo(() => new THREE.Vector2(NaN, NaN), []);
   useFrame(({ clock }) => {
     const p = travel(path, vehicle, clock.elapsedTime);
+    const { x, z } = steerAtBridge(p.x, p.z, p.angle);
     if (g.current) {
-      g.current.position.set(p.x, terrainHeight(p.x, p.z) + FLOAT, p.z);
-      g.current.rotation.y = p.angle;
+      g.current.position.set(x, terrainHeight(x, z) + FLOAT, z);
+      const mx = x - prev.x;
+      const mz = z - prev.y;
+      g.current.rotation.y = Number.isFinite(mx) && mx * mx + mz * mz > 1e-10 ? Math.atan2(mx, mz) : p.angle;
+      prev.set(x, z);
     }
   });
   return (

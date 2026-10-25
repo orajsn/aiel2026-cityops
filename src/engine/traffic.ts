@@ -22,6 +22,7 @@ interface TrafficState {
   addPoint(p: RoutePoint): void;
   undoPoint(): void;
   newRoute(): void;
+  addRoutes(kind: TrafficKind, routes: { points: RoutePoint[] }[]): void;
   deleteRoute(i: number): void;
   replace(config: TrafficConfig, dirty?: boolean): void;
 }
@@ -68,6 +69,11 @@ export const useTrafficStore = create<TrafficState>((set, get) => ({
     set({ config: { ...config, [kind]: { ...config[kind], routes } }, dirty: true });
   },
   newRoute: () => set({ route: -1 }),
+  addRoutes: (kind, add) => {
+    const config = get().config;
+    const routes = [...config[kind].routes, ...add].slice(0, LIMITS.routes);
+    set({ config: { ...config, [kind]: { ...config[kind], routes } }, kind, route: routes.length - 1, dirty: true });
+  },
   deleteRoute: (i) => {
     const { config, kind } = get();
     const routes = config[kind].routes.filter((_, j) => j !== i);

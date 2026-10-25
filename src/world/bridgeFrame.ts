@@ -27,6 +27,8 @@ const S = BRIDGE_S;
 /** deck height and width in structure units */
 export const DECK_Y = 1.6;
 export const DECK_W = 1.9;
+/** deck thickness in structure units */
+export const DECK_T = 0.36;
 
 /**
  * Everything in the water and the heights that matter, in bridge-local world units (x along the deck,
@@ -95,4 +97,38 @@ export function inBridgeCorridor(x: number, z: number, margin = 3): boolean {
   const f = harborBridgeFrame();
   const { lx, lz } = toBridgeLocal(x, z);
   return Math.abs(lz) < margin && Math.abs(lx) < f.half + margin;
+}
+
+/**
+ * The road surface of Harbor Bridge at (x, z), in world units, or null off the bridge: the deck top between the
+ * banks, then each ramp sloping straight down to its foot on the street (as HarborBridge.tsx builds them).
+ * Cars use it so a route that crosses the bridge drives over the deck, not under it.
+ */
+export function bridgeDeckHeight(x: number, z: number): number | null {
+  const f = harborBridgeFrame();
+  const { lx, lz } = toBridgeLocal(x, z);
+  const ax = Math.abs(lx);
+  if (Math.abs(lz) > (DECK_W * BRIDGE_S) / 2 || ax > f.half) return null;
+  const top = (DECK_Y + DECK_T / 2) * BRIDGE_S;
+  if (ax <= f.water) return top;
+  const foot = (lx < 0 ? BRIDGE.footY.west : BRIDGE.footY.east) + 0.005 * BRIDGE_S;
+  return top + ((ax - f.water) / f.ramp) * (foot - top);
+}
+
+/**
+ * Two car lanes over Harbor Bridge, one each side of the centre line (traffic drives on the left in Bangkok:
+ * the first lane runs west to east), from the street before one ramp to the street after the other. Points sit
+ * where the deck changes slope, so the drawn line follows the deck. Lamp posts stand at the deck's sides.
+ */
+export function bridgeLanes(): { points: [number, number][] }[] {
+  const f = harborBridgeFrame();
+  const LANE = 0.065;
+  const xs = [-(f.half + 0.3), -f.half, -f.water, 0, f.water, f.half, f.half + 0.3];
+  const lane = (lz: number, order: number[]) => ({
+    points: order.map((lx) => {
+      const p = fromBridgeLocal(lx, lz);
+      return [Math.round(p.x * 1000) / 1000, Math.round(p.z * 1000) / 1000] as [number, number];
+    }),
+  });
+  return [lane(LANE, xs), lane(-LANE, [...xs].reverse())];
 }

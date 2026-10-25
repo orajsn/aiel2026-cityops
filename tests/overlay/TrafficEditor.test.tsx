@@ -9,7 +9,8 @@ import { useSceneStore } from '../../src/engine/store';
 
 beforeEach(() => {
   act(() => {
-    useTrafficStore.getState().replace(DEFAULT_TRAFFIC);
+    // drawing starts from no car routes (the defaults carry Harbor Bridge's two lanes)
+    useTrafficStore.getState().replace({ ...DEFAULT_TRAFFIC, cars: { ...DEFAULT_TRAFFIC.cars, routes: [] } });
     useTrafficStore.setState({ kind: 'cars', editing: false });
     useCameraStore.getState().setEditing(false);
   });
@@ -71,4 +72,12 @@ test('R opens and closes Traffic mode, also while Camera mode has the keys', () 
   window.dispatchEvent(new KeyboardEvent('keydown', { key: 'r' }));
   expect(traffic).toHaveBeenCalledTimes(1);
   off();
+});
+
+test('Bridge lanes adds Harbor Bridge’s two lanes to the car routes in one click', () => {
+  act(() => setTrafficMode(true));
+  const { getByText } = render(<TrafficEditor />);
+  fireEvent.click(getByText('+ Bridge lanes'));
+  expect(useTrafficStore.getState().config.cars.routes).toHaveLength(2);
+  expect(DEFAULT_TRAFFIC.cars.routes).toHaveLength(2);
 });

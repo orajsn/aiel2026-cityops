@@ -55,3 +55,34 @@ test('boats are river-boat sized, not ships (a Chao Phraya express boat is ~4 m 
     expect(b.length).toBeLessThan(0.4); // < ~43 m
   }
 });
+
+test('Traffic mode: a boat route drawn straight through any pier, platform or tower leg is steered through the open span', async () => {
+  const { steerAtBridge } = await import('../../src/world/Boats');
+  const { makePath, travel } = await import('../../src/world/trafficPaths');
+  const { fromBridgeLocal } = await import('../../src/world/bridgeFrame');
+  const obs = obstacles();
+  const ferry = BOATS.find((b) => b.kind === 'ferry')!;
+  const barge = BOATS.find((b) => b.kind === 'barge')!;
+  // routes across the bridge at every pier, the platforms and between them, in both directions, a little skewed
+  for (let lx = -0.9; lx <= 0.75; lx += 0.03) {
+    const a = fromBridgeLocal(lx - 0.15, -3);
+    const b = fromBridgeLocal(lx + 0.15, 3);
+    const path = makePath([[a.x, a.z], [b.x, b.z]]);
+    for (const dir of [1, -1] as const) {
+      const v = { route: 0, start: dir === 1 ? 0 : path.length, speed: 0.05, dir, tint: 0 };
+      for (let t = 0; t < path.length / 0.05; t += 0.25) {
+        const p = travel(path, v, t);
+        const s = steerAtBridge(p.x, p.z, p.angle);
+        const { lx: bx, lz: bz } = toBridgeLocal(s.x, s.z);
+        for (const boat of [ferry, barge]) {
+          const hw = boat.width / 2 + 0.01;
+          const hl = boat.length / 2 + 0.01;
+          for (const [x0, x1, z0, z1] of obs) {
+            const hit = bx + hw > x0 && bx - hw < x1 && bz + hl > z0 && bz - hl < z1;
+            if (hit) throw new Error(`route at lx=${lx.toFixed(2)} dir ${dir}: ${boat.kind} hits at lx=${bx.toFixed(3)} lz=${bz.toFixed(3)}`);
+          }
+        }
+      }
+    }
+  }
+});
