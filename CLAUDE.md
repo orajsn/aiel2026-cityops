@@ -36,3 +36,17 @@ A deterministic, offline, click-through 3D web experience for two Oracle LiveLab
 ## Commands
 
 - `npm run dev` to run, `npx vitest run` to test, `npm run build` to bundle.
+
+## Where it runs (owner, 25-26 Oct)
+
+- **The live copy is on the cloud VM `jatuponghub`** (Oracle Linux 9, aarch64, SELinux enforcing), folder `/home/opc/cityops-live`, served at https://jatuponghub.duckdns.org/aiexperiencelive2026/ behind a login (nginx basic auth in `/etc/nginx/conf.d/codeserver.conf`; code-server keeps `/`). The login password exists only as a hash on the VM: never print, write or commit it. jatuponghub.com does not resolve; the duckdns name is the address.
+- **Services on the VM** (systemd, start at boot): `cityops-dev` is the Vite server on 127.0.0.1:8082 with `CITYOPS_BASE=/aiexperiencelive2026/`, `CITYOPS_BEHIND_LOGIN=1`, `CITYOPS_AUTOCOMMIT=1` (restart: `tools/serve-vm.sh`; logs: `journalctl -u cityops-dev`). `cityops-claude` is Claude Code Remote Control, named "CityOps VM", so the owner can work from the phone with the PC off (the owner installed it; approvals come to the phone). Never stop either one without the owner's say-so.
+- **Git:** the VM's `origin` is the bare repo `~/git/cityops-live.git`; its post-receive hook pulls into `~/cityops-live`, which updates the running site. The dev server commits the owner's camera and traffic saves on the VM by itself (identity "CityOps owner (VM)"). On the PC the remote is `jatuponghub`: always `bash tools/sync-vm.sh` (pull, then push), never a force-push.
+- **If you are a session running on the VM:** you are editing the live site the audience sees, so every saved file shows at once. Commit your own work and `git push origin main`, so the PC gets it on its next sync. Do not run `tools/sync-vm.sh` there (it is for the PC). Page previews (`tools/capture-thumbs.mjs`) need the PC's headless browser.
+- **The PC copy** (`C:\Users\UsEr\claude\cityops-live`, port 5174) is the development copy; its Cloudflare quick tunnel is the old way to share and no longer needed.
+
+## Open items (26 Oct)
+
+- Page 0's script line ("Good afternoon. Below us is Bangkok, from above. Let us fly down.") is a draft for the owner to reword.
+- The fly-in from page 0 to page 1 was checked by timing only; watch it on the iPad.
+- The Lab 3 side session still works on the PC copy: move it to the VM workflow when the owner says so.
