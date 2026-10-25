@@ -212,11 +212,15 @@ code,
 
 /* 0.1 title */
 .title { position: absolute; left: 48px; bottom: 120px; }
-.title__kicker { font-size: 16px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 14px; }
-.title__word { margin: 0; font-size: 132px; font-weight: 600; line-height: 1; color: var(--red); letter-spacing: 0.04em; }
-.title__rule { width: 120px; height: 2px; background: var(--red); margin: 22px 0 16px; transform-origin: left; }
+/* owner, 25 Oct: medium, big, medium (the word was gigantic between two tiny lines) */
+.title__kicker { font-size: 20px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 14px; }
+.title__word { margin: 0; font-size: 100px; font-weight: 600; line-height: 1; color: var(--red); letter-spacing: 0.04em; white-space: nowrap; }
+/* the Oracle O as the O of Ops: cap height, on the baseline, a little wider than a letter */
+.title__o { display: inline-block; height: 0.727em; width: 1.149em; margin: 0 0.04em 0 0.02em; vertical-align: baseline; }
+.title__oracle { color: var(--red); font-weight: 600; }
+.title__rule { width: 120px; height: 2px; background: var(--red); margin: 20px 0 16px; transform-origin: left; }
 .title__sub { font-size: 28px; color: var(--ink); font-weight: 400; }
-.title__org { margin-top: 14px; font-size: 15px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-dim); }
+.title__org { margin-top: 14px; font-size: 20px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-dim); }
 
 /* 0.2 legend: the count, and the seven districts by name, at once */
 .legend { position: absolute; left: 48px; bottom: 170px; width: 470px; padding: 22px 26px; border-radius: 14px; background: var(--panel); font-size: 18px; }
