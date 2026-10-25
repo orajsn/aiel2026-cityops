@@ -2,7 +2,8 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { spawn } from 'node:child_process';
-import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import { gzipSync } from 'node:zlib';
 import { cpus, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -135,12 +136,63 @@ function captureGuard(): Plugin {
   };
 }
 
+/**
+ * The map is ~50 MB and the tunnel carries ~0.5 MB/s (measured 25 Oct: the 20 MB photo took 42 s), so the iPad
+ * waited minutes on "Loading the Bangkok map". Map files under /models never change while we work:
+ * - the geometry (.bin, .gltf) goes out gzip-compressed (29 MB -> 11.5 MB), compressed once and kept in memory;
+ * - every /models file may be kept by the browser for a week without asking again (a second visit is instant).
+ * Pictures (.jpeg/.png/.glb) are already compressed and are only given the cache rule.
+ */
+function fastModels(): Plugin {
+  const root = fileURLToPath(new URL('./public', import.meta.url));
+  const packed = new Map<string, { mtime: number; gz: Buffer }>();
+  const TYPES: Record<string, string> = { '.bin': 'application/octet-stream', '.gltf': 'model/gltf+json' };
+  return {
+    name: 'cityops-fast-models',
+    configureServer(server) {
+      // files the watcher does not see (public/** is ignored so previews do not reload the page): the dev server
+      // only learns of new public files at startup, so new previews and sw.js are read straight from disk here
+      server.middlewares.use((req, res, next) => {
+        const url = decodeURIComponent((req.url ?? '').split('?')[0]);
+        const fresh = url === '/sw.js' ? 'text/javascript' : url.startsWith('/thumbs/') && url.endsWith('.jpg') && !url.includes('..') ? 'image/jpeg' : null;
+        if (!fresh) return next();
+        const file = join(root, url);
+        if (!existsSync(file)) return next();
+        res.writeHead(200, { 'content-type': fresh, 'cache-control': 'no-cache' });
+        res.end(readFileSync(file));
+      });
+      server.middlewares.use((req, res, next) => {
+        const url = decodeURIComponent((req.url ?? '').split('?')[0]);
+        if (!url.startsWith('/models/') || url.includes('..')) return next();
+        res.setHeader('cache-control', 'public, max-age=604800');
+        const ext = url.slice(url.lastIndexOf('.'));
+        if (!TYPES[ext] || !/\bgzip\b/.test(String(req.headers['accept-encoding'] ?? ''))) return next();
+        const file = join(root, url);
+        let st;
+        try {
+          st = statSync(file);
+        } catch {
+          return next();
+        }
+        let hit = packed.get(file);
+        if (!hit || hit.mtime !== st.mtimeMs) packed.set(file, (hit = { mtime: st.mtimeMs, gz: gzipSync(readFileSync(file), { level: 9 }) }));
+        const etag = `"gz-${st.size}-${Math.round(st.mtimeMs)}"`;
+        res.setHeader('etag', etag);
+        res.setHeader('vary', 'accept-encoding');
+        if (req.headers['if-none-match'] === etag) return void res.writeHead(304).end();
+        res.writeHead(200, { 'content-type': TYPES[ext], 'content-encoding': 'gzip', 'content-length': hit.gz.length });
+        res.end(req.method === 'HEAD' ? undefined : hit.gz);
+      });
+    },
+  };
+}
+
 export default defineConfig({
   base: './',
   build: { assetsInlineLimit: 0 },
   // the saved-angles file changes while presenting: do not reload the page when it does. Polling: on this
   // machine the file-change events were sometimes missed and the server kept serving stale code.
-  plugins: [react(), cameraOverrides(), fullReloadForScene(), viewersCount(), captureGuard()],
+  plugins: [react(), cameraOverrides(), fullReloadForScene(), viewersCount(), captureGuard(), fastModels()],
   server: { port: 5174, strictPort: true, watch: { ignored: ['**/src/content/cameraOverrides.json', '**/public/**', '**/.claude/**'], usePolling: true, interval: 400 }, allowedHosts: TUNNEL_HOSTS },
   test: {
     environment: 'jsdom',
