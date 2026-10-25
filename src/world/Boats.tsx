@@ -4,6 +4,9 @@ import { useFrame } from '@react-three/fiber';
 import { RIVER_CURVE } from './river';
 import { BRIDGE, fromBridgeLocal, toBridgeLocal } from './bridgeFrame';
 import { terrainHeight } from './terrain';
+import { speedUnits } from '../content/traffic';
+import { drivableRoutes, useTrafficStore } from '../engine/traffic';
+import { makePath, placeVehicles, travel, type Path, type Vehicle } from './trafficPaths';
 
 export interface BoatSpec {
   t: number;
@@ -28,13 +31,28 @@ function spec(t: number, speed: number, side: number, kind: 'ferry' | 'barge'): 
   return { t, speed, side, kind, width: d.w * BOAT_SCALE, length: d.l * BOAT_SCALE };
 }
 
-export const BOATS: BoatSpec[] = [
-  spec(0.3, 0.0035, -0.4, 'ferry'),
-  spec(0.42, -0.0028, 0.35, 'barge'),
-  spec(0.55, 0.003, -0.3, 'ferry'),
-  spec(0.66, -0.0025, 0.4, 'barge'),
-  spec(0.74, 0.0032, -0.35, 'ferry'),
-];
+/** the river centreline's length (map units); river boats move in t (0..1) along it */
+const RIVER_LENGTH = RIVER_CURVE.getLength();
+/** lanes off the centreline, alternating banks; near the bridge every boat is steered into its span lane */
+const SIDES = [-0.4, 0.35, -0.3, 0.4, -0.35];
+
+/**
+ * River boats from Traffic mode's settings (how many, speed 1..10): spread along the river between t 0.3 and 0.75,
+ * ferries and barges in turn, every other one going upstream. Speeds come out the same every time.
+ */
+export function riverBoats(count: number, speedMin: number, speedMax: number): BoatSpec[] {
+  const out: BoatSpec[] = [];
+  for (let i = 0; i < count; i++) {
+    const f = (i * 0.6180339887) % 1;
+    const s = speedMin + (speedMax - speedMin) * f;
+    const dir = i % 2 === 0 ? 1 : -1;
+    out.push(spec(0.3 + (0.45 * (i + 0.5)) / Math.max(1, count), (dir * speedUnits(s)) / RIVER_LENGTH, SIDES[i % SIDES.length], i % 2 === 0 ? 'ferry' : 'barge'));
+  }
+  return out;
+}
+
+/** today's boats (Traffic mode defaults: five, speed 9 to 10) */
+export const BOATS: BoatSpec[] = riverBoats(5, 9, 10);
 
 const tmp = new THREE.Vector3();
 function smooth(e0: number, e1: number, x: number) {
@@ -59,13 +77,38 @@ export function boatXZ(t: number, b: BoatSpec): { x: number; z: number } {
   return fromBridgeLocal(lx + (lane - lx) * w, lz);
 }
 
-/** A few boats on the real river: the city's slow ambient motion. */
+/**
+ * Boats: the city's slow ambient motion. With no boat route drawn in Traffic mode they sail the real river;
+ * with routes, they go back and forth along those instead. How many and how fast come from Traffic mode.
+ */
 export function Boats() {
+  const fleet = useTrafficStore((s) => s.config.boats);
+  const routes = useMemo(() => drivableRoutes(fleet), [fleet]);
+  const river = useMemo(() => riverBoats(fleet.count, fleet.speedMin, fleet.speedMax), [fleet.count, fleet.speedMin, fleet.speedMax]);
+  const paths = useMemo(() => routes.map((r) => makePath(r.points)), [routes]);
+  const onRoutes = useMemo(() => placeVehicles(paths, fleet.count, fleet.speedMin, fleet.speedMax, 23), [paths, fleet.count, fleet.speedMin, fleet.speedMax]);
   return (
     <group name="boats">
-      {BOATS.map((b, i) => (
-        <Boat key={i} spec={b} />
-      ))}
+      {routes.length
+        ? onRoutes.map((v, i) => <RouteBoat key={`r${i}`} vehicle={v} path={paths[v.route]} kind={i % 2 === 0 ? 'ferry' : 'barge'} />)
+        : river.map((b, i) => <Boat key={i} spec={b} />)}
+    </group>
+  );
+}
+
+/** a boat on a drawn route */
+function RouteBoat({ vehicle, path, kind }: { vehicle: Vehicle; path: Path; kind: 'ferry' | 'barge' }) {
+  const g = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    const p = travel(path, vehicle, clock.elapsedTime);
+    if (g.current) {
+      g.current.position.set(p.x, terrainHeight(p.x, p.z) + FLOAT, p.z);
+      g.current.rotation.y = p.angle;
+    }
+  });
+  return (
+    <group ref={g}>
+      <BoatBody kind={kind} />
     </group>
   );
 }
@@ -88,10 +131,18 @@ function Boat({ spec: b }: { spec: BoatSpec }) {
       prev.set(x, z);
     }
   });
-  const ferry = b.kind === 'ferry';
+  return (
+    <group ref={g}>
+      <BoatBody kind={b.kind} />
+    </group>
+  );
+}
+
+function BoatBody({ kind }: { kind: 'ferry' | 'barge' }) {
+  const ferry = kind === 'ferry';
   const d = ferry ? FERRY : BARGE;
   return (
-    <group ref={g} scale={BOAT_SCALE}>
+    <group scale={BOAT_SCALE}>
       <mesh position={[0, 0.3, 0]} castShadow>
         <boxGeometry args={[d.w, 0.6, d.l]} />
         <meshStandardMaterial color={ferry ? '#f4f1ea' : '#4d5f73'} roughness={0.9} />

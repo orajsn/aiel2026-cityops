@@ -3,3 +3,4 @@ dist
 .superpowers
 assets-original
 dev.log
+src/content/traffic.prev.json

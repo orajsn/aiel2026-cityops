@@ -1,0 +1,16 @@
+{
+  "boats": {
+    "count": 5,
+    "speedMin": 9,
+    "speedMax": 10,
+    "size": 1,
+    "routes": []
+  },
+  "cars": {
+    "count": 40,
+    "speedMin": 5,
+    "speedMax": 8,
+    "size": 3,
+    "routes": []
+  }
+}

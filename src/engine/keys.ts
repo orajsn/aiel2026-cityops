@@ -7,6 +7,7 @@ export interface KeyHandlers {
   theme?(): void;
   script?(): void;
   camera?(): void;
+  traffic?(): void;
   /** true while Camera mode has the keys (arrows walk the camera) */
   isEditing?(): boolean;
 }
@@ -17,6 +18,10 @@ export function bindKeys(store: SceneStore, handlers: KeyHandlers): () => void {
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
     if (e.key === 'c' || e.key === 'C') {
       handlers.camera?.();
+      return;
+    }
+    if (e.key === 'r' || e.key === 'R') {
+      handlers.traffic?.();
       return;
     }
     if (handlers.isEditing?.()) return;

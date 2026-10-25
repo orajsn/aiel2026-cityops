@@ -9,11 +9,14 @@ import { bindHash } from './engine/hash';
 import { bindKeys } from './engine/keys';
 import { SCENES } from './scenes';
 import { loadOverrides, useCameraStore } from './engine/camera';
+import { loadTraffic, useTrafficStore } from './engine/traffic';
+import { setTrafficMode } from './overlay/TrafficEditor';
 
 export default function App() {
   useEffect(() => {
     useSceneStore.getState().setScenes(SCENES);
     void loadOverrides();
+    void loadTraffic();
     const ui = useUiStore.getState();
     const unHash = bindHash(useSceneStore);
     const unKeys = bindKeys(useSceneStore, {
@@ -22,7 +25,8 @@ export default function App() {
       lang: () => ui.toggleLang(),
       theme: () => ui.toggleTheme(),
       script: () => ui.toggleScript(),
-      camera: () => useCameraStore.getState().setEditing(!useCameraStore.getState().editing),
+      camera: () => (useTrafficStore.getState().editing ? setTrafficMode(false) : useCameraStore.getState().setEditing(!useCameraStore.getState().editing)),
+      traffic: () => setTrafficMode(!useTrafficStore.getState().editing),
       isEditing: () => useCameraStore.getState().editing,
     });
     return () => {

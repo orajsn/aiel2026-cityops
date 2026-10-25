@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
 import { canSaveFrom, TUNNEL_HOSTS } from './src/engine/remote';
+import { normalizeTraffic } from './src/content/traffic';
 
 /** Camera mode → Save: write the owner's saved angles into the project (dev server only). */
 function cameraOverrides(): Plugin {
@@ -33,6 +34,48 @@ function cameraOverrides(): Plugin {
             const data = JSON.parse(body);
             writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`);
             res.writeHead(200).end('ok');
+          } catch {
+            res.writeHead(400).end('bad json');
+          }
+        });
+      });
+    },
+  };
+}
+
+/**
+ * Traffic mode → Save: GET/POST /__traffic reads and writes src/content/traffic.json (dev server only). Every save is
+ * cleaned by normalizeTraffic (counts, speeds and points clamped, size-limited) and the previous file is kept as
+ * traffic.prev.json. Unlike camera saves this works through the public links too: the owner draws on the iPad
+ * through the VM's HTTPS link, and the data is only routes and numbers. The file is not watched, so a save never
+ * reloads a page someone is presenting from.
+ */
+function trafficSaves(): Plugin {
+  const file = fileURLToPath(new URL('./src/content/traffic.json', import.meta.url));
+  const prev = fileURLToPath(new URL('./src/content/traffic.prev.json', import.meta.url));
+  return {
+    name: 'cityops-traffic',
+    configureServer(server) {
+      server.middlewares.use('/__traffic', (req, res) => {
+        res.setHeader('cache-control', 'no-store');
+        if (req.method === 'GET') {
+          res.setHeader('content-type', 'application/json');
+          return void res.end(JSON.stringify(normalizeTraffic(existsSync(file) ? readFileSync(file, 'utf8') : null)));
+        }
+        if (req.method !== 'POST') return void res.writeHead(405).end();
+        let body = '';
+        let size = 0;
+        req.on('data', (c: Buffer) => {
+          size += c.length;
+          if (size > 512 * 1024) req.destroy();
+          else body += c;
+        });
+        req.on('end', () => {
+          try {
+            const clean = normalizeTraffic(JSON.parse(body));
+            if (existsSync(file)) writeFileSync(prev, readFileSync(file));
+            writeFileSync(file, `${JSON.stringify(clean, null, 2)}\n`);
+            res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify(clean));
           } catch {
             res.writeHead(400).end('bad json');
           }
@@ -192,8 +235,8 @@ export default defineConfig({
   build: { assetsInlineLimit: 0 },
   // the saved-angles file changes while presenting: do not reload the page when it does. Polling: on this
   // machine the file-change events were sometimes missed and the server kept serving stale code.
-  plugins: [react(), cameraOverrides(), fullReloadForScene(), viewersCount(), captureGuard(), fastModels()],
-  server: { port: 5174, strictPort: true, watch: { ignored: ['**/src/content/cameraOverrides.json', '**/public/**', '**/.claude/**'], usePolling: true, interval: 400 }, allowedHosts: TUNNEL_HOSTS },
+  plugins: [react(), cameraOverrides(), trafficSaves(), fullReloadForScene(), viewersCount(), captureGuard(), fastModels()],
+  server: { port: 5174, strictPort: true, watch: { ignored: ['**/src/content/cameraOverrides.json', '**/src/content/traffic.json', '**/src/content/traffic.prev.json', '**/public/**', '**/.claude/**'], usePolling: true, interval: 400 }, allowedHosts: TUNNEL_HOSTS },
   test: {
     environment: 'jsdom',
     globals: true,

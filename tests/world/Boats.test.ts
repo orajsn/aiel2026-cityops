@@ -1,4 +1,5 @@
-import { BOATS, BOAT_TOP_Y, boatXZ } from '../../src/world/Boats';
+import { BOATS, BOAT_TOP_Y, boatXZ, riverBoats, type BoatSpec } from '../../src/world/Boats';
+import { LIMITS } from '../../src/content/traffic';
 import { BRIDGE, toBridgeLocal } from '../../src/world/bridgeFrame';
 
 /** Everything standing in the water under Harbor Bridge, in bridge-local units: [x0, x1, z0, z1]. */
@@ -13,12 +14,11 @@ function obstacles(): [number, number, number, number][] {
   return out;
 }
 
-test('no boat ever sails through a pier, a tower leg or an inspection platform (Pier 3 and Pier 2)', () => {
-  expect(BRIDGE.platforms.map((p) => p.x)).toEqual([BRIDGE.piers[2], BRIDGE.piers[1]]);
+function sail(boats: BoatSpec[], step: number) {
   const obs = obstacles();
   let underBridge = 0;
-  for (const b of BOATS) {
-    for (let t = 0.25; t <= 0.9; t += 0.00005) {
+  for (const b of boats) {
+    for (let t = 0.25; t <= 0.9; t += step) {
       const { x, z } = boatXZ(t, b);
       const { lx, lz } = toBridgeLocal(x, z);
       const hw = b.width / 2 + 0.01;
@@ -30,7 +30,18 @@ test('no boat ever sails through a pier, a tower leg or an inspection platform (
       }
     }
   }
-  expect(underBridge).toBeGreaterThan(0); // the boats really do pass under the bridge
+  return underBridge;
+}
+
+test('no boat ever sails through a pier, a tower leg or an inspection platform (Pier 3 and Pier 2)', () => {
+  expect(BRIDGE.platforms.map((p) => p.x)).toEqual([BRIDGE.piers[2], BRIDGE.piers[1]]);
+  expect(sail(BOATS, 0.00005)).toBeGreaterThan(0); // the boats really do pass under the bridge
+});
+
+test('Traffic mode: the most river boats it allows, at any speed, still clear every pier, leg and platform', () => {
+  const many = riverBoats(LIMITS.boats.count[1], 1, 10);
+  expect(many).toHaveLength(LIMITS.boats.count[1]);
+  expect(sail(many, 0.0002)).toBeGreaterThan(0);
 });
 
 test('boats pass under the deck and the platform with room to spare', () => {
