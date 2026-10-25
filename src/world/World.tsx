@@ -16,6 +16,7 @@ import { OpsRoom } from './OpsRoom';
 import { BridgeQuestion } from './BridgeQuestion';
 import { CITY_DIM } from './BangkokCity';
 import { useFrame } from '@react-three/fiber';
+import { useTrafficStore } from '../engine/traffic';
 
 export interface WorldProps {
   pins?: AssetType[] | 'all';
@@ -39,7 +40,9 @@ export interface WorldProps {
 
 export function World() {
   const scene = useSceneStore((s) => s.scenes[s.index]);
-  const w = (scene?.world ?? {}) as WorldProps;
+  // Traffic mode clears the page's story pieces away: only the city, its traffic and the routes stay
+  const traffic = useTrafficStore((s) => s.editing);
+  const w = (traffic ? {} : (scene?.world ?? {})) as WorldProps;
   const theme = useUiStore((s) => s.theme);
   return (
     <>
@@ -61,7 +64,7 @@ export function World() {
       {w.vectors && <VectorField {...w.vectors} position={[0, -80, 40]} />}
       <SkyStage act={w.sky ?? null} />
       <OpsRoom show={!!w.ops} />
-      {w.question && <BridgeQuestion key={scene?.id} />}
+      {w.question && !traffic && <BridgeQuestion key={scene?.id} />}
       <CityDimmer dim={w.ops ? 0.62 : 0} />
       <Effects />
     </>

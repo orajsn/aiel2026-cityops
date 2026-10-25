@@ -14,8 +14,12 @@ interface TrafficState {
   kind: TrafficKind;
   /** the route being drawn (index into config[kind].routes), -1 = none yet */
   route: number;
+  /** the drawn point picked for moving or deleting */
+  point: { route: number; index: number } | null;
   /** unsaved changes */
   dirty: boolean;
+  /** when unsaved work was brought back from this browser (ms since 1970), for the bar's note */
+  restored: number | null;
   setEditing(v: boolean): void;
   setKind(k: TrafficKind): void;
   select(i: number): void;
@@ -24,6 +28,9 @@ interface TrafficState {
   undoPoint(): void;
   newRoute(): void;
   addRoutes(kind: TrafficKind, routes: { points: RoutePoint[] }[]): void;
+  selectPoint(p: { route: number; index: number } | null): void;
+  movePoint(p: RoutePoint): void;
+  deletePoint(): void;
   deleteRoute(i: number): void;
   replace(config: TrafficConfig, dirty?: boolean): void;
 }
@@ -33,9 +40,11 @@ export const useTrafficStore = create<TrafficState>((set, get) => ({
   editing: false,
   kind: 'cars',
   route: -1,
+  point: null,
   dirty: false,
-  setEditing: (editing) => set({ editing }),
-  setKind: (kind) => set({ kind, route: get().config[kind].routes.length - 1 }),
+  restored: null,
+  setEditing: (editing) => set({ editing, point: null }),
+  setKind: (kind) => set({ kind, route: get().config[kind].routes.length - 1, point: null }),
   select: (route) => set({ route }),
   setFleet: (kind, patch) => {
     const config = normalizeTraffic({ ...get().config, [kind]: { ...get().config[kind], ...patch } });
@@ -55,7 +64,7 @@ export const useTrafficStore = create<TrafficState>((set, get) => ({
     }
     if (routes[route].points.length >= LIMITS.points) return;
     routes[route].points.push([Math.round(p[0] * 1000) / 1000, Math.round(p[1] * 1000) / 1000]);
-    set({ config: { ...config, [kind]: { ...config[kind], routes } }, route, dirty: true });
+    set({ config: { ...config, [kind]: { ...config[kind], routes } }, route, point: null, dirty: true });
   },
   undoPoint: () => {
     const { config, kind, route } = get();
@@ -69,7 +78,28 @@ export const useTrafficStore = create<TrafficState>((set, get) => ({
     }
     set({ config: { ...config, [kind]: { ...config[kind], routes } }, dirty: true });
   },
-  newRoute: () => set({ route: -1 }),
+  newRoute: () => set({ route: -1, point: null }),
+  selectPoint: (point) => set(point ? { point, route: point.route } : { point: null }),
+  movePoint: (p) => {
+    const { config, kind, point } = get();
+    if (!point) return;
+    const routes = config[kind].routes.map((r) => ({ points: [...r.points] }));
+    if (!routes[point.route]?.points[point.index]) return;
+    routes[point.route].points[point.index] = [Math.round(p[0] * 1000) / 1000, Math.round(p[1] * 1000) / 1000];
+    set({ config: { ...config, [kind]: { ...config[kind], routes } }, dirty: true });
+  },
+  deletePoint: () => {
+    const { config, kind, point } = get();
+    if (!point) return;
+    const routes = config[kind].routes.map((r) => ({ points: [...r.points] }));
+    routes[point.route]?.points.splice(point.index, 1);
+    let route = point.route;
+    if (routes[point.route] && routes[point.route].points.length === 0) {
+      routes.splice(point.route, 1);
+      route = routes.length - 1;
+    }
+    set({ config: { ...config, [kind]: { ...config[kind], routes } }, route, point: null, dirty: true });
+  },
   addRoutes: (kind, add) => {
     const config = get().config;
     const routes = [...config[kind].routes, ...add].slice(0, LIMITS.routes);
@@ -78,9 +108,9 @@ export const useTrafficStore = create<TrafficState>((set, get) => ({
   deleteRoute: (i) => {
     const { config, kind } = get();
     const routes = config[kind].routes.filter((_, j) => j !== i);
-    set({ config: { ...config, [kind]: { ...config[kind], routes } }, route: Math.min(get().route, routes.length - 1), dirty: true });
+    set({ config: { ...config, [kind]: { ...config[kind], routes } }, route: Math.min(get().route, routes.length - 1), point: null, dirty: true });
   },
-  replace: (config, dirty = false) => set({ config: normalizeTraffic(config), dirty, route: -1 }),
+  replace: (config, dirty = false) => set({ config: normalizeTraffic(config), dirty, route: -1, point: null }),
 }));
 
 /** routes still being drawn may have one point: only routes of two points or more drive */
@@ -88,13 +118,45 @@ export function drivableRoutes(f: Fleet) {
   return f.routes.filter((r) => r.points.length >= 2);
 }
 
-/** read the saved traffic fresh from the dev server (the file is not watched, so a save never reloads the page) */
+/**
+ * Unsaved work is kept in this browser (owner, 25 Oct: six routes were lost to a save that could not reach the
+ * server), so a failed save or a reload never loses it; a good save clears it.
+ */
+export const DRAFT_KEY = 'cityops.trafficDraft';
+const keepDraft = (config: TrafficConfig) => {
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ at: Date.now(), config }));
+  } catch {
+    /* storage blocked: nothing kept */
+  }
+};
+const dropDraft = () => {
+  try {
+    localStorage.removeItem(DRAFT_KEY);
+  } catch {
+    /* storage blocked */
+  }
+};
+useTrafficStore.subscribe((s, prev) => {
+  if (s.dirty && s.config !== prev.config) keepDraft(s.config);
+});
+
+/** read the saved traffic fresh from the dev server (the file is not watched, so a save never reloads the page), then any unsaved work kept in this browser */
 export async function loadTraffic(): Promise<void> {
   try {
     const r = await fetch(at('__traffic'), { cache: 'no-store' });
     if (r.ok && (r.headers.get('content-type') ?? '').includes('json')) useTrafficStore.getState().replace(await r.json());
   } catch {
     /* no dev server: the bundled traffic.json stands */
+  }
+  try {
+    const kept = JSON.parse(localStorage.getItem(DRAFT_KEY) ?? 'null');
+    if (kept?.config) {
+      useTrafficStore.getState().replace(kept.config, true);
+      useTrafficStore.setState({ restored: typeof kept.at === 'number' ? kept.at : Date.now() });
+    }
+  } catch {
+    /* storage blocked or a broken draft: the saved file stands */
   }
 }
 
@@ -103,7 +165,8 @@ export async function persistTraffic(): Promise<'project' | 'failed'> {
   try {
     const r = await fetch(at('__traffic'), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(useTrafficStore.getState().config) });
     if (r.ok) {
-      useTrafficStore.setState({ dirty: false });
+      useTrafficStore.setState({ dirty: false, restored: null });
+      dropDraft();
       return 'project';
     }
   } catch {

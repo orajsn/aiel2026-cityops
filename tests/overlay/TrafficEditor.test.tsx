@@ -81,3 +81,84 @@ test('Bridge lanes adds Harbor Bridge’s two lanes to the car routes in one cli
   expect(useTrafficStore.getState().config.cars.routes).toHaveLength(2);
   expect(DEFAULT_TRAFFIC.cars.routes).toHaveLength(2);
 });
+
+test('a drawn point can be picked, moved and deleted; deleting a route’s last point removes the route', () => {
+  const s = useTrafficStore.getState();
+  act(() => {
+    s.addPoint([-40, -20]);
+    s.addPoint([-38, -21]);
+    s.addPoint([-36, -22]);
+  });
+  act(() => useTrafficStore.getState().selectPoint({ route: 0, index: 1 }));
+  expect(useTrafficStore.getState().point).toEqual({ route: 0, index: 1 });
+  expect(useTrafficStore.getState().route).toBe(0);
+  act(() => useTrafficStore.getState().movePoint([-37.5, -25]));
+  expect(useTrafficStore.getState().config.cars.routes[0].points[1]).toEqual([-37.5, -25]);
+  act(() => useTrafficStore.getState().deletePoint());
+  expect(useTrafficStore.getState().config.cars.routes[0].points).toEqual([[-40, -20], [-36, -22]]);
+  expect(useTrafficStore.getState().point).toBeNull();
+  // a new tap adds to the route, and drops any point selection
+  act(() => useTrafficStore.getState().selectPoint({ route: 0, index: 0 }));
+  act(() => useTrafficStore.getState().addPoint([-30, -30]));
+  expect(useTrafficStore.getState().point).toBeNull();
+  // delete down to nothing: the route goes
+  for (let i = 0; i < 3; i++) act(() => (useTrafficStore.getState().selectPoint({ route: 0, index: 0 }), useTrafficStore.getState().deletePoint()));
+  expect(useTrafficStore.getState().config.cars.routes).toEqual([]);
+});
+
+test('the panel shows the picked point with Delete point; the Delete key deletes it too', () => {
+  act(() => setTrafficMode(true));
+  const s = useTrafficStore.getState();
+  act(() => {
+    s.addPoint([-40, -20]);
+    s.addPoint([-38, -21]);
+    s.addPoint([-36, -22]);
+    useTrafficStore.getState().selectPoint({ route: 0, index: 2 });
+  });
+  const { getByText } = render(<TrafficEditor />);
+  expect(getByText(/Point 3 of route 1/)).toBeInTheDocument();
+  expect(getByText('Delete point')).toBeInTheDocument();
+  act(() => void window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete' })));
+  expect(useTrafficStore.getState().config.cars.routes[0].points).toHaveLength(2);
+  // the point is gone, and so is its row
+  expect(() => getByText('Delete point')).toThrow();
+});
+
+test('a tap near a drawn point on screen picks that point (the nearest within reach), else nothing', async () => {
+  const { nearestPoint } = await import('../../src/world/TrafficDraw');
+  const pts = [
+    { route: 0, index: 0, sx: 100, sy: 100 },
+    { route: 0, index: 1, sx: 130, sy: 100 },
+    { route: 1, index: 0, sx: 400, sy: 300 },
+  ];
+  expect(nearestPoint(pts, 126, 104, 18)).toEqual({ route: 0, index: 1 });
+  expect(nearestPoint(pts, 395, 310, 18)).toEqual({ route: 1, index: 0 });
+  expect(nearestPoint(pts, 250, 200, 18)).toBeNull();
+});
+
+test('unsaved routes are kept in this browser and come back after a reload or a failed save', async () => {
+  const { loadTraffic, persistTraffic, DRAFT_KEY } = await import('../../src/engine/traffic');
+  localStorage.removeItem(DRAFT_KEY);
+  act(() => {
+    useTrafficStore.getState().addPoint([-40, -20]);
+    useTrafficStore.getState().addPoint([-38, -21]);
+  });
+  const kept = JSON.parse(localStorage.getItem(DRAFT_KEY) ?? 'null');
+  expect(kept?.config.cars.routes).toHaveLength(1);
+  // a reload: the page starts from the saved file, then the draft comes back on top, still unsaved
+  act(() => useTrafficStore.getState().replace(DEFAULT_TRAFFIC));
+  const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(DEFAULT_TRAFFIC), { headers: { 'content-type': 'application/json' } }));
+  vi.stubGlobal('fetch', fetchMock);
+  await act(async () => loadTraffic());
+  expect(useTrafficStore.getState().config.cars.routes[0].points).toEqual([[-40, -20], [-38, -21]]);
+  expect(useTrafficStore.getState().dirty).toBe(true);
+  expect(useTrafficStore.getState().restored).toBeTruthy();
+  // a failed save keeps the draft; a good one clears it
+  fetchMock.mockRejectedValueOnce(new Error('offline'));
+  expect(await persistTraffic()).toBe('failed');
+  expect(localStorage.getItem(DRAFT_KEY)).not.toBeNull();
+  fetchMock.mockResolvedValueOnce(new Response('{}', { status: 200 }));
+  expect(await persistTraffic()).toBe('project');
+  expect(localStorage.getItem(DRAFT_KEY)).toBeNull();
+  vi.unstubAllGlobals();
+});

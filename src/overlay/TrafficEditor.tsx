@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LIMITS, type TrafficKind } from '../content/traffic';
 import { persistTraffic, useTrafficStore } from '../engine/traffic';
 import { useCameraStore } from '../engine/camera';
@@ -23,7 +23,23 @@ export function TrafficEditor() {
   const kind = useTrafficStore((s) => s.kind);
   const route = useTrafficStore((s) => s.route);
   const dirty = useTrafficStore((s) => s.dirty);
+  const point = useTrafficStore((s) => s.point);
+  const restored = useTrafficStore((s) => s.restored);
   const [note, setNote] = useState('');
+  // Delete or Backspace deletes the picked point
+  useEffect(() => {
+    if (!editing) return;
+    const key = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+      if ((e.key === 'Delete' || e.key === 'Backspace') && useTrafficStore.getState().point) {
+        e.preventDefault();
+        useTrafficStore.getState().deletePoint();
+      }
+    };
+    window.addEventListener('keydown', key);
+    return () => window.removeEventListener('keydown', key);
+  }, [editing]);
   if (!editing) return null;
   const st = useTrafficStore.getState();
   const fleet = config[kind];
@@ -31,7 +47,7 @@ export function TrafficEditor() {
 
   const save = async () => {
     const where = await persistTraffic();
-    setNote(where === 'project' ? 'Saved in the project' : 'Could not save: the dev server did not answer');
+    setNote(where === 'project' ? 'Saved in the project' : 'Could not save: the server did not answer. Your routes are kept in this browser: press Save again in a moment');
   };
 
   return (
@@ -47,7 +63,7 @@ export function TrafficEditor() {
         </div>
       </div>
       <div className="cam-edit__hint">
-        Tap or click the map to add a point to the {kind === 'cars' ? 'car' : 'boat'} route · drag to look · arrows / WASD move, Q E down / up · iPad: two fingers move
+        Tap the map to add a point to the {kind === 'cars' ? 'car' : 'boat'} route · tap a point to pick it, drag it to move it · drag elsewhere to look · arrows / WASD move, Q E down / up · iPad: two fingers move
         {kind === 'boats' && !fleet.routes.length ? ' · no boat route yet: the boats sail the river' : ''}
       </div>
       <div className="cam-edit__row traffic-edit__routes">
@@ -71,6 +87,19 @@ export function TrafficEditor() {
           Delete route
         </button>
       </div>
+      {point && (
+        <div className="cam-edit__row traffic-edit__point">
+          <span>
+            Point {point.index + 1} of route {point.route + 1} · drag it on the map to move it
+          </span>
+          <button type="button" onClick={() => st.deletePoint()}>
+            Delete point
+          </button>
+          <button type="button" onClick={() => st.selectPoint(null)}>
+            Done with this point
+          </button>
+        </div>
+      )}
       <div className="cam-edit__row traffic-edit__sliders">
         <label>
           How many <b>{fleet.count}</b>
@@ -99,6 +128,11 @@ export function TrafficEditor() {
           Done
         </button>
       </div>
+      {restored && dirty && !note && (
+        <div className="cam-edit__note">
+          Your unsaved routes from {new Date(restored).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} are back: press Save to keep them
+        </div>
+      )}
       {note && <div className="cam-edit__note">{note}</div>}
     </div>
   );

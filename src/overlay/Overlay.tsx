@@ -38,13 +38,15 @@ export function Overlay() {
   if (!scene) return null;
 
   const panelKey = scene.overlayGroup ?? scene.id;
-  const showPanel = !!scene.overlay && (settled || (!!scene.overlayGroup && shownKey.current === panelKey));
+  // Traffic mode clears the page away: only the map, the traffic and its bar stay
+  const showPanel = !trafficEditing && !!scene.overlay && (settled || (!!scene.overlayGroup && shownKey.current === panelKey));
   shownKey.current = showPanel ? panelKey : settled ? null : shownKey.current;
 
   const Comp = scene.overlay ? OVERLAYS[scene.overlay] : null;
 
   return (
     <>
+      {!trafficEditing && (
       <div className="strip">
         {/* the Oracle logo shares the strip's white panel (owner: on its own it sat on the city) */}
         <span className="strip__logo" role="img" aria-label="Oracle" />
@@ -55,9 +57,12 @@ export function Overlay() {
         <span className="strip__sep" />
         <span className="strip__title">{scene.title}</span>
       </div>
-      <div className="counter mono">
-        {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
-      </div>
+      )}
+      {!trafficEditing && (
+        <div className="counter mono">
+          {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+        </div>
+      )}
 
       <AnimatePresence mode="wait">
         {showPanel && (
@@ -74,13 +79,13 @@ export function Overlay() {
         )}
       </AnimatePresence>
 
-      {scene.card && settled && <HandoffCard card={scene.card} />}
+      {scene.card && settled && !trafficEditing && <HandoffCard card={scene.card} />}
 
       {/* lab guide: on a page with a notebook stop, the Jupyter drawer waits on the left edge */}
-      {settled && <JupyterDrawer key={scene.id} sceneId={scene.id} />}
+      {settled && !trafficEditing && <JupyterDrawer key={scene.id} sceneId={scene.id} />}
 
       {/* presenter script under the page; CC (or S) hides it */}
-      {scene.script && scriptOpen && (
+      {scene.script && scriptOpen && !trafficEditing && (
         <div className="script" aria-label="presenter script">
           <Rich text={scene.script} />
         </div>
