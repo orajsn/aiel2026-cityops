@@ -1,7 +1,10 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { spawn } from 'node:child_process';
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { cpus, tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
 import { canSaveFrom, TUNNEL_HOSTS } from './src/engine/remote';
@@ -55,13 +58,89 @@ function fullReloadForScene(): Plugin {
   };
 }
 
+/**
+ * GET /__viewers: how many browsers have the app open right now (one hot-reload socket each). The capture tools
+ * (tools/browser.mjs) wait while it is above zero, so a capture never slows the PC while someone uses the app.
+ */
+function viewersCount(): Plugin {
+  return {
+    name: 'cityops-viewers',
+    configureServer(server) {
+      server.middlewares.use('/__viewers', (_req, res) => {
+        res.setHeader('content-type', 'application/json');
+        res.setHeader('cache-control', 'no-store');
+        res.end(JSON.stringify({ viewers: server.ws.clients.size }));
+      });
+    },
+  };
+}
+
+/**
+ * The capture tools' hidden browser draws the city in software: its gpu-process alone kept ~12 of 16 cores busy at
+ * AboveNormal priority (Edge raises it itself), and when a tool was killed its browser kept running and the PC
+ * crawled (owner, 25 Oct). The dev server runs all day, so it keeps watch: while a capture holds the lock, every
+ * capture process goes to Idle priority on a quarter of the cores (re-applied every 5 s, Edge raises it again);
+ * once the holder has died, its browser is closed and the lock removed; once a minute, any capture browser with no
+ * live holder is closed. Windows only; capture processes are found by their throw-away profile folder name.
+ */
+function captureGuard(): Plugin {
+  const LOCK = join(tmpdir(), 'cityops-capture.lock');
+  const n = cpus().length;
+  const k = Math.max(2, Math.floor(n / 4));
+  const mask = Number(((1n << BigInt(k)) - 1n) << BigInt(Math.max(0, n - k)));
+  const MATCH = `Get-CimInstance Win32_Process -Filter "Name='msedge.exe' OR Name='chrome.exe'" | Where-Object { $_.CommandLine -like '*cityops-capture-*' }`;
+  const CALM = `${MATCH} | ForEach-Object { $q = Get-Process -Id $_.ProcessId -ErrorAction SilentlyContinue; if ($q) { if ($q.PriorityClass -ne 'Idle') { try { $q.PriorityClass = 'Idle' } catch {} }; if ([int64]$q.ProcessorAffinity -ne ${mask}) { try { $q.ProcessorAffinity = [IntPtr]${mask} } catch {} } } }`;
+  const CLOSE = `${MATCH} | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }`;
+  const alive = (pid: number) => {
+    try {
+      process.kill(pid, 0);
+      return true;
+    } catch (e) {
+      return (e as NodeJS.ErrnoException).code === 'EPERM';
+    }
+  };
+  let busy = false;
+  const ps = (command: string) => {
+    if (busy) return;
+    busy = true;
+    spawn('powershell', ['-NoProfile', '-Command', command], { stdio: 'ignore', windowsHide: true }).on('exit', () => (busy = false)).on('error', () => (busy = false));
+  };
+  return {
+    name: 'cityops-capture-guard',
+    configureServer(server) {
+      if (process.platform !== 'win32') return;
+      let tick = 0;
+      const timer = setInterval(() => {
+        tick++;
+        let holder = 0;
+        try {
+          holder = Number(readFileSync(LOCK, 'utf8').trim());
+        } catch {
+          /* no capture running */
+        }
+        if (holder && alive(holder)) return ps(CALM);
+        if (holder) {
+          try {
+            unlinkSync(LOCK);
+          } catch {
+            /* gone already */
+          }
+          return ps(CLOSE);
+        }
+        if (tick % 12 === 0) ps(CLOSE);
+      }, 5000);
+      timer.unref();
+      server.httpServer?.on('close', () => clearInterval(timer));
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), cameraOverrides()],
   base: './',
   build: { assetsInlineLimit: 0 },
   // the saved-angles file changes while presenting: do not reload the page when it does. Polling: on this
   // machine the file-change events were sometimes missed and the server kept serving stale code.
-  plugins: [react(), cameraOverrides(), fullReloadForScene()],
+  plugins: [react(), cameraOverrides(), fullReloadForScene(), viewersCount(), captureGuard()],
   server: { port: 5174, strictPort: true, watch: { ignored: ['**/src/content/cameraOverrides.json', '**/public/**', '**/.claude/**'], usePolling: true, interval: 400 }, allowedHosts: TUNNEL_HOSTS },
   test: {
     environment: 'jsdom',
