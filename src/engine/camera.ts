@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import overridesJson from '../content/cameraOverrides.json';
 import { SHOTS, type Shot, type Vec3 } from '../world/shots';
 import type { SceneDef } from './types';
+import { at } from './base';
 
 /** A camera angle the owner set by hand for one page (Camera mode → Save). */
 export interface SavedAngle {
@@ -50,7 +51,7 @@ export function shotForScene(scene: SceneDef, overrides = useCameraStore.getStat
  */
 export async function loadOverrides(): Promise<void> {
   try {
-    const r = await fetch('/__camera-overrides', { cache: 'no-store' });
+    const r = await fetch(at('__camera-overrides'), { cache: 'no-store' });
     if (r.ok && (r.headers.get('content-type') ?? '').includes('json')) {
       useCameraStore.setState({ overrides: await r.json() });
       return;
@@ -73,7 +74,7 @@ export async function loadOverrides(): Promise<void> {
  */
 export async function persistOverrides(overrides: Record<string, SavedAngle>): Promise<'project' | 'browser'> {
   try {
-    const r = await fetch('/__camera-overrides', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(overrides) });
+    const r = await fetch(at('__camera-overrides'), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(overrides) });
     if (r.ok) return 'project';
   } catch {
     /* no dev server */

@@ -5,9 +5,10 @@ import { inBridgeCorridor } from './bridgeFrame';
 import { nearestRoad } from './roads';
 import { nearLandmark } from './landmarks';
 import { bangkokCovers } from './BangkokCity';
+import { at } from '../engine/base';
 
 /** Kenney city-kit models (CC0, kenney.nl), served from public/models/kenney. */
-export const KIT = '/models/kenney';
+export const KIT = at('models/kenney');
 
 export const MODEL_SETS = {
   tall: ['a', 'b', 'c', 'd', 'e'].map((k) => `commercial/building-skyscraper-${k}.glb`),

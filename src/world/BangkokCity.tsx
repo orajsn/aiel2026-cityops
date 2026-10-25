@@ -2,13 +2,14 @@ import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useGLTF } from '@react-three/drei';
 import { setTerrainGrid, terrainGridFromMesh } from './terrain';
+import { at } from '../engine/base';
 
 /**
  * "Bangkok" by TerraMesh (Sketchfab, CC-BY-4.0), used as delivered: terrain with its aerial
  * texture and the extruded buildings with their wall textures. Only the heavy roughness and
  * specular maps were dropped. Georeferenced so the pins and the river centreline land on it.
  */
-const URL = '/models/city/bangkok-full/scene.gltf';
+const URL = at('models/city/bangkok-full/scene.gltf');
 
 /**
  * Model units -> scene units. Fitted on Sanam Luang and Lumphini Park in the model's aerial texture,

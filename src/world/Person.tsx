@@ -4,12 +4,13 @@ import { useFrame } from '@react-three/fiber';
 import { useAnimations, useGLTF } from '@react-three/drei';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import type { Vec3 } from './shots';
+import { at } from '../engine/base';
 
 /** Kenney Mini Characters (CC0): character-{male|female}-{a..f}.glb, each with idle/walk/sit/crouch/interact clips. */
 export type Who = `character-${'male' | 'female'}-${'a' | 'b' | 'c' | 'd' | 'e' | 'f'}`;
 export type Pose = 'idle' | 'walk' | 'sit' | 'crouch' | 'interact-right' | 'emote-yes' | 'pick-up';
 
-const url = (who: Who) => `/models/kenney/characters/${who}.glb`;
+const url = (who: Who) => at(`models/kenney/characters/${who}.glb`);
 
 export interface PersonProps {
   who: Who;

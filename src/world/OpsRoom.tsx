@@ -6,6 +6,7 @@ import { ASSETS, assetPosition, project } from '../content/geo';
 import riverJson from '../content/river.json';
 import { Person, type Who } from './Person';
 import type { Vec3 } from './shots';
+import { at } from '../engine/base';
 
 /**
  * City Operations Control Center, close up: a cut-away control room floating over its site, drawn in
@@ -53,7 +54,7 @@ export function OpsRoom({ show }: { show: boolean }) {
  * y = 0 (Kenney pieces have their origin at a corner). `screen` puts a glowing display on its +z face.
  */
 function Prop({ name, width, position, rotation = 0, screen }: { name: string; width: number; position: Vec3; rotation?: number; screen?: THREE.Texture }) {
-  const gltf = useGLTF(`/models/kenney/furniture/${name}.glb`);
+  const gltf = useGLTF(at(`models/kenney/furniture/${name}.glb`));
   const { obj, scale, offset, size } = useMemo(() => {
     const o = gltf.scene.clone(true);
     o.traverse((m) => {
@@ -305,4 +306,4 @@ function drawToday(ctx: CanvasRenderingContext2D) {
   ctx.fillText('ALL_MINILM_L12_V2 · 384 numbers per text', 60, H - 46);
 }
 
-for (const n of ['desk', 'computerScreen', 'chairDesk', 'pottedPlant']) useGLTF.preload?.(`/models/kenney/furniture/${n}.glb`);
+for (const n of ['desk', 'computerScreen', 'chairDesk', 'pottedPlant']) useGLTF.preload?.(at(`models/kenney/furniture/${n}.glb`));

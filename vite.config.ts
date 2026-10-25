@@ -11,12 +11,28 @@ import type { Plugin } from 'vite';
 import { canSaveFrom, TUNNEL_HOSTS } from './src/engine/remote';
 import { normalizeTraffic } from './src/content/traffic';
 
+/**
+ * Where the app lives: '/' on this PC, '/aiexperiencelive2026/' on the cloud VM, behind nginx's login
+ * (CITYOPS_BASE, set by tools/vm-setup.sh). The dev server's own endpoints and file shortcuts below are
+ * written for '/', so `local` strips the base before matching.
+ */
+const BASE = process.env.CITYOPS_BASE ?? '/';
+const local = (url: string) => (BASE !== '/' && url.startsWith(BASE) ? `/${url.slice(BASE.length)}` : url);
+/** on the VM the dev server only listens on 127.0.0.1 behind nginx's login, so every request there is the owner's */
+const BEHIND_LOGIN = process.env.CITYOPS_BEHIND_LOGIN === '1';
+
 /** Camera mode → Save: write the owner's saved angles into the project (dev server only). */
 function cameraOverrides(): Plugin {
   const file = fileURLToPath(new URL('./src/content/cameraOverrides.json', import.meta.url));
   return {
     name: 'cityops-camera-overrides',
     configureServer(server) {
+      // the app's own endpoints (/__camera-overrides, /__traffic, /__viewers) under the base address
+      if (BASE !== '/')
+        server.middlewares.use((req, _res, next) => {
+          if (req.url?.startsWith(`${BASE}__`)) req.url = `/${req.url.slice(BASE.length)}`;
+          next();
+        });
       server.middlewares.use('/__camera-overrides', (req, res) => {
         if (req.method === 'GET') {
           // read fresh from disk: the file is excluded from the watcher, so its module copy goes stale
@@ -26,7 +42,7 @@ function cameraOverrides(): Plugin {
         }
         if (req.method !== 'POST') return void res.writeHead(405).end();
         // the public tunnel link is view-only
-        if (!canSaveFrom(req.headers)) return void res.writeHead(403).end('view-only');
+        if (!BEHIND_LOGIN && !canSaveFrom(req.headers)) return void res.writeHead(403).end('view-only');
         let body = '';
         req.on('data', (c) => (body += c));
         req.on('end', () => {
@@ -196,7 +212,7 @@ function fastModels(): Plugin {
       // files the watcher does not see (public/** is ignored so previews do not reload the page): the dev server
       // only learns of new public files at startup, so new previews and sw.js are read straight from disk here
       server.middlewares.use((req, res, next) => {
-        const url = decodeURIComponent((req.url ?? '').split('?')[0]);
+        const url = local(decodeURIComponent((req.url ?? '').split('?')[0]));
         const fresh = url === '/sw.js' ? 'text/javascript' : url.startsWith('/thumbs/') && url.endsWith('.jpg') && !url.includes('..') ? 'image/jpeg' : null;
         if (!fresh) return next();
         const file = join(root, url);
@@ -205,7 +221,7 @@ function fastModels(): Plugin {
         res.end(readFileSync(file));
       });
       server.middlewares.use((req, res, next) => {
-        const url = decodeURIComponent((req.url ?? '').split('?')[0]);
+        const url = local(decodeURIComponent((req.url ?? '').split('?')[0]));
         if (!url.startsWith('/models/') || url.includes('..')) return next();
         res.setHeader('cache-control', 'public, max-age=604800');
         const ext = url.slice(url.lastIndexOf('.'));
@@ -231,7 +247,8 @@ function fastModels(): Plugin {
 }
 
 export default defineConfig({
-  base: './',
+  // './' builds a copy that runs from any folder; the dev server uses '/' or the VM's address
+  base: process.env.CITYOPS_BASE ?? './',
   build: { assetsInlineLimit: 0 },
   // the saved-angles file changes while presenting: do not reload the page when it does. Polling: on this
   // machine the file-change events were sometimes missed and the server kept serving stale code.

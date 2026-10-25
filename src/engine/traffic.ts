@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import trafficJson from '../content/traffic.json';
 import { LIMITS, normalizeTraffic, type Fleet, type RoutePoint, type TrafficConfig, type TrafficKind } from '../content/traffic';
+import { at } from './base';
 
 /**
  * Traffic mode (owner tool, next to Camera mode): draw boat and car routes on the map and set how many
@@ -90,7 +91,7 @@ export function drivableRoutes(f: Fleet) {
 /** read the saved traffic fresh from the dev server (the file is not watched, so a save never reloads the page) */
 export async function loadTraffic(): Promise<void> {
   try {
-    const r = await fetch('/__traffic', { cache: 'no-store' });
+    const r = await fetch(at('__traffic'), { cache: 'no-store' });
     if (r.ok && (r.headers.get('content-type') ?? '').includes('json')) useTrafficStore.getState().replace(await r.json());
   } catch {
     /* no dev server: the bundled traffic.json stands */
@@ -100,7 +101,7 @@ export async function loadTraffic(): Promise<void> {
 /** save to the project; 'failed' if the dev server is not reachable or refused it */
 export async function persistTraffic(): Promise<'project' | 'failed'> {
   try {
-    const r = await fetch('/__traffic', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(useTrafficStore.getState().config) });
+    const r = await fetch(at('__traffic'), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(useTrafficStore.getState().config) });
     if (r.ok) {
       useTrafficStore.setState({ dirty: false });
       return 'project';
