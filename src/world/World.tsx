@@ -17,6 +17,7 @@ import { BridgeQuestion } from './BridgeQuestion';
 import { CITY_DIM } from './BangkokCity';
 import { useFrame } from '@react-three/fiber';
 import { useTrafficStore } from '../engine/traffic';
+import { STREAM_MS } from '../overlay/concepts/DataCounters';
 
 export interface WorldProps {
   pins?: AssetType[] | 'all';
@@ -53,7 +54,7 @@ export function World() {
       <Lighting />
       <City />
       {w.pins && <AssetPins visible={w.pins} highlight={w.highlight} />}
-      <DataStream running={!!w.dataStream} />
+      <DataStream running={!!w.dataStream} durationMs={STREAM_MS} />
       {w.core && <DatabaseDiorama face={w.core} />}
       {(w.graph || w.core === 'graph') && (
         <GraphLines

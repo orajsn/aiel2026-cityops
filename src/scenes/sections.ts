@@ -8,7 +8,7 @@ export interface Section {
 export const CHAPTER_NAME = ['Introduction', 'Lab 2 · RAG to Agents', 'Lab 3 · Agent Memory'];
 
 export const SECTIONS: Section[] = [
-  { chapter: 0, name: 'The city and its data', pages: ['0.1', '0.2', '0.3'] },
+  { chapter: 0, name: 'The city and its data', pages: ['0.0', '0.1', '0.2', '0.3'] },
   { chapter: 0, name: 'The question on the bridge', pages: ['0.4'] },
   { chapter: 0, name: 'One database, four shapes', pages: ['0.5', '0.6'] },
   { chapter: 0, name: 'One bridge, two problems', pages: ['0.7'] },

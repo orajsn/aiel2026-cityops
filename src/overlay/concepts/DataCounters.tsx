@@ -1,6 +1,14 @@
 import { motion } from 'motion/react';
 import { useSceneStore } from '../../engine/store';
 
+/** how long the day's data takes to come in (DataStream on this page uses the same) */
+export const STREAM_MS = 4000;
+
+/**
+ * Introduction page 3: the day's data flows into the City Operations Control Center (3D), and a band along the
+ * bottom counts it in: three big numbers side by side, then the line that matters, most of it is free text.
+ * Owner, 25 Oct: the counting was slow; it now takes four seconds.
+ */
 export function DataCounters() {
   const c = useSceneStore((s) => s.counters);
   const rows = [
@@ -9,28 +17,22 @@ export function DataCounters() {
     { n: c.findings, label: 'findings', max: 220 },
   ];
   return (
-    <div className="counters">
-      <div className="counters__clock" aria-hidden>
-        <svg viewBox="0 0 64 64" width="64" height="64">
-          <circle cx="32" cy="32" r="29" fill="none" stroke="rgba(230,233,239,0.18)" strokeWidth="1.5" />
-          {Array.from({ length: 12 }, (_, i) => (
-            <line key={i} x1="32" y1="5" x2="32" y2="9" stroke="rgba(230,233,239,0.4)" strokeWidth="1.5" transform={`rotate(${i * 30} 32 32)`} />
-          ))}
-          <motion.line x1="32" y1="32" x2="32" y2="10" stroke="#C74634" strokeWidth="2" strokeLinecap="round" style={{ originX: '32px', originY: '32px' }} initial={{ rotate: 0 }} animate={{ rotate: 720 }} transition={{ duration: 9, ease: 'linear' }} />
-          <circle cx="32" cy="32" r="2" fill="#C74634" />
-        </svg>
-        <div className="counters__day">24 hours</div>
+    <motion.div className="counters" data-testid="data-counters" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.45 }}>
+      <div className="counters__day">in 24 hours</div>
+      <div className="counters__rows">
+        {rows.map((r) => (
+          <div key={r.label} className="counters__row">
+            <div className="counters__n mono">{r.n}</div>
+            <div className="counters__label">{r.label}</div>
+            <div className="counters__bar">
+              <div style={{ width: `${(r.n / r.max) * 100}%` }} />
+            </div>
+          </div>
+        ))}
       </div>
-      {rows.map((r, i) => (
-        <motion.div key={r.label} className="counters__row" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + i * 0.15 }}>
-          <div className="counters__n mono">{r.n}</div>
-          <div className="counters__label">{r.label}</div>
-          <div className="counters__bar"><div style={{ width: `${(r.n / r.max) * 100}%` }} /></div>
-        </motion.div>
-      ))}
-      <motion.div className="counters__note" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 6 }}>
-        most of it is free text, written by inspectors
+      <motion.div className="counters__note" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: STREAM_MS / 1000 + 0.3 }}>
+        most of it is <b>free text</b>, written by inspectors
       </motion.div>
-    </div>
+    </motion.div>
   );
 }

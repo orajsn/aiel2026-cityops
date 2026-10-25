@@ -4,6 +4,7 @@
  */
 export const SCRIPT: Record<string, string> = {
   // Chapter 0 · The city
+  '0.0': 'Good afternoon. Below us is **Bangkok**, from above. Let us fly down.',
   '0.1': 'This is **Bangkok**, our city for the afternoon. Everything you will build today runs its **operations team**. This is the city. Tonight we run it.',
   '0.2': 'Every pin is a piece of infrastructure: bridges, substations, pipelines, sensors. **Twenty-eight assets**. Each one has **a record, a spec sheet, a history, and neighbours**.',
   '0.3': 'Every day the city writes about itself: **308 logs, 60 reports, 220 findings**, all flowing into the City Operations Control Center. Most of it is **free text** written by inspectors.',

@@ -22,6 +22,8 @@ export interface SceneDef {
   shot: ShotId;
   /** Cut to this shot on entry, then fly to `shot` (used for the opening fly-in). */
   enterFrom?: ShotId;
+  /** shown as page 0 of its part, before page 1 (the Introduction's opening view); the pages after keep their numbers */
+  pageZero?: boolean;
   world?: Record<string, unknown>;
   overlay?: OverlayKey;
   overlayProps?: Record<string, unknown>;

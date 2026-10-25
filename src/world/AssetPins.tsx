@@ -31,7 +31,7 @@ interface PinAnim {
   startMs: number; // when this pin starts rising (performance.now based)
 }
 
-export function AssetPins({ visible, highlight = [], onHover, groupStaggerMs = 700 }: AssetPinsProps) {
+export function AssetPins({ visible, highlight = [], onHover, groupStaggerMs = 300 }: AssetPinsProps) {
   const [hovered, setHovered] = useState<string | null>(null);
   const theme = useUiStore((s) => s.theme);
   const highlightSet = useMemo(() => new Set(highlight), [highlight]);

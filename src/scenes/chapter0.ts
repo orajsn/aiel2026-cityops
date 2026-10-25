@@ -4,10 +4,18 @@ const HB = 'Harbor Bridge';
 
 export const chapter0: SceneDef[] = [
   {
+    // page 0 (owner, 25 Oct): the show opens on the wide view over Bangkok, so Next flies the camera down into
+    // page 1 instead of page 1 opening on a still frame. Shows as page 0; the pages after keep their numbers.
+    id: '0.0',
+    chapter: 0,
+    title: 'Bangkok from above',
+    shot: 'city',
+    pageZero: true,
+  },
+  {
     id: '0.1',
     chapter: 0,
     title: 'Night over the river',
-    enterFrom: 'arrive',
     shot: 'city',
     overlay: 'TitleCard',
     recapMode: true,

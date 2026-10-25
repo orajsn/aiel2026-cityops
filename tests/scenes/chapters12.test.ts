@@ -33,7 +33,7 @@ test('no page says "fictional scenario" (owner: everyone already knows)', () => 
 test('SCENES runs chapter 0, then 1, then 2', () => {
   const chapters = SCENES.map((s) => s.chapter);
   expect(chapters).toEqual([...chapters].sort());
-  expect(SCENES.length).toBe(7 + 9 + 29);
+  expect(SCENES.length).toBe(8 + 9 + 29);
 });
 
 test('no banned names anywhere in the copy', () => {
