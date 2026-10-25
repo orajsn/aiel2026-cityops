@@ -15,7 +15,7 @@ export const chapter0: SceneDef[] = [
   {
     id: '0.1',
     chapter: 0,
-    title: 'Night over the river',
+    title: 'Bangkok, our city',
     shot: 'city',
     overlay: 'TitleCard',
     recapMode: true,
