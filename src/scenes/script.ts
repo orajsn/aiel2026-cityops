@@ -31,6 +31,7 @@ export const SCRIPT: Record<string, string> = {
   '3.1c': 'Day 2. Jordan Vance comes to the same rust and asks what happened here. The copilot has nothing. Same questions again, the earlier advice is missing, and the follow-up is out of view. The records may still exist. The next visit needs a way to find and use the relevant history.',
   '3.2a': 'An agent needs more than one kind of memory. Short-term memory is what it holds right now: the context window and the session. When the chat closes, it is gone. That is what happened to Mercer’s notes.',
   '3.2b': 'Long-term memory is what the agent keeps between visits. This is what Vance needed.',
+  '3.2p': 'Long-term memory comes in three kinds, and you already have all three. Riding a bike is procedural: how to do something. Last summer’s trip is episodic: what happened. What you learned in school is semantic: what is true. An agent needs the same three: its system prompt, its past actions, the facts about its users.',
   '3.2c': 'Long-term memory comes in three kinds. Procedural is how to do the job. Episodic is what happened. Semantic is what is true.',
   '3.2d': 'Each kind lives in its own layer. Procedures become workflows and tools. Episodes become tool logs, conversations and summaries. Facts become a knowledge base, entities and personas.',
   '3.2e': 'Last, shared memory. What one inspector learns, the next one can use. That is the handoff Vance was missing.',

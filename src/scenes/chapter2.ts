@@ -2,6 +2,7 @@ import type { SceneDef } from '../engine/types';
 import type { CastProps } from '../overlay/concepts/Cast';
 import type { ChatNote, CopilotChatProps } from '../overlay/concepts/CopilotChat';
 import type { MemoryMapProps } from '../overlay/concepts/MemoryMap';
+import type { LikeAPersonProps } from '../overlay/concepts/LikeAPerson';
 import type { GlassProps } from '../overlay/concepts/Glass';
 import type { DisciplinesProps } from '../overlay/concepts/Disciplines';
 import type { MemoryLoopProps } from '../overlay/concepts/MemoryLoop';
@@ -121,6 +122,19 @@ const map = (id: string, step: MemoryMapProps['step'], message: string, notebook
 
 const b22a = map('3.2a', 1, '**Short-term memory**: what the agent holds right now.');
 const b22b = map('3.2b', 2, '**Long-term memory**: what it keeps between visits.');
+/**
+ * 3.2p · Like a person (owner, 26 Oct): the human analogy between long-term memory and its three kinds. The camera
+ * still holds at the rust; the next click opens the map again with the three kinds drawing in.
+ */
+const b22p: SceneDef = {
+  id: '3.2p',
+  chapter: 2,
+  title: 'Like a person',
+  shot: 'pier2-close',
+  world: { bridge: true, inspect: { pier: 'pier2', who: 'character-male-d' } },
+  overlay: 'LikeAPerson',
+  overlayProps: { kicker: 'Kinds of memory', message: 'Long-term memory comes in three kinds. **You already have all three.**' } satisfies LikeAPersonProps as unknown as Record<string, unknown>,
+};
 const b22c = map('3.2c', 3, 'Three kinds: **how to do the job**, **what happened**, **what is true**.');
 const b22d = map('3.2d', 4, 'Each kind lives in its own layer.');
 const b22e = map('3.2e', 5, 'And a **shared memory**, so the next inspector can use it too.', 'CITY_MEMORY holds fact, preference, guideline and memory records');
@@ -259,6 +273,7 @@ export const chapter2: SceneDef[] = [
   b21c,
   b22a,
   b22b,
+  b22p,
   b22c,
   b22d,
   b22e,
