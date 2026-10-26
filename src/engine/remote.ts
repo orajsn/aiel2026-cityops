@@ -17,4 +17,4 @@ export function canSaveFrom(headers: Record<string, string | string[] | undefine
 }
 
 /** host names the dev server answers besides localhost and IP addresses */
-export const TUNNEL_HOSTS = ['.trycloudflare.com', '.duckdns.org'];
+export const TUNNEL_HOSTS = ['.trycloudflare.com', '.duckdns.org', 'aielbkk26.aiscloud.app'];

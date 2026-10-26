@@ -19,8 +19,9 @@ test('saves through the Cloudflare tunnel are refused', () => {
 test('saves through a public name or a public IP are refused', () => {
   expect(canSaveFrom({ host: 'jatuponghub.duckdns.org:5173' })).toBe(false);
   expect(canSaveFrom({ host: '161.118.233.175:5173' })).toBe(false);
+  expect(canSaveFrom({ host: 'aielbkk26.aiscloud.app' })).toBe(false);
 });
 
 test('the dev server answers the tunnel and DuckDNS names', () => {
-  expect(TUNNEL_HOSTS).toEqual(expect.arrayContaining(['.trycloudflare.com', '.duckdns.org']));
+  expect(TUNNEL_HOSTS).toEqual(expect.arrayContaining(['.trycloudflare.com', '.duckdns.org', 'aielbkk26.aiscloud.app']));
 });
