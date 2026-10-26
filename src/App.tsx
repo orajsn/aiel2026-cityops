@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { World } from './world/World';
 import { Overlay } from './overlay/Overlay';
-import { Stage } from './Stage';
+import { Stage, useRenderDpr } from './Stage';
 import { useSceneStore } from './engine/store';
 import { useUiStore } from './engine/ui';
 import { bindHash } from './engine/hash';
@@ -13,6 +13,7 @@ import { loadTraffic, useTrafficStore } from './engine/traffic';
 import { setTrafficMode } from './overlay/TrafficEditor';
 
 export default function App() {
+  const dpr = useRenderDpr();
   useEffect(() => {
     useSceneStore.getState().setScenes(SCENES);
     void loadOverrides();
@@ -40,7 +41,8 @@ export default function App() {
       <div id="app">
         <Canvas
           shadows
-          dpr={[1, 1.5]}
+          // the stage is CSS-scaled: draw only the pixels the screen really shows (Stage.tsx)
+          dpr={dpr}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
           camera={{ position: [10, 150, 170], fov: 45, near: 0.1, far: 4000 }}
           style={{ position: 'absolute', inset: 0 }}
