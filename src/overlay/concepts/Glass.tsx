@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { EASE, WidePanel } from './WidePanel';
+import { LineIcon, type IconName } from './icons';
 
 export interface GlassProps {
   kicker: string;
@@ -14,12 +15,15 @@ export interface GlassProps {
 export const GLASS_LAYERS = ['System prompt', 'Developer instructions', 'Tool schemas', 'Retrieved context', 'Conversation history', 'User message'];
 /** the four facts beside the glass (slide 27) */
 export const GLASS_FACTS = ['Finite resource', 'LLM’s only input', 'Assembled, not automatic', 'Garbage in, garbage out'];
-/** the curation problem (slide 28), told with the bridge instead of the deck's running shoes (owner, 25 Oct) */
-export const CURATION = [
-  { word: 'Volume', title: 'The window fills up', text: 'By turn 15 the window is full. One more tool call and it breaks.' },
-  { word: 'Relevance', title: 'Wrong data is in it', text: 'Mercer’s finding is there, but buried under search results Vance never asked for.' },
-  { word: 'Accuracy', title: 'Summaries lose details', text: 'The summary says “rust on the pier” but lost the 25%.' },
-  { word: 'Timing', title: 'The right memory, at the wrong moment', text: 'Her finding was loaded at the start, not fetched again when Vance asked.' },
+/**
+ * The curation problem (slide 28), told with the bridge instead of the deck's running shoes (owner, 25 Oct). Each has
+ * its icon, the same one again when it is solved (Ending.tsx, 3.15b), so the audience links problem and fix.
+ */
+export const CURATION: { word: string; title: string; text: string; icon: IconName }[] = [
+  { word: 'Volume', title: 'The window fills up', text: 'By turn 15 the window is full. One more tool call and it breaks.', icon: 'overflow' },
+  { word: 'Relevance', title: 'Wrong data is in it', text: 'Mercer’s finding is there, but buried under search results Vance never asked for.', icon: 'target' },
+  { word: 'Accuracy', title: 'Summaries lose details', text: 'The summary says “rust on the pier” but lost the 25%.', icon: 'inspect' },
+  { word: 'Timing', title: 'The right memory, at the wrong moment', text: 'Her finding was loaded at the start, not fetched again when Vance asked.', icon: 'clock' },
 ];
 
 const W = 520;
@@ -97,8 +101,11 @@ export function Glass({ kicker, message, step, notebook }: GlassProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.35 + i * 0.3, duration: 0.45, ease: EASE }}
                 >
-                  <div style={{ fontSize: 23, fontWeight: 700, color: 'var(--ink)', marginBottom: 10 }}>
-                    <span style={{ color: 'var(--teal)' }}>{c.word}</span> · {c.title}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 10 }}>
+                    <LineIcon name={c.icon} size={44} />
+                    <div style={{ fontSize: 23, fontWeight: 700, color: 'var(--ink)' }}>
+                      <span style={{ color: 'var(--teal)' }}>{c.word}</span> · {c.title}
+                    </div>
                   </div>
                   <div style={{ fontSize: 21, lineHeight: 1.4, color: 'var(--ink)' }}>{c.text}</div>
                 </motion.div>

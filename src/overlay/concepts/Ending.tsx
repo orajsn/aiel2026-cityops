@@ -2,6 +2,8 @@ import { motion } from 'motion/react';
 import { Rich } from '../Rich';
 import { ChatWindow, type ChatItem } from './CopilotChat';
 import { EASE, WidePanel } from './WidePanel';
+import { CURATION } from './Glass';
+import { LineIcon, type IconName } from './icons';
 
 /**
  * Lab 3 pages 26 to 29, the ending (owner, 25 Oct; sketches agreed in chat): with and without memory, the four
@@ -27,6 +29,8 @@ export interface WithWithoutProps extends EndingProps {
 
 /** the deck's comparison rows (slide 14 and the storyline doc's four-row comparison), said plainly */
 export const COMPARE_ROWS = ['knows it is the same bridge', 'cites the real finding', 'gives a specific action', 'never sees private chats'];
+/** each row's icon, in the same order (owner, 26 Oct: an icon in place of the tick) */
+const ROW_ICONS: IconName[] = ['pin', 'quote', 'wrench', 'lock'];
 
 export function WithWithout({ kicker, message, notebook, question, without, withMemory }: WithWithoutProps) {
   const chat = (answer: string): ChatItem[] => [
@@ -47,8 +51,8 @@ export function WithWithout({ kicker, message, notebook, question, without, with
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 22 }}>
         {COMPARE_ROWS.map((r, i) => (
-          <motion.div key={r} data-row={r} style={{ padding: '12px 18px', borderRadius: 12, background: TEAL_TINT, border: '2px solid var(--teal)', fontSize: 22, color: 'var(--ink)' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.6 + i * 0.25, duration: 0.45, ease: EASE }}>
-            <span style={{ color: 'var(--teal)', fontWeight: 700, marginRight: 10 }}>✓</span>
+          <motion.div key={r} data-row={r} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '10px 18px', borderRadius: 12, background: TEAL_TINT, border: '2px solid var(--teal)', fontSize: 22, color: 'var(--ink)' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.6 + i * 0.25, duration: 0.45, ease: EASE }}>
+            <LineIcon name={ROW_ICONS[i]} size={36} />
             {r}
           </motion.div>
         ))}
@@ -72,9 +76,13 @@ export function FailuresSolved({ kicker, message, notebook }: EndingProps) {
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="failures-solved">
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 10 }}>
         {SOLVED.map((s, i) => (
-          <motion.div key={s.word} data-solved={s.word} style={{ position: 'relative', padding: '24px 26px', borderRadius: 16, background: TEAL_TINT, border: '2px solid var(--teal)', minHeight: 150 }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.35, duration: 0.45, ease: EASE }}>
-            <div style={{ fontSize: 30, fontWeight: 700, color: 'var(--teal)', marginBottom: 12 }}>{s.word}</div>
-            <div style={{ fontSize: 24, color: 'var(--ink)', lineHeight: 1.4, maxWidth: '78%' }}>{s.text}</div>
+          <motion.div key={s.word} data-solved={s.word} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 22, padding: '24px 26px', borderRadius: 16, background: TEAL_TINT, border: '2px solid var(--teal)', minHeight: 150 }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.35, duration: 0.45, ease: EASE }}>
+            {/* the same icon the problem had on the glass */}
+            <LineIcon name={CURATION.find((c) => c.word === s.word)!.icon} size={64} />
+            <div style={{ flex: 1, minWidth: 0, paddingRight: 120 }}>
+              <div style={{ fontSize: 30, fontWeight: 700, color: 'var(--teal)', marginBottom: 12 }}>{s.word}</div>
+              <div style={{ fontSize: 24, color: 'var(--ink)', lineHeight: 1.4 }}>{s.text}</div>
+            </div>
             {/* the stamp lands after the card */}
             <motion.span
               style={{ position: 'absolute', top: 22, right: 22, padding: '6px 14px', borderRadius: 8, border: '3px solid var(--teal)', color: 'var(--teal)', fontWeight: 800, fontSize: 20, letterSpacing: '0.1em' }}
@@ -146,7 +154,8 @@ export function BothLabs({ rule, history, message }: BothLabsProps) {
 /* ---------- page 29 · Takeaways ---------- */
 
 export interface TakeawaysProps extends EndingProps {
-  points: { title: string; text: string }[];
+  /** each with its icon in place of the number when it has one */
+  points: { title: string; text: string; icon?: IconName }[];
   quiz: string[];
 }
 
@@ -157,7 +166,11 @@ export function Takeaways({ kicker, message, notebook, points, quiz }: Takeaways
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {points.map((p, i) => (
             <motion.div key={p.title} data-takeaway={i + 1} style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '18px 22px', borderRadius: 14, background: TEAL_TINT, border: '2px solid var(--teal)' }} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + i * 0.5, duration: 0.45, ease: EASE }}>
-              <span style={{ flex: 'none', width: 54, height: 54, borderRadius: '50%', background: 'var(--teal)', color: '#ffffff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, fontWeight: 700 }}>{i + 1}</span>
+              {p.icon ? (
+                <LineIcon name={p.icon} size={58} />
+              ) : (
+                <span style={{ flex: 'none', width: 54, height: 54, borderRadius: '50%', background: 'var(--teal)', color: '#ffffff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, fontWeight: 700 }}>{i + 1}</span>
+              )}
               <span>
                 <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--ink)' }}>{p.title}</div>
                 <div style={{ fontSize: 21, color: 'var(--ink)', marginTop: 4 }}>{p.text}</div>

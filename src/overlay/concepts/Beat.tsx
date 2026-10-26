@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Rich } from '../Rich';
+import { LineIcon, type IconName } from './icons';
 
 const EASE = [0.2, 0.8, 0.2, 1] as const;
 
@@ -8,7 +9,7 @@ type Tone = 'teal' | 'red' | 'grey' | 'blue' | 'green' | 'amber';
 export type Visual =
   | { kind: 'chat'; lines: { who: string; text: string; tone?: Tone }[] }
   | { kind: 'flow'; steps: string[]; loop?: boolean; hot?: number[] }
-  | { kind: 'cards'; items: { title: string; sub?: string; tone?: Tone }[]; cols?: number }
+  | { kind: 'cards'; items: { title: string; sub?: string; tone?: Tone; icon?: IconName }[]; cols?: number }
   | { kind: 'compare'; left: { title: string; lines: string[]; tone?: Tone }; right: { title: string; lines: string[]; tone?: Tone } }
   | { kind: 'list'; items: string[]; ordered?: boolean }
   | { kind: 'code'; lines: string[] }
@@ -82,6 +83,7 @@ function VisualView({ v }: { v: Visual }) {
         <div className="beat-cards" style={{ gridTemplateColumns: `repeat(${v.cols ?? 2}, 1fr)` }}>
           {v.items.map((c, i) => (
             <motion.div key={i} className={`beat-card tone-${c.tone ?? 'teal'}`} {...item(i)}>
+              {c.icon && <LineIcon name={c.icon} size={52} />}
               <div className="beat-card__title">{c.title}</div>
               {c.sub && <div className="beat-card__sub">{c.sub}</div>}
             </motion.div>

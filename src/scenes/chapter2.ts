@@ -258,9 +258,9 @@ const b217: SceneDef = {
     kicker: 'If you only remember three things',
     message: 'Three things to **take home**.',
     points: [
-      { title: 'Memory is the foundation, not a feature', text: 'An agent is only as good as what it can recall.' },
-      { title: 'The context window is a curation problem', text: 'Memory, context and harness engineering solve it.' },
-      { title: 'One converged store beats four services', text: 'Vector, SQL, JSON and graph in one database.' },
+      { title: 'Memory is the foundation, not a feature', text: 'An agent is only as good as what it can recall.', icon: 'foundation' },
+      { title: 'The context window is a curation problem', text: 'Memory, context and harness engineering solve it.', icon: 'glass' },
+      { title: 'One converged store beats four services', text: 'Vector, SQL, JSON and graph in one database.', icon: 'converge' },
     ],
     quiz: ['5 minutes', '80% to pass', 'a badge'],
   } satisfies TakeawaysProps as unknown as Record<string, unknown>,

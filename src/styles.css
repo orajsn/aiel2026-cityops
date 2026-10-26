@@ -345,6 +345,7 @@ code,
 .beat-flow__back { font-size: 16px; color: var(--teal); margin-top: 4px; }
 .beat-cards { display: grid; gap: 14px; }
 .beat-card { padding: 16px 18px; border-radius: 10px; border-top: 4px solid var(--tone); background: rgba(127, 127, 127, 0.08); }
+.beat-card > svg { display: block; margin-bottom: 12px; }
 .beat-card__title { font-size: 24px; color: var(--ink); font-weight: 600; }
 .beat-card__sub { font-size: 18px; color: var(--ink-dim); margin-top: 6px; line-height: 1.35; }
 .beat-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

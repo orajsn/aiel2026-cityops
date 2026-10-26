@@ -82,9 +82,15 @@ const b18 = beat(1, '2.8', 'A sticky note', 'sky', {
 const b19 = beat(1, '2.9', 'Three questions', 'pier2', {
   kicker: 'Closing Lab 2',
   notebook: 'rag_to_agents_lab.ipynb · Section 6 close',
+  // three cards with their icons (owner, 26 Oct: more icons)
   visual: {
-    kind: 'list',
-    items: ['RAG: what does the record say?', 'Workflow: triage predictably.', 'Agent: reason and tell me what to do.'],
+    kind: 'cards',
+    cols: 3,
+    items: [
+      { title: 'RAG', sub: 'What does the record say?', icon: 'lookup' },
+      { title: 'Workflow', sub: 'Triage predictably.', icon: 'steps' },
+      { title: 'Agent', sub: 'Reason and tell me what to do.', icon: 'branch' },
+    ],
   },
   message: 'At three o’clock we give it **a real memory**.',
 }, { bridge: true, markers: true });
