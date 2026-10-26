@@ -2,11 +2,11 @@ import { render } from '@testing-library/react';
 import { LikeAPerson } from '../../src/overlay/concepts/LikeAPerson';
 import { chapter2 } from '../../src/scenes/chapter2';
 
-test('three kinds in the map order, each a person example over its agent example', () => {
+test('three kinds in the map order, each a person example over its agent example over its Harbor Bridge example', () => {
   const c = render(<LikeAPerson kicker="k" message="m" />).container;
   const kinds = [...c.querySelectorAll('[data-kind]')].map((k) => k.getAttribute('data-kind'));
   expect(kinds).toEqual(['Procedural', 'Episodic', 'Semantic']);
-  for (const w of ['Riding a bike', 'Its system prompt', 'last summer', 'Its past actions', 'learned in school', 'Facts about a user'])
+  for (const w of ['Riding a bike', 'Its system prompt', 'last summer', 'Its past actions', 'learned in school', 'Facts about a user', 'Approved inspection guidance', 'What Mercer saw and advised', 'Harbor Bridge and the right pier'])
     expect(c.textContent).toContain(w);
   // teal and greys only: red is for alerts
   expect(c.innerHTML).not.toMatch(/--red|#c74634/i);
