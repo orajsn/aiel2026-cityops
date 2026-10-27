@@ -11,9 +11,13 @@ import { SCENES } from './scenes';
 import { loadOverrides, useCameraStore } from './engine/camera';
 import { loadTraffic, useTrafficStore } from './engine/traffic';
 import { setTrafficMode } from './overlay/TrafficEditor';
+import { fixedDpr, useGraphicsStore } from './engine/graphics';
 
 export default function App() {
-  const dpr = useRenderDpr();
+  // Settings › Graphics: Auto draws what the screen shows, a fixed resolution draws exactly that
+  const autoDpr = useRenderDpr();
+  const fixed = useGraphicsStore((s) => fixedDpr(s.resolution, s.custom));
+  const dpr = fixed ?? autoDpr;
   useEffect(() => {
     useSceneStore.getState().setScenes(SCENES);
     void loadOverrides();
@@ -41,7 +45,7 @@ export default function App() {
       <div id="app">
         <Canvas
           shadows
-          // the stage is CSS-scaled: draw only the pixels the screen really shows (Stage.tsx)
+          // the stage is CSS-scaled: Auto draws only the pixels the screen really shows (Stage.tsx)
           dpr={dpr}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
           camera={{ position: [10, 150, 170], fov: 45, near: 0.1, far: 4000 }}

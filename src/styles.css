@@ -586,4 +586,19 @@ code,
 .settings__sky { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 8px 6px 10px; border-radius: 10px; border: 2px solid var(--line); background: transparent; color: var(--ink); font: 600 14px/1.2 var(--font-body); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .settings__sky i { display: block; width: 100%; height: 56px; border-radius: 6px; }
 .settings__sky.is-on { border-color: var(--teal); }
+.settings__label + .settings__res, .settings__label + .settings__tools { margin-bottom: 4px; }
+.settings__skies + .settings__label, .settings__now + .settings__label { margin-top: 16px; }
+.settings__res { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.settings__chip { min-height: 40px; padding: 0 6px; border-radius: 8px; border: 2px solid var(--line); background: transparent; color: var(--ink); font: 600 14px/1 var(--font-body); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.settings__chip.is-on { border-color: var(--teal); color: var(--teal); }
+.settings__custom { display: flex; align-items: flex-end; gap: 8px; margin-top: 10px; }
+.settings__custom label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-dim); }
+.settings__custom input { width: 92px; height: 40px; padding: 0 8px; border-radius: 8px; border: 2px solid var(--line); background: transparent; color: var(--ink); font: 500 15px/1 var(--font-mono); }
+.settings__x { padding-bottom: 10px; color: var(--ink-dim); }
+.settings__custom .settings__chip { flex: 1; }
+.settings__now { margin-top: 8px; font-size: 13px; color: var(--ink-dim); }
+.settings__tools { display: flex; flex-direction: column; gap: 8px; }
+.settings__tool { display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding: 0 14px; border-radius: 10px; border: 2px solid var(--line); background: transparent; color: var(--ink); font: 600 15px/1 var(--font-body); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; }
+.settings__tool.is-on { border-color: var(--teal); color: var(--teal); }
+.settings__tool kbd { font: 500 12px/1 var(--font-mono); color: var(--ink-dim); padding: 4px 7px; border: 1px solid var(--line); border-radius: 5px; }
 .stepper__btn--gear { font-size: 26px; font-weight: 400; }

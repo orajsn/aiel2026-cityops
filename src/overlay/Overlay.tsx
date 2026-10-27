@@ -8,9 +8,8 @@ import { HandoffCard } from './HandoffCard';
 import { JupyterDrawer } from './jupyter/JupyterDrawer';
 import { JumpMenu } from './JumpMenu';
 import { CameraEditor } from './CameraEditor';
-import { TrafficEditor, setTrafficMode } from './TrafficEditor';
+import { TrafficEditor } from './TrafficEditor';
 import { useTrafficStore } from '../engine/traffic';
-import { useCameraStore } from '../engine/camera';
 import { Rich } from './Rich';
 import { SettingsPanel } from './SettingsPanel';
 import { pageNumber } from '../scenes';
@@ -32,7 +31,6 @@ export function Overlay() {
   const settled = useSceneStore((s) => s.settled);
   const jumpOpen = useUiStore((s) => s.jumpOpen);
   const scriptOpen = useUiStore((s) => s.scriptOpen);
-  const cameraEditing = useCameraStore((s) => s.editing);
   const trafficEditing = useTrafficStore((s) => s.editing);
   const [settingsOpen, setSettingsOpen] = useState(false);
   // the panel group on screen now: a page in the same group keeps it up while its camera settles
@@ -122,22 +120,7 @@ export function Overlay() {
         >
           ▦
         </button>
-        <button
-          type="button"
-          className={`stepper__btn stepper__btn--text${cameraEditing && !trafficEditing ? ' is-on' : ''}`}
-          aria-label={cameraEditing ? 'Leave Camera mode' : 'Camera mode'}
-          onClick={() => (trafficEditing ? setTrafficMode(false) : useCameraStore.getState().setEditing(!cameraEditing))}
-        >
-          CAM
-        </button>
-        <button
-          type="button"
-          className={`stepper__btn stepper__btn--text stepper__btn--small${trafficEditing ? ' is-on' : ''}`}
-          aria-label={trafficEditing ? 'Leave Traffic mode' : 'Traffic mode'}
-          onClick={() => setTrafficMode(!trafficEditing)}
-        >
-          Traffic
-        </button>
+        {/* CAM and Traffic live in Settings › Tools (owner, 27 Oct) */}
         <button type="button" className="stepper__btn" aria-label="Back" disabled={index === 0} onClick={() => useSceneStore.getState().prev()}>
           ‹
         </button>
