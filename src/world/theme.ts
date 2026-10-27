@@ -3,13 +3,15 @@
  * between the skies in Settings (or the T key): the warm afternoon of the light Redwood illustration style,
  * a clear blue midday sky, and the dark night style.
  */
-export type ThemeName = 'light' | 'clear' | 'night';
+export type ThemeName = 'light' | 'clear' | 'night' | 'time';
 
 /** the order the T key goes through, and the names Settings shows */
 export const SKIES: { id: ThemeName; label: string }[] = [
   { id: 'light', label: 'Afternoon' },
   { id: 'clear', label: 'Clear blue' },
   { id: 'night', label: 'Night' },
+  // the sky follows the show from morning to evening (timeOfDay.ts)
+  { id: 'time', label: 'Time of day' },
 ];
 
 export interface Theme {
@@ -45,7 +47,7 @@ export interface Theme {
   coreBody: string;
 }
 
-export const THEMES: Record<ThemeName, Theme> = {
+const BASE: Record<Exclude<ThemeName, 'time'>, Theme> = {
   light: {
     name: 'light',
     bg: '#F2DCC8',
@@ -136,12 +138,18 @@ export const THEMES: Record<ThemeName, Theme> = {
   },
 };
 
+/**
+ * Time of day: the Afternoon look, which TimeOfDay.tsx then moves through the day every frame. Its swatch in
+ * Settings runs from the morning sky down to the evening horizon.
+ */
+export const THEMES: Record<ThemeName, Theme> = { ...BASE, time: { ...BASE.light, name: 'time', skyTop: '#7DB3E0', skyHorizon: '#F2AC6E' } };
+
 const KEY = 'cityops.theme';
 
 export function storedTheme(): ThemeName {
   try {
     const v = window.localStorage.getItem(KEY);
-    return v === 'night' || v === 'clear' ? v : 'light';
+    return v === 'night' || v === 'clear' || v === 'time' ? v : 'light';
   } catch {
     return 'light';
   }

@@ -4,6 +4,7 @@ import type { AssetType } from '../content/geo';
 import { City } from './City';
 import { Lighting } from './Lighting';
 import { Effects } from './Effects';
+import { TimeOfDay } from './TimeOfDay';
 import { AssetPins } from './AssetPins';
 import { CameraRig } from './CameraRig';
 import { FreeCam } from './FreeCam';
@@ -45,6 +46,7 @@ export function World() {
   const traffic = useTrafficStore((s) => s.editing);
   const w = (traffic ? {} : (scene?.world ?? {})) as WorldProps;
   const theme = useUiStore((s) => s.theme);
+  const themeName = useUiStore((s) => s.themeName);
   return (
     <>
       <color attach="background" args={[theme.bg]} />
@@ -52,6 +54,8 @@ export function World() {
       <CameraRig />
       <FreeCam />
       <Lighting />
+      {/* Settings › Sky › Time of day: morning on the first page to evening on the last */}
+      {themeName === 'time' && <TimeOfDay />}
       <City />
       {w.pins && <AssetPins visible={w.pins} highlight={w.highlight} />}
       <DataStream running={!!w.dataStream} durationMs={STREAM_MS} />

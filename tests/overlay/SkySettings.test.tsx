@@ -35,11 +35,11 @@ test('the clear sky is blue, and keeps the light panels', () => {
   expect(document.documentElement.getAttribute('data-theme')).toBe('night');
 });
 
-test('the T key goes through all three skies', () => {
+test('the T key goes through all four skies', () => {
   const seen = [useUiStore.getState().themeName];
   for (let i = 0; i < 3; i++) {
     useUiStore.getState().toggleTheme();
     seen.push(useUiStore.getState().themeName);
   }
-  expect(seen).toEqual(['light', 'clear', 'night', 'light']);
+  expect(seen).toEqual(['light', 'clear', 'night', 'time']);
 });

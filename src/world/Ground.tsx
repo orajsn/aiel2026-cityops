@@ -36,6 +36,14 @@ const SKY_FRAG = /* glsl */ `
   }
 `;
 
+/** The sky dome's two colours, shared by every dome, so Time of day (TimeOfDay.tsx) can move them every frame. */
+export const SKY_UNIFORMS = { uTop: { value: new THREE.Color() }, uHorizon: { value: new THREE.Color() } };
+function skyUniforms(top: string, horizon: string) {
+  SKY_UNIFORMS.uTop.value.set(top);
+  SKY_UNIFORMS.uHorizon.value.set(horizon);
+  return SKY_UNIFORMS;
+}
+
 /**
  * Ground: the slab, plus a sky dome and a far ground plane so a low camera sees a horizon
  * instead of the slab's edge. The far plane is single-sided, so from under the slab it vanishes.
@@ -52,7 +60,7 @@ export function SkyAndHorizon({ ground = true }: { ground?: boolean }) {
         side: THREE.BackSide,
         depthWrite: false,
         fog: false,
-        uniforms: { uTop: { value: new THREE.Color(theme.skyTop) }, uHorizon: { value: new THREE.Color(theme.skyHorizon) } },
+        uniforms: skyUniforms(theme.skyTop, theme.skyHorizon),
       }),
     [theme.skyTop, theme.skyHorizon],
   );
@@ -86,7 +94,7 @@ export function Ground() {
         side: THREE.BackSide,
         depthWrite: false,
         fog: false,
-        uniforms: { uTop: { value: new THREE.Color(theme.skyTop) }, uHorizon: { value: new THREE.Color(theme.skyHorizon) } },
+        uniforms: skyUniforms(theme.skyTop, theme.skyHorizon),
       }),
     [theme.skyTop, theme.skyHorizon],
   );

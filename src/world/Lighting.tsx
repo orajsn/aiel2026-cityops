@@ -3,6 +3,9 @@ import * as THREE from 'three';
 import { useThree } from '@react-three/fiber';
 import { useUiStore } from '../engine/ui';
 
+/** where the sun sits in the fixed skies; Time of day moves it (timeOfDay.ts) */
+export const SUN_POS: [number, number, number] = [-180, 90, 120];
+
 export function Lighting() {
   const theme = useUiStore((s) => s.theme);
   const gl = useThree((s) => s.gl);
@@ -22,10 +25,11 @@ export function Lighting() {
 
   return (
     <>
-      <ambientLight intensity={theme.ambient} />
-      <hemisphereLight args={[theme.hemiSky, theme.hemiGround, theme.hemi]} />
+      <ambientLight name="ambient" intensity={theme.ambient} />
+      <hemisphereLight name="hemi" args={[theme.hemiSky, theme.hemiGround, theme.hemi]} />
       <directionalLight
-        position={[-180, 90, 120]}
+        name="sun"
+        position={SUN_POS}
         intensity={theme.sunIntensity}
         color={theme.sun}
         castShadow={theme.shadows}
