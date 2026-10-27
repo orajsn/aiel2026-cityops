@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { LAB_STOPS, stopCells, todoLines, type StopCell } from '../../content/labStops';
 import { NotebookMarkdown, PythonCode } from './NotebookMarkdown';
+import { useDrawerStore } from '../../engine/presentation';
 
 /** cells longer than this show their first lines and fold the rest */
 const FOLD_AT = 16;
@@ -13,27 +14,33 @@ const BADGE: Record<string, string> = { run: 'run', todo: 'fill in, then run', c
  * The lab guide's Jupyter drawer. On a page with a stop (src/content/labStops.ts) a handle waits on the screen's left edge;
  * opening it slides in a JupyterLab-looking notebook: the same cells the audience has open, in order, with the
  * ones to run numbered, the TODO marked, and the line each prints when it worked. "Next cell" walks the room
- * through them one by one.
+ * through them one by one. Open and focus live in useDrawerStore, so a clicker in Presentation mode walks the
+ * same drawer (presentation.ts).
  */
 export function JupyterDrawer({ sceneId }: { sceneId: string }) {
   const stop = LAB_STOPS[sceneId];
-  const [open, setOpen] = useState(false);
-  const [focus, setFocus] = useState(0);
+  const open = useDrawerStore((s) => s.open);
+  const focus = useDrawerStore((s) => s.focus);
+  const { setOpen, setFocus } = useDrawerStore.getState();
   const [unfolded, setUnfolded] = useState<Set<number>>(new Set());
   const cellRefs = useRef(new Map<number, HTMLDivElement>());
+  // a page's drawer starts closed when it appears
+  useEffect(() => useDrawerStore.getState().reset(), [sceneId]);
+  const cells = stop ? stopCells(stop) : [];
+  const runs = cells.filter((c) => c.run);
+  // the cell in focus scrolls into view, whoever moved it (a click here or the clicker)
+  useEffect(() => {
+    const c = runs.find((r) => r.run === focus);
+    if (c) cellRefs.current.get(c.index)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focus, open]);
   if (!stop) return null;
 
-  const cells = stopCells(stop);
-  const runs = cells.filter((c) => c.run);
   // the room is done when the last cell has run: its success line if it prints one
   const last = runs[runs.length - 1];
   const cellWord = runs.length === 1 ? 'cell' : 'cells';
 
-  const goTo = (run: number) => {
-    setFocus(run);
-    const c = runs.find((r) => r.run === run);
-    if (c) cellRefs.current.get(c.index)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
-  };
+  const goTo = (run: number) => setFocus(run);
 
   return (
     <div className="jd" data-testid="jupyter-drawer">

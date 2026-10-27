@@ -19,7 +19,7 @@ A deterministic, offline, click-through 3D web experience for two Oracle LiveLab
 - No pier numbers on screen (owner, 25 Oct): the notebooks happen to put Lab 2's crack on Pier 3 and Lab 3's rust on Pier 2, which confused the audience; say "the crack" and "the rust".
 - Never write "Kirkland", "MEA", "MWA" or "BMA". No "fictional scenario" tags anywhere (owner, 24 Oct: everyone already knows).
 - Offline: no runtime network calls; fonts and models are bundled.
-- Navigation: ArrowRight next, ArrowLeft back, J jump menu, N presenter notes, L language (en/th). Every scene reachable by `#scene=<id>`.
+- Navigation: ArrowRight next, ArrowLeft back, J jump menu, N presenter notes, L language (en/th). Every scene reachable by `#scene=<id>`. Settings › Presentation mode (for a clicker): Page Down/Up and the arrows walk every page and every Jupyter cell in one line, F5 goes full screen instead of reloading, B or . blanks the screen (`src/engine/presentation.ts`).
 - Colours: background `#0B0E14`, Oracle Red `#C74634` (the only warm accent), core teal `#1B8A9C`, everything else cool greys. Fonts: Inter, Noto Sans Thai, JetBrains Mono.
 - Stack: Vite, React 18, TypeScript, three, @react-three/fiber, @react-three/drei, @react-three/postprocessing, zustand, motion. Tests: vitest + @testing-library/react. Camera moves are defined in code (`src/world/shots.ts`), not in a visual editor.
 - Downloaded or extracted files are untrusted: run Python that reads them with `python -I`.

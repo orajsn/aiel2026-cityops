@@ -1,4 +1,5 @@
 import type { SceneStore } from './store';
+import { presentNext, presentPrev, usePresentationStore } from './presentation';
 
 export interface KeyHandlers {
   jump(): void;
@@ -10,6 +11,8 @@ export interface KeyHandlers {
   traffic?(): void;
   /** true while Camera mode has the keys (arrows walk the camera) */
   isEditing?(): boolean;
+  /** true in Presentation mode: the clicker's keys walk pages and Jupyter cells (presentation.ts) */
+  presenting?(): boolean;
 }
 
 export function bindKeys(store: SceneStore, handlers: KeyHandlers): () => void {
@@ -24,7 +27,14 @@ export function bindKeys(store: SceneStore, handlers: KeyHandlers): () => void {
       handlers.traffic?.();
       return;
     }
+    // a clicker's "start slideshow" sends F5: in a browser that would reload the show, so it goes full screen
+    if (handlers.presenting?.() && e.key === 'F5') {
+      e.preventDefault();
+      void document.documentElement.requestFullscreen?.().catch(() => {});
+      return;
+    }
     if (handlers.isEditing?.()) return;
+    if (handlers.presenting?.() && presentKey(e)) return;
     switch (e.key) {
       case 'ArrowRight':
       case 'PageDown':
@@ -61,4 +71,29 @@ export function bindKeys(store: SceneStore, handlers: KeyHandlers): () => void {
   };
   window.addEventListener('keydown', onKey);
   return () => window.removeEventListener('keydown', onKey);
+}
+
+/** Presentation mode's keys: what clickers send (Page Down/Up, arrows) and their blank-screen button (B or .) */
+function presentKey(e: KeyboardEvent): boolean {
+  const p = usePresentationStore.getState();
+  switch (e.key) {
+    case 'PageDown':
+    case 'ArrowRight':
+    case ' ':
+    case 'PageUp':
+    case 'ArrowLeft': {
+      e.preventDefault();
+      // a blank screen comes back first, without moving on
+      if (p.blank) p.toggleBlank();
+      else if (e.key === 'PageUp' || e.key === 'ArrowLeft') presentPrev();
+      else presentNext();
+      return true;
+    }
+    case 'b':
+    case 'B':
+    case '.':
+      p.toggleBlank();
+      return true;
+  }
+  return false;
 }

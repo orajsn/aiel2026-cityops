@@ -12,6 +12,7 @@ import { loadOverrides, useCameraStore } from './engine/camera';
 import { loadTraffic, useTrafficStore } from './engine/traffic';
 import { setTrafficMode } from './overlay/TrafficEditor';
 import { fixedDpr, useGraphicsStore } from './engine/graphics';
+import { usePresentationStore } from './engine/presentation';
 
 export default function App() {
   // Settings › Graphics: Auto draws what the screen shows, a fixed resolution draws exactly that
@@ -33,6 +34,7 @@ export default function App() {
       camera: () => (useTrafficStore.getState().editing ? setTrafficMode(false) : useCameraStore.getState().setEditing(!useCameraStore.getState().editing)),
       traffic: () => setTrafficMode(!useTrafficStore.getState().editing),
       isEditing: () => useCameraStore.getState().editing,
+      presenting: () => usePresentationStore.getState().on,
     });
     return () => {
       unHash();

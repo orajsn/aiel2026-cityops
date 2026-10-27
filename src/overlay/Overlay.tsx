@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useProgress } from '@react-three/drei';
 import { useSceneStore } from '../engine/store';
@@ -13,6 +13,7 @@ import { useTrafficStore } from '../engine/traffic';
 import { Rich } from './Rich';
 import { SettingsPanel } from './SettingsPanel';
 import { pageNumber } from '../scenes';
+import { usePresentationStore } from '../engine/presentation';
 
 // named for the event's agenda (owner): the intro, then Lab 2 and Lab 3; pages are numbered the same way (0.x, 2.x, 3.x)
 const CHAPTER_LABEL = ['Introduction', 'Lab 2 · RAG to Agents', 'Lab 3 · Agent Memory'];
@@ -24,6 +25,28 @@ function MapLoading() {
   return <div className="map-loading mono">Loading the Bangkok map · {Math.round(progress)}%</div>;
 }
 
+/** Presentation mode: true after a few seconds without the mouse, so the corner buttons and the pointer step aside */
+function useIdle(active: boolean, ms = 3000): boolean {
+  const [idle, setIdle] = useState(false);
+  useEffect(() => {
+    if (!active) return setIdle(false);
+    let t = window.setTimeout(() => setIdle(true), ms);
+    const wake = () => {
+      setIdle(false);
+      window.clearTimeout(t);
+      t = window.setTimeout(() => setIdle(true), ms);
+    };
+    window.addEventListener('pointermove', wake);
+    window.addEventListener('pointerdown', wake);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('pointermove', wake);
+      window.removeEventListener('pointerdown', wake);
+    };
+  }, [active, ms]);
+  return idle;
+}
+
 export function Overlay() {
   const scene = useSceneStore((s) => s.scenes[s.index]);
   const index = useSceneStore((s) => s.index);
@@ -33,6 +56,13 @@ export function Overlay() {
   const scriptOpen = useUiStore((s) => s.scriptOpen);
   const trafficEditing = useTrafficStore((s) => s.editing);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const presenting = usePresentationStore((s) => s.on);
+  const blank = usePresentationStore((s) => s.blank);
+  // while Settings is open nothing hides
+  const idle = useIdle(presenting && !settingsOpen);
+  useEffect(() => {
+    document.body.classList.toggle('is-idle', idle);
+  }, [idle]);
   // the panel group on screen now: a page in the same group keeps it up while its camera settles
   const shownKey = useRef<string | null>(null);
   if (!scene) return null;
@@ -94,7 +124,7 @@ export function Overlay() {
       {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} />}
 
       {/* touch navigation: the iPad has no arrow keys */}
-      <nav className="stepper" aria-label="Scene navigation">
+      <nav className={`stepper${idle ? ' is-idle' : ''}`} aria-label="Scene navigation">
         <button
           type="button"
           className={`stepper__btn stepper__btn--text stepper__btn--gear${settingsOpen ? ' is-on' : ''}`}
@@ -137,6 +167,11 @@ export function Overlay() {
       {trafficEditing ? <TrafficEditor /> : <CameraEditor />}
 
       {jumpOpen && <JumpMenu />}
+
+      {/* the clicker's blank-screen button (Presentation mode): the show fades to the background; a tap brings it back */}
+      <AnimatePresence>
+        {blank && <motion.div className="blank" data-testid="blank" onClick={() => usePresentationStore.getState().toggleBlank()} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }} />}
+      </AnimatePresence>
     </>
   );
 }

@@ -5,6 +5,10 @@ import { JupyterDrawer } from '../../src/overlay/jupyter/JupyterDrawer';
 import { NotebookMarkdown } from '../../src/overlay/jupyter/NotebookMarkdown';
 import { chapter1 } from '../../src/scenes/chapter1';
 import { chapter2 } from '../../src/scenes/chapter2';
+import { useDrawerStore } from '../../src/engine/presentation';
+
+// each test is a fresh page: in the app, changing page closes the drawer (presentation.ts)
+beforeEach(() => useDrawerStore.getState().reset());
 
 test('python colouring: keywords, strings, comments, numbers and def names, and nothing lost', () => {
   const src = 'def embed(self, n=384):\n    # TODO 1: fill in\n    return f"ok {n}"  # done';

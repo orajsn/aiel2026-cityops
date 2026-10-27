@@ -602,3 +602,18 @@ code,
 .settings__tool.is-on { border-color: var(--teal); color: var(--teal); }
 .settings__tool kbd { font: 500 12px/1 var(--font-mono); color: var(--ink-dim); padding: 4px 7px; border: 1px solid var(--line); border-radius: 5px; }
 .stepper__btn--gear { font-size: 26px; font-weight: 400; }
+
+/* Presentation mode (Settings): the clicker's blank screen, the corner buttons and pointer step aside when idle */
+.blank { position: absolute; inset: 0; background: #0b0e14; z-index: 59; cursor: pointer; } /* just under the corner buttons (stepper, 60) */
+.stepper { transition: opacity 400ms; }
+.stepper.is-idle { opacity: 0; pointer-events: none; }
+body.is-idle, body.is-idle * { cursor: none !important; }
+.settings__switch { display: flex; align-items: center; gap: 14px; width: 100%; margin-top: 16px; padding: 12px 14px; border-radius: 10px; border: 2px solid var(--line); background: transparent; color: var(--ink); text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.settings__switch.is-on { border-color: var(--teal); }
+.settings__switch-text { display: flex; flex-direction: column; gap: 4px; flex: 1; font: 400 12px/1.35 var(--font-body); color: var(--ink-dim); }
+.settings__switch-text b { font-size: 15px; font-weight: 600; color: var(--ink); }
+.settings__switch i { position: relative; flex: none; width: 44px; height: 26px; border-radius: 13px; background: var(--line); transition: background 200ms; }
+.settings__switch i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); transition: transform 200ms; }
+.settings__switch.is-on i { background: var(--teal); }
+.settings__switch.is-on i::after { transform: translateX(18px); }
+.settings__switch + .settings__label { margin-top: 16px; }

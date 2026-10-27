@@ -1,9 +1,10 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { Overlay } from '../../src/overlay/Overlay';
 import { useSceneStore } from '../../src/engine/store';
 import { useCameraStore } from '../../src/engine/camera';
 import { useTrafficStore } from '../../src/engine/traffic';
 import { useGraphicsStore } from '../../src/engine/graphics';
+import { usePresentationStore } from '../../src/engine/presentation';
 
 beforeEach(() => {
   useSceneStore.getState().setScenes([{ id: 'a', chapter: 0, title: 'A', shot: 'city' }]);
@@ -44,4 +45,18 @@ test('Graphics: pick a resolution, or type a custom one', () => {
   fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
   expect(useGraphicsStore.getState()).toMatchObject({ resolution: 'custom', custom: { w: 3200, h: 1800 } });
   expect(screen.getByText(/drawing 3200 × 1800/)).toBeInTheDocument();
+});
+
+test('Presentation mode is a switch in Settings, remembered on this device; B blanks the screen', () => {
+  render(<Overlay />);
+  fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+  const sw = screen.getByRole('switch', { name: 'Presentation mode' });
+  expect(sw).not.toBeChecked();
+  fireEvent.click(sw);
+  expect(usePresentationStore.getState().on).toBe(true);
+  expect(localStorage.getItem('cityops.presentation')).toBe('on');
+  expect(screen.queryByTestId('blank')).toBeNull();
+  act(() => usePresentationStore.getState().toggleBlank());
+  expect(screen.getByTestId('blank')).toBeInTheDocument();
+  act(() => usePresentationStore.getState().setOn(false));
 });

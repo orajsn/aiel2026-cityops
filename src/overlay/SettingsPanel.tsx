@@ -5,6 +5,7 @@ import { useTrafficStore } from '../engine/traffic';
 import { drawSize, fixedDpr, useGraphicsStore, type Resolution } from '../engine/graphics';
 import { useRenderDpr } from '../Stage';
 import { setTrafficMode } from './TrafficEditor';
+import { usePresentationStore } from '../engine/presentation';
 import { SKIES, THEMES } from '../world/theme';
 
 const RESOLUTIONS: { id: Resolution; label: string }[] = [
@@ -17,13 +18,14 @@ const RESOLUTIONS: { id: Resolution; label: string }[] = [
 
 /**
  * Settings, above the corner buttons: which sky the city sits under (owner, 25 Oct), how many pixels the
- * 3D view draws, and the owner's tools, Camera mode and Traffic mode (owner, 27 Oct: out of the corner bar,
- * into here). Sky and resolution are remembered on this device.
+ * 3D view draws, Presentation mode for a clicker, and the owner's tools, Camera mode and Traffic mode (owner, 27 Oct:
+ * out of the corner bar, into here). Sky, resolution and Presentation mode are remembered on this device.
  */
 export function SettingsPanel({ onClose }: { onClose(): void }) {
   const themeName = useUiStore((s) => s.themeName);
   const cameraEditing = useCameraStore((s) => s.editing);
   const trafficEditing = useTrafficStore((s) => s.editing);
+  const presenting = usePresentationStore((s) => s.on);
   return (
     <div className="settings" role="dialog" aria-label="Settings">
       <div className="settings__head">
@@ -53,6 +55,21 @@ export function SettingsPanel({ onClose }: { onClose(): void }) {
       </div>
 
       <Graphics />
+
+      <button
+        type="button"
+        role="switch"
+        aria-checked={presenting}
+        aria-label="Presentation mode"
+        className={`settings__switch${presenting ? ' is-on' : ''}`}
+        onClick={() => usePresentationStore.getState().setOn(!presenting)}
+      >
+        <span className="settings__switch-text">
+          <b>Presentation mode</b>
+          <span>Clicker: Page Down / Page Up walk every page and every Jupyter cell · B blanks the screen</span>
+        </span>
+        <i aria-hidden />
+      </button>
 
       <div className="settings__label" id="settings-tools">
         Tools
