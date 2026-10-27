@@ -59,8 +59,9 @@ export const TURN_STEPS = [
   'Open Vance’s own thread',
   'Read the bridge’s record',
   'Build the context card',
-  'Search the shared memory',
+  // the notebook's call_copilot order (TODO 6): similar findings, then the asset's shared memory
   'Find similar findings',
+  'Search the shared memory',
   'Ask the language model',
   'Save both messages',
   'Extract new memories',

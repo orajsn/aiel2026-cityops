@@ -55,7 +55,8 @@ const b20: SceneDef = {
  * and holds there.
  */
 const MERCER_SAYS: { text: string; missing: string }[] = [
-  { text: 'Rust on the pier, about 25% section loss.', missing: 'Same questions. Again.' },
+  // the notebook's words for her finding (reviewer, 27 Oct), without the pier number (owner, 25 Oct: no pier numbers on screen)
+  { text: 'Corrosion on the bearing assemblies, with about 25% section loss at the bearing plate edges.', missing: 'Same questions. Again.' },
   { text: 'My advice: repair within 60 days.', missing: 'Earlier advice is missing' },
   { text: 'Follow-up: work to plan.', missing: 'And the follow-up?' },
 ];
@@ -72,7 +73,7 @@ const chat = (id: string, title: string, shot: string, props: CopilotChatProps &
 
 const b21a = chat('3.1a', 'The agent that forgets · Day 1', 'pier2-inspect', {
   kicker: 'Day 1 · the rust',
-  message: 'Mercer tells the copilot what she found.',
+  message: 'Mercer talks to the copilot first, then calls **log_finding** to record the official finding.',
   items: [
     { divider: 'Day 1 · Evelyn_H_Mercer' },
     ...MERCER_SAYS.map((m) => ({ from: 'person' as const, text: m.text })),
@@ -82,7 +83,7 @@ const b21a = chat('3.1a', 'The agent that forgets · Day 1', 'pier2-inspect', {
 
 const b21b = chat('3.1b', 'The agent that forgets · the chat closes', 'pier2-close', {
   kicker: 'The chat closes',
-  message: 'Nothing carried over.',
+  message: 'Before adding memory: **nothing carried over.**',
   items: [
     { divider: 'Day 1 · Evelyn_H_Mercer' },
     ...MERCER_SAYS.map((m) => ({ from: 'person' as const, text: m.text, state: 'emptying' as const })),
@@ -176,8 +177,8 @@ const atOps = (id: string, title: string, overlay: string, props: object, group?
   overlayProps: props as Record<string, unknown>,
 });
 
-const b26 = atOps('3.6', 'One connection', 'OneConnection', { kicker: 'Lab 3 · Part 1', message: 'The copilot needs **one connection**: the database.', notebook: `${NB} · Part 1 and TODO 1` } satisfies HandsOnProps);
-const b27 = atOps('3.7', 'The write path', 'WritePath', { kicker: 'Lab 3 · Part 3', message: 'The agent does not store what you said. It stores **what it learned**.', notebook: `${NB} · Part 3, TODO 2 (report_event), peek_sdk_tables` } satisfies HandsOnProps);
+const b26 = atOps('3.6', 'One connection', 'OneConnection', { kicker: 'Lab 3 · Part 1-2', message: 'The copilot needs **one connection**: the database.', notebook: `${NB} · Parts 1-2 and TODO 1`, stop: '3.6' } satisfies HandsOnProps);
+const b27 = atOps('3.7', 'The write path', 'WritePath', { kicker: 'Lab 3 · Part 3', message: 'The agent does not store what you said. It stores **what it learned**.', notebook: `${NB} · Part 3, TODO 2 (report_event), peek_sdk_tables`, stop: '3.7' } satisfies HandsOnProps);
 const b28a = atOps('3.8a', 'Scope is the key', 'Scope', { kicker: 'Lab 3 · Part 3, TODO 3', step: 1, message: 'Search the memories with **no user id**: nothing comes back.', notebook: `${NB} · TODO 3` } satisfies ScopeProps, 'scope');
 const b28b = atOps('3.8b', 'Scope is the key', 'Scope', { kicker: 'Lab 3 · Part 3, TODO 3', step: 2, message: 'Records inherit the **scope** of the thread that wrote them.', notebook: `${NB} · TODO 3` } satisfies ScopeProps, 'scope');
 const b29 = atOps('3.9', 'The system of record', 'SystemOfRecord', { kicker: 'Lab 3 · Part 4', message: 'Memory is what the agent learns. Findings are what **the city records**.', notebook: `${NB} · Part 4, TODO 4` } satisfies HandsOnProps);

@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import type { CSSProperties, ReactNode } from 'react';
 import { Rich } from '../Rich';
 import { EASE } from './WidePanel';
+import { LAB_STOPS, stopCells } from '../../content/labStops';
 
 /**
  * Lab 3 pages 15 to 19, the notebook's Parts 1 to 5 (owner, 25 Oct; sketches agreed in chat). They play in
@@ -79,39 +80,81 @@ export interface HandsOnProps {
   /** the one line the presenter lands; **teal** and !!red!! marks as in Rich.tsx */
   message: string;
   notebook?: string;
+  /** the page's Jupyter stop (labStops.ts): its cells are listed at the bottom, one brief line each */
+  stop?: string;
 }
 
-export function OneConnection({ kicker, message, notebook }: HandsOnProps) {
+/**
+ * What the cells do (reviewer, 27 Oct): the page's cells to run, numbered as in the Jupyter drawer, one brief line
+ * each, at the bottom of the panel.
+ */
+export function CellBrief({ stop, delay }: { stop?: string; delay: number }) {
+  const s = stop ? LAB_STOPS[stop] : undefined;
+  if (!s) return null;
+  const runs = stopCells(s).filter((c) => c.run && c.mark?.brief);
+  return (
+    <In delay={delay} style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--line)' }}>
+      <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-dim)', marginBottom: 8 }}>What the cells do</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 20px' }}>
+        {runs.map((c) => (
+          <div key={c.run} data-brief={String(c.run)} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 16, color: 'var(--ink)', lineHeight: 1.25 }}>
+            <span style={{ flex: 'none', width: 24, height: 24, borderRadius: '50%', border: '2px solid var(--teal)', color: 'var(--teal)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700 }}>{c.run}</span>
+            <span>{c.mark!.brief}</span>
+          </div>
+        ))}
+      </div>
+    </In>
+  );
+}
+
+export function OneConnection({ kicker, message, notebook, stop }: HandsOnProps) {
   const inside = [
     { name: 'Memory', sub: 'what it learns' },
     { name: 'Findings', sub: 'the record' },
-    { name: 'Model', sub: 'text → point (Lab 2)' },
+    { name: 'Embedding model', sub: 'ALL_MINILM_L12_V2', code: true },
+  ];
+  /** the lab's two models and their jobs (reviewer, 27 Oct) */
+  const models = [
+    { id: 'embedding', name: 'Embedding model', job: 'turns text into a vector, for similarity search', where: 'ONNX, inside Oracle Database', teal: true },
+    { id: 'llm', name: 'Language model', job: 'reads text to extract memories and write the answers', where: 'Ollama, prepared for the lab', teal: false },
   ];
   return (
     <SidePanel kicker={kicker} message={message} notebook={notebook} testId="one-connection">
-      <div style={{ display: 'grid', gridTemplateColumns: '150px 80px 1fr', alignItems: 'center', marginTop: 18 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '150px 80px 1fr', alignItems: 'center', marginTop: 12 }}>
         <In delay={0.3} data-box="copilot" style={{ padding: '26px 0', textAlign: 'center', borderRadius: 14, background: GREY_TINT, border: '2px solid var(--line)', fontSize: 26, fontWeight: 700, color: 'var(--ink)' }}>
           Copilot
         </In>
         <Arrow delay={0.8} label="one" />
-        <In delay={1.2} data-box="database" style={{ padding: '16px 18px 18px', borderRadius: 16, border: '2px solid var(--teal)', background: TEAL_TINT }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--teal)', textAlign: 'center', marginBottom: 14 }}>Oracle AI Database</div>
+        <In delay={1.2} data-box="database" style={{ padding: '10px 14px 14px', borderRadius: 16, border: '2px solid var(--teal)', background: TEAL_TINT }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--teal)', textAlign: 'center', marginBottom: 10 }}>Oracle AI Database</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
             {inside.map((b, i) => (
-              <In key={b.name} delay={1.6 + i * 0.3} data-inside={b.name} style={{ padding: '16px 8px', borderRadius: 12, background: 'rgba(27, 138, 156, 0.18)', textAlign: 'center' }}>
+              <In key={b.name} delay={1.6 + i * 0.3} data-inside={b.name} style={{ padding: '10px 8px', borderRadius: 12, background: 'rgba(27, 138, 156, 0.18)', textAlign: 'center' }}>
                 <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink)' }}>{b.name}</div>
-                <div style={{ fontSize: 17, color: 'var(--ink)', marginTop: 6 }}>{b.sub}</div>
+                <div className={b.code ? 'code' : undefined} style={{ fontSize: b.code ? 14 : 17, color: 'var(--ink)', marginTop: 6 }}>{b.sub}</div>
               </In>
             ))}
           </div>
         </In>
       </div>
-      <In delay={2.7} style={{ marginTop: 16, marginLeft: 230, padding: '10px 16px', borderRadius: 10, background: GREY_TINT, fontSize: 19, color: 'var(--ink)' }}>
-        <Rich text="The model from **Lab 2 page 2** is still here." />
+      <In delay={2.7} style={{ marginTop: 14, fontSize: 14, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-dim)' }}>
+        Two models, two jobs
       </In>
-      <In delay={3.1} style={{ marginTop: 18, fontSize: 21, color: 'var(--ink)' }}>
-        <Rich text="Nothing else to set up: **no outside service, no API key**." />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+        {models.map((m, i) => (
+          <In key={m.id} delay={2.9 + i * 0.3} data-model={m.id} style={{ display: 'grid', gridTemplateColumns: '200px 1fr', alignItems: 'center', gap: 14, padding: '7px 16px', borderRadius: 10, background: m.teal ? TEAL_TINT : GREY_TINT, border: `2px solid ${m.teal ? 'var(--teal)' : 'var(--line)'}` }}>
+            <span style={{ fontSize: 20, fontWeight: 700, color: m.teal ? 'var(--teal)' : 'var(--ink)' }}>{m.name}</span>
+            <span style={{ fontSize: 18, color: 'var(--ink)', lineHeight: 1.3 }}>
+              {m.job}
+              <span style={{ display: 'block', fontSize: 16, color: 'var(--ink-dim)' }}>{m.where}</span>
+            </span>
+          </In>
+        ))}
+      </div>
+      <In delay={3.6} style={{ marginTop: 10, fontSize: 21, color: 'var(--ink)' }}>
+        <Rich text="**Embeddings run inside Oracle Database.**" />
       </In>
+      <CellBrief stop={stop} delay={3.9} />
     </SidePanel>
   );
 }
@@ -124,7 +167,7 @@ export const EXTRACTED = [
   { type: 'guideline', text: 'use emergency clamp RK-400' },
 ];
 
-export function WritePath({ kicker, message, notebook }: HandsOnProps) {
+export function WritePath({ kicker, message, notebook, stop }: HandsOnProps) {
   return (
     <SidePanel kicker={kicker} message={message} notebook={notebook} testId="write-path">
       <In delay={0.3} style={{ display: 'flex', justifyContent: 'center' }}>
@@ -164,6 +207,7 @@ export function WritePath({ kicker, message, notebook }: HandsOnProps) {
           </div>
         </In>
       </div>
+      <CellBrief stop={stop} delay={3.3} />
     </SidePanel>
   );
 }

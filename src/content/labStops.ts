@@ -28,6 +28,8 @@ export interface CellMark {
   expect?: string;
   /** one short line for the audience */
   say?: string;
+  /** what the cell does, in a few words, for the page's "what the cells do" list (HandsOn.tsx, CellBrief) */
+  brief?: string;
 }
 export interface LabStop {
   notebook: Notebook;
@@ -195,14 +197,14 @@ const L3: Record<string, LabStop> = {
     to: 20,
     minutes: 'about 5 min',
     marks: [
-      run(6, 'Helpers loaded: ok, show_table, print_json'),
-      run(7, 'Config ready: db=prism@aidbfree:1521/FREEPDB1  |  onnx=ALL_MINILM_L12_V2  |  llm=…  |  narratives=4'),
-      run(8, undefined, 'No output: it only defines connect_to_oracle().'),
-      run(9, 'Connected - using user prism'),
+      { ...run(6, 'Helpers loaded: ok, show_table, print_json'), brief: 'Load the helpers' },
+      { ...run(7, 'Config ready: db=prism@aidbfree:1521/FREEPDB1  |  onnx=ALL_MINILM_L12_V2  |  llm=…  |  narratives=4'), brief: 'Set the database and both models' },
+      { ...run(8, undefined, 'No output: it only defines connect_to_oracle().'), brief: 'Define connect_to_oracle()' },
+      { ...run(9, 'Connected - using user prism'), brief: 'Connect to Oracle' },
       { cell: 12, role: 'skip', say: 'Skip on your first run. Only to start over.' },
-      { cell: 15, role: 'todo', todo: 1, say: 'Fill in embed(): two lines. Stuck? Open the answer below it.' },
-      { cell: 18, role: 'check', expect: 'TODO 1 passed - embedder returns float32 (n, 384) arrays' },
-      run(20, 'OracleAgentMemory ready. Tables under prefix CITY_*'),
+      { cell: 15, role: 'todo', todo: 1, say: 'Fill in embed(): two lines. Stuck? Open the answer below it.', brief: 'TODO 1: embed(), text to a vector' },
+      { cell: 18, role: 'check', expect: 'TODO 1 passed - embedder returns float32 (n, 384) arrays', brief: 'Check TODO 1: 384 numbers per text' },
+      { ...run(20, 'OracleAgentMemory ready. Tables under prefix CITY_*'), brief: 'Start the memory SDK: CITY_* tables' },
     ],
   },
   // page 16 · The write path
@@ -213,13 +215,13 @@ const L3: Record<string, LabStop> = {
     to: 34,
     minutes: 'about 5 min',
     marks: [
-      run(23, 'Loaded … maintenance logs, … inspection reports.'),
-      run(24, 'Asset class distribution: …'),
-      run(25, 'Inserted 26 rows into CITY_ASSET.'),
-      run(26, undefined, 'Prints the Harbor Bridge row.'),
-      { cell: 29, role: 'todo', todo: 2, say: 'Two lines: build the content string, then call add_messages_async.' },
-      { cell: 32, role: 'check', expect: 'TODO 2 passed - added message(s): …' },
-      run(34, undefined, 'Shows what got persisted: CITY_MESSAGE and CITY_MEMORY rows.'),
+      { ...run(23, 'Loaded … maintenance logs, … inspection reports.'), brief: 'Load the logs and inspection reports' },
+      { ...run(24, 'Asset class distribution: …'), brief: 'Sort the assets into classes' },
+      { ...run(25, 'Inserted 26 rows into CITY_ASSET.'), brief: 'Create CITY_ASSET: 26 assets' },
+      { ...run(26, undefined, 'Prints the Harbor Bridge row.'), brief: 'Look up Harbor Bridge’s row' },
+      { cell: 29, role: 'todo', todo: 2, say: 'Two lines: build the content string, then call add_messages_async.', brief: 'TODO 2: report_event saves a report' },
+      { cell: 32, role: 'check', expect: 'TODO 2 passed - added message(s): …', brief: 'Check TODO 2 on one real log' },
+      { ...run(34, undefined, 'Shows what got persisted: CITY_MESSAGE and CITY_MEMORY rows.'), brief: 'See what landed in both tables' },
     ],
   },
   // pages 17 and 18 · Scope is the key (one stop, both pages)
