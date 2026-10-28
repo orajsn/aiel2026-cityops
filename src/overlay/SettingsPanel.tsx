@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUiStore } from '../engine/ui';
 import { useCameraStore } from '../engine/camera';
 import { useTrafficStore } from '../engine/traffic';
-import { antialiasFor, drawSize, fixedDpr, LOADED_AA, TEXT_SIZES, useGraphicsStore, type Resolution } from '../engine/graphics';
+import { antialiasFor, drawSize, fixedDpr, LOADED_AA, TEXT_MAX, TEXT_MIN, useGraphicsStore, type Resolution } from '../engine/graphics';
 import { useRenderDpr } from '../Stage';
 import { setTrafficMode } from './TrafficEditor';
 import { usePresentationStore } from '../engine/presentation';
@@ -225,23 +225,43 @@ function PerformanceCheck() {
   );
 }
 
-/** Text size: the page panels, the caption and the Jupyter drawer's code and notes, together */
+/** Text size: the page panels, the caption and the Jupyter drawer's code and notes, together: a slider, or type a number */
 function TextSize() {
   const size = useGraphicsStore((s) => s.textSize);
+  const pct = Math.round(size * 100);
+  const [typed, setTyped] = useState(String(pct));
+  // the box follows the slider (and a typed value once it is applied)
+  useEffect(() => setTyped(String(pct)), [pct]);
+  const apply = () => useGraphicsStore.getState().setTextSize(Number(typed) / 100);
   return (
     <>
       <div className="settings__label" id="settings-text">
         Text size
       </div>
-      <div className="settings__res" role="radiogroup" aria-labelledby="settings-text">
-        {TEXT_SIZES.map((k) => {
-          const label = `${Math.round(k * 100)}%`;
-          return (
-            <button key={k} type="button" role="radio" aria-checked={size === k} aria-label={label} className={`settings__chip${size === k ? ' is-on' : ''}`} onClick={() => useGraphicsStore.getState().setTextSize(k)}>
-              {label}
-            </button>
-          );
-        })}
+      <div className="settings__text">
+        <input
+          type="range"
+          min={TEXT_MIN * 100}
+          max={TEXT_MAX * 100}
+          step={5}
+          value={pct}
+          aria-labelledby="settings-text"
+          onChange={(e) => useGraphicsStore.getState().setTextSize(Number(e.target.value) / 100)}
+        />
+        <label className="settings__pct">
+          <input
+            type="number"
+            inputMode="numeric"
+            min={TEXT_MIN * 100}
+            max={TEXT_MAX * 100}
+            value={typed}
+            aria-label="Text size, percent"
+            onChange={(e) => setTyped(e.target.value)}
+            onBlur={apply}
+            onKeyDown={(e) => e.key === 'Enter' && apply()}
+          />
+          %
+        </label>
       </div>
     </>
   );

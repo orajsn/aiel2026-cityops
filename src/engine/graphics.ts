@@ -89,13 +89,17 @@ function storedFps(): boolean {
   }
 }
 
-/** Settings › Text size (owner, 28 Oct): readable from the back of the room */
-export const TEXT_SIZES = [0.9, 1, 1.1, 1.2, 1.3];
+/** Settings › Text size (owner, 28 Oct): readable from the back of the room, any size from 75% to 150% */
+export const TEXT_MIN = 0.75;
+export const TEXT_MAX = 1.5;
+
+/** a text size in range, to the nearest percent (a typed 200 becomes 150%, a typed 50 becomes 75%) */
+export const clampTextSize = (k: number) => (Number.isFinite(k) ? Math.round(Math.min(TEXT_MAX, Math.max(TEXT_MIN, k)) * 100) / 100 : 1);
 
 function storedTextSize(): number {
   try {
-    const v = Number(localStorage.getItem('cityops.textSize'));
-    return TEXT_SIZES.includes(v) ? v : 1;
+    const v = localStorage.getItem('cityops.textSize');
+    return v === null ? 1 : clampTextSize(Number(v));
   } catch {
     return 1;
   }
@@ -112,7 +116,8 @@ function applyTextSize(k: number) {
 export const useGraphicsStore = create<GraphicsState>((set, get) => ({
   ...stored(),
   textSize: storedTextSize(),
-  setTextSize: (textSize) => {
+  setTextSize: (k) => {
+    const textSize = clampTextSize(k);
     try {
       localStorage.setItem('cityops.textSize', String(textSize));
     } catch {

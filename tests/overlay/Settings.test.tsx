@@ -61,18 +61,25 @@ test('Presentation mode is a switch in Settings, remembered on this device; B bl
   act(() => usePresentationStore.getState().setOn(false));
 });
 
-test('Text size scales the panels, the caption and the Jupyter code, and is remembered on this device', () => {
-  const { container } = render(
-    <div id="stage-test">
-      <Overlay />
-    </div>,
-  );
+test('Text size: a slider and a number box, anywhere from 75% to 150%, remembered on this device', () => {
+  render(<Overlay />);
   fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
-  expect(screen.getByRole('radio', { name: '100%' })).toBeChecked();
-  fireEvent.click(screen.getByRole('radio', { name: '120%' }));
-  expect(useGraphicsStore.getState().textSize).toBe(1.2);
-  expect(localStorage.getItem('cityops.textSize')).toBe('1.2');
-  expect(document.documentElement.style.getPropertyValue('--text-zoom')).toBe('1.2');
+  const box = screen.getByLabelText('Text size, percent') as HTMLInputElement;
+  expect(box.value).toBe('100');
+  fireEvent.change(screen.getByRole('slider'), { target: { value: '125' } });
+  expect(useGraphicsStore.getState().textSize).toBe(1.25);
+  expect(box.value).toBe('125');
+  fireEvent.change(box, { target: { value: '137' } });
+  fireEvent.keyDown(box, { key: 'Enter' });
+  expect(useGraphicsStore.getState().textSize).toBe(1.37);
+  expect(localStorage.getItem('cityops.textSize')).toBe('1.37');
+  expect(document.documentElement.style.getPropertyValue('--text-zoom')).toBe('1.37');
+  expect(document.documentElement.style.getPropertyValue('--panel-zoom')).toBe('1.15');
+  // out of range is held to the range
+  fireEvent.change(box, { target: { value: '300' } });
+  fireEvent.blur(box);
+  expect(useGraphicsStore.getState().textSize).toBe(1.5);
+  act(() => useGraphicsStore.getState().setTextSize(0.5));
+  expect(useGraphicsStore.getState().textSize).toBe(0.75);
   act(() => useGraphicsStore.getState().setTextSize(1));
-  expect(container).toBeTruthy();
 });
