@@ -7,15 +7,30 @@ import { useDrawerStore, stopStepCount } from '../../src/engine/presentation';
 
 beforeEach(() => useDrawerStore.getState().reset());
 
-test('every guide block is a code cell inside its page’s stop, right under its section heading', () => {
+test('every guide block is a cell of its page’s stop, and every long cell’s parts start on real lines, in order', () => {
   for (const [id, blocks] of Object.entries(LAB_GUIDE)) {
     const stop = LAB_STOPS[id];
+    expect(stop, id).toBeDefined();
     for (const b of blocks) {
       expect(b.cell, `${id} ${b.title}`).toBeGreaterThanOrEqual(stop.from);
-      expect(b.cell).toBeLessThanOrEqual(stop.to);
-      expect(stop.notebook.cells[b.cell].type).toBe('code');
-      expect(stop.notebook.cells[b.cell - 1].source.startsWith(`### ${b.title.split(' ')[0]} `)).toBe(true);
+      expect(b.cell, `${id} ${b.title}`).toBeLessThanOrEqual(stop.to);
+      expect(stop.notebook.cells[b.cell].type, `${id} ${b.title}`).toBe('code');
+      const lines = stop.notebook.cells[b.cell].source.split('\n');
+      let last = -1;
+      for (const p of b.parts ?? []) {
+        const r = partLines(lines, p, b.parts);
+        expect(r.start, `${id} ${b.title} ${p.label}`).toBeGreaterThan(last);
+        last = r.start;
+      }
     }
+  }
+});
+
+test('every cell to run on every Lab 2 and Lab 3 page has a step in the guide', () => {
+  for (const [id, stop] of Object.entries(LAB_STOPS)) {
+    if (!/^[23]\./.test(id)) continue;
+    const guided = new Set((LAB_GUIDE[id] ?? []).map((b) => b.cell));
+    for (const m of stop.marks) expect(guided.has(m.cell), `${id} cell ${m.cell}`).toBe(true);
   }
 });
 
@@ -75,7 +90,7 @@ test('a step runs its cell: [*] for a moment, then [n] and its output; 5.4 runs 
 
 test('a quick clicker does not lose a run: each cell started finishes, in order', () => {
   vi.useFakeTimers();
-  const c = render(<JupyterDrawer sceneId="2.2" />).container;
+  const c = render(<JupyterDrawer sceneId="2.1" />).container; // two plain steps: 0.4, then 0.5
   act(() => useDrawerStore.setState({ open: true, focus: 1 }));
   act(() => vi.advanceTimersByTime(300));
   act(() => useDrawerStore.setState({ focus: 2 }));

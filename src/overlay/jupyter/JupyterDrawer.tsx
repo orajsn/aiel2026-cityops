@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { LAB_STOPS, stopCells, todoLines, type StopCell } from '../../content/labStops';
 import { NotebookMarkdown, PythonCode } from './NotebookMarkdown';
 import { useDrawerStore } from '../../engine/presentation';
-import { guideSteps, partLines, type GuideStep } from '../../content/labGuide';
+import { blockChip, guideSteps, partLines, type GuideStep } from '../../content/labGuide';
 
 /** cells longer than this show their first lines and fold the rest */
 const FOLD_AT = 16;
@@ -48,9 +48,11 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
   // guide, a section's heading, or the first line of a part inside its code
   useEffect(() => {
     if (step) {
+      // a part: its first line inside the code; a block: the text just above its cell when there is some, else the cell
+      const above = stop!.notebook.cells[step.block.cell - 1]?.type === 'markdown' && cells.some((c) => c.index === step.block.cell - 1);
       const el = range
         ? cellRefs.current.get(step.block.cell)?.querySelector(`[data-line="${range.start}"]`)
-        : cellRefs.current.get(step.block.cell - 1);
+        : cellRefs.current.get(above ? step.block.cell - 1 : step.block.cell);
       el?.scrollIntoView?.({ behavior: 'smooth', block: range ? 'center' : 'start' });
       return;
     }
@@ -62,7 +64,7 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
   // the cell a step reaches 'runs', as the room runs it: [*] for a moment, then [n] and its output. A long cell
   // that is stepped through part by part runs after its last part, once it has been explained.
   const runNow = step
-    ? !step.block.parts || step.part === step.block.parts[step.block.parts.length - 1]
+    ? (!step.block.parts || step.part === step.block.parts[step.block.parts.length - 1]) && cells.find((c) => c.index === step.block.cell)?.run
       ? step.block.cell
       : null
     : (runs.find((r) => r.run === focus)?.index ?? null);
@@ -136,7 +138,7 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
                     steps.map((s, i) =>
                       s.part ? null : (
                         <button key={s.block.title} type="button" title={s.block.title} className={`jd__step jd__step--section${step?.block === s.block ? ' is-on' : ''}`} onClick={() => goTo(i + 1)}>
-                          {s.block.title.split(' ')[0]}
+                          {blockChip(stop!.notebook, sceneId, s.block)}
                         </button>
                       ),
                     )
@@ -155,7 +157,7 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
               {step?.part && (
                 <div className="jd__note jd__note--pinned" data-guide-note>
                   <b>
-                    {step.block.title.split(' ')[0]} · {step.part.label}
+                    {blockChip(stop!.notebook, sceneId, step.block)} · {step.part.label}
                   </b>
                   <span>{step.part.note}</span>
                 </div>
@@ -165,7 +167,7 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
                   key={c.index}
                   c={c}
                   focused={guided ? step?.block.cell === c.index : !!c.run && c.run === focus}
-                  note={step && !step.part && step.block.cell - 1 === c.index ? step.block : undefined}
+                  note={step && !step.part && step.block.cell === c.index ? step.block : undefined}
                   exec={running.has(c.index) ? 'running' : ran.get(c.index)}
                   guideLines={range && step?.block.cell === c.index ? range : undefined}
                   folded={
@@ -193,18 +195,9 @@ function Cell({ c, focused, folded, note, guideLines, exec, onUnfold, onPick, re
   const role = c.mark?.role;
   if (c.cell.type !== 'code') {
     return (
-      <div className={`jd__cell jd__cell--md${note ? ' is-focus' : ''}`} ref={refFn}>
+      <div className="jd__cell jd__cell--md" ref={refFn}>
         <div className="jd__prompt" />
-        <div>
-          <NotebookMarkdown source={c.cell.source} />
-          {/* a guide's section: what it does, why, and what to look for, under its heading */}
-          {note && (
-            <div className="jd__note" data-guide-note>
-              <span>{note.note}</span>
-              {note.lookFor && <span className="jd__ok">✓ look for: {note.lookFor}</span>}
-            </div>
-          )}
-        </div>
+        <NotebookMarkdown source={c.cell.source} />
       </div>
     );
   }
@@ -223,6 +216,14 @@ function Cell({ c, focused, folded, note, guideLines, exec, onUnfold, onPick, re
         </span>
       </div>
       <div className="jd__body">
+        {/* a guide's step: what this cell does and why, just above its code */}
+        {note && (
+          <div className="jd__note" data-guide-note>
+            <b>{note.title}</b>
+            <span>{note.note}</span>
+            {note.lookFor && <span className="jd__ok">✓ look for: {note.lookFor}</span>}
+          </div>
+        )}
         {role && (
           <div className={`jd__badge jd__badge--${role}`}>
             {role === 'todo' ? `TODO ${c.mark!.todo} · ` : ''}
