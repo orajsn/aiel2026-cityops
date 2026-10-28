@@ -6,6 +6,7 @@ import { antialiasFor, drawSize, fixedDpr, LOADED_AA, useGraphicsStore, type Res
 import { useRenderDpr } from '../Stage';
 import { setTrafficMode } from './TrafficEditor';
 import { usePresentationStore } from '../engine/presentation';
+import { PERF_STEPS, usePerfStore, verdict } from '../engine/perfCheck';
 import { SKIES, THEMES } from '../world/theme';
 
 const RESOLUTIONS: { id: Resolution; label: string }[] = [
@@ -174,6 +175,50 @@ function Graphics() {
         <input type="checkbox" checked={showFps} onChange={(e) => useGraphicsStore.getState().setShowFps(e.target.checked)} />
         Show frame rate
       </label>
+      <PerformanceCheck />
     </>
+  );
+}
+
+/** Settings › Graphics › Performance check: five measurements on this machine, then what they mean */
+function PerformanceCheck() {
+  const { status, step, results, info } = usePerfStore();
+  return (
+    <div className="settings__perf" data-testid="perf-check">
+      {status === 'running' ? (
+        <div className="settings__perf-run">
+          Testing: {PERF_STEPS[step].label} ({step + 1}/{PERF_STEPS.length})…
+        </div>
+      ) : (
+        <button type="button" className="settings__chip settings__perf-btn" onClick={() => usePerfStore.getState().start()}>
+          {status === 'done' ? 'Run the performance check again' : 'Run a performance check (15 s)'}
+        </button>
+      )}
+      {status === 'done' && (
+        <>
+          <table className="settings__perf-table mono">
+            <tbody>
+              {results.map((r) => (
+                <tr key={r.id} data-perf={r.id}>
+                  <td>{r.label}</td>
+                  <td>{r.fps} fps</td>
+                  <td>slowest {r.slowMs} ms</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {verdict(results).map((v) => (
+            <div key={v} className="settings__perf-verdict">
+              {v}
+            </div>
+          ))}
+          {info && (
+            <div className="settings__perf-info mono">
+              {info.gpu} · {info.size} · {info.drawCalls} draw calls · {Math.round(info.triangles / 1000)}k triangles
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 }

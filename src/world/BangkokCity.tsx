@@ -55,25 +55,48 @@ export function edgeVisibility(x: number, z: number): number {
   );
 }
 
+/**
+ * Horizon haze (owner, 28 Oct: from a low camera the far city stayed sharp up to the map's cut edge). The city fades
+ * into the haze colour as it nears the horizon line, the way real air looks: what matters is how far below the
+ * horizon a point is seen (its depression angle), so a low camera hazes the far city while a camera looking down
+ * from above sees all of it clearly. `angle` is the tangent of the angle where the haze is gone, `max` its strongest.
+ */
+export const HAZE = { angle: 0.12, max: 0.9 };
+
+const smoothstep = (a: number, b: number, x: number) => {
+  const k = Math.max(0, Math.min(1, (x - a) / (b - a)));
+  return k * k * (3 - 2 * k);
+};
+
+/** how much haze covers `point` seen from `camera` (0 clear .. HAZE.max), the same maths as the shader below */
+export function hazeAt(camera: THREE.Vector3, point: THREE.Vector3): number {
+  const dx = point.x - camera.x;
+  const dz = point.z - camera.z;
+  const below = (camera.y - point.y) / Math.max(Math.hypot(dx, dz), 1e-3);
+  return (1 - smoothstep(0, HAZE.angle, below)) * HAZE.max;
+}
+
 /** How far the whole city fades into the haze (0 = clear): pages that focus on something else dim it. Shared by every map material. */
 export const CITY_DIM = { value: 0 };
 
 /** Blend every map material towards the fog colour near the map's edge, after fog is applied. */
-function addEdgeFade(mat: THREE.Material) {
+export function addEdgeFade(mat: THREE.Material) {
   mat.onBeforeCompile = (shader) => {
     shader.uniforms.uEdgeRect = {
       value: new THREE.Vector4(BKK.x, BKK.z, MODEL_HALF_X * BKK.scale, MODEL_HALF_Z * BKK.scale),
     };
     shader.uniforms.uCityDim = CITY_DIM;
     shader.uniforms.uEdgeFade = { value: new THREE.Vector4(EDGE_FADE.west, EDGE_FADE.east, EDGE_FADE.north, EDGE_FADE.south) };
+    shader.uniforms.uHaze = { value: new THREE.Vector2(HAZE.angle, HAZE.max) };
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>
-varying vec2 vEdgeXZ;`)
+varying vec3 vEdgeW;`)
       .replace('#include <project_vertex>', `#include <project_vertex>
-vEdgeXZ = (modelMatrix * vec4(transformed, 1.0)).xz;`);
+vEdgeW = (modelMatrix * vec4(transformed, 1.0)).xyz;`);
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', `#include <common>
-varying vec2 vEdgeXZ;
+varying vec3 vEdgeW;
+uniform vec2 uHaze;
 uniform vec4 uEdgeRect;
 uniform vec4 uEdgeFade;
 uniform float uCityDim;`)
@@ -81,17 +104,21 @@ uniform float uCityDim;`)
         '#include <fog_fragment>',
         `#include <fog_fragment>
         #ifdef USE_FOG
-          vec2 edgeLo = vEdgeXZ - (uEdgeRect.xy - uEdgeRect.zw);
-          vec2 edgeHi = (uEdgeRect.xy + uEdgeRect.zw) - vEdgeXZ;
+          vec2 edgeLo = vEdgeW.xz - (uEdgeRect.xy - uEdgeRect.zw);
+          vec2 edgeHi = (uEdgeRect.xy + uEdgeRect.zw) - vEdgeW.xz;
           float edgeK = min(
             min(smoothstep(0.0, 1.0, clamp(edgeLo.x / uEdgeFade.x, 0.0, 1.0)), smoothstep(0.0, 1.0, clamp(edgeHi.x / uEdgeFade.y, 0.0, 1.0))),
             min(smoothstep(0.0, 1.0, clamp(edgeLo.y / uEdgeFade.z, 0.0, 1.0)), smoothstep(0.0, 1.0, clamp(edgeHi.y / uEdgeFade.w, 0.0, 1.0)))
           );
-          gl_FragColor.rgb = mix(fogColor, gl_FragColor.rgb, edgeK * (1.0 - uCityDim));
+          // horizon haze: how far below the horizon line this point is seen from the camera
+          vec3 toFrag = vEdgeW - cameraPosition;
+          float below = -toFrag.y / max(length(toFrag.xz), 1e-3);
+          float haze = (1.0 - smoothstep(0.0, uHaze.x, below)) * uHaze.y;
+          gl_FragColor.rgb = mix(fogColor, gl_FragColor.rgb, edgeK * (1.0 - haze) * (1.0 - uCityDim));
         #endif`,
       );
   };
-  mat.customProgramCacheKey = () => 'bkk-edge-fade';
+  mat.customProgramCacheKey = () => 'bkk-edge-fade-haze';
 }
 
 export function BangkokCity() {

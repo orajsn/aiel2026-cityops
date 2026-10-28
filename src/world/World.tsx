@@ -6,6 +6,7 @@ import { Lighting } from './Lighting';
 import { Effects } from './Effects';
 import { TimeOfDay } from './TimeOfDay';
 import { FRAME } from '../engine/graphics';
+import { PerfCheck } from './PerfCheck';
 import { AssetPins } from './AssetPins';
 import { CameraRig } from './CameraRig';
 import { FreeCam } from './FreeCam';
@@ -75,6 +76,7 @@ export function World() {
       <CityDimmer dim={w.ops ? 0.62 : 0} />
       <Effects />
       <FrameMeter />
+      <PerfCheck />
     </>
   );
 }
