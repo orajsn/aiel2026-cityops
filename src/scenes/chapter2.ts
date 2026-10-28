@@ -158,6 +158,8 @@ const atRust = (id: string, title: string, overlay: string, props: object, group
 
 const b23a = atRust('3.3a', 'The glass', 'Glass', { kicker: 'The context window', step: 1, message: 'The context window is **all the model sees**.' } satisfies GlassProps, 'glass');
 const b23b = atRust('3.3b', 'The glass', 'Glass', { kicker: 'The context window', step: 2, message: 'The context window is a **curation problem**.', notebook: 'the Part 6 context card is the cure' } satisfies GlassProps, 'glass');
+// 3.3c · which discipline solves which of the four problems (owner, 28 Oct, in the owner's words)
+const b23c = atRust('3.3c', 'The glass', 'Glass', { kicker: 'Three disciplines, four problems', step: 3, message: 'Each discipline solves **two** of the four. Volume and Timing need **two disciplines** each.' } satisfies GlassProps, 'glass');
 const b24 = atRust('3.4', 'Three disciplines', 'Disciplines', { kicker: 'Three disciplines, one goal', message: 'One job: the **right tokens in**, the wrong ones out.' } satisfies DisciplinesProps);
 const b25a = atRust('3.5a', 'The loop with memory', 'MemoryLoop', { kicker: 'The agent loop, with memory wired in', step: 1, message: 'This afternoon’s loop, with memory **read at the start** and **written at the end**.', notebook: `${NB} · Part 1, TODO 1` } satisfies MemoryLoopProps, 'loop');
 const b25b = atRust('3.5b', 'The loop with memory', 'MemoryLoop', { kicker: 'The agent loop, with memory wired in', step: 2, message: 'One store, one memory manager, **any harness**.' } satisfies MemoryLoopProps, 'loop');
@@ -280,6 +282,7 @@ export const chapter2: SceneDef[] = [
   b22e,
   b23a,
   b23b,
+  b23c,
   b24,
   b25a,
   b25b,

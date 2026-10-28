@@ -6,8 +6,8 @@ export interface GlassProps {
   kicker: string;
   /** the one line the presenter lands; **teal** and !!red!! marks as in Rich.tsx */
   message: string;
-  /** 1: the glass fills with what goes into the context window; 2: the four ways that goes wrong */
-  step: 1 | 2;
+  /** 1: the glass fills with what goes into the context window; 2: the four ways that goes wrong; 3: which discipline solves which */
+  step: 1 | 2 | 3;
   notebook?: string;
 }
 
@@ -40,6 +40,12 @@ const half = (y: number) => 168 + ((BOTTOM - y) / (BOTTOM - TOP)) * 52;
  * told with Mercer's finding and Vance's question (click 2). One panel across both clicks.
  */
 export function Glass({ kicker, message, step, notebook }: GlassProps) {
+  if (step === 3)
+    return (
+      <WidePanel kicker={kicker} message={message} notebook={notebook} testId="glass" step={step}>
+        <CurationMap />
+      </WidePanel>
+    );
   const cx = W / 2;
   const outline = `M${cx - half(TOP)} ${TOP} L${cx - half(BOTTOM)} ${BOTTOM} Q${cx} ${BOTTOM + 14} ${cx + half(BOTTOM)} ${BOTTOM} L${cx + half(TOP)} ${TOP}`;
   return (
@@ -115,5 +121,119 @@ export function Glass({ kicker, message, step, notebook }: GlassProps) {
         </AnimatePresence>
       </div>
     </WidePanel>
+  );
+}
+
+/* ---------- click 3 · which discipline solves which (owner, 28 Oct, in the owner's words) ---------- */
+
+/** the three disciplines and the two curation problems each one solves, and how */
+export const CURATION_FIX: { name: string; icon: IconName; what: string; solves: { word: string; how: string }[] }[] = [
+  {
+    name: 'Memory engineering',
+    icon: 'database',
+    what: 'Building and storing the information the agent uses and generates.',
+    solves: [
+      { word: 'Volume', how: 'stores and offloads, so the window never bloats' },
+      { word: 'Accuracy', how: 'controls what gets summarized, and how' },
+    ],
+  },
+  {
+    name: 'Context engineering',
+    icon: 'funnel',
+    what: 'Deciding what to pull from memory, so the agent perceives the right data, for the right query, at the right time.',
+    solves: [
+      { word: 'Relevance', how: 'pulls only what matters for this query' },
+      { word: 'Timing', how: 'retrieves at the moment of inference, not at session start' },
+    ],
+  },
+  {
+    name: 'Harness engineering',
+    icon: 'loop',
+    what: 'How the agent runs reliably, and guarantees information is retrieved.',
+    solves: [
+      { word: 'Timing', how: 'guarantees retrieval on every call, not when the model remembers' },
+      { word: 'Volume', how: 'enforces offloading after every tool execution' },
+    ],
+  },
+];
+
+/** the problem as it reads on the map: Accuracy is also called fidelity */
+const chipLabel = (word: string) => (word === 'Accuracy' ? 'Accuracy / Fidelity' : word);
+const iconOf = (word: string) => CURATION.find((c) => c.word === word)!.icon;
+
+/** layout of the map, in the panel's px: four problem chips on top, three discipline cards below */
+const MAP_W = 1400;
+const CHIP_Y = 0;
+const CHIP_H = 64;
+const CARD_Y = 176;
+const CARD_W = 440;
+const chipX = (i: number) => (MAP_W * (i + 0.5)) / CURATION.length;
+const cardX = (i: number) => i * (CARD_W + (MAP_W - 3 * CARD_W) / 2);
+
+function CurationMap() {
+  // each discipline comes in with its two lines, one after the other
+  const at = (i: number) => 0.9 + i * 0.8;
+  return (
+    <div style={{ position: 'relative', width: MAP_W, height: 540, margin: '6px auto 0' }}>
+      <svg width={MAP_W} height={CARD_Y} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }} aria-hidden>
+        {CURATION_FIX.map((d, i) =>
+          d.solves.map((s, j) => {
+            const x1 = chipX(CURATION.findIndex((c) => c.word === s.word));
+            const x2 = cardX(i) + CARD_W / 2 + (j ? 90 : -90);
+            return (
+              <motion.path
+                key={`${d.name}>${s.word}`}
+                data-link={`${d.name}>${s.word}`}
+                d={`M${x1} ${CHIP_Y + CHIP_H} C${x1} ${CHIP_H + 60} ${x2} ${CARD_Y - 60} ${x2} ${CARD_Y}`}
+                fill="none"
+                stroke="var(--teal)"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ delay: at(i) + 0.2 + j * 0.2, duration: 0.6, ease: EASE }}
+              />
+            );
+          }),
+        )}
+      </svg>
+      {CURATION.map((c, i) => (
+        <motion.div
+          key={c.word}
+          data-problem-chip={c.word}
+          style={{ position: 'absolute', top: CHIP_Y, left: chipX(i) - 140, width: 280, height: CHIP_H, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, borderRadius: 32, background: 'rgba(127, 127, 127, 0.1)', fontSize: 24, fontWeight: 700, color: 'var(--ink)' }}
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 + i * 0.12, duration: 0.45, ease: EASE }}
+        >
+          <LineIcon name={c.icon} size={36} />
+          {chipLabel(c.word)}
+        </motion.div>
+      ))}
+      {CURATION_FIX.map((d, i) => (
+        <motion.div
+          key={d.name}
+          data-discipline={d.name}
+          style={{ position: 'absolute', top: CARD_Y, left: cardX(i), width: CARD_W, boxSizing: 'border-box', padding: '20px 22px', borderRadius: 16, background: 'rgba(27, 138, 156, 0.1)', border: '2px solid var(--teal)' }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: at(i), duration: 0.5, ease: EASE }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 10 }}>
+            <LineIcon name={d.icon} size={44} />
+            <span style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)' }}>{d.name}</span>
+          </div>
+          <div style={{ fontSize: 18, lineHeight: 1.4, color: 'var(--ink-dim)', marginBottom: 14 }}>{d.what}</div>
+          {d.solves.map((s) => (
+            <div key={s.word} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '10px 0', borderTop: '1px solid var(--line)' }}>
+              <LineIcon name={iconOf(s.word)} size={30} />
+              <span style={{ fontSize: 19, lineHeight: 1.35, color: 'var(--ink)' }}>
+                <b style={{ color: 'var(--teal)' }}>{chipLabel(s.word)}</b> → {s.how}
+              </span>
+            </div>
+          ))}
+        </motion.div>
+      ))}
+    </div>
   );
 }
