@@ -5,6 +5,7 @@ import { City } from './City';
 import { Lighting } from './Lighting';
 import { Effects } from './Effects';
 import { TimeOfDay } from './TimeOfDay';
+import { FRAME } from '../engine/graphics';
 import { AssetPins } from './AssetPins';
 import { CameraRig } from './CameraRig';
 import { FreeCam } from './FreeCam';
@@ -17,6 +18,7 @@ import { OpsRoom } from './OpsRoom';
 import { BridgeQuestion } from './BridgeQuestion';
 import { CITY_DIM } from './BangkokCity';
 import { useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
 import { useTrafficStore } from '../engine/traffic';
 import { STREAM_MS } from '../overlay/concepts/DataCounters';
 
@@ -72,6 +74,7 @@ export function World() {
       {w.question && !traffic && <BridgeQuestion key={scene?.id} />}
       <CityDimmer dim={w.ops ? 0.62 : 0} />
       <Effects />
+      <FrameMeter />
     </>
   );
 }
@@ -80,6 +83,22 @@ export function World() {
 function CityDimmer({ dim }: { dim: number }) {
   useFrame((_, dt) => {
     CITY_DIM.value += (dim - CITY_DIM.value) * Math.min(1, dt * 2.5);
+  });
+  return null;
+}
+
+/** counts frames for the frame rate readout (Settings › Graphics › Show frame rate) */
+function FrameMeter() {
+  const n = useRef({ frames: 0, since: 0 });
+  useFrame(({ clock }) => {
+    const m = n.current;
+    m.frames++;
+    const now = clock.elapsedTime;
+    if (now - m.since >= 0.5) {
+      FRAME.fps = Math.round(m.frames / (now - m.since));
+      m.frames = 0;
+      m.since = now;
+    }
   });
   return null;
 }

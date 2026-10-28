@@ -34,6 +34,18 @@ export function fixedDpr(resolution: Resolution, custom: Size): number | null {
 /** the pixels the 3D view draws at this pixel ratio */
 export const drawSize = (dpr: number): Size => ({ w: Math.round(STAGE_W * dpr), h: Math.round(STAGE_H * dpr) });
 
+/**
+ * Anti-aliasing (MSAA) draws every pixel about four times over. From 2K up the pixels are too small for jagged
+ * edges to show, and at 4K it multiplies the heaviest part of a frame (owner, 28 Oct: 4K felt laggy), so it goes off.
+ */
+export function antialiasFor(resolution: Resolution, custom: Size): boolean {
+  const dpr = fixedDpr(resolution, custom);
+  return dpr === null || drawSize(dpr).w < 2560;
+}
+
+/** the frame rate the 3D view keeps, measured by FrameMeter (World.tsx), read by the readout */
+export const FRAME = { fps: 0 };
+
 const KEY = 'cityops.resolution';
 
 function stored(): { resolution: Resolution; custom: Size } {
@@ -58,13 +70,33 @@ function store(v: { resolution: Resolution; custom?: Size }) {
 export interface GraphicsState {
   resolution: Resolution;
   custom: Size;
+  /** a small frame rate readout in the corner, to see what a setting costs on this machine */
+  showFps: boolean;
+  setShowFps(on: boolean): void;
   setResolution(r: Resolution): void;
   /** sets the custom size and switches to it */
   setCustom(s: Size): void;
 }
 
+function storedFps(): boolean {
+  try {
+    return localStorage.getItem('cityops.fps') === 'on';
+  } catch {
+    return false;
+  }
+}
+
 export const useGraphicsStore = create<GraphicsState>((set, get) => ({
   ...stored(),
+  showFps: storedFps(),
+  setShowFps: (showFps) => {
+    try {
+      localStorage.setItem('cityops.fps', showFps ? 'on' : 'off');
+    } catch {
+      /* per-viewer convenience only */
+    }
+    set({ showFps });
+  },
   setResolution: (resolution) => {
     set({ resolution });
     store({ resolution, ...(resolution === 'custom' ? { custom: get().custom } : {}) });
@@ -74,3 +106,13 @@ export const useGraphicsStore = create<GraphicsState>((set, get) => ({
     store({ resolution: 'custom', custom });
   },
 }));
+
+/**
+ * Anti-aliasing is fixed when the canvas is made, so it follows the resolution this page loaded with. Making a
+ * new canvas to change it throws the old WebGL context away, and Chrome then refuses a new one (seen on the VM,
+ * 28 Oct): the change waits for a reload instead (Settings says so).
+ */
+export const LOADED_AA = (() => {
+  const { resolution, custom } = useGraphicsStore.getState();
+  return antialiasFor(resolution, custom);
+})();

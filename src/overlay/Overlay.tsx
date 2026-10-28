@@ -14,6 +14,7 @@ import { Rich } from './Rich';
 import { SettingsPanel } from './SettingsPanel';
 import { pageNumber } from '../scenes';
 import { usePresentationStore } from '../engine/presentation';
+import { FRAME, useGraphicsStore } from '../engine/graphics';
 
 // named for the event's agenda (owner): the intro, then Lab 2 and Lab 3; pages are numbered the same way (0.x, 2.x, 3.x)
 const CHAPTER_LABEL = ['Introduction', 'Lab 2 · RAG to Agents', 'Lab 3 · Agent Memory'];
@@ -23,6 +24,20 @@ function MapLoading() {
   const { active, progress } = useProgress();
   if (!active) return null;
   return <div className="map-loading mono">Loading the Bangkok map · {Math.round(progress)}%</div>;
+}
+
+/** Settings › Graphics › Show frame rate: what the 3D view keeps up, twice a second */
+function FpsReadout() {
+  const [fps, setFps] = useState(FRAME.fps);
+  useEffect(() => {
+    const t = window.setInterval(() => setFps(FRAME.fps), 500);
+    return () => window.clearInterval(t);
+  }, []);
+  return (
+    <div className="fps mono" data-testid="fps">
+      {fps} fps
+    </div>
+  );
 }
 
 /** Presentation mode: true after a few seconds without the mouse, so the corner buttons and the pointer step aside */
@@ -57,6 +72,7 @@ export function Overlay() {
   const trafficEditing = useTrafficStore((s) => s.editing);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const presenting = usePresentationStore((s) => s.on);
+  const showFps = useGraphicsStore((s) => s.showFps);
   const blank = usePresentationStore((s) => s.blank);
   // while Settings is open nothing hides
   const idle = useIdle(presenting && !settingsOpen);
@@ -164,6 +180,7 @@ export function Overlay() {
       </div>
 
       <MapLoading />
+      {showFps && <FpsReadout />}
       {trafficEditing ? <TrafficEditor /> : <CameraEditor />}
 
       {jumpOpen && <JumpMenu />}

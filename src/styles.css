@@ -617,3 +617,10 @@ body.is-idle, body.is-idle * { cursor: none !important; }
 .settings__switch.is-on i { background: var(--teal); }
 .settings__switch.is-on i::after { transform: translateX(18px); }
 .settings__switch + .settings__label { margin-top: 16px; }
+
+/* Settings › Graphics › Show frame rate */
+.settings__check { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 14px; color: var(--ink); cursor: pointer; }
+.settings__check input { width: 18px; height: 18px; accent-color: var(--teal); }
+.fps { position: absolute; right: 40px; top: 40px; padding: 6px 12px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); font-size: 16px; color: var(--ink); z-index: 58; }
+.settings__reload { margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: rgba(27, 138, 156, 0.12); font-size: 13px; color: var(--ink); }
+.settings__reload button { margin-left: 4px; padding: 4px 10px; border-radius: 6px; border: 2px solid var(--teal); background: transparent; color: var(--teal); font: 600 13px/1 var(--font-body); cursor: pointer; }

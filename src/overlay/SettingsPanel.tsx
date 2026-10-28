@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useUiStore } from '../engine/ui';
 import { useCameraStore } from '../engine/camera';
 import { useTrafficStore } from '../engine/traffic';
-import { drawSize, fixedDpr, useGraphicsStore, type Resolution } from '../engine/graphics';
+import { antialiasFor, drawSize, fixedDpr, LOADED_AA, useGraphicsStore, type Resolution } from '../engine/graphics';
 import { useRenderDpr } from '../Stage';
 import { setTrafficMode } from './TrafficEditor';
 import { usePresentationStore } from '../engine/presentation';
@@ -109,6 +109,7 @@ export function SettingsPanel({ onClose }: { onClose(): void }) {
 function Graphics() {
   const resolution = useGraphicsStore((s) => s.resolution);
   const custom = useGraphicsStore((s) => s.custom);
+  const showFps = useGraphicsStore((s) => s.showFps);
   const autoDpr = useRenderDpr();
   const now = drawSize(fixedDpr(resolution, custom) ?? autoDpr);
   const [w, setW] = useState(String(custom.w));
@@ -159,7 +160,20 @@ function Graphics() {
       )}
       <div className="settings__now mono">
         drawing {now.w} × {now.h}
+        {!LOADED_AA && ' · no anti-aliasing'}
       </div>
+      {antialiasFor(resolution, custom) !== LOADED_AA && (
+        <div className="settings__reload">
+          Reload the page to turn anti-aliasing {LOADED_AA ? 'off' : 'on'} for this size.{' '}
+          <button type="button" onClick={() => window.location.reload()}>
+            Reload
+          </button>
+        </div>
+      )}
+      <label className="settings__check">
+        <input type="checkbox" checked={showFps} onChange={(e) => useGraphicsStore.getState().setShowFps(e.target.checked)} />
+        Show frame rate
+      </label>
     </>
   );
 }

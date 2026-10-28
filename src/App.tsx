@@ -11,7 +11,7 @@ import { SCENES } from './scenes';
 import { loadOverrides, useCameraStore } from './engine/camera';
 import { loadTraffic, useTrafficStore } from './engine/traffic';
 import { setTrafficMode } from './overlay/TrafficEditor';
-import { fixedDpr, useGraphicsStore } from './engine/graphics';
+import { fixedDpr, LOADED_AA, useGraphicsStore } from './engine/graphics';
 import { usePresentationStore } from './engine/presentation';
 
 export default function App() {
@@ -49,7 +49,8 @@ export default function App() {
           shadows
           // the stage is CSS-scaled: Auto draws only the pixels the screen really shows (Stage.tsx)
           dpr={dpr}
-          gl={{ antialias: true, powerPreference: 'high-performance' }}
+          // anti-aliasing follows the resolution the page loaded with (graphics.ts, LOADED_AA)
+          gl={{ antialias: LOADED_AA, powerPreference: 'high-performance' }}
           camera={{ position: [10, 150, 170], fov: 45, near: 0.1, far: 4000 }}
           style={{ position: 'absolute', inset: 0 }}
           // dev only: lets a verification script render full-size captures from any camera

@@ -1,4 +1,4 @@
-import { drawSize, fixedDpr, useGraphicsStore } from '../../src/engine/graphics';
+import { antialiasFor, drawSize, fixedDpr, useGraphicsStore } from '../../src/engine/graphics';
 
 test('auto follows the screen; the presets draw exactly their size on the 1920x1080 stage', () => {
   expect(fixedDpr('auto', { w: 0, h: 0 })).toBeNull();
@@ -21,4 +21,21 @@ test('the choice is remembered on this device', () => {
   useGraphicsStore.getState().setCustom({ w: 2880, h: 1620 });
   expect(useGraphicsStore.getState().resolution).toBe('custom');
   expect(JSON.parse(localStorage.getItem('cityops.resolution')!)).toEqual({ resolution: 'custom', custom: { w: 2880, h: 1620 } });
+});
+
+test('anti-aliasing stays on for Auto and FHD, and goes off from 2K up, where the pixels are too small to need it', () => {
+  const aa = (r: Parameters<typeof antialiasFor>[0], c = { w: 0, h: 0 }) => antialiasFor(r, c);
+  expect(aa('auto')).toBe(true);
+  expect(aa('fhd')).toBe(true);
+  expect(aa('2k')).toBe(false);
+  expect(aa('4k')).toBe(false);
+  expect(aa('custom', { w: 2880, h: 1620 })).toBe(false);
+  expect(aa('custom', { w: 1600, h: 900 })).toBe(true);
+});
+
+test('the frame rate readout is a setting remembered on this device', () => {
+  useGraphicsStore.getState().setShowFps(true);
+  expect(useGraphicsStore.getState().showFps).toBe(true);
+  expect(localStorage.getItem('cityops.fps')).toBe('on');
+  useGraphicsStore.getState().setShowFps(false);
 });
