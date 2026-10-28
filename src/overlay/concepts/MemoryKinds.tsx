@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, animate, motion, useMotionValue, useTransform } from 'motion/react';
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import mercerPortrait from '../../assets/portraits/mercer.png';
 import vancePortrait from '../../assets/portraits/vance.png';
@@ -24,7 +24,7 @@ function Portrait({ who, size = 64 }: { who: 'mercer' | 'vance'; size?: number }
     <img
       data-portrait={who}
       src={who === 'mercer' ? mercerPortrait : vancePortrait}
-      alt={who === 'mercer' ? 'Evelyn_H_Mercer' : 'Jordan_Vance'}
+      alt={who === 'mercer' ? 'Mercer' : 'Vance'}
       width={size}
       height={size}
       style={{ width: size, height: size, borderRadius: '50%', border: `3px solid ${TEAL_LINE}`, background: 'rgba(127,127,127,0.15)', objectFit: 'cover', flex: 'none', display: 'block' }}
@@ -44,7 +44,7 @@ function Arrow({ d, delay, w = 90, h = 30 }: { d: string; delay: number; w?: num
 function NoteCard({ text, i, style, children }: { text?: string; i: number; style?: CSSProperties; children?: ReactNode }) {
   return (
     <div data-note={i} style={{ border: '2px solid var(--line)', borderRadius: 12, padding: '10px 16px', background: 'var(--card-bg, rgba(127,127,127,0.08))', ...style }}>
-      <div className="mono" style={{ ...MONO, fontSize: 15, color: 'var(--ink-dim)', marginBottom: 4 }}>Evelyn_H_Mercer</div>
+      <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink-dim)', marginBottom: 4 }}>Mercer</div>
       <div style={{ fontSize: 20, lineHeight: 1.35, color: 'var(--ink)' }}>{text}</div>
       {children}
     </div>
@@ -75,111 +75,250 @@ export function DeskCabinet({ kicker, message, step, notebook }: DeskCabinetProp
   );
 }
 
+/** how long the sweep takes to clear the table (ms) */
+const SWEEP_MS = 1300;
+
+/** the desk is a wooden table (owner, 29 Oct: "context window is like table so brown"); muted wood, never orange */
+const WOOD = { top: '#a47b55', edge: '#7d5a3c', leg: '#6b4c33', grain: 'rgba(255, 255, 255, 0.07)' };
+
+/** a wooden table seen a little from above: the top (where the cards lie), its front edge, two legs */
+function Table({ width, children, label }: { width: number; children: ReactNode; label: ReactNode }) {
+  return (
+    <div style={{ width }}>
+      <div
+        data-desk="session"
+        style={{
+          position: 'relative',
+          borderRadius: '14px 14px 4px 4px',
+          background: `repeating-linear-gradient(90deg, ${WOOD.top} 0 120px, ${WOOD.grain} 120px 122px, ${WOOD.top} 122px 240px)`,
+          backgroundColor: WOOD.top,
+          padding: '20px 22px 22px',
+          boxShadow: `inset 0 2px 0 rgba(255,255,255,0.18)`,
+          overflow: 'hidden',
+        }}
+      >
+        {children}
+      </div>
+      {/* the front edge, and the legs under it */}
+      <div style={{ height: 16, background: WOOD.edge, borderRadius: '0 0 6px 6px' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 34px' }}>
+        <div style={{ width: 22, height: 58, background: WOOD.leg, borderRadius: '0 0 4px 4px' }} />
+        <div style={{ width: 22, height: 58, background: WOOD.leg, borderRadius: '0 0 4px 4px' }} />
+      </div>
+      <div style={{ textAlign: 'center', fontSize: 21, fontWeight: 600, color: 'var(--ink-dim)', marginTop: -36 }}>{label}</div>
+    </div>
+  );
+}
+
+/** a card lying on the table: solid, so it reads on the wood */
+const CARD: CSSProperties = { background: 'var(--panel-strong)', border: '1px solid rgba(0,0,0,0.12)', boxShadow: '0 3px 8px rgba(0,0,0,0.18)', borderRadius: 10 };
+
 function Desk() {
   const [wiped, setWiped] = useState(false);
+  const [swept, setSwept] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setWiped(true), WIPE_DELAY);
-    return () => clearTimeout(t);
+    const u = setTimeout(() => setSwept(true), WIPE_DELAY + SWEEP_MS);
+    return () => (clearTimeout(t), clearTimeout(u));
   }, []);
-  const tilt = [-1.2, 0.8, 0.6, -0.5];
+  const tilt = [-1.6, 1.1, 0.8, -0.9];
   const cards: { text: string; who: 'mercer' | 'copilot' }[] = [...MERCER_NOTES.map((text) => ({ text, who: 'mercer' as const })), { text: 'Noted.', who: 'copilot' }];
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '860px 90px 1fr', alignItems: 'center', gap: 18, marginTop: 14, minHeight: 430 }}>
-      <div data-desk="session" style={{ border: '3px solid var(--line)', borderRadius: 28, background: GREY_FILL, padding: '22px 24px 16px', height: 400, boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, flex: 1, alignContent: 'start', position: 'relative' }}>
-          <div style={{ position: 'absolute', right: -6, top: -10, zIndex: 1 }}>
-            <Portrait who="mercer" size={52} />
-          </div>
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+      <Table
+        width={1180}
+        label={
+          <span data-desk="wiped" data-wiped={swept} style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
+            <Portrait who="mercer" size={44} />
+            {swept ? 'the chat closes: the desk is swept clean' : 'the context window · the session'}
+          </span>
+        }
+      >
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, minHeight: 250, alignContent: 'start' }}>
           {cards.map((c, i) => (
             <motion.div
               key={c.text}
               data-card={c.who}
               initial={{ opacity: 0, y: -24, rotate: tilt[i] }}
-              animate={wiped ? { opacity: 0, x: 90, rotate: tilt[i] * 3 } : { opacity: 1, x: 0, y: 0, rotate: tilt[i] }}
-              transition={{ delay: wiped ? i * 0.12 : 0.3 + i * 0.35, duration: 0.6, ease: EASE }}
-              style={{ alignSelf: 'start' }}
+              // the sweep passes left to right: each card goes as it reaches it, off the table's right edge
+              animate={wiped ? { opacity: 0, x: 1200 - (i % 2) * 560, y: 30 + i * 6, rotate: tilt[i] * 14 } : { opacity: 1, x: 0, y: 0, rotate: tilt[i] }}
+              transition={wiped ? { delay: 0.15 + (i % 2) * 0.28 + Math.floor(i / 2) * 0.06, duration: 0.85, ease: [0.5, 0, 0.75, 0] } : { delay: 0.3 + i * 0.35, duration: 0.6, ease: EASE }}
+              style={{ ...CARD, padding: '12px 18px', minHeight: 100 }}
             >
-              {c.who === 'mercer' ? (
-                <NoteCard text={c.text} i={i} style={{ minHeight: 96 }} />
-              ) : (
-                <div style={{ border: `2px solid ${TEAL_LINE}`, borderRadius: 12, padding: '10px 16px', background: 'var(--card-bg, rgba(127,127,127,0.08))', minHeight: 96 }}>
-                  <div className="mono" style={{ ...MONO, fontSize: 15, color: 'var(--teal)', marginBottom: 4 }}>copilot</div>
-                  <div style={{ fontSize: 20, color: 'var(--ink)' }}>{c.text}</div>
-                </div>
-              )}
+              <div style={{ fontSize: 15, fontWeight: 700, color: c.who === 'mercer' ? 'var(--ink-dim)' : 'var(--teal)', marginBottom: 4 }}>{c.who === 'mercer' ? 'Mercer' : 'AI Agent'}</div>
+              <div style={{ fontSize: 21, lineHeight: 1.35, color: 'var(--ink)' }}>{c.text}</div>
             </motion.div>
           ))}
         </div>
-        <div style={{ textAlign: 'center', fontSize: 22, fontWeight: 600, color: 'var(--ink-dim)', paddingTop: 8 }}>the context window · the session</div>
-      </div>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: wiped ? 1 : 0 }} transition={{ duration: 0.5, ease: EASE }}>
-        <Arrow d="M2 15 H80 M66 4 L82 15 L66 26" delay={0} />
-      </motion.div>
-      <motion.div data-desk="wiped" data-wiped={wiped} initial={{ opacity: 0 }} animate={{ opacity: wiped ? 1 : 0, scale: wiped ? 1 : 0.96 }} transition={{ delay: wiped ? 0.35 : 0, duration: 0.6, ease: EASE }} style={{ textAlign: 'center' }}>
-        <div style={{ border: '3px dashed var(--ink-dim)', borderRadius: 24, height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: 'var(--ink-dim)' }}>empty</div>
-        <div style={{ marginTop: 14, fontSize: 22, fontWeight: 600, color: 'var(--ink-dim)' }}>the chat closes: the desk is wiped</div>
-      </motion.div>
+        {/* the sweep: a broad soft band crossing the table, left to right, as the chat closes */}
+        {wiped && (
+          <motion.div
+            aria-hidden
+            initial={{ x: '-40%', opacity: 0 }}
+            animate={{ x: '120%', opacity: [0, 0.9, 0.9, 0] }}
+            transition={{ duration: 1.1, ease: [0.4, 0, 0.6, 1], times: [0, 0.15, 0.8, 1] }}
+            style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: '35%', background: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 70%, rgba(255,255,255,0) 100%)', pointerEvents: 'none' }}
+          />
+        )}
+      </Table>
     </div>
+  );
+}
+
+/** when Vance's question has appeared, the middle drawer slides out (s); then her notes come out to answer him */
+const DRAWER_AT = 3.5;
+const ANSWER_AT = 4.4;
+const CAB_GREY = '#8a919c';
+const CAB_DARK = '#5c6b78';
+const CAB_LIGHT = '#aab1ba';
+
+/**
+ * The cabinet in a three-quarter view (owner, 29 Oct: "it should tilt a bit, so it can see the opening"): its
+ * front, its top and its right side; each drawer lights teal as a note goes in, and when Vance asks, the middle
+ * drawer slides out towards us and its open top shows the teal folders inside.
+ */
+const CW = 250; // front width
+const CH = 300; // front height
+const DX = 46; // depth, drawn up and to the right
+const DY = -30;
+const X0 = 10;
+const Y0 = 40;
+const DRAWER_H = 86;
+const drawerY = (i: number) => Y0 + 14 + i * 95;
+/** how far the open drawer comes out, in depth units (1 = the cabinet's whole depth) */
+const PULL = 1.3;
+
+function FilingCabinet() {
+  const k = useMotionValue(0);
+  useEffect(() => {
+    const c = animate(k, PULL, { delay: DRAWER_AT, duration: 0.9, ease: EASE });
+    return () => c.stop();
+  }, [k]);
+  // the open drawer: its front moves out by k depth units (down and to the left)
+  const fx = X0 + 12;
+  const fy = drawerY(1);
+  const fw = CW - 24;
+  const frontX = useTransform(k, (v) => -DX * v);
+  const frontY = useTransform(k, (v) => -DY * v);
+  // its open top: from the moved front's top edge back to where the front was
+  const topFace = useTransform(k, (v) => {
+    const x = fx - DX * v;
+    const y = fy - DY * v;
+    return `M${x} ${y} L${x + fw} ${y} L${fx + fw} ${fy} L${fx} ${fy} Z`;
+  });
+  const sideFace = useTransform(k, (v) => {
+    const x = fx + fw - DX * v;
+    const y = fy - DY * v;
+    return `M${x} ${y} L${fx + fw} ${fy} L${fx + fw} ${fy + DRAWER_H} L${x} ${y + DRAWER_H} Z`;
+  });
+  const foldersX = useTransform(k, (v) => -DX * v * 0.55);
+  const foldersY = useTransform(k, (v) => -DY * v * 0.55);
+  const folderOpacity = useTransform(k, [0, 0.3], [0, 1]);
+  return (
+    <svg width={CW + DX + 20} height={CH + Y0 + 60} viewBox={`0 0 ${CW + DX + 20} ${CH + Y0 + 60}`} style={{ overflow: 'visible', display: 'block' }} aria-hidden>
+      <ellipse cx={X0 + CW / 2 + 10} cy={Y0 + CH + 6} rx={CW / 2 + 30} ry={8} fill="rgba(127,127,127,0.22)" />
+      {/* top and right side, then the front */}
+      <path d={`M${X0} ${Y0} L${X0 + DX} ${Y0 + DY} L${X0 + CW + DX} ${Y0 + DY} L${X0 + CW} ${Y0} Z`} fill={CAB_LIGHT} />
+      <path d={`M${X0 + CW} ${Y0} L${X0 + CW + DX} ${Y0 + DY} L${X0 + CW + DX} ${Y0 + CH + DY} L${X0 + CW} ${Y0 + CH} Z`} fill={CAB_DARK} />
+      <rect x={X0} y={Y0} width={CW} height={CH} rx={6} fill={CAB_GREY} />
+      {/* the gap the open drawer leaves */}
+      <rect x={fx} y={fy} width={fw} height={DRAWER_H} rx={5} fill="rgba(20, 26, 34, 0.55)" />
+      {[0, 1, 2].map((i) => {
+        const open = i === 1;
+        const y = drawerY(i);
+        const face = (
+          <>
+            <motion.rect
+              x={fx}
+              y={y}
+              width={fw}
+              height={DRAWER_H}
+              rx={5}
+              stroke={CAB_DARK}
+              strokeWidth={2.5}
+              initial={{ fill: 'rgb(150, 157, 167)' }}
+              animate={{ fill: 'rgb(104, 166, 178)' }}
+              transition={{ delay: 0.9 + i * 0.7, duration: 0.6, ease: EASE }}
+            />
+            <rect x={fx + fw / 2 - 46} y={y + 13} width={92} height={20} rx={4} fill="rgba(255,255,255,0.8)" />
+            <motion.path d={`M${fx + fw / 2 - 36} ${y + 23}h72`} stroke={CAB_DARK} strokeWidth={3} strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 1 + i * 0.7, duration: 0.5, ease: EASE }} />
+            <rect x={fx + fw / 2 - 32} y={y + 52} width={64} height={14} rx={7} fill={CAB_DARK} />
+          </>
+        );
+        return open ? (
+          <g key={i} data-drawer={i} data-open>
+            {/* inside the open drawer: its side, its open top with the folders standing in it */}
+            <motion.path d={sideFace} fill={CAB_DARK} />
+            <motion.path d={topFace} fill="rgba(20, 26, 34, 0.7)" />
+            <motion.g style={{ x: foldersX, y: foldersY, opacity: folderOpacity }}>
+              {[0, 1, 2, 3, 4].map((f) => (
+                <rect key={f} data-folder={f} x={fx + 18 + f * 40} y={fy - 16 - (f % 2) * 4} width={30} height={24} rx={3} fill="var(--teal)" opacity={0.65 + (f % 3) * 0.12} />
+              ))}
+            </motion.g>
+            <motion.g style={{ x: frontX, y: frontY }}>{face}</motion.g>
+          </g>
+        ) : (
+          <g key={i} data-drawer={i}>
+            {face}
+          </g>
+        );
+      })}
+    </svg>
   );
 }
 
 function Cabinet() {
   return (
-    <div style={{ marginTop: 14 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '700px 130px 340px', gap: 0, alignItems: 'center', justifyContent: 'start' }}>
-        <div data-desk="session" style={{ border: '3px solid var(--line)', borderRadius: 28, background: GREY_FILL, padding: '14px 18px 10px', boxSizing: 'border-box' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {MERCER_NOTES.map((t, i) => (
-              <motion.div key={t} initial={{ opacity: 1 }} animate={{ opacity: [1, 1, 0.45] }} transition={{ duration: 1, delay: 0.5 + i * 0.7, times: [0, 0.4, 1] }} style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-                <div style={{ flex: 1 }}>
-                  <NoteCard text={t} i={i} style={{ padding: '6px 14px' }} />
-                </div>
-              </motion.div>
-            ))}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontSize: 19, fontWeight: 600, color: 'var(--ink-dim)', paddingTop: 8 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '500px 90px 330px 1fr', alignItems: 'center', columnGap: 16, marginTop: 10 }}>
+      {/* the desk, the same table as the page before */}
+      <Table
+        width={500}
+        label={
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
             <Portrait who="mercer" size={40} />
             the desk
-          </div>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 52, alignItems: 'center', paddingBottom: 46 }}>
-          {[0, 1, 2].map((i) => (
-            <Arrow key={i} d="M2 15 H92 M78 4 L94 15 L78 26" delay={0.5 + i * 0.7} w={100} />
+          </span>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {MERCER_NOTES.map((t, i) => (
+            <motion.div key={t} data-note={i} initial={{ opacity: 1 }} animate={{ opacity: [1, 1, 0.4] }} transition={{ duration: 1, delay: 0.5 + i * 0.7, times: [0, 0.4, 1] }} style={{ ...CARD, padding: '8px 14px' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink-dim)' }}>Mercer</div>
+              <div style={{ fontSize: 18, lineHeight: 1.3, color: 'var(--ink)' }}>{t}</div>
+            </motion.div>
           ))}
         </div>
-        <div>
-          <div data-cabinet="drawers" style={{ border: `3px solid ${TEAL_LINE}`, borderRadius: 22, background: TEAL_FILL, padding: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                data-drawer={i}
-                initial={{ backgroundColor: 'rgba(27, 138, 156, 0)' }}
-                animate={{ backgroundColor: 'rgba(27, 138, 156, 0.22)' }}
-                transition={{ delay: 0.9 + i * 0.7, duration: 0.6, ease: EASE }}
-                style={{ border: `2px solid ${TEAL_LINE}`, borderRadius: 12, height: 78, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14 }}
-              >
-                <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 1 + i * 0.7, duration: 0.5, ease: EASE }} style={{ width: 70, height: 4, borderRadius: 2, background: TEAL_LINE }} />
-              </motion.div>
-            ))}
-          </div>
-          <div style={{ marginTop: 10, textAlign: 'center', fontSize: 21, fontWeight: 700, color: 'var(--teal)' }}>kept in Oracle AI Database</div>
-        </div>
+      </Table>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 56, alignItems: 'center', paddingBottom: 60 }}>
+        {[0, 1, 2].map((i) => (
+          <Arrow key={i} d="M2 15 H70 M56 4 L72 15 L56 26" delay={0.5 + i * 0.7} w={76} />
+        ))}
       </div>
-      <motion.div data-day2 initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 3, duration: 0.6, ease: EASE }} style={{ display: 'flex', alignItems: 'center', gap: 22, marginTop: 50, paddingLeft: 870 }}>
-        {/* Vance reaches up into the cabinet */}
-        <div style={{ position: 'relative' }}>
-          <svg width={72} height={40} viewBox="0 0 72 40" aria-hidden style={{ position: 'absolute', left: 0, top: -44, overflow: 'visible' }}>
-            <motion.path d="M36 38 V4 M26 14 L36 4 L46 14" fill="none" stroke={TEAL_LINE} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 3.2, duration: 0.6, ease: EASE }} />
-          </svg>
-          <Portrait who="vance" size={72} />
+      <div style={{ textAlign: 'center' }}>
+        <div data-cabinet="drawers" style={{ display: 'flex', justifyContent: 'center' }}>
+          <FilingCabinet />
         </div>
-        <div>
-          <div style={{ border: `2px solid ${TEAL_LINE}`, borderRadius: 999, background: TEAL_FILL, padding: '8px 26px', fontSize: 22, color: 'var(--ink)' }} data-question>What happened at this pier?</div>
-          <div style={{ marginTop: 6, fontSize: 19, color: 'var(--ink-dim)' }}>
-            Day 2 · <span className="mono" style={MONO}>Jordan_Vance</span> opens it
+        <div style={{ marginTop: -36, fontSize: 21, fontWeight: 700, color: 'var(--teal)' }}>kept in Oracle AI Database</div>
+      </div>
+      {/* Day 2: Vance asks, the drawer opens, and her notes come out to answer him */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 18, alignSelf: 'center' }}>
+        <motion.div data-day2 initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.9, duration: 0.6, ease: EASE }} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <Portrait who="vance" size={84} />
+          <div>
+            <div data-question style={{ border: `2px solid ${TEAL_LINE}`, borderRadius: 999, background: TEAL_FILL, padding: '8px 22px', fontSize: 22, color: 'var(--ink)' }}>What happened at this pier?</div>
+            <div style={{ marginTop: 6, fontSize: 19, color: 'var(--ink-dim)' }}>
+              Day 2 · <b>Vance</b> asks
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+        <motion.div data-answer initial={{ opacity: 0, x: -70, scale: 0.92 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ delay: ANSWER_AT, duration: 0.8, ease: EASE }} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 18px', borderRadius: 16, border: `2px solid ${TEAL_LINE}`, background: 'rgba(27, 138, 156, 0.16)' }}>
+          <LineIcon name="database" size={34} />
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.08em', color: 'var(--teal)' }}>AI AGENT · FROM THE CABINET</div>
+            <div style={{ fontSize: 20, lineHeight: 1.35, color: 'var(--ink)' }}>Mercer logged corrosion here on Day 1: about 25% section loss, repair within 60 days.</div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }
@@ -224,11 +363,13 @@ export function ThreeKinds({ kicker, message, notebook }: ThreeKindsProps) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="three-kinds">
       <div style={{ display: 'grid', gridTemplateColumns: '170px repeat(3, 1fr)', columnGap: 26, rowGap: 0, marginTop: 8, alignItems: 'start' }}>
-        <div style={{ textAlign: 'center' }}>
+        {/* the two people, big enough to read from the back of the hall (owner); each spans rows so the cards keep their place */}
+        <div style={{ gridColumn: 1, gridRow: '1 / 4', alignSelf: 'start', textAlign: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <Portrait who="mercer" size={84} />
+            <Portrait who="mercer" size={120} />
           </div>
-          <div className="mono" style={{ ...MONO, fontSize: 15, color: 'var(--ink)', marginTop: 4 }}>Evelyn_H_Mercer</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)', marginTop: 6 }}>Mercer</div>
+          <div style={{ fontSize: 19, letterSpacing: 1.5, color: 'var(--ink-dim)', fontWeight: 700 }}>DAY 1</div>
         </div>
         <div data-report style={{ gridColumn: '2 / 5', border: '2px solid var(--line)', borderRadius: 18, background: GREY_FILL, padding: '14px 22px', fontSize: 27, lineHeight: 1.55, color: 'var(--ink)' }}>
           <Fragment i={0} icon="book">On Day 1 Mercer reported</Fragment>{' '}
@@ -272,12 +413,12 @@ export function ThreeKinds({ kicker, message, notebook }: ThreeKindsProps) {
           </div>
         ))}
 
-        <div style={{ gridColumn: 1, gridRow: 5, textAlign: 'center' }}>
+        <div style={{ gridColumn: 1, gridRow: '3 / 6', alignSelf: 'end', textAlign: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <Portrait who="vance" size={68} />
+            <Portrait who="vance" size={120} />
           </div>
-          <div className="mono" style={{ ...MONO, fontSize: 15, color: 'var(--ink)', marginTop: 4 }}>Jordan_Vance</div>
-          <div style={{ fontSize: 15, letterSpacing: 1.5, color: 'var(--ink-dim)', fontWeight: 600 }}>DAY 2</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)', marginTop: 6 }}>Vance</div>
+          <div style={{ fontSize: 19, letterSpacing: 1.5, color: 'var(--ink-dim)', fontWeight: 700 }}>DAY 2</div>
         </div>
         {KINDS.map((k, i) => (
           <motion.div
@@ -323,8 +464,9 @@ export function SharedShelf({ kicker, message, notebook }: SharedShelfProps) {
           <motion.path d="M300 360 C290 335 285 320 280 304" fill="none" stroke="var(--ink-dim)" strokeWidth={4} strokeDasharray="2 10" strokeLinecap="round" initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} transition={{ delay: 1.4, duration: 0.5 }} />
           {/* then the lines that do arrive */}
           {[
-            { d: 'M545 392 C545 250 560 150 652 142 M636 128 L653 142 L638 158', at: 2.2 },
-            { d: 'M580 392 C580 320 600 250 652 242 M636 228 L653 242 L638 258', at: 2.5 },
+            // the tips stop short of the shelf's border (left edge at x 640), never on it
+            { d: 'M545 390 C545 250 555 150 626 142 M612 129 L627 142 L612 155', at: 2.2 },
+            { d: 'M580 390 C580 320 595 250 626 242 M612 229 L627 242 L612 255', at: 2.5 },
           ].map((l, i) => (
             <motion.path key={i} data-line="shelf" d={l.d} fill="none" stroke={TEAL_LINE} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: l.at, duration: 0.8, ease: EASE }} />
           ))}
@@ -381,7 +523,7 @@ export function SharedShelf({ kicker, message, notebook }: SharedShelfProps) {
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Portrait who="vance" size={84} />
           </div>
-          <div className="mono" style={{ ...MONO, fontSize: 17, color: 'var(--ink)', marginTop: 4, whiteSpace: 'nowrap', marginLeft: -20, marginRight: -20 }}>Jordan_Vance</div>
+          <div style={{ fontSize: 19, fontWeight: 600, color: 'var(--ink)', marginTop: 4, whiteSpace: 'nowrap' }}>Vance</div>
         </motion.div>
 
         <motion.div data-reads initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 3.2, duration: 0.5 }} style={{ position: 'absolute', left: 700, top: 302, fontSize: 21, fontWeight: 700, color: 'var(--teal)' }}>

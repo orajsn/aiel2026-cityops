@@ -5,7 +5,7 @@ import { Rich } from '../Rich';
 const EASE = [0.2, 0.8, 0.2, 1] as const;
 const GREY = '#8a919c';
 
-/** a line across the chat naming the day and who is talking, e.g. "Day 1 · Evelyn_H_Mercer" */
+/** a line across the chat naming the day and who is talking, e.g. "Day 1 · Mercer" */
 export interface ChatDivider {
   divider: string;
 }
@@ -79,7 +79,7 @@ export interface ChatNote {
   tone?: 'teal' | 'red';
 }
 
-export function CopilotChat({ kicker, message, title = 'Copilot', subtitle = 'Harbor Bridge inspections', items, notebook, after = [] }: CopilotChatProps & { after?: ChatNote[] }) {
+export function CopilotChat({ kicker, message, title = 'AI Agent', subtitle = 'Harbor Bridge inspections', items, notebook, after = [] }: CopilotChatProps & { after?: ChatNote[] }) {
   const notesAt = chatSchedule(items).labelsAt + 0.2;
   return (
     <div className="beat">
@@ -121,7 +121,7 @@ export function CopilotChat({ kicker, message, title = 'Copilot', subtitle = 'Ha
 }
 
 /** the chat window alone (title bar and stacked messages), for panels that show one or more of them */
-export function ChatWindow({ title = 'Copilot', subtitle = 'Harbor Bridge inspections', items, testId = 'copilot-chat' }: { title?: string; subtitle?: string; items: ChatItem[]; testId?: string }) {
+export function ChatWindow({ title = 'AI Agent', subtitle = 'Harbor Bridge inspections', items, testId = 'copilot-chat' }: { title?: string; subtitle?: string; items: ChatItem[]; testId?: string }) {
   const s = chatSchedule(items);
   let emptyN = 0;
   let labelN = 0;

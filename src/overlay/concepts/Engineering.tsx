@@ -77,93 +77,202 @@ function Arrow({ delay = 0, w = 70 }: { delay?: number; w?: number }) {
 
 /* ---------- column 1: everyday life ---------- */
 
-const draw = { stroke: 'var(--ink-dim)', strokeWidth: 2.2, fill: 'none', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+const SKIN = '#c98e6b';
+const SKIN2 = '#8d5a3b';
+const G_LIGHT = 'rgba(138, 145, 156, 0.35)';
+const G_MID = '#8a919c';
+const G_DARK = '#5c6b78';
+const T_SOFT = 'rgba(27, 138, 156, 0.28)';
+const T_MID = 'rgba(27, 138, 156, 0.6)';
+
+const MERCER_TOP = '#6f6a8f';
+const VANCE_SUIT = '#2f3640';
+const VANCE_HAIR = '#a8643f';
+const MERCER_HAIR = '#2b2f36';
+
+/** a drawn flat head with ears, hair and a friendly face; `who` picks Mercer or Vance */
+function Head({ who, cx, cy, r = 20 }: { who: 'mercer' | 'vance'; cx: number; cy: number; r?: number }) {
+  const skin = who === 'mercer' ? SKIN2 : SKIN;
+  const k = r / 20;
+  return (
+    <g data-head={who}>
+      <circle cx={cx - r} cy={cy + 2 * k} r={4 * k} fill={skin} />
+      <circle cx={cx + r} cy={cy + 2 * k} r={4 * k} fill={skin} />
+      <circle cx={cx} cy={cy} r={r} fill={skin} />
+      {who === 'mercer' ? (
+        <>
+          <circle cx={cx} cy={cy - r - 1 * k} r={7 * k} fill={MERCER_HAIR} />
+          <path d={`M${cx - r - 1} ${cy - 2 * k}A${r + 1} ${r + 1} 0 0 1 ${cx + r + 1} ${cy - 2 * k}L${cx + r * 0.75} ${cy - 8 * k}H${cx - r * 0.75}Z`} fill={MERCER_HAIR} />
+        </>
+      ) : (
+        <path d={`M${cx - r - 1} ${cy - 2 * k}L${cx - r - 1} ${cy - 12 * k}L${cx - 11 * k} ${cy - r - 5 * k}L${cx - 4 * k} ${cy - r + 2 * k}L${cx} ${cy - r - 7 * k}L${cx + 5 * k} ${cy - r + 2 * k}L${cx + 11 * k} ${cy - r - 5 * k}L${cx + r + 1} ${cy - 12 * k}L${cx + r + 1} ${cy - 2 * k}L${cx + r * 0.75} ${cy - 8 * k}H${cx - r * 0.75}Z`} fill={VANCE_HAIR} />
+      )}
+      <g stroke="var(--ink)" strokeLinecap="round" fill="none" strokeWidth={2.2 * k}>
+        <path d={`M${cx - 7 * k} ${cy + 1 * k}v${3 * k}M${cx + 7 * k} ${cy + 1 * k}v${3 * k}`} />
+        <path d={`M${cx - 5 * k} ${cy + 9 * k}q${5 * k} ${4 * k} ${10 * k} 0`} strokeWidth={1.8 * k} />
+      </g>
+    </g>
+  );
+}
+
+function Name({ x, y, text }: { x: number; y: number; text: string }) {
+  return (
+    <text x={x} y={y} textAnchor="middle" fontFamily="Inter, sans-serif" fontSize="15" fontWeight="600" fill="var(--ink)">
+      {text}
+    </text>
+  );
+}
 
 function Clerk() {
   return (
     <svg data-everyday="clerk" width="320" height="230" viewBox="0 0 320 230">
-      <g {...draw}>
-        <path d="M10 130h120M30 130v90M110 130v90" />
-        <path d="M30 118h70M34 110h62M30 102h68" />
-        <circle cx="82" cy="52" r="17" />
-        <path d="M54 130c0-36 8-60 28-60s28 24 28 60" />
-        <path d="M110 92l60-14" />
-        <rect x="190" y="12" width="110" height="206" rx="6" />
-        {[22, 76, 130, 184].map((y, i) => (
-          <g key={y}>
-            <rect x="198" y={y} width="94" height="40" rx="4" stroke={i === 1 ? 'var(--teal)' : undefined} fill={i === 1 ? TEAL_TINT : 'none'} />
-            <path d={`M232 ${y + 20}h26`} stroke={i === 1 ? 'var(--teal)' : undefined} />
-          </g>
-        ))}
-      </g>
-      <motion.g initial={{ x: 0, y: 0, opacity: 0 }} animate={{ x: [0, 0, 22], y: [0, 0, 20], opacity: [0, 1, 1] }} transition={{ delay: 0.6, duration: 1.4, ease: EASE }}>
-        <rect x="150" y="48" width="38" height="46" rx="3" transform="rotate(8 169 71)" stroke="var(--teal)" strokeWidth={2.2} fill="rgba(27,138,156,0.1)" />
-        <path d="M158 62h22M158 72h22M158 82h14" stroke="var(--teal)" strokeWidth={2} strokeLinecap="round" />
+      {/* floor shadow */}
+      <ellipse cx="160" cy="222" rx="150" ry="6" fill="rgba(127,127,127,0.18)" />
+      {/* filing cabinet: body, side in a darker tone, four drawers */}
+      <rect x="190" y="12" width="110" height="206" rx="8" fill={G_DARK} />
+      <rect x="190" y="12" width="104" height="206" rx="8" fill={G_MID} opacity={0.9} />
+      {[20, 72, 124, 176].map((y, i) => (
+        <g key={y}>
+          <rect x="198" y={y} width="88" height="36" rx="5" fill={i === 1 ? T_MID : G_LIGHT} stroke={i === 1 ? 'var(--teal)' : G_DARK} strokeWidth={2} />
+          <rect x="226" y={y + 7} width="32" height="9" rx="2.5" fill="rgba(255,255,255,0.7)" />
+          <path d={`M232 ${y + 11.5}h20`} stroke={G_DARK} strokeWidth={2} strokeLinecap="round" />
+          <rect x="228" y={y + 22} width="28" height="7" rx="3.5" fill={i === 1 ? 'var(--teal)' : G_DARK} />
+        </g>
+      ))}
+      {/* the teal drawer, pulled open a little */}
+      <path d="M198 74l-10 7v26l10-2z" fill="var(--teal)" opacity={0.85} />
+      {/* desk: top, front, legs in two tones */}
+      <rect x="6" y="128" width="136" height="12" rx="4" fill={G_MID} />
+      <rect x="10" y="140" width="128" height="14" rx="2" fill={G_DARK} />
+      <rect x="16" y="154" width="12" height="64" rx="3" fill={G_DARK} />
+      <rect x="120" y="154" width="12" height="64" rx="3" fill={G_DARK} />
+      <rect x="104" y="154" width="14" height="40" rx="3" fill={G_MID} opacity={0.7} />
+      {/* papers on the desk */}
+      <rect x="24" y="118" width="40" height="10" rx="2" fill="rgba(138,145,156,0.55)" />
+      <rect x="28" y="110" width="34" height="9" rx="2" fill={T_SOFT} />
+      {/* the clerk */}
+      <path d="M52 132c0-34 6-56 30-56s30 22 30 56z" fill={MERCER_TOP} />
+      <path d="M72 78l10 16 10-16z" fill="rgba(255,255,255,0.75)" />
+      <path d="M82 94v38" stroke="var(--teal)" strokeWidth={3} />
+      <rect x="76" y="68" width="12" height="12" rx="5" fill={SKIN2} />
+      <Head who="mercer" cx={82} cy={50} r={20} />
+      {/* arm reaching to the folder */}
+      <path d="M100 92c12 2 26 -2 46 -12" stroke={MERCER_TOP} strokeWidth={13} strokeLinecap="round" fill="none" />
+      <circle cx="148" cy="78" r="7" fill={SKIN2} />
+      {/* the folder slides into the open teal drawer */}
+      <motion.g initial={{ x: 0, y: 0, opacity: 0 }} animate={{ x: [0, 0, 38], y: [0, 0, 12], opacity: [0, 1, 1] }} transition={{ delay: 0.6, duration: 1.4, ease: EASE }}>
+        <g transform="rotate(8 169 71)">
+          <rect x="150" y="48" width="38" height="46" rx="4" fill="var(--teal)" />
+          <path d="M150 54a4 4 0 0 1 4-4h12l4 5h14a4 4 0 0 1 4 4v-5a4 4 0 0 0-4-4h-14l-4-5h-12a4 4 0 0 0-4 4z" fill="var(--teal)" opacity={0.7} />
+          <rect x="158" y="64" width="22" height="3.5" rx="1.7" fill="rgba(255,255,255,0.85)" />
+          <rect x="158" y="73" width="22" height="3.5" rx="1.7" fill="rgba(255,255,255,0.85)" />
+          <rect x="158" y="82" width="14" height="3.5" rx="1.7" fill="rgba(255,255,255,0.85)" />
+        </g>
+        <circle cx="150" cy="78" r="7" fill={SKIN2} />
       </motion.g>
     </svg>
   );
 }
 
 function Librarian() {
-  const shelf = (y: number) =>
-    Array.from({ length: 17 }).map((_, i) => <rect key={i} x={8 + i * 18} y={y + (i % 3) * 4} width={13} height={34 - (i % 3) * 4} rx={1.5} />);
+  const spines = ['rgba(27,138,156,0.65)', G_MID, 'rgba(27,138,156,0.35)', G_DARK, 'rgba(138,145,156,0.55)', 'rgba(27,138,156,0.5)'];
+  const shelf = (y: number, seed: number) =>
+    Array.from({ length: 17 }).map((_, i) => {
+      const h = 34 - ((i + seed) % 4) * 4;
+      return <rect key={i} x={8 + i * 18} y={y + 34 - h} width={14} height={h} rx={2} fill={spines[(i * 5 + seed) % spines.length]} />;
+    });
   return (
     <svg data-everyday="librarian" width="320" height="230" viewBox="0 0 320 230">
-      <g {...draw}>
-        <path d="M4 40h312M4 90h312" />
-        {shelf(6)}
-        {shelf(56)}
-        <circle cx="70" cy="120" r="16" />
-        <path d="M44 170c0-30 8-40 26-40s26 10 26 40" />
-        <rect x="14" y="170" width="150" height="48" />
-        <circle cx="270" cy="130" r="16" />
-        <path d="M250 218v-46c0-24 40-24 40 0v46" />
-      </g>
+      {/* back wall + bookshelves */}
+      <rect x="0" y="0" width="320" height="100" rx="8" fill="rgba(138,145,156,0.16)" />
+      {shelf(4, 0)}
+      <rect x="0" y="38" width="320" height="6" rx="2" fill={G_DARK} />
+      {shelf(48, 2)}
+      <rect x="0" y="82" width="320" height="6" rx="2" fill={G_DARK} />
+      
+      {/* Mercer behind the counter */}
+      <path d="M44 176c0-34 6-48 26-48s26 14 26 48z" fill={MERCER_TOP} />
+      <path d="M62 130l8 14 8-14z" fill="rgba(255,255,255,0.75)" />
+      <rect x="64" y="116" width="12" height="14" rx="5" fill={SKIN2} />
+      <Head who="mercer" cx={70} cy={102} r={19} />
+      {/* counter */}
+      <rect x="4" y="166" width="168" height="12" rx="4" fill={G_MID} />
+      <rect x="8" y="178" width="160" height="36" rx="3" fill={G_DARK} />
+      {[0, 1, 2].map((i) => (
+        <rect key={i} x={16 + i * 50} y="184" width="42" height="24" rx="3" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth={2} />
+      ))}
+      {/* Vance receives */}
+      <path d="M244 206v-38c0-22 12-32 28-32s28 10 28 32v38z" fill={VANCE_SUIT} />
+      <path d="M262 136l10 16 10-16z" fill="rgba(255,255,255,0.85)" />
+      <path d="M270 142h4l2 20-4 4-4-4z" fill="var(--teal)" />
+      <rect x="264" y="120" width="12" height="14" rx="5" fill={SKIN} />
+      <Head who="vance" cx={270} cy={106} r={19} />
+      <Name x={70} y={226} text="Mercer" />
+      <Name x={270} y={226} text="Vance" />
+      {/* arms and the three pages passing across */}
+      <path d="M92 150c28 2 50 -10 74 -14" stroke={MERCER_TOP} strokeWidth={12} strokeLinecap="round" fill="none" />
+      <path d="M252 152c-12 0 -24 -6 -36 -14" stroke={VANCE_SUIT} strokeWidth={12} strokeLinecap="round" fill="none" />
       <motion.g initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8, duration: 0.8, ease: EASE }}>
-        <path d="M96 150c30-14 50-22 76-24" {...draw} />
         {[0, 1, 2].map((i) => (
-          <rect key={i} x={172 + i * 8} y={104 + i * 5} width="40" height="48" rx="3" transform={`rotate(${-6 + i * 5} ${192 + i * 8} ${128 + i * 5})`} stroke="var(--teal)" strokeWidth={2.2} fill="rgba(27,138,156,0.1)" />
+          <rect key={i} x={172 + i * 8} y={104 + i * 5} width="38" height="46" rx="4" transform={`rotate(${-6 + i * 5} ${192 + i * 8} ${128 + i * 5})`} fill={i === 2 ? 'var(--teal)' : T_MID} stroke="var(--teal)" strokeWidth={1.5} />
         ))}
+        <path d="M188 140h20M188 148h20" stroke="rgba(255,255,255,0.85)" strokeWidth={3} strokeLinecap="round" />
+        <circle cx="170" cy="136" r="7" fill={SKIN2} />
+        <circle cx="214" cy="140" r="7" fill={SKIN} />
       </motion.g>
     </svg>
   );
 }
 
 function ShiftRoutine() {
-  const inspector = (x: number) => (
-    <g {...draw}>
-      <path d={`M${x - 14} 70a14 12 0 0 1 28 0z`} stroke="var(--teal)" fill={TEAL_TINT} />
-      <rect x={x - 17} y={70} width={34} height={5} rx={2} stroke="var(--teal)" />
-      <path d={`M${x - 18} 150V92c0-12 36-12 36 0v58`} />
+  const inspector = (x: number, who: 'mercer' | 'vance', name: string) => (
+    <g>
+      <rect x={x - 14} y={118} width={11} height={36} rx={4} fill={G_DARK} />
+      <rect x={x + 3} y={118} width={11} height={36} rx={4} fill={G_DARK} />
+      <path d={`M${x - 24} 124V90c0-12 8-18 24-18s24 6 24 18v34z`} fill={who === 'mercer' ? MERCER_TOP : VANCE_SUIT} />
+      <rect x={x - 31} y={86} width={12} height={34} rx={6} fill={who === 'mercer' ? MERCER_TOP : VANCE_SUIT} />
+      <rect x={x + 19} y={86} width={12} height={34} rx={6} fill={who === 'mercer' ? MERCER_TOP : VANCE_SUIT} />
+      <circle cx={x - 25} cy={122} r={5.5} fill={who === 'mercer' ? SKIN2 : SKIN} />
+      <circle cx={x + 25} cy={122} r={5.5} fill={who === 'mercer' ? SKIN2 : SKIN} />
+      <path d={`M${x - 20} 124V88c0-6 6-10 12-10l8 12 8-12c6 0 12 4 12 10v36z`} fill="var(--teal)" />
+      <rect x={x - 20} y={106} width={40} height={5} fill="rgba(255,255,255,0.8)" />
+      <rect x={x - 20} y={116} width={40} height={4} fill="rgba(255,255,255,0.8)" />
+      <rect x={x - 5} y={68} width={10} height={10} rx={4} fill={who === 'mercer' ? SKIN2 : SKIN} />
+      <Head who={who} cx={x} cy={54} r={17} />
+      {/* teal hard hat drawn over the top of the portrait */}
+      <path d={`M${x - 19} 40a19 16 0 0 1 38 0z`} fill="var(--teal)" stroke="rgba(255,255,255,0.5)" strokeWidth={1.5} />
+      <rect x={x - 23} y={38} width={46} height={6} rx={3} fill="var(--teal)" stroke="rgba(255,255,255,0.5)" strokeWidth={1.5} />
+      <rect x={x - 3.5} y={26} width={7} height={11} rx={3} fill="rgba(255,255,255,0.45)" />
+      <Name x={x} y={176} text={name} />
     </g>
   );
   return (
     <div data-everyday="shift" style={{ width: 320 }}>
-      <div style={{ border: '2.5px solid var(--ink-dim)', borderRadius: 10, padding: '16px 18px', width: 220, margin: '0 auto 10px', position: 'relative' }}>
-        <span style={{ position: 'absolute', top: 8, left: '50%', width: 11, height: 11, borderRadius: '50%', background: 'var(--teal)', transform: 'translateX(-50%)' }} />
-        <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: 2, color: GREY, margin: '10px 0 12px' }}>SHIFT ROUTINE</div>
+      <div style={{ border: `3px solid ${G_DARK}`, background: 'rgba(138, 145, 156, 0.14)', boxShadow: '0 4px 0 rgba(127,127,127,0.25)', borderRadius: 10, padding: '16px 18px', width: 230, margin: '0 auto 8px', position: 'relative' }}>
+        <span style={{ position: 'absolute', top: -7, left: '50%', width: 14, height: 14, borderRadius: '50%', background: 'var(--teal)', boxShadow: '0 2px 0 rgba(0,0,0,0.25)', transform: 'translateX(-50%)' }} />
+        <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: 2, color: GREY, margin: '8px 0 12px' }}>SHIFT ROUTINE</div>
         {['Read the log first', 'Write the log last'].map((t, i) => (
           <motion.div key={t} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 + i * 0.7, duration: 0.5, ease: EASE }} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 19, color: 'var(--ink)', marginBottom: 8 }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="4" />
+              <rect x="2" y="2" width="20" height="20" rx="4" fill={TEAL_TINT} />
               <path d="M6.5 12.5l4 4 7-8" />
             </svg>
             {t}
           </motion.div>
         ))}
       </div>
-      <svg width="320" height="150" viewBox="0 0 320 160">
-        {inspector(110)}
-        {inspector(210)}
-        <path d="M130 118l32-8" {...draw} />
+      <svg width="320" height="164" viewBox="0 8 320 168">
+        <ellipse cx="160" cy="157" rx="120" ry="4" fill="rgba(127,127,127,0.2)" />
+        {inspector(100, 'mercer', 'Mercer')}
+        {inspector(220, 'vance', 'Vance')}
       </svg>
     </div>
   );
 }
 
 const EVERYDAY: Record<Which, { art: ReactNode; caption: string }> = {
-  memory: { art: <Clerk />, caption: 'A clerk files the report in labelled folders instead of piling it on the desk.' },
-  context: { art: <Librarian />, caption: 'A librarian hears your question and hands you the three pages you need, not the whole library.' },
+  memory: { art: <Clerk />, caption: 'Mercer files the report in labelled folders instead of piling it on the desk.' },
+  context: { art: <Librarian />, caption: 'Mercer hears the question and hands Vance just the pages he needs, not the whole library.' },
   harness: { art: <ShiftRoutine />, caption: 'A shift routine pinned on the wall that every inspector follows: check the log before starting, write in the log before leaving.' },
 };
 
@@ -196,7 +305,7 @@ function MemorySteps() {
       <Step n={1}>
         <div style={stepTitle}>Mercer finishes her Day 1 turn.</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Portrait src={mercerPortrait} alt="Evelyn_H_Mercer" size={78} />
+          <Portrait src={mercerPortrait} alt="Mercer" size={78} />
           <div style={bubble}>“…about 25% section loss at the bearing plate edges.”</div>
           <MiniGlass w={44} layers={1} />
         </div>
@@ -237,7 +346,7 @@ function ContextSteps() {
       <Step n={1}>
         <div style={stepTitle}>Vance asks a question.</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Portrait src={vancePortrait} alt="Jordan_Vance" size={78} />
+          <Portrait src={vancePortrait} alt="Vance" size={78} />
           <div style={bubble}>“What happened at this pier?”</div>
         </div>
       </Step>

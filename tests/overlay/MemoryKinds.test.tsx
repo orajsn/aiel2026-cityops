@@ -9,14 +9,14 @@ test('desk: Mercer’s three notes in order, the copilot card, then the chat clo
   expect(notes).toHaveLength(3);
   MERCER_NOTES.forEach((t, i) => {
     expect(notes[i]).toContain(t);
-    expect(notes[i]).toContain('Evelyn_H_Mercer');
+    expect(notes[i]).toContain('Mercer');
   });
   expect(c.querySelector('[data-card="copilot"]')?.textContent).toContain('Noted.');
   expect(c.textContent).toContain('the context window · the session');
   expect(c.querySelector('[data-portrait="mercer"]')).not.toBeNull();
   expect(c.querySelector('[data-desk="wiped"]')?.getAttribute('data-wiped')).toBe('false');
   await waitFor(() => expect(c.querySelector('[data-desk="wiped"]')?.getAttribute('data-wiped')).toBe('true'), { timeout: 5000 });
-  expect(c.textContent).toContain('the chat closes: the desk is wiped');
+  expect(c.textContent).toContain('the chat closes: the desk is swept clean');
   noRed(c);
 }, 8000);
 
@@ -26,7 +26,7 @@ test('cabinet: three drawers, kept in Oracle AI Database, Day 2 Vance asks what 
   expect(c.querySelectorAll('[data-note]')).toHaveLength(3);
   expect(c.textContent).toContain('kept in Oracle AI Database');
   const day2 = c.querySelector('[data-day2]')!;
-  expect(day2.textContent).toContain('Jordan_Vance');
+  expect(day2.textContent).toContain('Vance');
   expect(day2.textContent).toContain('What happened at this pier?');
   expect(day2.querySelector('[data-portrait="vance"]')).not.toBeNull();
   expect(c.querySelector('[data-portrait="mercer"]')).not.toBeNull();
@@ -46,7 +46,7 @@ test('three kinds: Mercer’s report, three cards in order, Vance’s three ques
   expect([...c.querySelectorAll('[data-fragment]')].map((f) => f.getAttribute('data-fragment'))).toEqual(['Episodic', 'Semantic', 'Procedural']);
   expect([...c.querySelectorAll('[data-kind]')].map((f) => f.getAttribute('data-kind'))).toEqual(['Episodic', 'Semantic', 'Procedural']);
   expect([...c.querySelectorAll('[data-question]')].map((q) => q.getAttribute('data-question'))).toEqual(['Episodic', 'Semantic', 'Procedural']);
-  for (const w of ['What happened', 'What is true', 'How to do the job', 'EPISODIC MEMORY', 'SEMANTIC MEMORY', 'PROCEDURAL MEMORY', 'What happened here?', 'How bad is it?', 'What do I do first?', 'Evelyn_H_Mercer', 'Jordan_Vance', '~25%'])
+  for (const w of ['What happened', 'What is true', 'How to do the job', 'EPISODIC MEMORY', 'SEMANTIC MEMORY', 'PROCEDURAL MEMORY', 'What happened here?', 'How bad is it?', 'What do I do first?', 'Mercer', 'Vance', '~25%'])
     expect(c.textContent).toContain(w);
   expect(c.querySelector('[data-portrait="mercer"]')).not.toBeNull();
   expect(c.querySelector('[data-portrait="vance"]')).not.toBeNull();
@@ -68,7 +68,7 @@ test('shared shelf: private drawer with a lock, the Harbor Bridge shelf with two
     expect(x.textContent).toContain('written by Mercer');
     expect(x.querySelector('[data-portrait="mercer"]')).not.toBeNull();
   });
-  expect(c.querySelector('[data-vance]')?.textContent).toContain('Jordan_Vance');
+  expect(c.querySelector('[data-vance]')?.textContent).toContain('Vance');
   expect(c.querySelector('[data-vance] [data-portrait="vance"]')).not.toBeNull();
   expect(c.querySelectorAll('[data-line="shelf"]')).toHaveLength(2);
   expect(c.querySelector('[data-enforced]')?.textContent).toContain('The database enforces this: Vance’s search can’t reach Mercer’s private notes.');

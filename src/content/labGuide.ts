@@ -29,7 +29,7 @@ export interface GuideBlock {
 
 /** pages 3.8a and 3.8b share one stop (Part 3: view_memories and TODO 3) */
 const SCOPE_GUIDE: GuideBlock[] = [
-  { cell: 36, title: 'view_memories()', note: 'A read-only view of CITY_MEMORY: every row, whatever its scope. Only for looking: the copilot reads memory scoped, not like this.' },
+  { cell: 36, title: 'view_memories()', note: 'A read-only view of CITY_MEMORY: every row, whatever its scope. Only for looking: the AI agent reads memory scoped, not like this.' },
   { cell: 38, title: 'Sample 4 reports', note: 'Picks 4 maintenance reports, a mix of severities and assets: the same 4 every run.' },
   { cell: 39, title: 'TODO 3 · the scope', note: 'Each report goes through report_event, then a search. Set user_id to "inspector_demo", the scope they were written with. Left as None, the search finds nothing.' },
   { cell: 42, title: 'Check TODO 3', note: 'Confirms the 4 reports became searchable memories.' },
@@ -219,15 +219,15 @@ export const LAB_GUIDE: Record<string, GuideBlock[]> = {
     { cell: 62, title: 'Who sees what', note: 'Vance searches at his own scope: no trace of Mercer’s note. At city scope he finds the shared guideline for Harbor Bridge.' },
     { cell: 63, title: 'Prove it', note: 'Assertions: the scoping is enforced in the database’s SQL, not by a Python filter.' },
   ],
-  // page 3.12a · Part 6: the copilot
-  '3.12a': [{ cell: 67, title: 'The system prompt', note: 'The copilot’s system prompt, which says what it gets each turn, and the helper that calls the language model on Ollama.' }],
+  // page 3.12a · Part 6: the AI agent
+  '3.12a': [{ cell: 67, title: 'The system prompt', note: 'The AI agent’s system prompt, which says what it gets each turn, and the helper that calls the language model on Ollama.' }],
   // page 3.12b · Part 6: get_context_card and TODO 6
   '3.12b': [
     { cell: 69, title: 'What the context card holds', note: 'Look at a context card before using it: a summary, the topics, the relevant memories, and the recent messages.' },
     {
       cell: 71,
       title: 'TODO 6 · call_copilot',
-      note: 'One copilot turn, end to end. Two lines to write, (a) and (b); the rest is built. Seven parts:',
+      note: 'One AI agent turn, end to end. Two lines to write, (a) and (b); the rest is built. Seven parts:',
       parts: [
         { label: 'A · Vance’s own thread', note: 'Each inspector gets a private thread per asset; every thread of one asset shares its memory.', from: /# Pre-built: resolve this inspector's PRIVATE/ },
         { label: 'B · The asset’s record', note: 'Reads the asset from CITY_ASSET.', from: /# Pre-built: asset record from CITY_ASSET/ },
@@ -242,7 +242,7 @@ export const LAB_GUIDE: Record<string, GuideBlock[]> = {
   ],
   // page 3.13 · Day 1: Mercer at the rust
   '3.13': [
-    { cell: 77, title: 'Day 1 · Mercer asks', note: 'Mercer tells the copilot what she sees and asks what to do: call_copilot. No earlier findings yet, so the answer is a fresh diagnosis.' },
+    { cell: 77, title: 'Day 1 · Mercer asks', note: 'Mercer tells the AI agent what she sees and asks what to do: call_copilot. No earlier findings yet, so the answer is a fresh diagnosis.' },
     { cell: 79, title: 'Day 1 · the official finding', note: 'Now she is sure, so she records it with log_finding: corrosion, medium, grade C, repair within 60 days.' },
     { cell: 80, title: 'The memory after Day 1', note: 'What her turns left in CITY_MEMORY, pooled under Harbor Bridge.' },
     { cell: 82, title: 'Did she leave a guideline?', note: 'A look inside her thread for a guideline.' },

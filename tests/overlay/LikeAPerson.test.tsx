@@ -19,8 +19,17 @@ test('three kinds in the map order, each a person example over its agent example
 
 test('the person page sits between long-term memory and the three kinds, at the rust, the camera holding', () => {
   const ids = chapter2.map((s) => s.id);
-  expect(ids.slice(ids.indexOf('3.2b'), ids.indexOf('3.2b') + 3)).toEqual(['3.2b', '3.2p', '3.2c']);
+  expect(ids.slice(ids.indexOf('3.2b'), ids.indexOf('3.2b') + 5)).toEqual(['3.2b', '3.2p', '3.2q', '3.2r', '3.2c']);
   const page = chapter2.find((s) => s.id === '3.2p')!;
   expect(page.overlay).toBe('LikeAPerson');
   expect(page.shot).toBe(chapter2.find((s) => s.id === '3.2b')!.shot);
+});
+
+test('one click per kind: procedural, episodic, semantic; the kind being talked about is lit, the others wait', () => {
+  const ids = ['3.2p', '3.2q', '3.2r'];
+  const pages = ids.map((id) => chapter2.find((s) => s.id === id)!);
+  expect(pages.map((p) => (p.overlayProps as { focus: number }).focus)).toEqual([0, 1, 2]);
+  expect(new Set(pages.map((p) => p.overlayGroup)).size).toBe(1);
+  const c = render(<LikeAPerson kicker="k" message="m" focus={1} />).container;
+  expect([...c.querySelectorAll('[data-kind]')].map((k) => k.getAttribute('data-on'))).toEqual(['false', 'true', 'false']);
 });

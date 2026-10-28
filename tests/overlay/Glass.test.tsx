@@ -24,10 +24,10 @@ test('step 2: four small glasses, each failing its own way, with the legend', ()
   {
     const c = render(<Glass kicker="k" message="m" step={2} />).container;
     expect([...c.querySelectorAll('[data-problem]')].map((e) => e.getAttribute('data-problem'))).toEqual(['Volume', 'Relevance', 'Accuracy', 'Timing']);
-    for (const w of ['every tool result piles in; by turn 15 it overflows', '30 search results bury Mercer’s finding', 'squeezed into a summary, the 25% is lost', 'her finding was there at the start, not when Vance asks', 'grey = noise and old turns', 'teal = what Vance needs']) expect(c.textContent).toContain(w);
+    for (const w of ['every tool result piles in; by turn 15 it overflows', 'Mercer’s finding spills out', 'the 25% falls out', 'by turn 15, when Vance asks, it is gone', 'grey = noise and old turns', 'teal = what Vance needs']) expect(c.textContent).toContain(w);
     // Mercer's finding is the one teal cell among the grey results
     expect(c.querySelectorAll('[data-piece="finding"]').length).toBeGreaterThanOrEqual(1);
-    expect(c.querySelectorAll('[data-glass="Relevance"] [data-piece]')).toHaveLength(25);
+    expect(c.querySelectorAll('[data-glass="Relevance"] [data-piece="finding"]')).toHaveLength(1);
     expect(c.querySelector('[data-glass="Accuracy"] [data-piece="lost"]')?.textContent).toBe('25%');
     expect(c.querySelectorAll('[data-layer]')).toHaveLength(0);
     expect(c.innerHTML).not.toMatch(/--red|#c74634/i);

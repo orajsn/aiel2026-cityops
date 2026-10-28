@@ -10,7 +10,12 @@ import type { Vec3 } from './shots';
 
 /** structure scale: the map is real scale (1 unit ~ 108 m); the bridge is drawn a few times larger than life so it reads */
 const S = BRIDGE_S;
-const PYLON_H = 11;
+/**
+ * Pylon height above the deck, structure units (owner, 29 Oct: the pylons stood ~300 m tall, twice the tallest
+ * tower beside the bridge). Now the tops are ~0.92 world units (~100 m) above the water: under the riverside
+ * condos (0.3 to 1.4 units on the city model within 4 units of the bridge), so the city still reads taller.
+ */
+export const PYLON_H = 2.6;
 
 const CONCRETE = '#d9d4c9';
 const DECK = '#8d93a0';
@@ -45,7 +50,8 @@ export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: '
         const dx = 0.5 + i * ((f.water * 0.3) / 7);
         for (const sgn of [-1, 1]) {
           out.push([
-            [px, DECK_Y + PYLON_H - 0.4 - i * 0.55, 0],
+            // anchors spread down the pylon's upper part: the outermost cable from the top
+            [px, DECK_Y + PYLON_H - 0.25 - (7 - i) * ((PYLON_H * 0.55) / 7), 0],
             [px + sgn * dx, DECK_Y + DECK_T / 2, 0],
           ]);
         }

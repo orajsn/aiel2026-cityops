@@ -8,7 +8,7 @@ test('memory: filing steps with Mercer, the records, and the Volume and Accuracy
   const c = render(<Discipline kicker="k" message="m" which="memory" />).container;
   expect(c.querySelector('[data-which="memory"]')).toBeTruthy();
   expect([...c.querySelectorAll('[data-step]')].map((e) => e.getAttribute('data-step')).filter((s) => /^[123]$/.test(s!))).toContain('1');
-  expect(c.querySelector('img[alt="Evelyn_H_Mercer"]')).toBeTruthy();
+  expect(c.querySelector('img[alt="Mercer"]')).toBeTruthy();
   for (const w of ['IN EVERYDAY LIFE'.toLowerCase(), 'oracle ai database', 'fact: ~25% section loss', 'offload to the store', 'the fact kept on its own']) expect(c.textContent!.toLowerCase()).toContain(w);
   expect(fixed(c)).toEqual(['Volume', 'Accuracy']);
   expect(unfixed(c)).toEqual(['Relevance', 'Timing']);
@@ -17,7 +17,7 @@ test('memory: filing steps with Mercer, the records, and the Volume and Accuracy
 
 test('context: Vance asks, three ticks', () => {
   const c = render(<Discipline kicker="k" message="m" which="context" />).container;
-  expect(c.querySelector('img[alt="Jordan_Vance"]')).toBeTruthy();
+  expect(c.querySelector('img[alt="Vance"]')).toBeTruthy();
   expect(fixed(c)).toEqual(['Volume', 'Relevance', 'Timing']);
   expect(unfixed(c)).toEqual(['Accuracy']);
   for (const w of ['compress', 'retrieve + filter', 'built for this turn', 'her guideline']) expect(c.textContent).toContain(w);

@@ -122,7 +122,7 @@ export function OneConnection({ kicker, message, notebook, stop }: HandsOnProps)
     <SidePanel kicker={kicker} message={message} notebook={notebook} testId="one-connection">
       <div style={{ display: 'grid', gridTemplateColumns: '150px 80px 1fr', alignItems: 'center', marginTop: 12 }}>
         <In delay={0.3} data-box="copilot" style={{ padding: '26px 0', textAlign: 'center', borderRadius: 14, background: GREY_TINT, border: '2px solid var(--line)', fontSize: 26, fontWeight: 700, color: 'var(--ink)' }}>
-          Copilot
+          AI Agent
         </In>
         <Arrow delay={0.8} label="one" />
         <In delay={1.2} data-box="database" style={{ padding: '10px 14px 14px', borderRadius: 16, border: '2px solid var(--teal)', background: TEAL_TINT }}>

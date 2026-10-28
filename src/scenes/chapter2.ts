@@ -74,9 +74,9 @@ const chat = (id: string, title: string, shot: string, props: CopilotChatProps &
 
 const b21a = chat('3.1a', 'The agent that forgets · Day 1', 'pier2-inspect', {
   kicker: 'Day 1 · the rust',
-  message: 'Mercer talks to the copilot first, then calls **log_finding** to record the official finding.',
+  message: 'Mercer talks to the AI agent first, then calls **log_finding** to record the official finding.',
   items: [
-    { divider: 'Day 1 · Evelyn_H_Mercer' },
+    { divider: 'Day 1 · Mercer' },
     ...MERCER_SAYS.map((m) => ({ from: 'person' as const, text: m.text })),
     { from: 'copilot', text: 'Noted.' },
   ],
@@ -86,7 +86,7 @@ const b21b = chat('3.1b', 'The agent that forgets · the chat closes', 'pier2-cl
   kicker: 'The chat closes',
   message: 'Before adding memory: **nothing carried over.**',
   items: [
-    { divider: 'Day 1 · Evelyn_H_Mercer' },
+    { divider: 'Day 1 · Mercer' },
     ...MERCER_SAYS.map((m) => ({ from: 'person' as const, text: m.text, state: 'emptying' as const })),
     { from: 'copilot', text: 'Noted.', state: 'emptying' },
     { divider: 'Mercer leaves · the session ends' },
@@ -99,7 +99,7 @@ const b21c = chat('3.1c', 'The agent that forgets · Day 2', 'pier2-close', {
   items: [
     { divider: 'Day 1 · not kept' },
     ...MERCER_SAYS.map((m) => ({ from: 'person' as const, text: m.text, state: 'empty' as const, label: m.missing })),
-    { divider: 'Day 2 · Jordan_Vance' },
+    { divider: 'Day 2 · Vance' },
     { from: 'person', text: 'What happened at this pier?' },
     { from: 'copilot', text: 'I have no earlier information. What do you see?' },
   ],
@@ -125,7 +125,11 @@ const atRust = (id: string, title: string, overlay: string, props: object, group
 
 const b22a = atRust('3.2a', 'Short-term memory', 'DeskCabinet', { kicker: 'Kinds of memory', step: 1, message: '**Short-term memory** is the desk: what the agent holds right now.' } satisfies DeskCabinetProps, 'desk');
 const b22b = atRust('3.2b', 'Long-term memory', 'DeskCabinet', { kicker: 'Kinds of memory', step: 2, message: '**Long-term memory** is the cabinet: what it keeps between visits.' } satisfies DeskCabinetProps, 'desk');
-const b22p = atRust('3.2p', 'Like a person', 'LikeAPerson', { kicker: 'Kinds of memory', message: 'Long-term memory comes in three kinds. **You already have all three.**' } satisfies LikeAPersonProps);
+// one click per kind (owner, 29 Oct), the table staying put
+const person = (id: string, focus: 0 | 1 | 2) => atRust(id, 'Like a person', 'LikeAPerson', { kicker: 'Kinds of memory', focus, message: 'Long-term memory comes in three kinds. **You already have all three.**' } satisfies LikeAPersonProps, 'person');
+const b22p = person('3.2p', 0);
+const b22q = person('3.2q', 1);
+const b22r = person('3.2r', 2);
 const b22c = atRust('3.2c', 'One report, three cards', 'ThreeKinds', { kicker: 'Kinds of memory', message: 'One thing Mercer says holds **three kinds of knowledge**.' } satisfies ThreeKindsProps);
 const b22e = atRust('3.2e', 'Private drawer, shared shelf', 'SharedShelf', { kicker: 'Private and shared', message: 'What Mercer keeps for herself, and **what she leaves for the next inspector**.', notebook: 'CITY_MEMORY holds fact, preference, guideline and memory records' } satisfies SharedShelfProps);
 
@@ -157,7 +161,7 @@ const atOps = (id: string, title: string, overlay: string, props: object, group?
   overlayProps: props as Record<string, unknown>,
 });
 
-const b26 = atOps('3.6', 'One connection', 'OneConnection', { kicker: 'Lab 3 · Part 1-2', message: 'The copilot needs **one connection**: the database.', notebook: `${NB} · Parts 1-2 and TODO 1`, stop: '3.6' } satisfies HandsOnProps);
+const b26 = atOps('3.6', 'One connection', 'OneConnection', { kicker: 'Lab 3 · Part 1-2', message: 'The AI agent needs **one connection**: the database.', notebook: `${NB} · Parts 1-2 and TODO 1`, stop: '3.6' } satisfies HandsOnProps);
 const b27 = atOps('3.7', 'The write path', 'WritePath', { kicker: 'Lab 3 · Part 3', message: 'The agent does not store what you said. It stores **what it learned**.', notebook: `${NB} · Part 3, TODO 2 (report_event), peek_sdk_tables`, stop: '3.7' } satisfies HandsOnProps);
 const b28a = atOps('3.8a', 'Scope is the key', 'Scope', { kicker: 'Lab 3 · Part 3, TODO 3', step: 1, message: 'Search the memories with **no user id**: nothing comes back.', notebook: `${NB} · TODO 3` } satisfies ScopeProps, 'scope');
 const b28b = atOps('3.8b', 'Scope is the key', 'Scope', { kicker: 'Lab 3 · Part 3, TODO 3', step: 2, message: 'Records inherit the **scope** of the thread that wrote them.', notebook: `${NB} · TODO 3` } satisfies ScopeProps, 'scope');
@@ -169,7 +173,7 @@ const b210 = atOps('3.10', 'Vector search with walls', 'VectorWalls', { kicker: 
  * back to the rust, Day 1 and Day 2 in the chat window from page 2; 28 over the bridge; 29 the takeaways.
  */
 const b211 = atOps('3.11', 'Private doors, shared hall', 'DoorsAndHall', { kicker: 'Lab 3 · Part 5', message: 'This is a **SQL WHERE clause**, not a Python filter.', notebook: `${NB} · Part 5` } satisfies HandsOnProps);
-const b212a = atOps('3.12a', 'The copilot turn', 'CopilotTurn', { kicker: 'Lab 3 · Part 6, TODO 6', step: 1, message: 'One copilot turn, **eight steps**.', notebook: `${NB} · Part 6, TODO 6` } satisfies CopilotTurnProps, 'turn');
+const b212a = atOps('3.12a', 'The AI agent turn', 'CopilotTurn', { kicker: 'Lab 3 · Part 6, TODO 6', step: 1, message: 'One copilot turn, **eight steps**.', notebook: `${NB} · Part 6, TODO 6` } satisfies CopilotTurnProps, 'turn');
 const b212b = atOps('3.12b', 'The context card', 'CopilotTurn', { kicker: 'Lab 3 · Part 6, TODO 6', step: 2, message: 'This is **the prompt the model actually receives**.', notebook: `${NB} · Part 6, the context card` } satisfies CopilotTurnProps, 'turn');
 
 const b213 = chat('3.13', 'Day 1: Mercer at the rust', 'pier2-inspect', {
@@ -257,6 +261,8 @@ export const chapter2: SceneDef[] = [
   b22a,
   b22b,
   b22p,
+  b22q,
+  b22r,
   b22c,
   b22e,
   b23a,

@@ -81,13 +81,13 @@ const PourIcon = () => (
   </svg>
 );
 
-/** a small drawing of the language model: a few layers of nodes, a wave of light through them */
+/** a small drawing of the language model, the same 2-3-3-2 network as Lab 2's (NeuralNet.tsx), a wave of light through it */
 function NeuralDrawing() {
   const cols = [
+    [105, 195],
     [60, 150, 240],
-    [30, 105, 195, 270],
     [60, 150, 240],
-    [150],
+    [105, 195],
   ];
   const xs = [20, 90, 160, 230];
   const nodes = cols.flatMap((c, ci) => c.map((y) => ({ x: xs[ci], y })));
@@ -102,7 +102,7 @@ function NeuralDrawing() {
         <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--teal)" strokeOpacity={0.4} strokeWidth={1.5} />
       ))}
       {nodes.map((n, i) => (
-        <motion.circle key={i} cx={n.x} cy={n.y} r={n.x === 230 ? 11 : 7} fill="var(--teal)" animate={{ opacity: [0.55, 1, 0.55] }} transition={{ delay: 4 + (n.x / 230) * 1.2, duration: 2.4, repeat: Infinity, repeatDelay: 1.2, ease: 'easeInOut' }} />
+        <motion.circle key={i} cx={n.x} cy={n.y} r={10} fill="var(--teal)" animate={{ opacity: [0.55, 1, 0.55] }} transition={{ delay: 4 + (n.x / 230) * 1.2, duration: 2.4, repeat: Infinity, repeatDelay: 1.2, ease: 'easeInOut' }} />
       ))}
     </svg>
   );
@@ -124,7 +124,7 @@ function GlassFill() {
                 initial={{ opacity: 0, y: -60 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + i * 0.32, duration: 0.6, ease: EASE }}
-                style={{ height: LAYER_H, boxSizing: 'border-box', borderTop: '3px solid var(--panel-bg, rgba(255,255,255,0.0))', background: `rgba(27, 138, 156, ${0.12 + i * 0.045})`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 24, fontWeight: 600, color: 'var(--ink)', ...(i === 0 ? { paddingBottom: 6 } : {}) }}
+                style={{ height: LAYER_H, boxSizing: 'border-box', borderTop: i === GLASS_LAYERS.length - 1 ? 'none' : '5px solid var(--panel-strong)', background: `rgba(27, 138, 156, ${i % 2 ? 0.3 : 0.16})`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 24, fontWeight: 600, color: 'var(--ink)', ...(i === 0 ? { paddingBottom: 6 } : {}) }}
               >
                 {name === 'Vance’s question' && <img data-portrait="vance" src={vancePortrait} alt="" width={46} height={46} style={{ borderRadius: '50%', border: '2px solid var(--teal)', objectFit: 'cover' }} />}
                 {name}
@@ -198,9 +198,9 @@ const START = 0.4;
 
 const WRONG: { word: string; text: string }[] = [
   { word: 'Volume', text: 'every tool result piles in; by turn 15 it overflows' },
-  { word: 'Relevance', text: '30 search results bury Mercer’s finding' },
-  { word: 'Accuracy', text: 'squeezed into a summary, the 25% is lost' },
-  { word: 'Timing', text: 'her finding was there at the start, not when Vance asks' },
+  { word: 'Relevance', text: '30 search results crowd in, and Mercer’s finding spills out' },
+  { word: 'Accuracy', text: 'a summary squeezes her finding to “rust on the pier”: the 25% falls out' },
+  { word: 'Timing', text: 'her finding came in at turn 1; by turn 15, when Vance asks, it is gone' },
 ];
 
 /** a tumbler 200 wide, rim at y=40, base at y=230; pieces are drawn inside it */
@@ -227,59 +227,116 @@ const VolumeGlass = (t0: number) => (
   </>
 );
 
+/**
+ * Relevance: thirty search results pour in, more than the glass holds; they heap over the rim and spill down the
+ * sides, and Mercer's finding (the one teal piece) is among what spills out.
+ */
+const SPILL: { x: number; y: number; to: [number, number]; finding?: boolean }[] = [
+  { x: 70, y: 26, to: [196, 120], finding: true },
+  { x: 120, y: 24, to: [-8, 150] },
+  { x: 96, y: 14, to: [204, 190] },
+  { x: 140, y: 30, to: [-14, 214] },
+];
 const RelevanceGlass = (t0: number) => (
   <>
-    {Array.from({ length: 25 }).map((_, i) => {
+    {Array.from({ length: 30 }).map((_, i) => {
       const r = Math.floor(i / 5);
       const c = i % 5;
-      const hit = i === 12;
       return (
         <motion.rect
           key={i}
-          data-piece={hit ? 'finding' : 'result'}
-          x={59 + c * 17}
-          y={146 + r * 16 - 0}
-          width={14}
-          height={12}
+          data-piece="result"
+          x={56 + c * 18}
+          y={204 - r * 28}
+          width={16}
+          height={22}
           rx={2}
-          fill={hit ? TEAL_FILL : GREY_FILL}
-          stroke={hit ? 'var(--teal)' : GREY_LINE}
-          strokeWidth={hit ? 2 : 1}
-          initial={{ opacity: 0, y: -16 }}
-          animate={hit ? { opacity: 1, y: 0, scale: [1, 1.5, 1] } : { opacity: 1, y: 0 }}
-          transition={{ delay: hit ? t0 + 0.8 : t0 + (i % 12) * 0.045, duration: hit ? 0.6 : 0.3, ease: EASE }}
-          style={{ transformOrigin: `${59 + c * 17 + 7}px ${146 + r * 16 + 6}px` }}
+          fill={GREY_FILL}
+          stroke={GREY_LINE}
+          strokeWidth={1}
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: t0 + (i % 15) * 0.04 + Math.floor(i / 15) * 0.25, duration: 0.3, ease: EASE }}
         />
       );
     })}
-  </>
-);
-
-const AccuracyGlass = (t0: number) => (
-  <>
-    {[0, 1, 2, 3].map((i) => (
-      <motion.rect key={i} data-piece="turn" x={52} y={206 - i * 22} width={96} height={18} rx={3} fill={GREY_FILL} stroke={GREY_LINE} strokeWidth={1.5} initial={{ opacity: 0, y: -14 }} animate={{ opacity: [0, 1, 1, 0], y: 0 }} transition={{ delay: t0, duration: 0.8, times: [0, 0.3, 0.7, 1], ease: EASE }} />
+    {/* the heap above the rim, then what spills over: Mercer's finding goes with it */}
+    {SPILL.map((p, i) => (
+      <motion.rect
+        key={`s${i}`}
+        data-piece={p.finding ? 'finding' : 'result'}
+        x={p.x}
+        y={p.y}
+        width={p.finding ? 22 : 16}
+        height={p.finding ? 18 : 14}
+        rx={2}
+        fill={p.finding ? TEAL_FILL : GREY_FILL}
+        stroke={p.finding ? 'var(--teal)' : GREY_LINE}
+        strokeWidth={p.finding ? 2.5 : 1}
+        initial={{ opacity: 0, x: 0, y: -30, rotate: 0 }}
+        animate={{ opacity: 1, x: [0, 0, p.to[0] - p.x], y: [0, 0, p.to[1] - p.y], rotate: [0, 0, i % 2 ? -50 : 50] }}
+        transition={{ delay: t0 + 0.7 + i * 0.12, duration: 1.1, times: [0, 0.3, 1], ease: EASE }}
+        style={{ transformOrigin: `${p.x + 8}px ${p.y + 7}px` }}
+      />
     ))}
-    <motion.g data-piece="summary" initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: t0 + 0.6, duration: 0.45, ease: EASE }} style={{ transformOrigin: '100px 195px' }}>
-      <rect x={44} y={174} width={112} height={44} rx={4} fill={GREY_FILL} stroke={GREY_LINE} strokeWidth={1.5} />
-      <text x={100} y={192} textAnchor="middle" fontSize={14} fill="var(--ink-dim)">summary:</text>
-      <text x={100} y={210} textAnchor="middle" fontSize={14} fill="var(--ink-dim)">rust on the pier</text>
-    </motion.g>
-    <motion.text data-piece="lost" x={156} y={140} fontSize={26} fontStyle="italic" fontWeight={700} fill="var(--teal)" initial={{ opacity: 1, x: 0, y: 0 }} animate={{ opacity: [1, 1, 0], x: [0, 12, 34], y: [0, -14, -44], rotate: [0, 8, 20] }} transition={{ delay: t0 + 0.6, duration: 1, times: [0, 0.3, 1], ease: EASE }}>
-      25%
+    <motion.text x={214} y={112} fontSize={13} fontWeight={700} fill="var(--teal)" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: t0 + 1.8, duration: 0.4 }}>
+      her finding
     </motion.text>
   </>
 );
 
+/**
+ * Accuracy: Mercer's finding goes in whole ("~25% section loss at the bearing plate edges"), then the window is
+ * summarised: the card is squeezed down to "rust on the pier", and the 25% drops out of the glass, crossed out.
+ */
+const AccuracyGlass = (t0: number) => (
+  <>
+    <motion.g data-piece="finding" initial={{ opacity: 0, scaleY: 1 }} animate={{ opacity: [0, 1, 1, 0], scaleY: [1, 1, 1, 0.3] }} transition={{ delay: t0, duration: 1.6, times: [0, 0.2, 0.6, 1], ease: EASE }} style={{ transformOrigin: '100px 228px' }}>
+      <rect x={42} y={120} width={116} height={100} rx={5} fill={TEAL_FILL} stroke="var(--teal)" strokeWidth={2} />
+      <text x={100} y={142} textAnchor="middle" fontSize={13} fontWeight={700} fill="var(--teal)">MERCER’S FINDING</text>
+      <text x={100} y={170} textAnchor="middle" fontSize={22} fontWeight={800} fill="var(--ink)">~25%</text>
+      <text x={100} y={190} textAnchor="middle" fontSize={13} fill="var(--ink)">section loss at the</text>
+      <text x={100} y={206} textAnchor="middle" fontSize={13} fill="var(--ink)">bearing plate edges</text>
+    </motion.g>
+    <motion.g data-piece="summary" initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: t0 + 1.3, duration: 0.45, ease: EASE }} style={{ transformOrigin: '100px 205px' }}>
+      <rect x={44} y={184} width={112} height={40} rx={4} fill={GREY_FILL} stroke={GREY_LINE} strokeWidth={1.5} />
+      <text x={100} y={200} textAnchor="middle" fontSize={13} fill="var(--ink-dim)">summary:</text>
+      <text x={100} y={217} textAnchor="middle" fontSize={14} fontWeight={600} fill="var(--ink)">rust on the pier</text>
+    </motion.g>
+    {/* the number falls out over the rim, struck through */}
+    <motion.g data-piece="lost" initial={{ opacity: 0, x: 0, y: 0 }} animate={{ opacity: [0, 1, 1], x: [0, 0, 92], y: [0, -40, 60] }} transition={{ delay: t0 + 1.2, duration: 1.1, times: [0, 0.35, 1], ease: EASE }}>
+      <text x={78} y={168} fontSize={22} fontWeight={800} fill="var(--teal)">25%</text>
+      <line x1={74} y1={161} x2={126} y2={161} stroke="var(--ink)" strokeWidth={3} strokeLinecap="round" />
+    </motion.g>
+  </>
+);
+
+/**
+ * Timing: a timeline under the glass. At turn 1 Mercer's finding is loaded; turn after turn piles in on top and
+ * the oldest drops out of the bottom, so by turn 15, when Vance asks, her finding is gone: an empty dashed slot.
+ */
 const TimingGlass = (t0: number) => (
   <>
-    <motion.g data-piece="finding" initial={{ opacity: 0, y: 0 }} animate={{ opacity: 1, y: [0, 0, 44] }} transition={{ delay: t0, duration: 1.0, times: [0, 0.4, 1], ease: EASE }}>
-      <rect x={52} y={206} width={96} height={20} rx={3} fill={TEAL_FILL} stroke="var(--teal)" strokeWidth={2} />
-      <text x={100} y={221} textAnchor="middle" fontSize={14} fill="var(--teal)">turn 1</text>
+    <motion.g data-piece="finding" initial={{ opacity: 0 }} animate={{ opacity: [0, 1, 1, 0], y: [0, 0, 0, 40] }} transition={{ delay: t0, duration: 1.8, times: [0, 0.15, 0.6, 1], ease: EASE }}>
+      <rect x={52} y={204} width={96} height={22} rx={3} fill={TEAL_FILL} stroke="var(--teal)" strokeWidth={2} />
+      <text x={100} y={220} textAnchor="middle" fontSize={13} fontWeight={600} fill="var(--teal)">her finding</text>
     </motion.g>
-    {[0, 1, 2].map((i) => (
-      <motion.rect key={i} data-piece="turn" x={52} y={206 - i * 26} width={96} height={20} rx={3} fill={GREY_FILL} stroke={GREY_LINE} strokeWidth={1.5} {...pop(t0 + 0.25 + i * 0.15)} />
+    {[0, 1, 2, 3, 4].map((i) => (
+      <motion.rect key={i} data-piece="turn" x={52} y={176 - i * 26} width={96} height={20} rx={3} fill={GREY_FILL} stroke={GREY_LINE} strokeWidth={1.5} {...pop(t0 + 0.3 + i * 0.18)} />
     ))}
+    <motion.rect data-piece="gone" x={52} y={204} width={96} height={22} rx={3} fill="none" stroke="var(--teal)" strokeWidth={2} strokeDasharray="5 4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: t0 + 1.9, duration: 0.4 }} />
+    <motion.g data-piece="ask" {...pop(t0 + 1.4)}>
+      <rect x={46} y={46} width={108} height={22} rx={11} fill="none" stroke="var(--ink-dim)" strokeWidth={1.5} />
+      <text x={100} y={62} textAnchor="middle" fontSize={13} fontWeight={600} fill="var(--ink)">Vance asks</text>
+    </motion.g>
+    {/* the timeline */}
+    <g fontSize={13} fill="var(--ink-dim)">
+      <line x1={30} y1={256} x2={170} y2={256} stroke={GREY_LINE} strokeWidth={2} />
+      <circle cx={30} cy={256} r={5} fill="var(--teal)" />
+      <circle cx={170} cy={256} r={5} fill="var(--ink-dim)" />
+      <text x={30} y={276} textAnchor="middle">turn 1</text>
+      <text x={170} y={276} textAnchor="middle">turn 15</text>
+    </g>
   </>
 );
 
