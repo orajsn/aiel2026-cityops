@@ -11,7 +11,8 @@ function inline(text: string): ReactNode[] {
 }
 
 /** `marked` tints whole lines (the TODO lines people type into); tokens are split at line ends for that */
-export function PythonCode({ source, marked }: { source: string; marked?: Set<number> }) {
+/** `marked` lines are lit: a TODO's lines, or (tone 'guide') the part of the cell a guide step is about */
+export function PythonCode({ source, marked, tone = 'todo' }: { source: string; marked?: Set<number>; tone?: 'todo' | 'guide' }) {
   const tokens = highlightPython(source);
   if (!marked?.size) {
     return <pre className="jd__code">{tokens.map((t, i) => (t.kind === 'plain' ? t.text : <span key={i} className={`py-${t.kind}`}>{t.text}</span>))}</pre>;
@@ -26,7 +27,7 @@ export function PythonCode({ source, marked }: { source: string; marked?: Set<nu
   return (
     <pre className="jd__code">
       {lines.map((line, i) => (
-        <span key={i} className={`jd__line${marked.has(i) ? ' jd__line--mark' : ''}`}>
+        <span key={i} data-line={i} className={`jd__line${marked.has(i) ? (tone === 'guide' ? ' jd__line--guide' : ' jd__line--mark') : ''}`}>
           {line.map((p, j) => (p.kind === 'plain' ? p.text : <span key={j} className={`py-${p.kind}`}>{p.text}</span>))}
           {'\n'}
         </span>

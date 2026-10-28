@@ -635,3 +635,11 @@ body.is-idle, body.is-idle * { cursor: none !important; }
 .settings__perf-table td:nth-child(3) { color: var(--ink-dim); text-align: right; }
 .settings__perf-verdict { margin-top: 8px; font-size: 13px; line-height: 1.4; color: var(--ink); }
 .settings__perf-info { margin-top: 6px; font-size: 11px; color: var(--ink-dim); word-break: break-word; }
+
+/* the Jupyter drawer's guide (labGuide.ts): a section's note under its heading, a part's note pinned on top, its lines lit */
+.jd__note { display: flex; flex-direction: column; gap: 6px; margin: 10px 0 4px; padding: 12px 16px; border-radius: 10px; border-left: 4px solid var(--teal); background: rgba(27, 138, 156, 0.1); font: 400 17px/1.45 var(--font-body); color: #1f2a33; }
+.jd__note b { font-size: 15px; color: var(--teal); letter-spacing: 0.02em; }
+.jd__note--pinned { position: sticky; top: 0; z-index: 2; margin: 0 0 10px; background: #e6f2f4; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08); }
+.jd__cell--md.is-focus { background: rgba(27, 138, 156, 0.05); border-radius: 8px; }
+.jd__line--guide { display: inline-block; width: 100%; background: rgba(27, 138, 156, 0.16); box-shadow: inset 3px 0 0 var(--teal); }
+.jd__step--section { width: auto; padding: 0 10px; border-radius: 16px; font-size: 14px; }

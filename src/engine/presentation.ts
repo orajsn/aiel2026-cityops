@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { LAB_STOPS, stopCells } from '../content/labStops';
+import { guideSteps } from '../content/labGuide';
 import { useSceneStore } from './store';
 
 /**
@@ -33,11 +34,17 @@ useSceneStore.subscribe((s, prev) => {
   if (s.index !== prev.index) useDrawerStore.getState().reset();
 });
 
-/** how many cells the page's stop has to run; 0 when the page has none, or is not on screen yet */
+/** how many steps a page's drawer has: its guide's sections and parts (labGuide.ts), else its cells to run */
+export function stopStepCount(id: string): number {
+  const stop = LAB_STOPS[id];
+  if (!stop) return 0;
+  return guideSteps(id).length || stopCells(stop).filter((c) => c.run).length;
+}
+
+/** the steps of the drawer on the page now; 0 when the page has none, or is not on screen yet */
 function runsHere(): number {
   const { settled } = useSceneStore.getState();
-  const stop = LAB_STOPS[useSceneStore.getState().current().id];
-  return stop && settled ? stopCells(stop).filter((c) => c.run).length : 0;
+  return settled ? stopStepCount(useSceneStore.getState().current().id) : 0;
 }
 
 export function presentNext() {
