@@ -98,3 +98,16 @@ test('a quick clicker does not lose a run: each cell started finishes, in order'
   expect([...c.querySelectorAll('[data-exec]')].map((e) => e.getAttribute('data-exec')).filter(Boolean)).toEqual(['1', '2']);
   vi.useRealTimers();
 });
+
+test('while the Jupyter drawer is open the caption steps aside, and comes back when it closes', async () => {
+  const { Overlay } = await import('../../src/overlay/Overlay');
+  const { useSceneStore } = await import('../../src/engine/store');
+  useSceneStore.getState().setScenes([{ id: '2.6', chapter: 1, title: 'One query', shot: 'sky', script: 'One call, four data models.' }]);
+  useSceneStore.getState().setSettled(true);
+  const c = render(<Overlay />).container;
+  expect(c.querySelector('.script')).not.toBeNull();
+  act(() => useDrawerStore.setState({ open: true }));
+  expect(c.querySelector('.script')).toBeNull();
+  act(() => useDrawerStore.setState({ open: false }));
+  expect(c.querySelector('.script')).not.toBeNull();
+});

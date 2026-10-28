@@ -13,7 +13,7 @@ import { useTrafficStore } from '../engine/traffic';
 import { Rich } from './Rich';
 import { SettingsPanel } from './SettingsPanel';
 import { pageNumber } from '../scenes';
-import { usePresentationStore } from '../engine/presentation';
+import { useDrawerStore, usePresentationStore } from '../engine/presentation';
 import { FRAME, useGraphicsStore } from '../engine/graphics';
 
 // named for the event's agenda (owner): the intro, then Lab 2 and Lab 3; pages are numbered the same way (0.x, 2.x, 3.x)
@@ -72,6 +72,8 @@ export function Overlay() {
   const trafficEditing = useTrafficStore((s) => s.editing);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const presenting = usePresentationStore((s) => s.on);
+  // the open Jupyter drawer reaches down to the corner buttons: the caption steps aside while it is open
+  const drawerOpen = useDrawerStore((s) => s.open);
   const showFps = useGraphicsStore((s) => s.showFps);
   const blank = usePresentationStore((s) => s.blank);
   // while Settings is open nothing hides
@@ -131,7 +133,7 @@ export function Overlay() {
       {settled && !trafficEditing && <JupyterDrawer key={scene.id} sceneId={scene.id} />}
 
       {/* presenter script under the page; CC (or S) hides it */}
-      {scene.script && scriptOpen && !trafficEditing && (
+      {scene.script && scriptOpen && !trafficEditing && !drawerOpen && (
         <div className="script" aria-label="presenter script">
           <Rich text={scene.script} />
         </div>

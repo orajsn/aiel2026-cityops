@@ -502,8 +502,9 @@ code,
 .jd__bar .jd__logo { width: 24px; height: 24px; }
 .jd__bar .jd__logo::after { left: 9px; top: 7px; border-left-width: 8px; border-top-width: 5px; border-bottom-width: 5px; }
 
-/* nearly full width, the same 48 px gap at the right edge as at the left (owner, 28 Oct) */
-.jd__panel { pointer-events: auto; position: absolute; left: 48px; top: 104px; height: 780px; width: 1824px; display: flex; flex-direction: column; background: #ffffff; color: #212121; border-radius: 12px; overflow: hidden; box-shadow: 0 14px 44px rgba(0,0,0,0.4); font-family: var(--font-body); }
+/* nearly full width, the same 48 px gap at the right edge as at the left; down to 16 px above the corner buttons
+   (stepper: 24 px from the bottom, 60 px tall), never over them (owner, 28 Oct) */
+.jd__panel { pointer-events: auto; position: absolute; left: 48px; top: 104px; height: 876px; width: 1824px; display: flex; flex-direction: column; background: #ffffff; color: #212121; border-radius: 12px; overflow: hidden; box-shadow: 0 14px 44px rgba(0,0,0,0.4); font-family: var(--font-body); }
 .jd__bar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #eeeeee; border-bottom: 1px solid #d6d6d6; }
 .jd__file { font-family: var(--font-mono); font-size: 15px; padding: 5px 12px; background: #fff; border: 1px solid #d6d6d6; border-bottom-color: #fff; border-radius: 4px 4px 0 0; }
 .jd__kernel { margin-left: auto; font-size: 14px; color: #616161; }
