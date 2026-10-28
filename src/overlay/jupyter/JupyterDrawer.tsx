@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { LAB_STOPS, stopCells, todoLines, type StopCell } from '../../content/labStops';
 import { NotebookMarkdown, PythonCode } from './NotebookMarkdown';
 import { useDrawerStore } from '../../engine/presentation';
-import { blockChip, guideSteps, partLines, type GuideStep } from '../../content/labGuide';
+import { guideSteps, partLines, type GuideStep } from '../../content/labGuide';
 
 /** cells longer than this show their first lines and fold the rest */
 const FOLD_AT = 16;
@@ -39,6 +39,8 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
   const cells = stop ? stopCells(stop) : [];
   const runs = cells.filter((c) => c.run);
   const steps = guideSteps(sceneId);
+  // a step's chip carries its cell's own number, the badge the cell shows; a skipped cell has none (owner, 28 Oct)
+  const chipOf = (cell: number) => String(cells.find((c) => c.index === cell)?.run ?? 'skip');
   const guided = steps.length > 0;
   const total = guided ? steps.length : runs.length;
   const step: GuideStep | undefined = guided && focus > 0 ? steps[focus - 1] : undefined;
@@ -137,8 +139,8 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
                   ? // a chip per section: its number, the full name on hover
                     steps.map((s, i) =>
                       s.part ? null : (
-                        <button key={s.block.title} type="button" title={s.block.title} className={`jd__step jd__step--section${step?.block === s.block ? ' is-on' : ''}`} onClick={() => goTo(i + 1)}>
-                          {blockChip(stop!.notebook, sceneId, s.block)}
+                        <button key={s.block.title} type="button" title={s.block.title} className={`jd__step jd__step--${cells.find((c) => c.index === s.block.cell)?.mark?.role ?? 'run'}${step?.block === s.block ? ' is-on' : ''}`} onClick={() => goTo(i + 1)}>
+                          {chipOf(s.block.cell)}
                         </button>
                       ),
                     )
@@ -157,7 +159,7 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
               {step?.part && (
                 <div className="jd__note jd__note--pinned" data-guide-note>
                   <b>
-                    {blockChip(stop!.notebook, sceneId, step.block)} · {step.part.label}
+                    {chipOf(step.block.cell)} · {step.part.label}
                   </b>
                   <span>{step.part.note}</span>
                 </div>

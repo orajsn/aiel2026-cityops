@@ -257,15 +257,6 @@ export const LAB_GUIDE: Record<string, GuideBlock[]> = {
   '3.15': [{ cell: 88, title: 'Without memory', note: 'The same question, to the same model, with no memory at all: compare its answer with the one Vance got.' }],
 };
 
-/**
- * A block's chip in the drawer: its section number when it has one ("5.4"), else its place among the page's blocks
- * ("1", "2"…: Lab 3's notebook does not number its sections).
- */
-export function blockChip(_nb: unknown, stopId: string, block: GuideBlock): string {
-  const n = block.title.match(/^\d+\.\d+/);
-  return n ? n[0] : String((LAB_GUIDE[stopId] ?? []).indexOf(block) + 1);
-}
-
 /** one step of a guided drawer: a block, or one of its parts */
 export interface GuideStep {
   block: GuideBlock;
