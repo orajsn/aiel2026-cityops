@@ -1,4 +1,4 @@
-import { Suspense, useMemo } from 'react';
+import { Component, Suspense, useMemo, type ReactNode } from 'react';
 import * as THREE from 'three';
 import { useGLTF } from '@react-three/drei';
 import url from '../assets/models/bhumibol.glb?url';
@@ -39,14 +39,30 @@ function Model() {
   return <primitive object={model} position={[BHUMIBOL.x, 0, 0]} scale={BHUMIBOL.scale} />;
 }
 
+/** a model that fails to load leaves only itself out, never the city around it */
+class Guard extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  componentDidCatch(error: unknown) {
+    console.error('Bhumibol Bridge model failed to load', error);
+  }
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
+
 /** in the bridge's own frame over the Taksin crossing, loaded on its own so the city never waits for it */
 export function BhumibolBridge() {
   const f = useMemo(() => harborBridgeFrame(), []);
   return (
     <group name="bhumibol-bridge" position={[f.x, 0, f.z]} rotation={[0, f.yaw, 0]}>
-      <Suspense fallback={null}>
-        <Model />
-      </Suspense>
+      <Guard>
+        <Suspense fallback={null}>
+          <Model />
+        </Suspense>
+      </Guard>
     </group>
   );
 }
