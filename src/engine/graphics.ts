@@ -73,6 +73,9 @@ export interface GraphicsState {
   /** a small frame rate readout in the corner, to see what a setting costs on this machine */
   showFps: boolean;
   setShowFps(on: boolean): void;
+  /** how big the text on screen is: the page panels, the caption and the Jupyter drawer's code and notes (1 = as designed) */
+  textSize: number;
+  setTextSize(k: number): void;
   setResolution(r: Resolution): void;
   /** sets the custom size and switches to it */
   setCustom(s: Size): void;
@@ -86,8 +89,38 @@ function storedFps(): boolean {
   }
 }
 
+/** Settings › Text size (owner, 28 Oct): readable from the back of the room */
+export const TEXT_SIZES = [0.9, 1, 1.1, 1.2, 1.3];
+
+function storedTextSize(): number {
+  try {
+    const v = Number(localStorage.getItem('cityops.textSize'));
+    return TEXT_SIZES.includes(v) ? v : 1;
+  } catch {
+    return 1;
+  }
+}
+
+/** the CSS reads the text size from --text-zoom (styles.css: panels, caption, Jupyter drawer) */
+function applyTextSize(k: number) {
+  if (typeof document === 'undefined') return;
+  document.documentElement.style.setProperty('--text-zoom', String(k));
+  // the page panels are laid out tight for 1080 px: they grow up to 115% and stay on the screen
+  document.documentElement.style.setProperty('--panel-zoom', String(Math.min(k, 1.15)));
+}
+
 export const useGraphicsStore = create<GraphicsState>((set, get) => ({
   ...stored(),
+  textSize: storedTextSize(),
+  setTextSize: (textSize) => {
+    try {
+      localStorage.setItem('cityops.textSize', String(textSize));
+    } catch {
+      /* per-viewer convenience only */
+    }
+    applyTextSize(textSize);
+    set({ textSize });
+  },
   showFps: storedFps(),
   setShowFps: (showFps) => {
     try {
@@ -116,3 +149,5 @@ export const LOADED_AA = (() => {
   const { resolution, custom } = useGraphicsStore.getState();
   return antialiasFor(resolution, custom);
 })();
+
+applyTextSize(useGraphicsStore.getState().textSize);

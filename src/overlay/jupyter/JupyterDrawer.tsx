@@ -8,6 +8,8 @@ import { guideSteps, partLines, type GuideStep } from '../../content/labGuide';
 /** cells longer than this show their first lines and fold the rest */
 const FOLD_AT = 16;
 const FOLD_SHOW = 10;
+/** how long a cell 'runs' before its output shows */
+const RUN_MS = 1100;
 
 const BADGE: Record<string, string> = { run: 'run', todo: 'fill in, then run', check: 'checkpoint', skip: 'skip' };
 
@@ -29,6 +31,9 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
   const { setOpen, setFocus } = useDrawerStore.getState();
   const [unfolded, setUnfolded] = useState<Set<number>>(new Set());
   const cellRefs = useRef(new Map<number, HTMLDivElement>());
+  // the cells that have 'run' on this page, with their execution count, and the one running now
+  const [ran, setRan] = useState<Map<number, number>>(new Map());
+  const [running, setRunning] = useState<Set<number>>(new Set());
   // a page's drawer starts closed when it appears
   useEffect(() => useDrawerStore.getState().reset(), [sceneId]);
   const cells = stop ? stopCells(stop) : [];
@@ -53,6 +58,29 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
     if (c) cellRefs.current.get(c.index)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focus, open]);
+
+  // the cell a step reaches 'runs', as the room runs it: [*] for a moment, then [n] and its output. A long cell
+  // that is stepped through part by part runs after its last part, once it has been explained.
+  const runNow = step
+    ? !step.block.parts || step.part === step.block.parts[step.block.parts.length - 1]
+      ? step.block.cell
+      : null
+    : (runs.find((r) => r.run === focus)?.index ?? null);
+  // a run finishes even when the next step comes quickly (a fast clicker): every started run completes
+  useEffect(() => {
+    if (!open || runNow === null || ran.has(runNow) || running.has(runNow)) return;
+    const cell = runNow;
+    setRunning((r) => new Set(r).add(cell));
+    window.setTimeout(() => {
+      setRan((m) => (m.has(cell) ? m : new Map(m).set(cell, m.size + 1)));
+      setRunning((r) => {
+        const next = new Set(r);
+        next.delete(cell);
+        return next;
+      });
+    }, RUN_MS);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runNow, open]);
   if (!stop) return null;
 
   // the room is done when the last cell has run: its success line if it prints one
@@ -77,7 +105,7 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
       )}
       <AnimatePresence>
         {open && (
-          <motion.div className="jd__panel" initial={{ x: -880, opacity: 0.6 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -880, opacity: 0.6 }} transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}>
+          <motion.div className="jd__panel" initial={{ x: -1560, opacity: 0.6 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -1560, opacity: 0.6 }} transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}>
             <div className="jd__bar">
               <span className="jd__logo" aria-hidden />
               <span className="jd__file">{stop.notebook.file}</span>
@@ -138,6 +166,7 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
                   c={c}
                   focused={guided ? step?.block.cell === c.index : !!c.run && c.run === focus}
                   note={step && !step.part && step.block.cell - 1 === c.index ? step.block : undefined}
+                  exec={running.has(c.index) ? 'running' : ran.get(c.index)}
                   guideLines={range && step?.block.cell === c.index ? range : undefined}
                   folded={
                     c.cell.type === 'code' &&
@@ -160,7 +189,7 @@ export function JupyterDrawer({ sceneId }: { sceneId: string }) {
   );
 }
 
-function Cell({ c, focused, folded, note, guideLines, onUnfold, onPick, refFn }: { c: StopCell; focused: boolean; folded: boolean; note?: GuideStep['block']; guideLines?: { start: number; end: number }; onUnfold(): void; onPick(): void; refFn(el: HTMLDivElement | null): void }) {
+function Cell({ c, focused, folded, note, guideLines, exec, onUnfold, onPick, refFn }: { c: StopCell; focused: boolean; folded: boolean; note?: GuideStep['block']; guideLines?: { start: number; end: number }; exec?: 'running' | number; onUnfold(): void; onPick(): void; refFn(el: HTMLDivElement | null): void }) {
   const role = c.mark?.role;
   if (c.cell.type !== 'code') {
     return (
@@ -189,7 +218,9 @@ function Cell({ c, focused, folded, note, guideLines, onUnfold, onPick, refFn }:
             {c.run}
           </span>
         )}
-        <span className="jd__in">[ ]:</span>
+        <span className={`jd__in${exec === 'running' ? ' is-running' : ''}`} data-exec={exec ?? ''}>
+          [{exec === 'running' ? '*' : (exec ?? ' ')}]:
+        </span>
       </div>
       <div className="jd__body">
         {role && (
@@ -217,10 +248,16 @@ function Cell({ c, focused, folded, note, guideLines, onUnfold, onPick, refFn }:
             </button>
           )}
         </div>
-        {c.mark?.expect && (
-          <div className="jd__out">
+        {exec === 'running' && (
+          <div className="jd__running">
+            <i /> running…
+          </div>
+        )}
+        {/* before it runs: what the room should see; once it has run: the output, as Jupyter shows it */}
+        {c.mark?.expect && exec !== 'running' && (
+          <div className={`jd__out ${typeof exec === 'number' ? 'jd__out--ran' : 'jd__out--hint'}`} data-output={typeof exec === 'number' ? 'ran' : 'hint'}>
             <span className="jd__ok">✓ {c.mark.expect}</span>
-            <span className="jd__out-label">you should see</span>
+            {typeof exec !== 'number' && <span className="jd__out-label">you should see</span>}
           </div>
         )}
       </div>

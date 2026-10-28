@@ -20,7 +20,8 @@ export function WidePanel({ kicker, message, notebook, testId, step, children }:
           className="beat__panel"
           data-testid={testId}
           data-step={step}
-          style={{ position: 'relative', right: 'auto', top: 'auto', width: 1480, maxHeight: 'none' }}
+          // with a larger text size (Settings) the panel grows, but never wider than the stage
+          style={{ position: 'relative', right: 'auto', top: 'auto', width: 'min(1480px, calc(1840px / var(--text-zoom, 1)))', maxHeight: 'none' }}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: EASE }}

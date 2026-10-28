@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useUiStore } from '../engine/ui';
 import { useCameraStore } from '../engine/camera';
 import { useTrafficStore } from '../engine/traffic';
-import { antialiasFor, drawSize, fixedDpr, LOADED_AA, useGraphicsStore, type Resolution } from '../engine/graphics';
+import { antialiasFor, drawSize, fixedDpr, LOADED_AA, TEXT_SIZES, useGraphicsStore, type Resolution } from '../engine/graphics';
 import { useRenderDpr } from '../Stage';
 import { setTrafficMode } from './TrafficEditor';
 import { usePresentationStore } from '../engine/presentation';
@@ -54,6 +54,8 @@ export function SettingsPanel({ onClose }: { onClose(): void }) {
           </button>
         ))}
       </div>
+
+      <TextSize />
 
       <Graphics />
 
@@ -220,5 +222,27 @@ function PerformanceCheck() {
         </>
       )}
     </div>
+  );
+}
+
+/** Text size: the page panels, the caption and the Jupyter drawer's code and notes, together */
+function TextSize() {
+  const size = useGraphicsStore((s) => s.textSize);
+  return (
+    <>
+      <div className="settings__label" id="settings-text">
+        Text size
+      </div>
+      <div className="settings__res" role="radiogroup" aria-labelledby="settings-text">
+        {TEXT_SIZES.map((k) => {
+          const label = `${Math.round(k * 100)}%`;
+          return (
+            <button key={k} type="button" role="radio" aria-checked={size === k} aria-label={label} className={`settings__chip${size === k ? ' is-on' : ''}`} onClick={() => useGraphicsStore.getState().setTextSize(k)}>
+              {label}
+            </button>
+          );
+        })}
+      </div>
+    </>
   );
 }

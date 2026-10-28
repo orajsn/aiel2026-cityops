@@ -60,3 +60,19 @@ test('Presentation mode is a switch in Settings, remembered on this device; B bl
   expect(screen.getByTestId('blank')).toBeInTheDocument();
   act(() => usePresentationStore.getState().setOn(false));
 });
+
+test('Text size scales the panels, the caption and the Jupyter code, and is remembered on this device', () => {
+  const { container } = render(
+    <div id="stage-test">
+      <Overlay />
+    </div>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+  expect(screen.getByRole('radio', { name: '100%' })).toBeChecked();
+  fireEvent.click(screen.getByRole('radio', { name: '120%' }));
+  expect(useGraphicsStore.getState().textSize).toBe(1.2);
+  expect(localStorage.getItem('cityops.textSize')).toBe('1.2');
+  expect(document.documentElement.style.getPropertyValue('--text-zoom')).toBe('1.2');
+  act(() => useGraphicsStore.getState().setTextSize(1));
+  expect(container).toBeTruthy();
+});
