@@ -55,6 +55,8 @@ export function SettingsPanel({ onClose }: { onClose(): void }) {
         ))}
       </div>
 
+      <BridgeChoice />
+
       <TextSize />
 
       <Graphics />
@@ -262,6 +264,29 @@ function TextSize() {
           />
           %
         </label>
+      </div>
+    </>
+  );
+}
+
+/** Bridge: Harbor Bridge, or the Bhumibol Bridge model on preview (owner, 28 Oct) */
+function BridgeChoice() {
+  const bridge = useGraphicsStore((s) => s.bridge);
+  const options = [
+    { id: 'harbor' as const, label: 'Harbor Bridge' },
+    { id: 'bhumibol' as const, label: 'Bhumibol (preview)' },
+  ];
+  return (
+    <>
+      <div className="settings__label" id="settings-bridge">
+        Bridge
+      </div>
+      <div className="settings__bridge" role="radiogroup" aria-labelledby="settings-bridge">
+        {options.map((o) => (
+          <button key={o.id} type="button" role="radio" aria-checked={bridge === o.id} aria-label={o.label} className={`settings__chip${bridge === o.id ? ' is-on' : ''}`} onClick={() => useGraphicsStore.getState().setBridge(o.id)}>
+            {o.label}
+          </button>
+        ))}
       </div>
     </>
   );

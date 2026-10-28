@@ -669,3 +669,5 @@ body.is-idle, body.is-idle * { cursor: none !important; }
 .settings__text input[type='range'] { flex: 1; accent-color: var(--teal); }
 .settings__pct { display: flex; align-items: center; gap: 4px; font: 600 14px/1 var(--font-body); color: var(--ink); }
 .settings__pct input { width: 64px; height: 36px; padding: 0 8px; border-radius: 8px; border: 2px solid var(--line); background: transparent; color: var(--ink); font: 500 15px/1 var(--font-mono); text-align: right; }
+.settings__bridge { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.settings__skies + .settings__label, .settings__bridge + .settings__label { margin-top: 16px; }

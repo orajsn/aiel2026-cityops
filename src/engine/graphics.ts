@@ -75,6 +75,9 @@ export interface GraphicsState {
   setShowFps(on: boolean): void;
   /** how big the text on screen is: the page panels, the caption and the Jupyter drawer's code and notes (1 = as designed) */
   textSize: number;
+  /** which bridge model stands at the crossing: Harbor Bridge, or the Bhumibol Bridge model on preview (owner, 28 Oct) */
+  bridge: 'harbor' | 'bhumibol';
+  setBridge(b: 'harbor' | 'bhumibol'): void;
   setTextSize(k: number): void;
   setResolution(r: Resolution): void;
   /** sets the custom size and switches to it */
@@ -113,8 +116,25 @@ function applyTextSize(k: number) {
   document.documentElement.style.setProperty('--panel-zoom', String(Math.min(k, 1.15)));
 }
 
+function storedBridge(): 'harbor' | 'bhumibol' {
+  try {
+    return localStorage.getItem('cityops.bridge') === 'bhumibol' ? 'bhumibol' : 'harbor';
+  } catch {
+    return 'harbor';
+  }
+}
+
 export const useGraphicsStore = create<GraphicsState>((set, get) => ({
   ...stored(),
+  bridge: storedBridge(),
+  setBridge: (bridge) => {
+    try {
+      localStorage.setItem('cityops.bridge', bridge);
+    } catch {
+      /* per-viewer convenience only */
+    }
+    set({ bridge });
+  },
   textSize: storedTextSize(),
   setTextSize: (k) => {
     const textSize = clampTextSize(k);

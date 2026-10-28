@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
 import { useUiStore } from '../engine/ui';
+import { useGraphicsStore } from '../engine/graphics';
 import { BRIDGE, BRIDGE_S, DECK_T, DECK_W, DECK_Y, harborBridgeFrame } from './bridgeFrame';
 import { Person, type Who } from './Person';
 import type { Vec3 } from './shots';
@@ -27,6 +28,8 @@ export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: '
   // work in structure units inside a group scaled by S, so spans still match the world
   const f = useMemo(() => ({ ...f0, water: f0.water / S, ramp: f0.ramp / S }), [f0]);
   const theme = useUiStore((s) => s.theme);
+  // Bhumibol preview (Settings): its own deck, towers and cables stand here; Pier 3 and Pier 2 keep the story
+  const preview = useGraphicsStore((s) => s.bridge === 'bhumibol');
 
   // six piers across the water, numbered 1..6 from the west bank; Pier 3 and Pier 2 carry the story.
   // Layout (world units) lives in BRIDGE so the boats can keep to the open channel.
@@ -71,6 +74,8 @@ export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: '
 
   return (
     <group position={[f.x, 0, f.z]} rotation={[0, f.yaw, 0]} scale={S} name="harbor-bridge">
+      {!preview && (
+        <>
       {/* deck over water */}
       <mesh position={[0, DECK_Y, 0]} castShadow receiveShadow>
         <boxGeometry args={[f.water * 2, DECK_T, DECK_W]} />
@@ -126,8 +131,10 @@ export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: '
           </mesh>
         </group>
       ))}
+        </>
+      )}
       {/* piers: shaft in the water with a cap under the deck */}
-      {piers.map((x, i) => (
+      {piers.map((x, i) => (preview && x !== pier3 && x !== pier2 ? null : (
         <group key={i} position={[x, 0, 0]}>
           <mesh position={[0, (DECK_Y - 0.3) / 2 - 0.4, 0]} castShadow>
             <boxGeometry args={[BRIDGE.pierW / S, DECK_Y - 0.3 + 0.8, BRIDGE.pierD / S]} />
@@ -138,7 +145,9 @@ export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: '
             <meshStandardMaterial color={CONCRETE} roughness={1} />
           </mesh>
         </group>
-      ))}
+      )))}
+      {!preview && (
+        <>
       {/* pylons: two legs each side of the deck, joined above */}
       {pylons.map((x, i) => (
         <group key={`p${i}`} position={[x, 0, 0]}>
@@ -157,6 +166,8 @@ export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: '
       {cables.map((pts, i) => (
         <Line key={i} points={pts} color="#f3ead6" lineWidth={1} />
       ))}
+        </>
+      )}
       {/* inspection platforms bolted to the camera-side faces of Pier 3 and Pier 2, railing on three open sides */}
       {BRIDGE.platforms.map((p, i) => (
         <group key={i} position={[p.x / S, p.y / S, p.z / S]}>
