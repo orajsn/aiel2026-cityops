@@ -115,7 +115,7 @@ test('Lab 2 page 4: the optional section says it is optional', () => {
 });
 
 test('pages without a stop show nothing', () => {
-  const { container } = render(<JupyterDrawer sceneId="3.5a" />);
+  const { container } = render(<JupyterDrawer sceneId="3.4c" />);
   expect(container.innerHTML).toBe('');
 });
 

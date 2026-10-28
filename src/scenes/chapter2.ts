@@ -4,7 +4,8 @@ import type { ChatNote, CopilotChatProps } from '../overlay/concepts/CopilotChat
 import type { MemoryMapProps } from '../overlay/concepts/MemoryMap';
 import type { LikeAPersonProps } from '../overlay/concepts/LikeAPerson';
 import type { GlassProps } from '../overlay/concepts/Glass';
-import type { DisciplinesProps } from '../overlay/concepts/Disciplines';
+import type { DisciplineProps, WhoFixesWhatProps } from '../overlay/concepts/Engineering';
+import type { DeskCabinetProps, ThreeKindsProps, SharedShelfProps } from '../overlay/concepts/MemoryKinds';
 import type { MemoryLoopProps } from '../overlay/concepts/MemoryLoop';
 import type { HandsOnProps, ScopeProps } from '../overlay/concepts/HandsOn';
 import type { CopilotTurnProps } from '../overlay/concepts/HandsOn2';
@@ -106,44 +107,10 @@ const b21c = chat('3.1c', 'The agent that forgets · Day 2', 'pier2-close', {
 }, { who: 'character-male-d' });
 
 /**
- * 3.2 · The memory map, in five clicks built exactly like the Lab 3 deck's slides 19 to 23 (owner, 25 Oct).
- * The camera stays at the rust with Vance there, since the map answers "what should Vance know?"; the five
- * pages share one panel, so each click only adds its part.
- */
-const map = (id: string, step: MemoryMapProps['step'], message: string, notebook?: string): SceneDef => ({
-  id,
-  chapter: 2,
-  title: 'The memory map',
-  shot: 'pier2-close',
-  world: { bridge: true, inspect: { pier: 'pier2', who: 'character-male-d' } },
-  overlay: 'MemoryMap',
-  overlayGroup: 'memory-map',
-  overlayProps: { kicker: 'Kinds of memory', step, message, notebook } satisfies MemoryMapProps as unknown as Record<string, unknown>,
-});
-
-const b22a = map('3.2a', 1, '**Short-term memory**: what the agent holds right now.');
-const b22b = map('3.2b', 2, '**Long-term memory**: what it keeps between visits.');
-/**
- * 3.2p · Like a person (owner, 26 Oct): the human analogy between long-term memory and its three kinds. The camera
- * still holds at the rust; the next click opens the map again with the three kinds drawing in.
- */
-const b22p: SceneDef = {
-  id: '3.2p',
-  chapter: 2,
-  title: 'Like a person',
-  shot: 'pier2-close',
-  world: { bridge: true, inspect: { pier: 'pier2', who: 'character-male-d' } },
-  overlay: 'LikeAPerson',
-  overlayProps: { kicker: 'Kinds of memory', message: 'Long-term memory comes in three kinds. **You already have all three.**' } satisfies LikeAPersonProps as unknown as Record<string, unknown>,
-};
-const b22c = map('3.2c', 3, 'Three kinds: **how to do the job**, **what happened**, **what is true**.');
-const b22d = map('3.2d', 4, 'Each kind lives in its own layer.');
-const b22e = map('3.2e', 5, 'And a **shared memory**, so the next inspector can use it too.', 'CITY_MEMORY holds fact, preference, guideline and memory records');
-
-/**
- * 3.3 to 3.5 · the glass, three disciplines, the loop (owner, 25 Oct), from the Lab 3 deck's slides 24 to 34.
- * The camera still holds at the rust with Vance there: the story has not changed place, these pages explain
- * what he should have had. Multi-click pages share one panel (overlayGroup).
+ * 3.2 · Kinds of memory (owner, 28 Oct: the V2 mocks, each page teaching in plain words). The camera stays at the
+ * rust with Vance there, since these pages answer "what should Vance know?". Short-term is the desk, long-term the
+ * cabinet (one panel across both clicks); then the human analogy (a real table), why there are three kinds, and the
+ * shared shelf. The full memory map waits for the end of the lab (3.15c), where the notebook shows what was built.
  */
 const atRust = (id: string, title: string, overlay: string, props: object, group?: string): SceneDef => ({
   id,
@@ -156,13 +123,24 @@ const atRust = (id: string, title: string, overlay: string, props: object, group
   overlayProps: props as Record<string, unknown>,
 });
 
-const b23a = atRust('3.3a', 'The glass', 'Glass', { kicker: 'The context window', step: 1, message: 'The context window is **all the model sees**.' } satisfies GlassProps, 'glass');
-const b23b = atRust('3.3b', 'The glass', 'Glass', { kicker: 'The context window', step: 2, message: 'The context window is a **curation problem**.', notebook: 'the Part 6 context card is the cure' } satisfies GlassProps, 'glass');
-// 3.3c · which discipline solves which of the four problems (owner, 28 Oct, in the owner's words)
-const b23c = atRust('3.3c', 'The glass', 'Glass', { kicker: 'Three disciplines, four problems', step: 3, message: 'Each discipline solves **two** of the four. Volume and Timing need **two disciplines** each.' } satisfies GlassProps, 'glass');
-const b24 = atRust('3.4', 'Three disciplines', 'Disciplines', { kicker: 'Three disciplines, one goal', message: 'One job: the **right tokens in**, the wrong ones out.' } satisfies DisciplinesProps);
-const b25a = atRust('3.5a', 'The loop with memory', 'MemoryLoop', { kicker: 'The agent loop, with memory wired in', step: 1, message: 'This afternoon’s loop, with memory **read at the start** and **written at the end**.', notebook: `${NB} · Part 1, TODO 1` } satisfies MemoryLoopProps, 'loop');
-const b25b = atRust('3.5b', 'The loop with memory', 'MemoryLoop', { kicker: 'The agent loop, with memory wired in', step: 2, message: 'One store, one memory manager, **any harness**.' } satisfies MemoryLoopProps, 'loop');
+const b22a = atRust('3.2a', 'Short-term memory', 'DeskCabinet', { kicker: 'Kinds of memory', step: 1, message: '**Short-term memory** is the desk: what the agent holds right now.' } satisfies DeskCabinetProps, 'desk');
+const b22b = atRust('3.2b', 'Long-term memory', 'DeskCabinet', { kicker: 'Kinds of memory', step: 2, message: '**Long-term memory** is the cabinet: what it keeps between visits.' } satisfies DeskCabinetProps, 'desk');
+const b22p = atRust('3.2p', 'Like a person', 'LikeAPerson', { kicker: 'Kinds of memory', message: 'Long-term memory comes in three kinds. **You already have all three.**' } satisfies LikeAPersonProps);
+const b22c = atRust('3.2c', 'One report, three cards', 'ThreeKinds', { kicker: 'Kinds of memory', message: 'One thing Mercer says holds **three kinds of knowledge**.' } satisfies ThreeKindsProps);
+const b22e = atRust('3.2e', 'Private drawer, shared shelf', 'SharedShelf', { kicker: 'Private and shared', message: 'What Mercer keeps for herself, and **what she leaves for the next inspector**.', notebook: 'CITY_MEMORY holds fact, preference, guideline and memory records' } satisfies SharedShelfProps);
+
+/**
+ * 3.3 and 3.4 · the glass, then the three jobs that fill it well (owner, 28 Oct: V2 mocks). Still at the rust with
+ * Vance there: the story has not changed place. One page per job, each with an everyday picture and the Harbor
+ * Bridge story in three steps, then the recap grid; this afternoon's loop now lives in the harness page.
+ */
+const b23a = atRust('3.3a', 'The glass', 'Glass', { kicker: 'The context window, “the glass”', step: 1, message: 'The language model reads **only what is in the glass**, this turn.' } satisfies GlassProps, 'glass');
+const b23b = atRust('3.3b', 'Four things go wrong', 'Glass', { kicker: 'The context window', step: 2, message: 'The glass is all the model sees, and **four things go wrong** when we fill it.', notebook: 'the Part 6 context card is the cure' } satisfies GlassProps, 'glass');
+const b24a = atRust('3.4a', 'Memory engineering', 'Discipline', { kicker: '① Memory engineering', which: 'memory', message: 'Decide what to keep, and **file it where it won’t get lost**.' } satisfies DisciplineProps);
+const b24b = atRust('3.4b', 'Context engineering', 'Discipline', { kicker: '② Context engineering', which: 'context', message: 'For each question, **pour in only what this question needs**.' } satisfies DisciplineProps);
+const b24c = atRust('3.4c', 'Harness engineering', 'Discipline', { kicker: '③ Harness engineering', which: 'harness', message: 'Make it happen **every turn, automatically**.', notebook: `${NB} · Part 1, TODO 1` } satisfies DisciplineProps);
+const b24d = atRust('3.4d', 'Who fixes what', 'WhoFixesWhat', { kicker: 'Three disciplines, four problems', message: 'That is why **Vance gets Mercer’s finding**.' } satisfies WhoFixesWhatProps);
+const b25b = atRust('3.5b', 'One store, any harness', 'MemoryLoop', { kicker: 'The agent loop, with memory wired in', message: 'One store, one memory manager, **any harness**.' } satisfies MemoryLoopProps);
 
 /**
  * Lab 3 pages 15 to 19 (3.6-3.10), the notebook's Parts 1 to 5, in the Ops room (owner, 25 Oct; sketches agreed
@@ -235,6 +213,8 @@ const b215 = atRust('3.15', 'With and without memory', 'WithWithout', {
   notebook: `${NB} · the comparison cell`,
 } satisfies WithWithoutProps);
 const b215b = atRust('3.15b', 'The four failures, solved', 'FailuresSolved', { kicker: 'Back to the glass', message: 'The four failures from the glass, **solved**.' } satisfies EndingProps);
+// 3.15c · the full memory map, moved from the start of the lab (owner, 28 Oct): after the hands-on its layers mean something (notebook cell 90)
+const b215c = atRust('3.15c', 'What you built', 'MemoryMap', { kicker: 'Kinds of memory', step: 5, message: 'The full memory map: **what you actually built** today.', notebook: `${NB} · Memory types - what you actually built` } satisfies MemoryMapProps);
 
 const b216: SceneDef = {
   id: '3.16',
@@ -278,13 +258,13 @@ export const chapter2: SceneDef[] = [
   b22b,
   b22p,
   b22c,
-  b22d,
   b22e,
   b23a,
   b23b,
-  b23c,
-  b24,
-  b25a,
+  b24a,
+  b24b,
+  b24c,
+  b24d,
   b25b,
   b26,
   b27,
@@ -299,6 +279,7 @@ export const chapter2: SceneDef[] = [
   b214,
   b215,
   b215b,
+  b215c,
   b216,
   b217,
 ];

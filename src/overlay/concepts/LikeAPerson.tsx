@@ -1,6 +1,8 @@
 import { motion } from 'motion/react';
+import type { CSSProperties, ReactNode } from 'react';
 import { EASE, WidePanel } from './WidePanel';
 import { LineIcon, type IconName } from './icons';
+import mercerPortrait from '../../assets/portraits/mercer.png';
 
 export interface LikeAPersonProps {
   kicker: string;
@@ -8,14 +10,12 @@ export interface LikeAPersonProps {
   message: string;
 }
 
-/** a person's memory is grey, the agent's teal (the same tones as the memory map) */
-const GREY = { fill: 'rgba(138, 145, 156, 0.12)', stroke: '#8a919c', label: 'var(--ink-dim)' };
-const TEAL = { fill: 'rgba(27, 138, 156, 0.10)', stroke: 'var(--teal)', label: 'var(--teal)' };
+const GREY = '#8a919c';
 
 type Example = { icon: IconName; text: string };
 
 /**
- * The map's order, top to bottom (MemoryMap click 3), so the next click lines up with this page. The Harbor Bridge
+ * The map's order (MemoryMap click 3), so the next click lines up with this page. The Harbor Bridge
  * examples are the map's own words for each kind.
  */
 const KINDS: { kind: string; what: string; icon: IconName; person: Example; agent: Example; lab: Example }[] = [
@@ -24,62 +24,92 @@ const KINDS: { kind: string; what: string; icon: IconName; person: Example; agen
   { kind: 'Semantic', what: 'what is true', icon: 'nodes', person: { icon: 'cap', text: 'Things I learned in school' }, agent: { icon: 'profile', text: 'Facts about a user' }, lab: { icon: 'pin', text: 'Harbor Bridge and the right pier' } },
 ];
 
-/** each part comes in by its column, then its row: columns left to right, top to bottom in each */
-const at = (col: number, row: number) => ({ initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.35 + col * 0.35 + row * 0.18, duration: 0.5, ease: EASE } });
+const ROW_FILL = ['rgba(138, 145, 156, 0.10)', 'rgba(27, 138, 156, 0.10)', 'rgba(138, 145, 156, 0.05)'];
+const LABEL_FILL = ['rgba(138, 145, 156, 0.2)', 'rgba(27, 138, 156, 0.2)', 'rgba(138, 145, 156, 0.2)'];
+const BORDER = '1px solid rgba(27, 138, 156, 0.45)';
+
+/** columns left to right, in each column person, then agent, then bridge */
+const at = (col: number, row: number) => ({ initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.3 + col * 0.55 + row * 0.2, duration: 0.5, ease: EASE } });
+
+const PersonIcon = () => (
+  <svg width={44} height={44} viewBox="0 0 48 48" fill="none" stroke={GREY} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="24" cy="14" r="8" />
+    <path d="M8 43c0-9 7-15 16-15s16 6 16 15" />
+  </svg>
+);
+const AgentIcon = () => (
+  <svg width={44} height={44} viewBox="0 0 48 48" fill="none" stroke="var(--teal)" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M24 4v6" />
+    <rect x="9" y="10" width="30" height="26" rx="6" />
+    <circle cx="18" cy="23" r="3" />
+    <circle cx="30" cy="23" r="3" />
+    <path d="M18 30h12M4 21v6M44 21v6M16 36v7M32 36v7" />
+  </svg>
+);
+
+const cell = (col: number, row: number): CSSProperties => ({
+  gridColumn: col + 2,
+  gridRow: row + 2,
+  display: 'flex',
+  alignItems: 'center',
+  gap: 16,
+  padding: '14px 18px',
+  background: ROW_FILL[row],
+  borderTop: BORDER,
+  borderLeft: BORDER,
+  fontSize: 24,
+  fontWeight: 500,
+  color: 'var(--ink)',
+  minHeight: 118,
+  boxSizing: 'border-box',
+});
 
 /**
- * Lab 3 · the human analogy (owner, 26 Oct, from the "AI Agent Memory: The Human Analogy" picture, redrawn in our
- * colours): between long-term memory (3.2b) and the map's three kinds (3.2c), each kind as a person has it
- * as the agent has it, and what it is in this lab at Harbor Bridge (owner: memory type, human example, lab example).
- * Columns come in left to right, in each one the person first, then the agent, then the bridge.
+ * Lab 3 · the human analogy (owner, 28 Oct, V2 mock): one table, the three kinds across, and down the rows a
+ * person, the agent, and what it is at Harbor Bridge. Columns come in left to right; in each one the
+ * person first, then the agent, then the bridge.
  */
 export function LikeAPerson({ kicker, message }: LikeAPersonProps) {
+  const rowHeads: { label: ReactNode; icon: ReactNode }[] = [
+    { label: <b>A person</b>, icon: <PersonIcon /> },
+    { label: <b>The agent</b>, icon: <AgentIcon /> },
+    {
+      label: (
+        <span style={{ display: 'flex', flexDirection: 'column', fontSize: 18, color: 'var(--ink-dim)', fontWeight: 600 }}>
+          At<span className="mono" style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--ink)' }}>Harbor Bridge</span>
+        </span>
+      ),
+      icon: <img data-portrait="mercer" src={mercerPortrait} alt="" width={52} height={52} style={{ borderRadius: '50%', border: '2px solid var(--teal)', objectFit: 'cover' }} />,
+    },
+  ];
   return (
     <WidePanel kicker={kicker} message={message} testId="like-a-person">
-      {/* one grid for all three columns, so each row (kind, person, arrow, agent, arrow, bridge) lines up across them however the text wraps */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gridAutoFlow: 'column', gridTemplateRows: 'auto 1fr auto 1fr auto 1fr', columnGap: 28, rowGap: 14, marginTop: 8 }}>
+      <div data-table="kinds" style={{ display: 'grid', gridTemplateColumns: '260px repeat(3, minmax(0, 1fr))', gridTemplateRows: 'auto repeat(3, 1fr)', border: '2px solid var(--teal)', borderRadius: 4, overflow: 'hidden', marginTop: 8 }}>
+        <div style={{ gridColumn: 1, gridRow: 1, background: 'rgba(27, 138, 156, 0.85)', color: '#fff', padding: '16px 20px', fontSize: 16, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', display: 'flex', alignItems: 'center' }}>Same idea, three places</div>
+        {rowHeads.map((r, row) => (
+          <motion.div key={row} data-row={['person', 'agent', 'bridge'][row]} {...at(0, row)} style={{ gridColumn: 1, gridRow: row + 2, display: 'flex', alignItems: 'center', gap: 16, padding: '14px 20px', background: LABEL_FILL[row], borderTop: BORDER, fontSize: 24, color: 'var(--ink)' }}>
+            {r.icon}
+            {r.label}
+          </motion.div>
+        ))}
         {KINDS.map((k, col) => (
           <div key={k.kind} data-kind={k.kind} style={{ display: 'contents' }}>
-            <motion.div {...at(col, 0)} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              <LineIcon name={k.icon} size={52} />
+            <motion.div {...at(col, 0)} style={{ gridColumn: col + 2, gridRow: 1, display: 'flex', alignItems: 'center', gap: 16, padding: '12px 18px', background: 'var(--teal)', color: '#fff', borderLeft: '1px solid rgba(255,255,255,0.3)' }}>
+              <LineIcon name={k.icon} size={48} color="#fff" />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: 30, fontWeight: 700, color: 'var(--ink)' }}>{k.kind}</span>
-                <span style={{ fontSize: 18, color: 'var(--ink-dim)' }}>{k.what}</span>
+                <span style={{ fontSize: 30, fontWeight: 700 }}>{k.kind}</span>
+                <span style={{ fontSize: 18, opacity: 0.9 }}>{k.what}</span>
               </div>
             </motion.div>
-            <motion.div {...at(col, 1)} style={{ display: 'flex' }}>
-              <Card tone={GREY} label="A person" icon={k.person.icon} text={k.person.text} />
-            </motion.div>
-            <Arrow {...at(col, 2)} />
-            <motion.div {...at(col, 3)} style={{ display: 'flex' }}>
-              <Card tone={TEAL} label="The agent" icon={k.agent.icon} text={k.agent.text} />
-            </motion.div>
-            <Arrow {...at(col, 4)} />
-            <motion.div {...at(col, 5)} style={{ display: 'flex' }}>
-              <Card tone={TEAL} label="At Harbor Bridge" icon={k.lab.icon} text={k.lab.text} dashed />
-            </motion.div>
+            {[k.person, k.agent, k.lab].map((ex, row) => (
+              <motion.div key={row} data-cell={['person', 'agent', 'bridge'][row]} {...at(col, row + 1)} style={cell(col, row)}>
+                <LineIcon name={ex.icon} size={44} color={row === 0 ? GREY : 'var(--teal)'} />
+                <span>{ex.text}</span>
+              </motion.div>
+            ))}
           </div>
         ))}
       </div>
     </WidePanel>
-  );
-}
-
-const Arrow = (motionProps: ReturnType<typeof at>) => (
-  <motion.svg {...motionProps} width={24} height={22} viewBox="0 0 24 22" style={{ justifySelf: 'center' }} aria-hidden="true">
-    <path d="M12 2v16M5 11l7 7 7-7" fill="none" stroke="#8a919c" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-  </motion.svg>
-);
-
-/** dashed: the lab's own case, not a general kind of memory */
-function Card({ tone, label, icon, text, dashed = false }: { tone: typeof GREY; label: string; icon: IconName; text: string; dashed?: boolean }) {
-  return (
-    <div style={{ flex: 1, display: 'flex', gap: 16, alignItems: 'center', padding: '16px 20px', borderRadius: 12, border: `2px ${dashed ? 'dashed' : 'solid'} ${tone.stroke}`, background: dashed ? 'transparent' : tone.fill }}>
-      <LineIcon name={icon} size={44} color={tone.stroke} />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: tone.label }}>{label}</span>
-        <span style={{ fontSize: 24, fontWeight: 500, color: 'var(--ink)' }}>{text}</span>
-      </div>
-    </div>
   );
 }

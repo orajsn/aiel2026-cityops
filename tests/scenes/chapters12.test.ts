@@ -6,7 +6,7 @@ import { OVERLAYS } from '../../src/overlay/registry';
 
 // one story beat per Storyboard row (doc tab "Storyboard"), in order
 const CH1_BEATS = ['2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7', '2.8', '2.9'];
-const CH2_BEATS = ['3.0', '3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2c', '3.2d', '3.2e', '3.3a', '3.3b', '3.3c', '3.4', '3.5a', '3.5b', '3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.14', '3.15', '3.15b', '3.16', '3.17'];
+const CH2_BEATS = ['3.0', '3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2c', '3.2e', '3.3a', '3.3b', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b', '3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.14', '3.15', '3.15b', '3.15c', '3.16', '3.17'];
 
 const beats = (ch: typeof chapter1) => ch.map((s) => s.id);
 
@@ -33,7 +33,7 @@ test('no page says "fictional scenario" (owner: everyone already knows)', () => 
 test('SCENES runs chapter 0, then 1, then 2', () => {
   const chapters = SCENES.map((s) => s.chapter);
   expect(chapters).toEqual([...chapters].sort());
-  expect(SCENES.length).toBe(8 + 9 + 31);
+  expect(SCENES.length).toBe(8 + 9 + 32);
 });
 
 test('no banned names anywhere in the copy', () => {

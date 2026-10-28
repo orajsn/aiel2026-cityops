@@ -8,6 +8,11 @@ test('three kinds in the map order, each a person example over its agent example
   expect(kinds).toEqual(['Procedural', 'Episodic', 'Semantic']);
   for (const w of ['Riding a bike', 'Its system prompt', 'last summer', 'Its past actions', 'learned in school', 'Facts about a user', 'Approved inspection guidance', 'What Mercer saw and advised', 'Harbor Bridge and the right pier'])
     expect(c.textContent).toContain(w);
+  // a table: corner cell, three kinds across, three rows, Mercer's portrait in the bridge row
+  expect(c.textContent).toContain('Same idea, three places');
+  expect([...c.querySelectorAll('[data-row]')].map((r) => r.getAttribute('data-row'))).toEqual(['person', 'agent', 'bridge']);
+  for (const k of c.querySelectorAll('[data-kind]')) expect(k.querySelectorAll('[data-cell]')).toHaveLength(3);
+  expect(c.querySelector('[data-row="bridge"] [data-portrait="mercer"]')).not.toBeNull();
   // teal and greys only: red is for alerts
   expect(c.innerHTML).not.toMatch(/--red|#c74634/i);
 });
