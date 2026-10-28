@@ -17,7 +17,7 @@ import { useDrawerStore, usePresentationStore } from '../engine/presentation';
 import { FRAME, useGraphicsStore } from '../engine/graphics';
 
 // named for the event's agenda (owner): the intro, then Lab 2 and Lab 3; pages are numbered the same way (0.x, 2.x, 3.x)
-const CHAPTER_LABEL = ['Introduction', 'Lab 2 · RAG to Agents', 'Lab 3 · Agent Memory'];
+const CHAPTER_LABEL = ['Introduction', 'Lab 2 · RAG to Agents', 'Lab 3 · Agent Memory', 'Lab 1 · AI Economics'];
 
 /** The map is ~70 MB: say so while it downloads instead of showing an empty sky. */
 function MapLoading() {

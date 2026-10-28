@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useSceneStore } from '../engine/store';
 import { useUiStore } from '../engine/ui';
-import { CHAPTER_NAME, SECTIONS } from '../scenes/sections';
+import { CHAPTER_NAME, PARTS, SECTIONS } from '../scenes/sections';
 import { pageNumber } from '../scenes';
 
 /**
@@ -30,7 +30,7 @@ export function JumpMenu() {
             ✕
           </button>
         </div>
-        {[0, 1, 2].map((c) => (
+        {PARTS.map((c) => (
           <section key={c} className="jump__chapter">
             <h2 className="jump__chapter-name">{CHAPTER_NAME[c]}</h2>
             {SECTIONS.filter((sec) => sec.chapter === c).map((sec) => (

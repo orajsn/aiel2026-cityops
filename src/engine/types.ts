@@ -17,7 +17,8 @@ export interface RecapRef {
 
 export interface SceneDef {
   id: string;
-  chapter: 0 | 1 | 2;
+  /** the part: 0 Introduction, 1 Lab 2, 2 Lab 3, 3 Lab 1 (played between the Introduction and Lab 2: PARTS) */
+  chapter: 0 | 1 | 2 | 3;
   title: string;
   shot: ShotId;
   /** Cut to this shot on entry, then fly to `shot` (used for the opening fly-in). */

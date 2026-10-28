@@ -1,6 +1,8 @@
 import { chapter1 } from '../../src/scenes/chapter1';
 import { chapter2 } from '../../src/scenes/chapter2';
 import { SCENES } from '../../src/scenes/index';
+import { PARTS } from '../../src/scenes/sections';
+import { WITH_LAB1, lab1 } from '../../src/scenes/lab1';
 import { SHOTS } from '../../src/world/shots';
 import { OVERLAYS } from '../../src/overlay/registry';
 
@@ -30,10 +32,10 @@ test('no page says "fictional scenario" (owner: everyone already knows)', () => 
   expect(JSON.stringify(SCENES)).not.toMatch(/fictional/i);
 });
 
-test('SCENES runs chapter 0, then 1, then 2', () => {
-  const chapters = SCENES.map((s) => s.chapter);
-  expect(chapters).toEqual([...chapters].sort());
-  expect(SCENES.length).toBe(8 + 9 + 34);
+test('SCENES runs the parts in show order: Introduction, Lab 1 (when in the show), Lab 2, Lab 3', () => {
+  const order = PARTS.map((c) => SCENES.filter((s) => s.chapter === c).map((s) => s.id)).flat();
+  expect(SCENES.map((s) => s.id)).toEqual(order);
+  expect(SCENES.length).toBe(8 + (WITH_LAB1 ? lab1.length : 0) + 9 + 34);
 });
 
 test('no banned names anywhere in the copy', () => {
