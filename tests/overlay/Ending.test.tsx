@@ -28,9 +28,12 @@ test('pages 26 to 29 render their parts', () => {
   expect(t.querySelector('[data-quiz]')).not.toBeNull();
 });
 
-test('Day 2 brings back the three Day 1 messages that went empty on page 3', () => {
-  const items = (id: string) => (chapter2.find((s) => s.id === id)!.overlayProps as { items: { from?: string; text?: string }[] }).items;
-  const day1 = items('3.1a').filter((i) => i.from === 'person').map((i) => i.text);
-  const day2 = items('3.14').filter((i) => i.from === 'person').map((i) => i.text);
-  expect(day2.slice(0, 3)).toEqual(day1);
+test('Back on the bridge: Day 1, Day 2 and both labs meet each build in two steps on one panel (owner, 29 Oct)', () => {
+  for (const [a, b, overlay] of [['3.13', '3.13a', 'Day1'], ['3.14', '3.14a', 'Day2'], ['3.16', '3.16a', 'LabsMeet']]) {
+    const s1 = chapter2.find((s) => s.id === a)!;
+    const s2 = chapter2.find((s) => s.id === b)!;
+    expect([s1.overlay, s2.overlay]).toEqual([overlay, overlay]);
+    expect(s1.overlayGroup).toBe(s2.overlayGroup);
+    expect([(s1.overlayProps as { step: number }).step, (s2.overlayProps as { step: number }).step]).toEqual([1, 2]);
+  }
 });

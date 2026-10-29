@@ -120,8 +120,9 @@ export function Overlay() {
             className="overlay-layer"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+            // quick page turn (owner, 29 Oct: the old 0.45 s out + 0.45 s in left the city empty too long)
+            exit={{ opacity: 0, y: -6, transition: { duration: 0.15 } }}
+            transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
           >
             {Comp ? <Comp {...(scene.overlayProps ?? {})} /> : <div className="overlay-missing">overlay not found: {scene.overlay}</div>}
           </motion.div>

@@ -110,7 +110,8 @@ export function L2Page({ testId, hasRed = false, children, ...p }: L2Props & { t
       <div data-picture style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         {children}
       </div>
-      <Footer takeaway={p.takeaway} terms={p.terms} next={p.next} />
+      {/* a takeaway only where the chapter ends, on the page with the Next band (owner, 29 Oct: not on every page) */}
+      <Footer takeaway={p.next ? p.takeaway : undefined} terms={p.terms} next={p.next} />
     </WidePanel>
   );
 }

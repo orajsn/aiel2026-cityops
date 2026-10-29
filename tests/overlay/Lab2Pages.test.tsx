@@ -23,13 +23,15 @@ const redRoots = (c: HTMLElement) => {
 
 beforeEach(() => useDrawerStore.getState().reset());
 
-test('every Lab 2 page renders its panel, headline, takeaway and (when it has them) glossary chip and next band', () => {
+test('every Lab 2 page renders its panel, headline, takeaway (chapter ends only) and (when it has them) glossary chip and next band', () => {
   expect(PAGES.length).toBe(58);
   for (const s of PAGES) {
     const c = renderPage(s.id);
     const p = s.overlayProps as { takeaway?: string; terms?: unknown[]; next?: string; step?: number };
     expect(c.querySelector('.beat__panel'), s.id).not.toBeNull();
-    expect(c.querySelector('[data-takeaway]'), s.id).not.toBeNull();
+    // the takeaway is only on the chapter's last page, the one with the Next band (owner, 29 Oct)
+    if (p.next && p.takeaway) expect(c.querySelector('[data-takeaway]'), s.id).not.toBeNull();
+    else expect(c.querySelector('[data-takeaway]'), s.id).toBeNull();
     expect(!!c.querySelector('[data-terms]'), s.id).toBe(!!p.terms?.length);
     expect(!!c.querySelector('[data-next]'), s.id).toBe(!!p.next);
     if (p.step) expect(c.querySelector('.beat__panel')!.getAttribute('data-step'), s.id).toBe(String(p.step));

@@ -178,37 +178,11 @@ const b211 = atOps('3.11', 'Private doors, shared hall', 'DoorsAndHall', { kicke
 const b212a = atOps('3.12a', 'The AI agent turn', 'CopilotTurn', { kicker: 'Lab 3 · Part 6, TODO 6', step: 1, message: 'One copilot turn, **eight steps**.', notebook: `${NB} · Part 6, TODO 6` } satisfies CopilotTurnProps, 'turn');
 const b212b = atOps('3.12b', 'The context card', 'CopilotTurn', { kicker: 'Lab 3 · Part 6, TODO 6', step: 2, message: 'This is **the prompt the model actually receives**.', notebook: `${NB} · Part 6, the context card` } satisfies CopilotTurnProps, 'turn');
 
-const b213 = chat('3.13', 'Day 1: Mercer at the rust', 'pier2-inspect', {
-  kicker: 'Day 1 · the rust',
-  message: 'This is what the next inspector **inherits**.',
-  items: [
-    { divider: 'Day 1 · Mercer' },
-    { from: 'person', text: '~25% section loss, rust bleed, 1.5 m.' },
-    { from: 'copilot', text: 'Noted. I’ll log it as a finding for Harbor Bridge.' },
-  ],
-  after: [
-    { title: 'Finding logged', text: 'corrosion · medium · grade C · repair within 60 days', tone: 'red' },
-    { title: 'Her guideline goes to shared memory', text: 'user_id="Harbor Bridge"' },
-  ],
-  notebook: `${NB} · Day 1, three cells`,
-}, { who: 'character-female-a' });
-
-const b214 = chat('3.14', 'Day 2: Vance at the same rust', 'pier2-close', {
-  kicker: 'Day 2 · the same rust',
-  message: 'No human handoff. **The finding and the memory carried it.**',
-  items: [
-    { divider: 'Day 1 · kept in memory' },
-    ...MERCER_SAYS.map((m) => ({ from: 'person' as const, text: m.text })),
-    { divider: 'Day 2 · Vance' },
-    { from: 'person', text: 'What happened at this pier?' },
-    { from: 'copilot', text: 'Mercer logged corrosion here on Day 1: about 25% section loss, grade C, repair within 60 days.' },
-  ],
-  after: [
-    { title: 'Source · Mercer’s finding', text: 'similarity score **0.289**' },
-    { title: 'Source · her guideline', text: 'from **shared memory**' },
-  ],
-  notebook: `${NB} · Day N`,
-}, { who: 'character-male-d' });
+// 3.13 and 3.14 as teaching panels that build in two steps (owner, 29 Oct: like the first teaching part)
+const b213 = atRust('3.13', 'Day 1: Mercer at the rust', 'Day1', { kicker: 'Day 1 · the rust', step: 1, message: 'Mercer reports the rust to **the AI agent**.', notebook: `${NB} · Day 1, three cells` }, 'day1');
+const b213a = atRust('3.13a', 'What the next inspector inherits', 'Day1', { kicker: 'Day 1 · the rust', step: 2, message: 'This is what the next inspector **inherits**.', notebook: `${NB} · Day 1, three cells` }, 'day1');
+const b214 = atRust('3.14', 'Day 2: Vance at the same rust', 'Day2', { kicker: 'Day 2 · the same rust', step: 1, message: 'Vance asks. The agent **looks it up first**.', notebook: `${NB} · Day N` }, 'day2');
+const b214a = atRust('3.14a', 'The answer, with its sources', 'Day2', { kicker: 'Day 2 · the same rust', step: 2, message: 'No human handoff. **The finding and the memory carried it.**', notebook: `${NB} · Day N` }, 'day2');
 
 const b215 = atRust('3.15', 'With and without memory', 'WithWithout', {
   kicker: 'Same question, asked twice',
@@ -222,19 +196,8 @@ const b215b = atRust('3.15b', 'The four failures, solved', 'FailuresSolved', { k
 // 3.15c · the full memory map, moved from the start of the lab (owner, 28 Oct): after the hands-on its layers mean something (notebook cell 90)
 const b215c = atRust('3.15c', 'What you built', 'MemoryMap', { kicker: 'Kinds of memory', step: 5, message: 'The full memory map: **what you actually built** today.', notebook: `${NB} · Memory types - what you actually built` } satisfies MemoryMapProps);
 
-const b216: SceneDef = {
-  id: '3.16',
-  chapter: 2,
-  title: 'Where both labs meet',
-  shot: 'pier2',
-  world: { bridge: true, markers: 'pier2' },
-  overlay: 'BothLabs',
-  overlayProps: {
-    rule: ['Section loss **over 25%**', '→ immediate structural review'],
-    history: ['Mercer’s finding:', '!!~25% section loss!!'],
-    message: 'This afternoon the agent had **the rule**. Now it has **the history**. Together they make the call.',
-  } satisfies BothLabsProps as unknown as Record<string, unknown>,
-};
+const b216 = atRust('3.16', 'Where both labs meet', 'LabsMeet', { kicker: 'Where both labs meet', step: 1, message: 'This afternoon the agent had **the rule**. Now it has **the history**.' }, 'meet');
+const b216a = atRust('3.16a', 'Together they make the call', 'LabsMeet', { kicker: 'Where both labs meet', step: 2, message: 'Together they **make the call**.' }, 'meet');
 
 // 3.17 · the Lab 3 recap (owner approved Flow317V2, 29 Oct); the quiz moved to 3.18
 const b217: SceneDef = {
@@ -306,11 +269,14 @@ export const chapter2: SceneDef[] = [
   b212a,
   b212b,
   b213,
+  b213a,
   b214,
+  b214a,
   b215,
   b215b,
   b215c,
   b216,
+  b216a,
   b217,
   b218,
 ];
