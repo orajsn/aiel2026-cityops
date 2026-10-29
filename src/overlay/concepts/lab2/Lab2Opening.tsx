@@ -7,6 +7,7 @@ import {
   cap, capTeal, card, fade, fadeUp, mono, useFocusN, type L2Props,
 } from './parts';
 import { RouteMap } from './RouteMap';
+import { Ladder, WhyLayers } from './WhyArt';
 
 /**
  * Lab 2 · the opening chapters of the Harbor Bridge deck: Story (one crack), Why (AI needs your data), and Setup
@@ -134,76 +135,13 @@ export function CrackStory(p: L2Props) {
 
 /* ---------------- Why · AI needs your data (2.0, 2.0a) ---------------- */
 
-const LAYERS = [
-  { title: 'Trust becomes a product requirement', sub: 'security · audit · observability', icon: 'lock' as IconName },
-  { title: 'More automation, fewer humans in the loop', sub: 'the system acts, people supervise', icon: 'loop' as IconName },
-  { title: 'Traction needs the right data', sub: 'your records, specs, history', icon: 'database' as IconName },
-];
-const BREAKS = [
-  { without: 'No data', what: 'Generic advice about a bridge it has never seen.' },
-  { without: 'No automation', what: 'People stay the bottleneck for every lookup.' },
-  { without: 'No trust', what: 'Nobody lets it act on a real asset.' },
-];
-export const LEVELS = [
-  { level: 'Chatbot', q: '“What is a hairline crack?”', who: 'nobody: one reply', free: 0.12, icon: 'speech' as IconName },
-  { level: 'RAG', q: '“What does the record say about this bridge?”', who: 'the application', free: 0.35, icon: 'lookup' as IconName },
-  { level: 'Workflow', q: '“Triage this incident predictably.”', who: 'the code', free: 0.6, icon: 'steps' as IconName },
-  { level: 'Agent', q: '“Reason it through and tell me what to do.”', who: 'the model', free: 0.9, icon: 'branch' as IconName },
-];
+export { LEVELS } from './WhyArt';
 
 export function WhyData(p: L2Props) {
   const step = p.step ?? 1;
   return (
     <L2Page testId="l2-why" {...p}>
-      <Swap k={step}>
-        {step === 1 ? (
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(0, 1fr)', gap: 34, minHeight: 0 }}>
-            {/* the three layers stack up from the data */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ fontSize: 23, color: DIM, marginBottom: 4 }}>A smart engineer who has never seen this bridge can still give bad advice.</div>
-              {LAYERS.map((l, i) => (
-                <motion.div key={l.title} data-layer={i} {...fadeUp(1.4 - i * 0.45)} style={{ ...card(i === 2), background: i === 2 ? TEAL : i === 1 ? TINT2 : SOFT, color: i === 2 ? '#fff' : INK, padding: '20px 26px', marginLeft: (2 - i) * 34, marginRight: (2 - i) * 34, flex: 1, display: 'flex', alignItems: 'center', gap: 22 }}>
-                  <LineIcon name={l.icon} size={64} color={i === 2 ? '#fff' : TEAL} />
-                  <div>
-                    <div style={{ fontSize: 29, fontWeight: 700 }}>{l.title}</div>
-                    <div style={{ fontSize: 21, opacity: 0.85 }}>{l.sub}</div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ ...cap, marginTop: 6 }}>What breaks without each layer</div>
-              {BREAKS.map((b, i) => (
-                <motion.div key={b.without} data-break={b.without} {...fadeUp(1.8 + i * 0.35)} style={{ ...card(), flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '18px 24px', borderLeft: `6px solid ${TEAL}` }}>
-                  <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: TEAL_D }}>{b.without}</div>
-                  <div style={{ fontSize: 25, color: INK, marginTop: 6 }}>{b.what}</div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div data-levels style={{ flex: 1, display: 'grid', gridTemplateColumns: '240px minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr)', gridTemplateRows: 'auto repeat(4, 1fr)', columnGap: 0, rowGap: 10, minHeight: 0 }}>
-            {['Level', 'A question it fits', 'Who picks the next step?', 'Freedom'].map((h) => (
-              <div key={h} style={{ ...cap, padding: '0 18px 4px' }}>{h}</div>
-            ))}
-            {LEVELS.map((l, i) => (
-              <motion.div key={l.level} data-level={l.level} {...fadeUp(0.3 + i * 0.4)} style={{ display: 'contents' }}>
-                <div style={{ ...card(i === 3), background: i === 3 ? TINT : SOFT, borderRadius: '14px 0 0 14px', borderRight: 'none', display: 'flex', alignItems: 'center', gap: 14, padding: '0 18px', fontSize: 26, fontWeight: 700, color: INK }}>
-                  <LineIcon name={l.icon} size={40} />
-                  {l.level}
-                </div>
-                <div style={{ background: i === 3 ? TINT : SOFT, display: 'flex', alignItems: 'center', padding: '0 18px', fontSize: 22, color: INK }}>{l.q}</div>
-                <div style={{ background: i === 3 ? TINT : SOFT, display: 'flex', alignItems: 'center', padding: '0 18px', fontSize: 22, fontWeight: 700, color: TEAL_D }}>{l.who}</div>
-                <div style={{ background: i === 3 ? TINT : SOFT, borderRadius: '0 14px 14px 0', display: 'flex', alignItems: 'center', padding: '0 22px' }}>
-                  <div style={{ flex: 1, height: 14, borderRadius: 7, background: 'rgba(127,127,127,0.18)', overflow: 'hidden' }}>
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${l.free * 100}%` }} transition={{ delay: 0.6 + i * 0.4, duration: 0.8, ease: EASE }} style={{ height: '100%', background: TEAL, borderRadius: 7 }} />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
-      </Swap>
+      <Swap k={step}>{step === 1 ? <WhyLayers /> : <Ladder />}</Swap>
     </L2Page>
   );
 }
