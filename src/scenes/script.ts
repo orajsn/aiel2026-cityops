@@ -6,12 +6,18 @@ export const SCRIPT: Record<string, string> = {
   // Chapter 0 · The city
   '0.0': 'Good afternoon. Below us is **Bangkok**, from above. Let us fly down.',
   '0.1': 'This is **Bangkok**, our city for the afternoon. Everything you will build today runs its **operations team**. This is the city. Today, we run it.',
-  '0.2': 'Every pin is a piece of infrastructure: bridges, substations, pipelines, sensors. **Twenty-eight assets**. Each one has **a record, a spec sheet, a history, and neighbours**.',
-  '0.3': 'Every day the city writes about itself: **308 logs, 60 reports, 220 findings**, all flowing into the City Operations Control Center. Most of it is **free text** written by inspectors.',
-  '0.4': 'Meet our inspector on Harbor Bridge, at **a hairline crack**. The question is simple: **what do we know about this bridge, and what should I do?** The answer exists. In **four shapes**, in **four places**. The inspector has !!none of them!!.',
+  '0.2': 'Every pin is a piece of infrastructure: bridges, substations, pipelines, sensors. **Twenty-eight assets**. Each one has **a record, a spec sheet, a history, and neighbours**. And one of them is our hero for the afternoon: **Harbor Bridge**.',
+  // 0.7 · one bridge, three labs: one panel, one card opening per click
+  '0.7': 'Harbor Bridge is our hero. **Three times** today we come back to it, and each time it brings **a new problem**.',
+  '0.7a': 'Lab 1, **the repair plan**: the data is in **four places**. We build **one assistant**, pick **the right model** for each question, and add **guardrails**.',
+  '0.7b': 'Lab 2, **the crack**: a model alone **guesses**. We build **an agent** that decides what to look up, looks it up, and says what to do.',
+  '0.7c': 'Lab 3, **the rust**: the agent **forgets** between days. We give it **memory**, so the next inspector knows what the last one found.',
+
+  // Lab 2 opens here (owner, 29 Oct): the city's data, the question on the bridge, the database, the language model
+  '0.3': 'Lab 2 starts with the city’s data. Every day the city writes about itself: **308 logs, 60 reports, 220 findings**, all flowing into the City Operations Control Center. Most of it is **free text** written by inspectors.',
+  '0.4': 'Back on Harbor Bridge, meet our inspector at **the crack**, a hairline one. The question is simple: **what do we know about this bridge, and what should I do?** The answer exists. In **four shapes**, in **four places**. The inspector has !!none of them!!.',
   '0.5': 'To answer the inspector we need four things: **the asset record**, **its spec sheet**, **what it depends on**, and **similar past reports**. Four shapes of data. And **one Oracle AI Database** holds all four. Not four databases to sync.',
-  '0.6': 'And this is the language model. It writes an answer **one word at a time**: that wave of light is it producing. It knows **the world**, not !!our city!!. Ours is small and runs on a CPU, so each answer takes **thirty to sixty seconds**. Today is about **what we give it**.',
-  '0.7': 'Harbor Bridge is our hero, linked to the substation that powers it, the sensors that watch it and the Ops Center that coordinates it. Two things will go wrong on this bridge today. The first one, we handle with **an agent**. The second, with **memory**.',
+  '0.6': 'And this is the language model. It writes an answer **one word at a time**: that wave of light is it producing. It knows **the world**, not !!our city!!. Ours is small and runs on a CPU, so each answer takes **thirty to sixty seconds**. This lab is about **what we give it**.',
 
   // Chapter 1 · RAG to Agents
   '2.1': 'The operator types the inspector’s question straight into the model. It answers fluently, and **it is a guess**: it has never heard of Harbor Bridge. A model knows **the world**. It does not know !!your city!!.',

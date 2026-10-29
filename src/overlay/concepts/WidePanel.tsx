@@ -10,7 +10,7 @@ export const EASE = [0.2, 0.8, 0.2, 1] as const;
  * mode (40). Used with SceneDef.overlayGroup, the panel stays put between clicks and only the headline
  * cross-fades.
  */
-export function WidePanel({ kicker, message, notebook, testId, step, children }: { kicker: string; message: string; notebook?: string; testId: string; step?: number; children: ReactNode }) {
+export function WidePanel({ kicker, message, notebook, testId, step, kickerColor, children }: { kicker: string; message: string; notebook?: string; testId: string; step?: number; /** the kicker is red by default; a page whose one red thing is elsewhere passes teal */ kickerColor?: string; children: ReactNode }) {
   return (
     <div className="beat">
       <motion.div style={{ position: 'absolute', inset: 0, background: 'rgba(11, 14, 20, 0.38)' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }} />
@@ -26,7 +26,7 @@ export function WidePanel({ kicker, message, notebook, testId, step, children }:
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: EASE }}
         >
-          <div className="beat__kicker">{kicker}</div>
+          <div className="beat__kicker" style={kickerColor ? { color: kickerColor } : undefined}>{kicker}</div>
           <AnimatePresence mode="wait">
             <motion.div key={message} className="beat__headline" style={{ marginBottom: 10 }} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.35, ease: EASE }}>
               <Rich text={message} />

@@ -21,6 +21,7 @@ import { MemoryLoop } from './MemoryLoop';
 import { OneConnection, WritePath, Scope, SystemOfRecord, VectorWalls } from './HandsOn';
 import { DoorsAndHall, CopilotTurn } from './HandsOn2';
 import { WithWithout, FailuresSolved, BothLabs, Takeaways } from './Ending';
+import { ThreeLabs } from './ThreeLabs';
 
 registerOverlay('TitleCard', TitleCard);
 registerOverlay('PinLegend', PinLegend);
@@ -29,6 +30,7 @@ registerOverlay('QuestionBubble', QuestionBubble);
 registerOverlay('CoreCaption', CoreCaption);
 registerOverlay('SmallBrain', SmallBrain);
 registerOverlay('BridgeMarkers', BridgeMarkers);
+registerOverlay('ThreeLabs', ThreeLabs);
 registerOverlay('Beat', Beat);
 registerOverlay('CopilotChat', CopilotChat);
 registerOverlay('Cast', Cast);

@@ -35,7 +35,8 @@ test('no page says "fictional scenario" (owner: everyone already knows)', () => 
 test('SCENES runs the parts in show order: Introduction, Lab 1 (when in the show), Lab 2, Lab 3', () => {
   const order = PARTS.map((c) => SCENES.filter((s) => s.chapter === c).map((s) => s.id)).flat();
   expect(SCENES.map((s) => s.id)).toEqual(order);
-  expect(SCENES.length).toBe(8 + (WITH_LAB1 ? lab1.length : 0) + 9 + 34);
+  // Introduction 7 (the city, then the bridge's four clicks); Lab 2 opens with the four data pages
+  expect(SCENES.length).toBe(7 + (WITH_LAB1 ? lab1.length : 0) + 4 + 9 + 34);
 });
 
 test('no banned names anywhere in the copy', () => {

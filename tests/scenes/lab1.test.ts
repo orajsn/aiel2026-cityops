@@ -1,14 +1,16 @@
 import { buildScenes } from '../../src/scenes/index';
 import { lab1, LAB1_SCRIPT, LAB1_SECTIONS } from '../../src/scenes/lab1';
-import { chapter0 } from '../../src/scenes/chapter0';
+import { chapter0, lab2Opening } from '../../src/scenes/chapter0';
 import { chapter1 } from '../../src/scenes/chapter1';
 import { chapter2 } from '../../src/scenes/chapter2';
 import { SHOTS } from '../../src/world/shots';
 
 // owner, 29 Oct: Lab 1 goes in before Lab 2, and must be easy to take out again with Lab 2 and Lab 3 untouched
-test('without Lab 1 the show is exactly the Introduction, Lab 2 and Lab 3, as before', () => {
+test('without Lab 1 the show is exactly the Introduction, Lab 2 (opening on the data pages) and Lab 3', () => {
   const ids = buildScenes(false).map((s) => s.id);
-  expect(ids).toEqual([...chapter0, ...chapter1, ...chapter2].map((s) => s.id));
+  expect(ids).toEqual([...chapter0, ...lab2Opening, ...chapter1, ...chapter2].map((s) => s.id));
+  // the Introduction ends on the bridge, then Lab 2 starts with the data stream
+  expect(ids.slice(chapter0.length - 1, chapter0.length + 1)).toEqual(['0.7c', '0.3']);
   expect(ids.some((id) => id.startsWith('1.'))).toBe(false);
 });
 

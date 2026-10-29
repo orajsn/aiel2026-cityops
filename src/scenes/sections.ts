@@ -12,11 +12,12 @@ export const CHAPTER_NAME = ['Introduction', 'Lab 2 · RAG to Agents', 'Lab 3 ·
 export const PARTS: (0 | 1 | 2 | 3)[] = WITH_LAB1 ? [0, 3, 1, 2] : [0, 1, 2];
 
 export const SECTIONS: Section[] = [
-  { chapter: 0, name: 'The city and its data', pages: ['0.0', '0.1', '0.2', '0.3'] },
-  { chapter: 0, name: 'The question on the bridge', pages: ['0.4'] },
-  { chapter: 0, name: 'One database, four shapes', pages: ['0.5', '0.6'] },
-  { chapter: 0, name: 'One bridge, two problems', pages: ['0.7'] },
+  { chapter: 0, name: 'The city', pages: ['0.0', '0.1', '0.2'] },
+  { chapter: 0, name: 'One bridge, three labs', pages: ['0.7', '0.7a', '0.7b', '0.7c'] },
   ...(WITH_LAB1 ? LAB1_SECTIONS : []),
+  // Lab 2 opens with the pages that were the Introduction's second half (owner, 29 Oct); ids kept
+  { chapter: 1, name: 'The data and the question', pages: ['0.3', '0.4'] },
+  { chapter: 1, name: 'One database, one model', pages: ['0.5', '0.6'] },
   { chapter: 1, name: 'Why a bare model is not enough', pages: ['2.1', '2.2', '2.3'] },
   { chapter: 1, name: 'From RAG to an agent', pages: ['2.4', '2.5', '2.6', '2.7', '2.8'] },
   { chapter: 1, name: 'Closing Lab 2', pages: ['2.9'] },
