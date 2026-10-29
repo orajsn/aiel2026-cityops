@@ -223,7 +223,8 @@ function FilingCabinet() {
       <rect x={X0} y={Y0} width={CW} height={CH} rx={6} fill={CAB_GREY} />
       {/* the gap the open drawer leaves */}
       <rect x={fx} y={fy} width={fw} height={DRAWER_H} rx={5} fill="rgba(20, 26, 34, 0.55)" />
-      {[0, 1, 2].map((i) => {
+      {/* the open drawer is drawn last, so as it slides out it sits in front of the drawer below it */}
+      {[0, 2, 1].map((i) => {
         const open = i === 1;
         const y = drawerY(i);
         const face = (
