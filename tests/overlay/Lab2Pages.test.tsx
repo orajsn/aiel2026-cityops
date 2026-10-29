@@ -79,7 +79,7 @@ test('the steps of a panel build in order: each click adds its part of the pictu
   expect(renderPage('2.2b').querySelectorAll('[data-pillar]')).toHaveLength(3);
   // the chief inspector: the figure first, then its loop of four, then what it does and the signed recommendation
   const chief = ['2.4i', '2.4j', '2.4k'].map(renderPage);
-  for (const c of chief) expect(c.querySelector('[data-figure="chief-inspector"]')).not.toBeNull();
+  for (const c of chief) expect(c.querySelector('[data-figure="ai-agent"]')).not.toBeNull();
   expect(chief[1].querySelectorAll('[data-loop-step]')).toHaveLength(4);
   expect(chief[2].querySelector('[data-signed]')).not.toBeNull();
   // the first run, then its trace and checks
@@ -98,7 +98,7 @@ test('the cast: Mercer reports the crack, Vance asks; the agent is the chief ins
   expect(c.textContent).toContain('Mercer');
   expect(c.textContent).toContain('Vance asks');
   const chief = renderPage('2.4i');
-  expect(chief.querySelector('[data-figure="chief-inspector"]')!.getAttribute('aria-label')).toBe('AI Agent');
+  expect(chief.querySelector('[data-figure="ai-agent"]')!.getAttribute('aria-label')).toBe('AI Agent');
   expect(chief.textContent).toContain('AI AGENT');
 });
 

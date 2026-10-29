@@ -4,8 +4,9 @@ import { EASE } from '../WidePanel';
 import { LineIcon, type IconName } from '../icons';
 import { Story, stepAt } from './Story';
 import { Triage } from './everyday';
+import { AgentAvatar } from './AgentAvatar';
 import { Fill, FitBox } from '../Fill';
-import { InfoDesk, Junction, Recipe, Taxi, Tram, WorkOrder } from './workflowArt';
+import { Junction, Library, Recipe, Taxi, Train, WorkOrder } from './workflowArt';
 import {
   Arrow, ArrowDown, CARD, ChiefInspector, Chip, DIM, INK, L2Page, Net, Num, Portrait, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
   cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props,
@@ -28,13 +29,13 @@ function Swap({ k, children }: { k: string | number; children: ReactNode }) {
 /* ---------------- 2.4c, 2.4d · who holds the pen, the anatomy of a workflow ---------------- */
 
 const PENS = [
-  { name: 'RAG', like: 'an information desk', who: 'the application', sub: 'one lookup, one answer', art: <InfoDesk /> },
-  { name: 'Workflow', like: 'a tram on its rails', who: 'the code', sub: '', art: <Tram />, ticks: ['Path fixed in advance', 'LLM only inside steps', 'Human sign-off (design option)', 'Replayable'] },
+  { name: 'RAG', like: 'a library desk', who: 'the application', sub: 'one lookup, one answer', art: <Library /> },
+  { name: 'Workflow', like: 'a train on its rails', who: 'the code', sub: '', art: <Train />, ticks: ['Path fixed in advance', 'LLM only inside steps', 'Human sign-off (design option)', 'Replayable'] },
   { name: 'Agent', like: 'a taxi in the city', who: 'the model', sub: 'flexible, less predictable', art: <Taxi /> },
 ];
 const PEN_AT = [0.3, 1.1, 1.9];
 
-/** 2.4c · three ways to get somewhere: a desk, a tram, a taxi; the workflow's tram in the middle, its four promises after */
+/** 2.4c · three ways to get somewhere: a library, a train, a taxi; the workflow's train in the middle, its four promises after */
 function WhoChooses() {
   return (
     <Fill>
@@ -42,17 +43,17 @@ function WhoChooses() {
         {PENS.map((c, i) => {
           const mid = i === 1;
           return (
-            <motion.div key={c.name} data-pen={c.name} {...fadeUp(PEN_AT[i])} style={{ ...card(mid), background: mid ? TINT : SOFT, padding: '18px 22px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-              <div style={{ fontSize: 34, fontWeight: 700, color: INK }}>{c.name}</div>
+            <motion.div key={c.name} data-pen={c.name} {...fadeUp(PEN_AT[i])} style={{ ...card(mid), background: mid ? TINT : SOFT, padding: '12px 22px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <div style={{ fontSize: 32, fontWeight: 700, color: INK }}>{c.name}</div>
               <div style={{ fontSize: 22, color: DIM }}>is like {c.like}</div>
-              <div style={{ flex: '1 1 0', minHeight: 150, width: '100%', margin: '10px 0', position: 'relative' }}>
+              <div style={{ flex: '1 1 0', minHeight: 110, width: '100%', margin: '6px 0', position: 'relative' }}>
                 <div style={{ position: 'absolute', inset: 0 }}>{c.art}</div>
               </div>
               <div style={{ fontSize: 21, color: DIM }}>The next step is picked by</div>
               <div style={{ fontSize: 30, fontWeight: 700, color: mid ? TEAL_D : INK }}>{c.who}</div>
               {c.sub && <div style={{ fontSize: 22, color: DIM, marginTop: 4 }}>{c.sub}</div>}
               {c.ticks && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10, textAlign: 'left' }}>
+                <div style={{ flex: 'none', display: 'flex', flexDirection: 'column', gap: 2, marginTop: 6, textAlign: 'left' }}>
                   {c.ticks.map((t, k) => (
                     <motion.div key={t} {...fadeUp(2.8 + k * 0.3)} style={{ fontSize: 22, color: INK, lineHeight: 1.3 }}>
                       <span style={{ color: TEAL, fontWeight: 700 }}>✓</span> {t}
@@ -176,53 +177,98 @@ export const STATIONS = [
 ];
 const TOTAL = STATIONS.reduce((a, s) => a + s.ms, 0);
 
+const BY = ['the language model', 'the database', 'the language model', 'plain Python'];
+const ST_X = [180, 520, 860, 1200];
+/** the crack report's ride, about nine seconds: it waits under each station in proportion to that station's time */
+const RIDE = (() => {
+  const dwell = [0.7, 0.9, 3.6, 0.3];
+  const move = 0.5;
+  const xs: number[] = [30];
+  const ts: number[] = [0];
+  let t = 0;
+  ST_X.forEach((x, i) => {
+    t += move;
+    xs.push(x, x);
+    ts.push(t, t + dwell[i]);
+    t += dwell[i];
+  });
+  t += move;
+  xs.push(1370);
+  ts.push(t);
+  return { xs, op: xs.map((_, i) => (i === 0 || i === xs.length - 1 ? 0 : 1)), times: ts.map((v) => v / t), dur: t };
+})();
+
+/**
+ * 2.4e · the conveyor belt is the picture (owner, 29 Oct: "you dont say what section spent time what"): four
+ * stations over a moving belt, the crack report waiting longest under the drafter; each station's own time in big
+ * type under it, then one bar that splits the 32 seconds between them.
+ */
 export function Conveyor(p: L2Props) {
+  const label = { ...cap, fontSize: 17, letterSpacing: '0.14em' };
   return (
     <L2Page testId="l2-conveyor" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18, minHeight: 0 }}>
-        <div style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-          {/* the crack report rides the belt */}
-          <motion.div data-rider initial={{ x: 0, opacity: 0 }} animate={{ x: ['0%', '0%', '82%'], opacity: [0, 1, 1] }} transition={{ duration: 6, times: [0, 0.1, 1], ease: 'easeInOut', repeat: Infinity, repeatDelay: 2 }} style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 999, background: 'rgba(31,42,51,0.92)', color: '#fff', fontSize: 19, marginBottom: 12 }}>
-            <LineIcon name="clipboard" size={26} color="#fff" /> crack 0.12 mm rides the belt →
-          </motion.div>
-          <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 50px minmax(0, 1fr) 50px minmax(0, 1fr) 50px minmax(0, 1fr)', alignItems: 'stretch' }}>
-            {STATIONS.map((s, i) => [
-              i > 0 ? (
-                <div key={`a${i}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Arrow w={44} delay={0.4 + i * 0.4} />
-                </div>
-              ) : null,
-              <motion.div key={s.name} data-station={s.name} {...fadeUp(0.2 + i * 0.4)} style={{ ...card(s.name === 'Drafter'), background: s.name === 'Drafter' ? TINT : SOFT, padding: '18px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <Num n={i + 1} size={34} />
-                  <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>{s.name}</span>
-                </div>
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <LineIcon name={s.icon} size={84} color={s.name === 'Drafter' ? TEAL : '#8a97a3'} />
-                </div>
-                <div style={{ fontSize: 22, color: INK, lineHeight: 1.35 }}>{s.out}</div>
-                <Chip dim={s.name !== 'Drafter'} style={{ alignSelf: 'flex-start', fontSize: 17 }}>{s.tok}</Chip>
-              </motion.div>,
-            ])}
-          </div>
-          {/* the belt */}
-          <div style={{ height: 10, borderRadius: 5, marginTop: 14, background: 'repeating-linear-gradient(90deg, rgba(127,127,127,0.35) 0 18px, rgba(127,127,127,0.15) 18px 30px)' }} />
-        </div>
-        <motion.div data-timing {...fadeUp(2)} style={{ ...card(), padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <span style={cap}>Where the 32 seconds go</span>
-            <span style={{ fontSize: 15, color: DIM }}>saved output, cell 50 · one CPU run</span>
-          </div>
-          <div style={{ display: 'flex', height: 46, borderRadius: 8, overflow: 'hidden', gap: 3 }}>
-            {STATIONS.filter((s) => s.ms > 0).map((s, i) => (
-              <motion.div key={s.name} data-ms={s.ms} initial={{ flexGrow: 0.001 }} animate={{ flexGrow: s.ms / TOTAL }} transition={{ delay: 2.3 + i * 0.3, duration: 0.9, ease: EASE }} style={{ flexBasis: 0, background: s.name === 'Drafter' ? TEAL : 'rgba(27,138,156,0.35)', color: s.name === 'Drafter' ? '#fff' : INK, display: 'flex', alignItems: 'center', justifyContent: 'center', ...mono(18, s.name === 'Drafter' ? '#fff' : INK), fontWeight: 700, whiteSpace: 'nowrap', minWidth: 120 }}>
-                {s.ms.toLocaleString('en-US')} ms
-              </motion.div>
+      <Fill>
+        <FitBox w={1400} h={600} max={1.15}>
+          {/* the belt: rollers under a moving tread */}
+          <svg width={1400} height={60} viewBox="0 0 1400 60" style={{ position: 'absolute', left: 0, top: 222 }} aria-hidden>
+            <rect x="20" y="8" width="1360" height="22" rx="11" fill="rgba(127,127,127,0.18)" stroke="rgba(127,127,127,0.5)" strokeWidth="2" />
+            <motion.path d="M30 19 H1370" stroke="rgba(127,127,127,0.55)" strokeWidth="4" strokeDasharray="14 18" initial={{ strokeDashoffset: 0 }} animate={{ strokeDashoffset: -320 }} transition={{ duration: 10, ease: 'linear', repeat: Infinity }} />
+            {Array.from({ length: 23 }, (_, i) => (
+              <circle key={i} cx={40 + i * 60} cy="44" r="9" fill="none" stroke="rgba(127,127,127,0.55)" strokeWidth="3" />
             ))}
-          </div>
-          <div style={{ fontSize: 19, color: DIM }}>The drafter writes one token at a time: it takes about 25 of the 32 seconds.</div>
-        </motion.div>
-      </div>
+          </svg>
+          {/* the four stations */}
+          {STATIONS.map((s, i) => {
+            const draft = s.name === 'Drafter';
+            return (
+              <motion.div key={s.name} data-station={s.name} {...fadeUp(0.2 + i * 0.35)} style={{ position: 'absolute', left: ST_X[i] - 150, top: 0, width: 300, height: 176, boxSizing: 'border-box', ...card(draft), background: draft ? TINT : 'var(--panel-strong)', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Num n={i + 1} size={36} />
+                  <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>{s.name}</span>
+                  <span style={{ marginLeft: 'auto' }}>
+                    <LineIcon name={s.icon} size={44} color={draft ? TEAL : '#8a97a3'} />
+                  </span>
+                </div>
+                <div style={{ fontSize: 20, color: TEAL_D }}>{BY[i]}</div>
+                <div style={{ fontSize: 22, color: INK, lineHeight: 1.3 }}>→ {s.out}</div>
+              </motion.div>
+            );
+          })}
+          {/* the station's arm down to the belt */}
+          {ST_X.map((x, i) => (
+            <motion.div key={x} {...fade(0.4 + i * 0.35)} style={{ position: 'absolute', left: x - 3, top: 176, width: 6, height: 40, background: 'rgba(127,127,127,0.45)', borderRadius: 3 }} />
+          ))}
+          {/* the crack report rides the belt and waits under each station */}
+          <motion.div data-rider initial={{ x: RIDE.xs[0], opacity: 0 }} animate={{ x: RIDE.xs, opacity: RIDE.op }} transition={{ delay: 1.6, duration: RIDE.dur, times: RIDE.times, ease: 'easeInOut', repeat: Infinity, repeatDelay: 1.5 }} style={{ position: 'absolute', left: -40, top: 190, width: 80, height: 36, borderRadius: 6, background: 'rgba(31,42,51,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <LineIcon name="clipboard" size={28} color="#fff" />
+          </motion.div>
+          {/* each station's own time, in big type */}
+          {STATIONS.map((s, i) => (
+            <motion.div key={s.name} data-ms={s.ms} {...fadeUp(1.8 + i * 0.35)} style={{ position: 'absolute', left: ST_X[i] - 150, top: 290, width: 300, textAlign: 'center' }}>
+              <div style={{ ...mono(40, s.name === 'Drafter' ? TEAL_D : INK), fontWeight: 700 }}>{s.ms.toLocaleString('en-US')} ms</div>
+              <div style={{ fontSize: 21, color: DIM, marginTop: 2 }}>{s.ms === 0 ? 'plain Python, under 1 ms' : `${(s.ms / 1000).toFixed(1)} s · ${s.tok}`}</div>
+            </motion.div>
+          ))}
+          {/* one bar: where the 32 seconds go */}
+          <motion.div data-timing {...fadeUp(3.4)} style={{ position: 'absolute', left: 0, top: 410, width: 1400, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+              <span style={label}>Where the 32 seconds go</span>
+              <span style={{ fontSize: 17, color: DIM }}>saved output, cell 50 · one CPU run</span>
+            </div>
+            <div style={{ display: 'flex', height: 58, gap: 4 }}>
+              {STATIONS.filter((s) => s.ms > 0).map((s, i) => (
+                <motion.div key={s.name} initial={{ flexGrow: 0.001 }} animate={{ flexGrow: s.ms / TOTAL }} transition={{ delay: 3.7 + i * 0.4, duration: 0.9, ease: EASE }} style={{ flexBasis: 0, minWidth: 270, borderRadius: 8, background: s.name === 'Drafter' ? TEAL : 'rgba(27,138,156,0.30)', display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px', whiteSpace: 'nowrap', overflow: 'hidden', color: s.name === 'Drafter' ? '#fff' : INK }}>
+                  <span style={{ width: 32, height: 32, borderRadius: '50%', flex: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, background: s.name === 'Drafter' ? '#fff' : TEAL, color: s.name === 'Drafter' ? TEAL_D : '#fff' }}>{i + 1}</span>
+                  <span style={{ fontSize: 22, fontWeight: 700 }}>{s.name}: {(s.ms / 1000).toFixed(1)} s</span>
+                </motion.div>
+              ))}
+            </div>
+            <motion.div {...fade(5.2)} style={{ fontSize: 24, color: INK, lineHeight: 1.4 }}>
+              <b style={{ color: TEAL_D }}>Drafting takes about 25 of the 32 seconds</b>: the language model writes its plan one token at a time (234 out). Formatting is plain Python and takes under 1 ms.
+            </motion.div>
+          </motion.div>
+        </FitBox>
+      </Fill>
     </L2Page>
   );
 }
@@ -293,9 +339,9 @@ const lit = (focusN: number | null, n: number) => ({
 });
 
 const DRAFT_FIELDS = [
-  { f: 'recommendation', d: 'One-line recommended action' },
-  { f: 'rationale', d: 'Why, in 2-4 sentences, referencing the context' },
-  { f: 'next_steps', d: 'Ordered list of concrete next steps' },
+  { f: 'recommendation', type: 'str', v: 'Follow-up NDT (mag particle or phased-array) within 14 days', d: 'One-line recommended action · for the crack, saved output, cell 50' },
+  { f: 'rationale', type: 'str', v: 'Why, in 2-4 sentences, referencing the context', d: 'the context: the 5 similar incidents' },
+  { f: 'next_steps', type: 'list[str]', v: 'Ordered list of concrete next steps', d: 'a list of short strings' },
 ];
 const FIELD_AT = [3.4, 3.9, 4.4];
 
@@ -401,22 +447,14 @@ export function Station3(p: L2Props) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <Num n={i + 1} size={36} />
                   <span style={{ ...mono(24, TEAL_D), fontWeight: 700 }}>{d.f}</span>
+                  <span style={{ ...mono(18, DIM) }}>{d.type}</span>
                 </div>
-                <div style={{ fontSize: 20, color: DIM }}>{d.d}</div>
-                <div style={{ flex: 1, minHeight: 56, borderRadius: 10, border: '2px dashed rgba(27,138,156,0.55)', padding: '10px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8, boxSizing: 'border-box' }}>
-                  {i === 0 ? (
-                    <motion.span {...fade(FIELD_AT[0])} style={{ fontSize: 22, color: INK, lineHeight: 1.35 }}>
-                      Follow-up NDT (mag particle or phased-array) within 14 days
-                    </motion.span>
-                  ) : (
-                    (i === 1 ? [100, 92, 60] : [70, 82, 64]).map((w, k) => (
-                      <motion.span key={k} initial={{ width: '0%' }} animate={{ width: `${w}%` }} transition={{ delay: FIELD_AT[i] + k * 0.15, duration: 0.5, ease: EASE }} style={{ height: 8, borderRadius: 4, background: 'rgba(127,127,127,0.3)', display: 'block' }} />
-                    ))
-                  )}
-                </div>
+                <motion.div {...fadeUp(FIELD_AT[i])} style={{ flex: 1, borderRadius: 10, border: `2px solid ${i === 0 ? TEAL : 'rgba(27,138,156,0.45)'}`, background: i === 0 ? TINT : 'transparent', padding: '8px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4, boxSizing: 'border-box' }}>
+                  <span style={{ fontSize: 22, color: INK, lineHeight: 1.3, fontWeight: i === 0 ? 600 : 400 }}>{d.v}</span>
+                  <span style={{ fontSize: 19, color: DIM, lineHeight: 1.3 }}>{d.d}</span>
+                </motion.div>
               </div>
             ))}
-            <div style={{ fontSize: 16, color: DIM }}>recommendation: saved output, cell 50</div>
           </motion.div>
         </FitBox>
       </Fill>
@@ -471,6 +509,7 @@ export function Order(p: L2Props) {
                     <motion.div initial={{ width: '0%' }} animate={{ width: '100%' }} transition={{ delay: RUN_AT[i], duration: RUN_DUR[i], ease: 'linear' }} style={{ height: '100%', background: c.by === 'the language model' ? TEAL : 'rgba(27,138,156,0.45)' }} />
                   </div>
                   <span style={{ ...mono(22, INK), fontWeight: 700 }}>{c.ms.toLocaleString('en-US')} ms</span>
+                  {c.ms === 0 && <span style={{ fontSize: 19, color: DIM, lineHeight: 1.25 }}>plain Python, under 1 ms</span>}
                 </motion.div>
               ))}
             </div>
@@ -506,85 +545,124 @@ export function Order(p: L2Props) {
 
 const CHECKLIST = ['Check the bearing plate', 'Measure the crack', 'Log the reading'];
 const LOOP = [
-  { n: 1, t: 'Look', s: 'read the situation' },
-  { n: 2, t: 'Pick a tool', s: 'from its toolbox' },
-  { n: 3, t: 'Read the result', s: 'check what came back' },
-  { n: 4, t: 'Decide again', s: 'done, or next step?' },
+  { n: 1, t: 'Look', s: 'read the situation', x: 350, y: 64 },
+  { n: 2, t: 'Pick a tool', s: 'from its toolbox', x: 585, y: 290 },
+  { n: 3, t: 'Read the result', s: 'check what came back', x: 350, y: 516 },
+  { n: 4, t: 'Decide again', s: 'done, or next step?', x: 115, y: 290 },
 ];
 const DOES = ['Plans and reasons', 'Picks its tools', 'Remembers across sessions', 'Adapts to what it finds'];
+const LOOP_AT = (i: number) => 0.5 + i * 0.6;
 
+function ChiefTick() {
+  return (
+    <svg width={34} height={34} viewBox="0 0 34 34" aria-hidden style={{ flex: 'none' }}>
+      <circle cx="17" cy="17" r="16" fill="var(--teal)" />
+      <path d="M9.5 17.5l5 5 10-11" stroke="#fff" strokeWidth={3.2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/**
+ * 2.4i, 2.4j, 2.4k · built across three clicks, as Lab 3's desk and filing cabinet are: the fixed checklist on the
+ * left meets a failure it has no step for (the page's one red thing); the AI agent arrives in the middle; next its
+ * loop of four is drawn around it, a light running the circle; last the list of what it does lights up on the right
+ * and it signs the recommendation.
+ */
 export function Chief(p: L2Props) {
   const step = p.step ?? 1;
+  const label = { ...cap, fontSize: 17, letterSpacing: '0.14em', marginBottom: 14 };
   return (
     <L2Page testId="l2-chief" hasRed={step === 1} {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '360px minmax(0, 1fr)', gap: 26, minHeight: 0 }}>
-        {/* the fixed checklist, with no step for the new failure */}
-        <motion.div data-checklist {...fadeUp(0.2)} style={{ ...card(), padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <LineIcon name="clipboard" size={44} color="#8a97a3" />
-            <div>
-              <div style={{ fontSize: 25, fontWeight: 700, color: INK }}>Fixed checklist</div>
-              <div style={{ fontSize: 18, color: DIM }}>steps decided in advance</div>
-            </div>
-          </div>
-          {CHECKLIST.map((c, i) => (
-            <motion.div key={c} {...fadeUp(0.5 + i * 0.3)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, background: CARD, border: '1.5px solid var(--line)', fontSize: 20, color: INK }}>
-              <Num n={i + 1} size={30} on={false} />
-              <span style={{ flex: 1 }}>{c}</span>
-              <span style={{ color: TEAL, fontWeight: 700 }}>✓</span>
+      <Fill>
+        <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: step === 3 ? '330px minmax(0, 1fr) 380px' : '400px minmax(0, 1fr)', columnGap: 30, marginTop: 4 }}>
+          {/* the fixed checklist, and the failure it has no step for */}
+          <div data-checklist style={{ display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--line)', paddingRight: 26 }}>
+            <div style={label}>In everyday life</div>
+            <motion.div {...fadeUp(0.2)} style={{ ...card(), background: 'var(--panel-strong)', padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <LineIcon name="clipboard" size={42} color="#8a97a3" />
+                <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>Fixed checklist</span>
+              </div>
+              {CHECKLIST.map((c, i) => (
+                <motion.div key={c} {...fadeUp(0.4 + i * 0.25)} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 22, color: INK }}>
+                  <Num n={i + 1} size={30} on={false} />
+                  <span style={{ flex: 1 }}>{c}</span>
+                  <span style={{ color: TEAL, fontWeight: 700 }}>✓</span>
+                </motion.div>
+              ))}
             </motion.div>
-          ))}
-          <motion.div data-new-failure {...fadeUp(1.6)} style={{ marginTop: 'auto', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, textAlign: 'center', borderRadius: 12, border: `2px dashed ${step === 1 ? RED : '#8a97a3'}`, padding: 14 }}>
-            <LineIcon name="inspect" size={44} color={step === 1 ? RED : '#8a97a3'} />
-            <div style={{ fontSize: 22, fontWeight: 700, color: step === 1 ? RED : INK }}>New failure: no step for it</div>
-            <div style={{ fontSize: 18, color: DIM }}>cannot grow new branches by itself</div>
-          </motion.div>
-        </motion.div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18, minHeight: 0 }}>
-          {/* the chief inspector */}
-          <motion.div data-chief {...fadeUp(0.8)} style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
-            <ChiefInspector size={step === 1 ? 190 : 120} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ fontSize: 32, fontWeight: 700, color: INK }}>Chief inspector</div>
-              <span style={{ alignSelf: 'flex-start', padding: '4px 14px', borderRadius: 999, background: TINT2, ...mono(18), fontWeight: 700 }}>AI AGENT · Harbor Bridge</span>
-              <div style={{ fontSize: 23, color: '#fff', background: 'rgba(31,42,51,0.92)', borderRadius: 14, padding: '10px 18px' }}>“I decide the next step myself.”</div>
-            </div>
-          </motion.div>
-          {/* the loop it runs */}
-          <motion.div data-loop {...reveal(upTo(step, 2), 0.2)} style={{ ...card(true), background: TINT, padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={capTeal}>The loop it runs, again and again</div>
-            <div style={{ display: 'flex', alignItems: 'stretch', gap: 6 }}>
-              {LOOP.map((l, i) => [
-                i > 0 ? (
-                  <div key={`a${i}`} style={{ display: 'flex', alignItems: 'center' }}>
-                    <Arrow w={40} delay={0.6 + i * 0.5} loop={upTo(step, 2) && i === 3} />
-                  </div>
-                ) : null,
-                <motion.div key={l.t} data-loop-step={l.n} {...reveal(upTo(step, 2), 0.4 + i * 0.5)} style={{ flex: 1, ...card(), background: CARD, padding: '12px 14px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <Num n={l.n} size={30} />
-                    <span style={{ fontSize: 22, fontWeight: 700, color: INK }}>{l.t}</span>
-                  </div>
-                  <div style={{ fontSize: 18, color: DIM, marginTop: 4 }}>{l.s}</div>
-                </motion.div>,
-              ])}
-              <div style={{ display: 'flex', alignItems: 'center', fontSize: 30, color: TEAL }}>↺</div>
-            </div>
-          </motion.div>
-          {/* what it does, and the signed recommendation */}
-          <motion.div data-does {...reveal(upTo(step, 3), 0.2)} style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) 300px', gap: 12, alignItems: 'stretch' }}>
-            {DOES.map((d, i) => (
-              <motion.div key={d} {...reveal(upTo(step, 3), 0.3 + i * 0.25)} style={{ gridColumn: (i % 2) + 1, ...card(), padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10, fontSize: 21, fontWeight: 600, color: INK }}>
-                <span style={{ color: TEAL, fontWeight: 700 }}>✓</span> {d}
+            <ArrowDown h={30} />
+            <motion.div data-new-failure {...fadeUp(1.4)} style={{ flex: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, textAlign: 'center', borderRadius: 14, border: `2.5px dashed ${step === 1 ? RED : '#8a97a3'}`, padding: 14 }}>
+              <LineIcon name="inspect" size={48} color={step === 1 ? RED : '#8a97a3'} />
+              <div style={{ fontSize: 24, fontWeight: 700, color: step === 1 ? RED : INK }}>A new failure: no step for it</div>
+              <div style={{ fontSize: 21, color: DIM, lineHeight: 1.35 }}>The list cannot grow a new branch by itself.</div>
+            </motion.div>
+            {step === 1 && (
+              <motion.div {...fade(2)} style={{ flex: 1, display: 'flex', alignItems: 'center', fontSize: 23, color: INK, lineHeight: 1.45, marginTop: 14 }}>
+                <span>
+                  A checklist is great for the known jobs. When something new turns up, <b>someone has to decide</b> what to do next.
+                </span>
               </motion.div>
-            ))}
-            <motion.div data-signed {...reveal(upTo(step, 3), 1.4)} style={{ gridColumn: 3, gridRow: '1 / 3', ...card(true), background: CARD, padding: '14px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>
-              <div style={{ fontSize: 21, color: INK }}>Ready → <b>recommendation</b></div>
-              <div style={{ borderTop: '1.5px solid var(--line)', paddingTop: 8, ...mono(17), fontWeight: 700 }}>SIGNED · Chief inspector</div>
-            </motion.div>
-          </motion.div>
+            )}
+          </div>
+          {/* the AI agent, and the loop it runs around itself */}
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <div style={label}>{step === 1 ? 'At Harbor Bridge: the chief inspector' : 'The loop it runs, again and again'}</div>
+            <FitBox w={700} h={590} max={1.1}>
+              <svg width={700} height={590} viewBox="0 0 700 590" style={{ position: 'absolute', inset: 0 }} aria-hidden>
+                <motion.circle cx={350} cy={290} r={226} fill="none" stroke="var(--teal)" strokeWidth={3} strokeDasharray="6 10" initial={{ opacity: 0 }} animate={{ opacity: step >= 2 ? 0.8 : 0.25 }} transition={{ delay: step >= 2 ? 0.2 : 1.6, duration: 0.6 }} />
+                {step >= 2 && (
+                  <motion.g style={{ originX: '350px', originY: '290px' }} initial={{ rotate: 0, opacity: 0 }} animate={{ rotate: 360, opacity: 1 }} transition={{ rotate: { delay: LOOP_AT(4), duration: 8, ease: 'linear', repeat: Infinity }, opacity: { delay: LOOP_AT(4), duration: 0.4 } }}>
+                    <circle cx={350 + 226 * Math.SQRT1_2} cy={290 - 226 * Math.SQRT1_2} r={10} fill="var(--teal)" />
+                  </motion.g>
+                )}
+              </svg>
+              {/* the agent in the middle */}
+              <motion.div data-chief {...fadeUp(step === 1 ? 1.8 : 0.1)} style={{ position: 'absolute', left: step === 1 ? 160 : 230, top: step === 1 ? 70 : 160, width: step === 1 ? 380 : 240, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, textAlign: 'center', transition: 'top 0.5s' }}>
+                <AgentAvatar size={step === 1 ? 210 : 130} live={step >= 2} />
+                <div style={{ fontSize: step === 1 ? 30 : 24, fontWeight: 700, color: INK }}>Chief inspector</div>
+                <span style={{ padding: '4px 14px', borderRadius: 999, background: TINT2, ...mono(step === 1 ? 18 : 15), fontWeight: 700 }}>{step === 1 ? 'AI AGENT · Harbor Bridge' : 'AI AGENT'}</span>
+                {step === 1 && (
+                  <motion.div {...fadeUp(2.5)} style={{ fontSize: 24, color: '#fff', background: 'rgba(31,42,51,0.92)', borderRadius: 14, padding: '10px 18px', marginTop: 6 }}>
+                    “I decide the next step myself.”
+                  </motion.div>
+                )}
+              </motion.div>
+              {/* the loop of four */}
+              {step >= 2 &&
+                LOOP.map((l, i) => (
+                  <motion.div key={l.t} data-loop-step={l.n} {...fadeUp(LOOP_AT(i))} style={{ position: 'absolute', left: l.x - 112, top: l.y - 54, width: 224, height: 108, boxSizing: 'border-box', borderRadius: 14, border: '2px solid var(--teal)', background: 'var(--panel-strong)', padding: '10px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Num n={l.n} size={30} />
+                      <span style={{ fontSize: 23, fontWeight: 700, color: INK, lineHeight: 1.15 }}>{l.t}</span>
+                    </div>
+                    <div style={{ fontSize: 19, color: DIM }}>{l.s}</div>
+                  </motion.div>
+                ))}
+            </FitBox>
+          </div>
+          {/* what it does, then the signed recommendation */}
+          {step === 3 && (
+            <div data-does style={{ display: 'flex', flexDirection: 'column', gap: 12, borderLeft: '1px solid var(--line)', paddingLeft: 26 }}>
+              <div style={{ ...label, marginBottom: 2 }}>What it does</div>
+              {DOES.map((d, i) => (
+                <motion.div key={d} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4 + i * 0.4, duration: 0.5, ease: EASE }} style={{ flex: '1 0 auto', display: 'flex', alignItems: 'center', gap: 14, padding: '8px 16px', borderRadius: 12, border: '2px solid var(--teal)', background: TINT, fontSize: 23, fontWeight: 700, color: INK }}>
+                  <ChiefTick /> {d}
+                </motion.div>
+              ))}
+              <motion.div data-signed {...fadeUp(2.2)} style={{ ...card(true), background: CARD, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                <AgentAvatar size={64} />
+                <div>
+                  <div style={{ fontSize: 23, color: INK }}>
+                    Ready → <b>the recommendation</b>
+                  </div>
+                  <div style={{ ...mono(18), fontWeight: 700, marginTop: 4 }}>SIGNED · AI Agent</div>
+                </div>
+              </motion.div>
+            </div>
+          )}
         </div>
-      </div>
+      </Fill>
     </L2Page>
   );
 }
