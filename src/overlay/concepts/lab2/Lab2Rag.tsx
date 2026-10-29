@@ -225,56 +225,95 @@ export function RagIdea(p: L2Props) {
 
 const BARS = Array.from({ length: 48 }, (_, i) => 0.25 + 0.75 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.6)));
 
+/** a strip of bars: the vector, drawn (illustration); `small` is the label on a folder */
+function Bars({ h, at = 1.6, n = 48 }: { h: number; at?: number; n?: number }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: h, width: '100%' }}>
+      {BARS.slice(0, n).map((v, i) => (
+        <motion.div key={i} initial={{ height: 0 }} animate={{ height: `${v * 100}%` }} transition={{ delay: at + i * 0.02, duration: 0.5, ease: EASE }} style={{ flex: 1, background: TEAL, borderRadius: 2, opacity: 0.85 }} />
+      ))}
+    </div>
+  );
+}
+
+/** one part of the machine: picture on top, its numbered caption under it; lights with the drawer's focus */
+function Part({ n, focusN, delay, title, children }: { n: number; focusN: number | null; delay: number; title: string; children: ReactNode }) {
+  const on = focusN === null || focusN === n;
+  return (
+    <motion.div data-step={n} data-on={on} {...fadeUp(delay)} style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 14, opacity: on ? 1 : 0.35, transition: 'opacity 300ms' }}>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>{children}</div>
+      <div style={{ minHeight: 76, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 14, paddingTop: 12, borderTop: `3px solid ${focusN === n ? TEAL : 'var(--line)'}` }}>
+        <Num n={n} on={on} size={44} />
+        <span style={{ fontSize: 26, fontWeight: 700, color: INK, lineHeight: 1.2 }}>{title}</span>
+      </div>
+    </motion.div>
+  );
+}
+
 export function Embed(p: L2Props) {
   const focusN = useFocusN(p.focusId);
   return (
     <L2Page testId="l2-embed" {...p}>
-      <StepRow
-        focusN={focusN}
-        steps={[
-          {
-            title: 'Your question, in plain words',
-            body: (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16 }}>
-                <LineIcon name="speech" size={80} />
-                <div style={{ fontSize: 26, color: '#fff', background: 'rgba(31,42,51,0.92)', borderRadius: 14, padding: '16px 20px' }}>“bearing corrosion on a bridge”</div>
+      <Fill gap={18}>
+        <div data-machine style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 0.9fr) 64px minmax(0, 1.15fr) 64px minmax(0, 1.25fr)', alignItems: 'stretch', columnGap: 6, minHeight: 360 }}>
+          <Part n={1} focusN={focusN} delay={0.2} title="Your question, in plain words">
+            <div style={{ position: 'relative', fontSize: 30, lineHeight: 1.3, color: '#fff', background: 'rgba(31,42,51,0.92)', borderRadius: 18, padding: '26px 26px' }}>
+              “bearing corrosion on a bridge”
+              <svg width="34" height="22" viewBox="0 0 34 22" aria-hidden style={{ position: 'absolute', left: 40, bottom: -20 }}>
+                <path d="M0 0h34L6 22z" fill="rgba(31,42,51,0.92)" />
+              </svg>
+            </div>
+            <div style={{ fontSize: 22, color: DIM, marginTop: 34 }}>words: the cabinet cannot compare them yet</div>
+          </Part>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', paddingBottom: 70 }}>
+            <Arrow w={56} delay={0.9} />
+          </div>
+          <Part n={2} focusN={focusN} delay={0.8} title="Embedding model runs inside Oracle">
+            {/* the database as a walled room: the model works inside it, the outside service stays crossed out */}
+            <div style={{ position: 'relative', border: `3px solid ${TEAL}`, borderRadius: 22, background: TINT, padding: '30px 22px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+              <span style={{ position: 'absolute', top: -16, left: 22, padding: '2px 12px', background: CARD, ...capTeal, fontSize: 16 }}>Oracle AI Database</span>
+              <Db size={120} />
+              <Chip style={{ fontSize: 21 }}>ALL_MINILM_L12_V2</Chip>
+              <Chip dim style={{ fontSize: 16, whiteSpace: 'normal', textAlign: 'center' }}>VECTOR_EMBEDDING(… USING :q AS data)</Chip>
+              <div data-no-outside style={{ position: 'absolute', top: -30, right: -14, display: 'flex', flexDirection: 'column', alignItems: 'center', background: CARD, borderRadius: 12, padding: '4px 8px' }}>
+                <svg width="64" height="44" viewBox="0 0 64 44" aria-hidden>
+                  <path d="M16 38a12 12 0 0 1 0-24 16 16 0 0 1 30-2 11 11 0 0 1 4 26z" fill="none" stroke={GREY} strokeWidth="3" />
+                  <path d="M10 6l44 34" stroke={GREY} strokeWidth="3.5" strokeLinecap="round" />
+                </svg>
+                <span style={{ fontSize: 17, color: DIM, fontWeight: 600 }}>no outside service</span>
               </div>
-            ),
-          },
-          {
-            title: 'Embedding model runs inside Oracle',
-            body: (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, textAlign: 'center' }}>
-                <Db size={110} />
-                <Chip style={{ fontSize: 19 }}>ALL_MINILM_L12_V2</Chip>
-                <div style={{ fontSize: 21, color: DIM }}>no outside service</div>
-                <Chip dim style={{ fontSize: 16, whiteSpace: 'normal' }}>VECTOR_EMBEDDING(… USING :q AS data)</Chip>
-              </div>
-            ),
-          },
-          {
-            title: 'Out come 384 numbers',
-            grow: 1.3,
-            body: (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16 }}>
-                  <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', gap: 3, height: 140 }}>
-                    {BARS.map((h, i) => (
-                      <motion.div key={i} initial={{ height: 0 }} animate={{ height: `${h * 100}%` }} transition={{ delay: 1.6 + i * 0.02, duration: 0.5, ease: EASE }} style={{ flex: 1, background: TEAL, borderRadius: 2, opacity: 0.85 }} />
-                    ))}
-                  </div>
-                  <motion.span {...fade(2.6)} style={{ fontSize: 76, fontWeight: 700, color: TEAL_D, lineHeight: 1 }}>384</motion.span>
-                </div>
-                <div style={{ fontSize: 16, color: DIM }}>bars: illustration · 384: saved output</div>
-                <Saved>✓ The ALL_MINILM_L12_V2 embedding model is active, and has 384 dimensions.</Saved>
-              </div>
-            ),
-          },
-        ]}
-      />
+            </div>
+          </Part>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', paddingBottom: 70 }}>
+            <Arrow w={56} delay={1.5} />
+          </div>
+          <Part n={3} focusN={focusN} delay={1.4} title="Out come 384 numbers">
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 18 }}>
+              <Bars h={170} />
+              <motion.span {...fade(2.6)} style={{ fontSize: 84, fontWeight: 700, color: TEAL_D, lineHeight: 0.9 }}>384</motion.span>
+            </div>
+            <div style={{ fontSize: 16, color: DIM, margin: '8px 0 14px' }}>bars: illustration · 384: saved output</div>
+            <Saved>✓ The ALL_MINILM_L12_V2 embedding model is active, and has 384 dimensions.</Saved>
+          </Part>
+        </div>
+        {/* the everyday picture: every folder was labelled the same way when it was filed; now the question gets its label */}
+        <motion.div data-everyday {...fadeUp(3.2)} style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 26, padding: '14px 24px', borderRadius: 16, background: SOFT }}>
+          <div style={{ position: 'relative', flex: 'none' }}>
+            <BigFolder w={92} on={false} />
+            <div style={{ position: 'absolute', left: 12, right: 12, bottom: 12, height: 26, background: '#fff', borderRadius: 4, padding: '3px 5px', boxSizing: 'border-box' }}>
+              <Bars h={20} at={0} n={24} />
+            </div>
+          </div>
+          <div style={{ fontSize: 24, lineHeight: 1.4, color: INK }}>
+            <span style={{ ...cap, fontSize: 15, display: 'block' }}>In everyday life</span>
+            Every folder in the cabinet got <b>a label made of numbers</b> when it was filed. Now the question gets the same kind of label, so the two can be compared.
+          </div>
+        </motion.div>
+      </Fill>
     </L2Page>
   );
 }
+
 
 /* ---------------- 2.2d · §1.3 and §1.5 the five folders closest in meaning ---------------- */
 
