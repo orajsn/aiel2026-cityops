@@ -786,40 +786,88 @@ export function Wipe(p: L2Props) {
   );
 }
 
-/* ---------------- 2.7d · §5.4 two memories, one database connection ---------------- */
+/* ---------------- 2.7d · two memories, one database connection ---------------- */
+
+const SVG_FONT = 'Inter, sans-serif';
+const SVG_MONO = 'JetBrains Mono, monospace';
+
+/** a table name drawn as a chip inside the picture */
+function TableChip({ x, y, w, t }: { x: number; y: number; w: number; t: string }) {
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={40} rx={8} fill="rgba(27,138,156,0.14)" stroke="#1b8a9c" strokeWidth={1.5} />
+      <text x={x + w / 2} y={y + 27} textAnchor="middle" fontSize={19} fontFamily={SVG_MONO} fill="#146f7f">{t}</text>
+    </g>
+  );
+}
 
 export function StoreSaver(p: L2Props) {
   const focusN = useFocusN(p.focusId);
+  const on = (n: number) => focusN === null || focusN === n;
+  const dim = (n: number) => ({ opacity: on(n) ? 1 : 0.35, transition: 'opacity 300ms' });
+  const bars = Array.from({ length: 22 });
   return (
     <L2Page testId="l2-storesaver" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-        <StepRow
-          focusN={focusN}
-          steps={[
-            { title: 'Logbook: long-term store', body: <><LineIcon name="book" size={60} /><div style={{ ...mono(22, INK), fontWeight: 700 }}>OracleStore</div><div style={{ fontSize: 19, color: DIM }}>decisions across conversations</div><Chip style={{ alignSelf: 'flex-start' }}>store_incident</Chip></> },
-            {
-              title: 'Notes embedded on write',
-              grow: 1.2,
-              body: (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <Chip dim>note</Chip>
-                    <Arrow w={34} delay={1.4} />
-                    <Chip>384 numbers</Chip>
-                  </div>
-                  <ArrowDown h={26} />
-                  <Chip style={{ alignSelf: 'flex-start' }}>store_vectors_incident</Chip>
-                  <div style={{ fontSize: 18, color: DIM }}>embedded inside the database, found again by meaning</div>
-                </div>
-              ),
-            },
-            { title: 'Notebook: checkpoints', body: <><LineIcon name="prompt" size={60} /><div style={{ ...mono(22, INK), fontWeight: 700 }}>OracleSaver</div><div style={{ fontSize: 19, color: DIM }}>steps of this conversation, per thread</div><div style={{ ...mono(15, TEAL_D) }}>checkpoints · checkpoint_blobs · checkpoint_writes</div></> },
-          ]}
-        />
-        <motion.div {...fadeUp(2.2)} style={{ padding: '10px 18px', borderRadius: 12, background: TEAL, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontSize: 22, fontWeight: 700 }}>
-          <Db size={34} color="#fff" /> Oracle AI Database
+      <Fill gap={10}>
+        <motion.div {...fade(0.1)} style={{ fontSize: 24, lineHeight: 1.45, color: INK }}>
+          Like a records office with <b>one front door and two rooms</b>: today’s working notes in one, the permanent logbook in the other, each new page filed by its meaning as it comes in.
         </motion.div>
-      </div>
+        <FitBox w={1300} h={590} max={1.1}>
+          <svg data-storesaver width={1300} height={590} viewBox="0 0 1300 590" style={{ overflow: 'visible' }}>
+            {/* the agent and the one connection */}
+            <motion.g {...fade(0.2)}>
+              <g transform="translate(30 170)">
+                <ChiefInspector size={180} />
+              </g>
+              <text x={120} y={385} textAnchor="middle" fontSize={28} fontWeight={700} fill="var(--ink)" fontFamily={SVG_FONT}>AI Agent</text>
+            </motion.g>
+            <motion.g {...fade(0.6)}>
+              <path d="M222 300H556" stroke="#5c6b78" strokeWidth={6} strokeLinecap="round" />
+              <text x={390} y={350} textAnchor="middle" fontSize={24} fontWeight={600} fill="#146f7f" fontFamily={SVG_FONT}>one connection</text>
+              <path d="M556 300C575 300 575 210 592 210M556 300C575 300 575 445 592 445" stroke="#5c6b78" strokeWidth={4} fill="none" />
+            </motion.g>
+            {/* the database, cut open: two rooms */}
+            <motion.g {...fade(0.3)}>
+              <path d="M548 70V540A372 40 0 0 0 1292 540V70" fill="rgba(27,138,156,0.08)" stroke="#1b8a9c" strokeWidth={3} />
+              <ellipse cx={920} cy={70} rx={372} ry={40} fill="rgba(27,138,156,0.22)" stroke="#1b8a9c" strokeWidth={3} />
+              <text x={920} y={80} textAnchor="middle" fontSize={26} fontWeight={700} fill="#146f7f" fontFamily={SVG_FONT}>Oracle AI Database</text>
+            </motion.g>
+            <motion.g data-step={1} data-on={on(1)} {...fadeUp(0.9)} style={dim(1)}>
+              <rect x={592} y={130} width={666} height={190} rx={16} fill="var(--panel-strong)" stroke={focusN === 1 ? '#1b8a9c' : '#aab1ba'} strokeWidth={2} />
+              <text x={620} y={174} fontSize={30} fontWeight={700} fill="var(--ink)" fontFamily={SVG_FONT}>Logbook <tspan fontFamily={SVG_MONO} fontSize={24} fill="#146f7f">OracleStore</tspan></text>
+              <text x={620} y={210} fontSize={22} fill="var(--ink-dim)" fontFamily={SVG_FONT}>decisions kept across conversations</text>
+              <TableChip x={620} y={252} w={184} t="store_incident" />
+              <TableChip x={820} y={252} w={276} t="store_vectors_incident" />
+            </motion.g>
+            {/* a note comes down the connection; inside, it becomes 384 numbers */}
+            <g data-step={2} data-on={on(2)} style={dim(2)}>
+              <motion.g initial={{ x: 0, opacity: 0 }} animate={{ x: [0, 0, 360], opacity: [0, 1, 0] }} transition={{ delay: 1.6, duration: 1.8, times: [0, 0.2, 1], ease: EASE }}>
+                <rect x={232} y={232} width={78} height={56} rx={6} fill="var(--panel-strong)" stroke="#5c6b78" strokeWidth={2} />
+                <path d="M244 250h54M244 262h54M244 274h34" stroke="#8a919c" strokeWidth={3} strokeLinecap="round" />
+                <text x={271} y={222} textAnchor="middle" fontSize={20} fill="var(--ink-dim)" fontFamily={SVG_FONT}>note</text>
+              </motion.g>
+              <motion.g {...fade(3.2)}>
+                <text x={1110} y={170} textAnchor="middle" fontSize={20} fontWeight={700} fill="#146f7f" fontFamily={SVG_FONT}>384 numbers</text>
+                {bars.map((_, i) => (
+                  <rect key={i} x={1012 + i * 9} y={186 + ((i * 7) % 5) * 3} width={6} height={30 - ((i * 7) % 5) * 3} rx={2} fill="#1b8a9c" opacity={0.45 + ((i * 3) % 5) * 0.12} />
+                ))}
+                <path d="M1110 222C1110 244 1040 238 1040 252" stroke="#1b8a9c" strokeWidth={2.5} strokeDasharray="4 4" fill="none" />
+              </motion.g>
+            </g>
+            <motion.g data-step={3} data-on={on(3)} {...fadeUp(1.3)} style={dim(3)}>
+              <rect x={592} y={355} width={666} height={180} rx={16} fill="var(--panel-strong)" stroke={focusN === 3 ? '#1b8a9c' : '#aab1ba'} strokeWidth={2} />
+              <text x={620} y={398} fontSize={30} fontWeight={700} fill="var(--ink)" fontFamily={SVG_FONT}>Notebook <tspan fontFamily={SVG_MONO} fontSize={24} fill="#146f7f">OracleSaver</tspan></text>
+              <text x={620} y={434} fontSize={22} fill="var(--ink-dim)" fontFamily={SVG_FONT}>steps of this conversation, per thread</text>
+              <TableChip x={620} y={470} w={150} t="checkpoints" />
+              <TableChip x={782} y={470} w={206} t="checkpoint_blobs" />
+              <TableChip x={1000} y={470} w={218} t="checkpoint_writes" />
+            </motion.g>
+          </svg>
+        </FitBox>
+        <motion.div {...fade(3.6)} style={{ fontSize: 23, color: INK, textAlign: 'center' }}>
+          Each note is <b style={{ color: TEAL_D }}>embedded inside the database</b> as it is written, and found again by meaning.
+        </motion.div>
+      </Fill>
     </L2Page>
   );
 }
