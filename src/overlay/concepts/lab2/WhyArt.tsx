@@ -121,7 +121,7 @@ function BottleneckScene({ start }: { start: number }) {
       </g>
       <g transform="translate(76 330)">
         <circle cx="0" cy="0" r="22" fill={CARD} stroke={G} strokeWidth={3} />
-        <motion.path d="M0 0V-14" stroke={G} strokeWidth={3} strokeLinecap="round" animate={{ rotate: 360 }} transition={{ delay: start, duration: CYCLE, repeat: Infinity, ease: 'linear' }} style={{ transformOrigin: '0px 0px' }} />
+        <motion.path d="M0 0V-14" stroke={G} strokeWidth={3} strokeLinecap="round" animate={{ rotate: 360 }} transition={{ delay: start, duration: CYCLE, repeat: Infinity, ease: 'linear' }} style={{ originX: 0.5, originY: 1 }} />
         <path d="M0 0h9" stroke={G} strokeWidth={3} strokeLinecap="round" />
       </g>
     </svg>
@@ -154,7 +154,7 @@ function BarrierScene({ start }: { start: number }) {
       <rect x="150" y="262" width="112" height="16" rx="4" fill={CARD} stroke="#5c6b78" strokeWidth={2.6} />
       {[0, 1, 2, 3].map((i) => <rect key={i} x={158 + i * 26} y={265} width={13} height={10} fill={GL} />)}
       {/* the padlock on the barrier: it gives a small shake when the action arrives */}
-      <motion.g animate={{ rotate: [0, 0, -9, 9, -5, 0, 0] }} transition={loop(start, [0, 0.42, 0.46, 0.5, 0.54, 0.58, 1])} style={{ transformOrigin: '251px 214px' }}>
+      <motion.g animate={{ rotate: [0, 0, -9, 9, -5, 0, 0] }} transition={loop(start, [0, 0.42, 0.46, 0.5, 0.54, 0.58, 1])} >
         <path d="M240 214v-11a11 11 0 0 1 22 0v11" fill="none" stroke={T} strokeWidth={3.6} />
         <rect x="233" y="211" width="36" height="30" rx="4" fill={T} />
         <circle cx="251" cy="225" r="4" fill="#fff" />
