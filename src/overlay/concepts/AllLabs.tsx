@@ -116,13 +116,14 @@ function Stair({ n, step, children }: { n: number; step: AllLabsProps['steps'][n
       animate={{ scaleY: 1, opacity: 1 }}
       transition={{ delay: t, duration: 0.9, ease: EASE }}
     >
-      <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', color: TEAL_D, textTransform: 'uppercase' }}>{step.tag}</div>
-      <div style={{ fontSize: 27, fontWeight: 700, marginTop: 4, lineHeight: 1.15, color: INK }}>{step.title}</div>
-      <motion.div {...fadeIn(t + 0.6)} style={{ flex: 1, minHeight: 0, margin: '12px 0', borderRadius: 12, background: 'var(--panel-strong)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, overflow: 'hidden' }}>
-        {children}
+      <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.1em', color: TEAL_D, textTransform: 'uppercase' }}>{step.tag}</div>
+      <div style={{ fontSize: 30, fontWeight: 700, marginTop: 4, lineHeight: 1.15, color: INK }}>{step.title}</div>
+      <motion.div {...fadeIn(t + 0.6)} style={{ flex: 1, minHeight: 0, margin: '14px 0', borderRadius: 12, background: 'var(--panel-strong)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        {/* the picture grows with the step */}
+        <div style={{ zoom: 1.2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>{children}</div>
       </motion.div>
-      <div style={{ fontSize: 18, lineHeight: 1.35, color: INK }}>{step.line}</div>
-      <div style={{ fontSize: 14, color: DIM, marginTop: 4 }}>{step.where}</div>
+      <div style={{ fontSize: 20, lineHeight: 1.35, color: INK }}>{step.line}</div>
+      <div style={{ fontSize: 15, color: DIM, marginTop: 4 }}>{step.where}</div>
     </motion.div>
   );
 }
@@ -130,7 +131,7 @@ function Stair({ n, step, children }: { n: number; step: AllLabsProps['steps'][n
 export function AllLabs({ kicker, message, steps, foundation, quiz }: AllLabsProps) {
   return (
     <WidePanel kicker={kicker} message={message} testId="all-labs" kickerColor="var(--teal)">
-      <div style={{ display: 'flex', gap: 24, height: 600 }}>
+      <div style={{ display: 'flex', gap: 24, flex: 1, minHeight: 0, marginTop: 6 }}>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           {/* the staircase: no empty gap, each lab one step up */}
           <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', flex: 1, minHeight: 0 }}>
@@ -150,7 +151,7 @@ export function AllLabs({ kicker, message, steps, foundation, quiz }: AllLabsPro
           </div>
           <motion.div
             data-foundation
-            style={{ height: 58, flex: 'none', transformOrigin: 'left', borderRadius: '0 0 14px 14px', background: TEAL, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 23, fontWeight: 700 }}
+            style={{ height: 66, flex: 'none', transformOrigin: 'left', borderRadius: '0 0 14px 14px', background: TEAL, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 25, fontWeight: 700 }}
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ delay: FOUNDATION_AT, duration: 1.1, ease: EASE }}

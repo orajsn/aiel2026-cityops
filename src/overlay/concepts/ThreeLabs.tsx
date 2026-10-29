@@ -18,7 +18,6 @@ const DIM = 'var(--ink-dim)';
 const TEAL_FILL = 'rgba(27, 138, 156, 0.16)';
 const GREY_FILL = 'rgba(127, 127, 127, 0.14)';
 const PAPER = '#f4f7f8';
-const CARDS_H = 580;
 
 /* ---------- motion: calm eases only, nothing wobbles ---------- */
 const rise = (delay: number) => ({ initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.6, ease: EASE } });
@@ -124,7 +123,7 @@ export function Portrait({ who, size = 54 }: { who: 'mercer' | 'vance'; size?: n
 }
 
 /** the crack close-up: grey concrete, and the crack draws itself down the pier (the one red thing) */
-function CrackCloseup({ w, h, delay }: { w: number; h: number; delay: number }) {
+function CrackCloseup({ w, h, delay }: { w: number | string; h: number | string; delay: number }) {
   return (
     <svg data-picture="crack" width={w} height={h} viewBox="0 0 300 210" role="img" aria-label="Close-up of a crack on the bridge pier" style={{ display: 'block' }}>
       <rect width="300" height="210" rx="10" fill="#bfc5cc" />
@@ -159,9 +158,9 @@ const RUST_FLAKES: [number, number][] = [
 ];
 
 /** the rust close-up: a steel bearing plate, and the rust spreading across it, patch by patch */
-function RustCloseup({ w, h, delay }: { w: number; h: number; delay: number }) {
+function RustCloseup({ w, h, delay, wide: forceWide }: { w: number | string; h: number | string; delay: number; wide?: boolean }) {
   // a wide frame crops to the plate
-  const wide = w / h > 1.8;
+  const wide = forceWide ?? (typeof w === 'number' && typeof h === 'number' && w / h > 1.8);
   const y0 = wide ? 30 : 0;
   const vh = wide ? 150 : 210;
   return (
@@ -190,15 +189,15 @@ function RustCloseup({ w, h, delay }: { w: number; h: number; delay: number }) {
 }
 
 /* ---------- shared pieces of an open card ---------- */
-const SEC: CSSProperties = { fontSize: 14, fontWeight: 700, letterSpacing: '0.12em', color: DIM, marginBottom: 12, textTransform: 'uppercase' };
-const BUB: CSSProperties = { borderRadius: 14, padding: '10px 14px', fontSize: 18, lineHeight: 1.35, color: 'var(--ink)' };
-const ST: CSSProperties = { fontSize: 22, fontWeight: 700, color: 'var(--ink)' };
-const SD: CSSProperties = { fontSize: 17, color: DIM, marginTop: 2 };
+const SEC: CSSProperties = { fontSize: 15, fontWeight: 700, letterSpacing: '0.12em', color: DIM, marginBottom: 14, textTransform: 'uppercase' };
+const BUB: CSSProperties = { borderRadius: 14, padding: '11px 15px', fontSize: 19, lineHeight: 1.35, color: 'var(--ink)' };
+const ST: CSSProperties = { fontSize: 24, fontWeight: 700, color: 'var(--ink)' };
+const SD: CSSProperties = { fontSize: 18, color: DIM, marginTop: 2 };
 const CHIP: CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 12px', borderRadius: 9, background: TEAL_FILL, fontSize: 16, fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' };
 
 function Problem({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div data-part="problem" style={{ flex: '0 0 360px', display: 'flex', flexDirection: 'column', paddingRight: 24, borderRight: '1px solid var(--line)', minWidth: 0 }}>
+    <div data-part="problem" style={{ flex: '0 0 380px', display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', paddingRight: 26, borderRight: '1px solid var(--line)', minWidth: 0 }}>
       <div style={SEC}>{title}</div>
       {children}
     </div>
@@ -207,7 +206,7 @@ function Problem({ title, children }: { title: string; children: ReactNode }) {
 
 function Build({ title, children, gap = 0 }: { title: string; children: ReactNode; gap?: number }) {
   return (
-    <div data-part="build" style={{ flex: 1, minWidth: 0, paddingLeft: 24, display: 'flex', flexDirection: 'column', gap }}>
+    <div data-part="build" style={{ flex: 1, minWidth: 0, paddingLeft: 26, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap }}>
       <div style={SEC}>{title}</div>
       {children}
     </div>
@@ -218,7 +217,7 @@ function Build({ title, children, gap = 0 }: { title: string; children: ReactNod
 function Step({ n, at, title, sub, children }: { n: number; at: number; title: string; sub?: string; children?: ReactNode }) {
   return (
     <motion.div data-build-step={n} {...fromLeft(at)} style={{ display: 'flex', gap: 14, alignItems: 'flex-start', padding: '10px 0', borderTop: n === 1 ? 'none' : '1px solid var(--line)', paddingTop: n === 1 ? 0 : 10 }}>
-      <div style={{ flex: 'none', width: 36, height: 36, borderRadius: '50%', background: TEAL, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700 }}>{n}</div>
+      <div style={{ flex: 'none', width: 40, height: 40, borderRadius: '50%', background: TEAL, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19, fontWeight: 700 }}>{n}</div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={ST}>{title}</div>
         {sub && <div style={SD}>{sub}</div>}
@@ -231,10 +230,10 @@ function Step({ n, at, title, sub, children }: { n: number; at: number; title: s
 /* ---------- Lab 1 · the repair plan ---------- */
 function Big1({ t }: { t: number }) {
   const sources: { pic: ReactNode; label: string }[] = [
-    { pic: <Doc label="PDF" w={50} />, label: 'Inspection report' },
-    { pic: <Drawing w={64} />, label: 'Bridge drawings' },
-    { pic: <Db w={42} />, label: 'Repair history' },
-    { pic: <Db w={42} />, label: 'Contractors' },
+    { pic: <Doc label="PDF" w={62} />, label: 'Inspection report' },
+    { pic: <Drawing w={84} />, label: 'Bridge drawings' },
+    { pic: <Db w={54} />, label: 'Repair history' },
+    { pic: <Db w={54} />, label: 'Contractors' },
   ];
   // the four sources slide together into the assistant: no tilt, no wobble (owner)
   const gathered: { dx: number; dy: number; pic: ReactNode }[] = [
@@ -250,7 +249,7 @@ function Big1({ t }: { t: number }) {
           {sources.map((s, i) => (
             <motion.div key={s.label} data-source={s.label} {...rise(t + 0.2 + i * 0.25)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
               {s.pic}
-              <div style={{ fontSize: 14, fontWeight: 600, color: DIM }}>{s.label}</div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: DIM }}>{s.label}</div>
             </motion.div>
           ))}
         </div>
@@ -258,7 +257,7 @@ function Big1({ t }: { t: number }) {
           <Worker label="project manager" />
           <div style={{ ...BUB, background: GREY_FILL, flex: 1 }}>“What does the spec require, who is qualified, and are the materials here?”</div>
         </motion.div>
-        <motion.div {...rise(t + 2)} style={{ marginTop: 12, fontSize: 17, color: DIM }}>
+        <motion.div {...rise(t + 2)} style={{ marginTop: 12, fontSize: 18, color: DIM }}>
           Four systems, four searches, before every meeting.
         </motion.div>
       </Problem>
@@ -345,7 +344,7 @@ function Big2({ t }: { t: number }) {
   return (
     <>
       <Problem title="The problem">
-        <CrackCloseup w={340} h={170} delay={t} />
+        <CrackCloseup w={354} h={210} delay={t} />
         <motion.div {...rise(t + 1.6)} style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 14 }}>
           <Worker label="inspector" />
           <div style={{ ...BUB, background: GREY_FILL, flex: 1 }}>“Is this crack serious? What should I do first?”</div>
@@ -407,7 +406,7 @@ function Big3({ t }: { t: number }) {
     <>
       <Problem title="The problem · an agent that forgets">
         <div style={{ marginBottom: 10 }}>
-          <RustCloseup w={340} h={150} delay={t} />
+          <RustCloseup w={354} h={180} delay={t} wide />
         </div>
         <motion.div {...rise(t + 0.2)} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <Portrait who="mercer" />
@@ -482,20 +481,20 @@ function Mini({ n }: { n: 1 | 2 | 3 }) {
   const lab = LABS[n - 1];
   const picture =
     n === 1 ? (
-      <div data-picture="sources" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 18px', justifyItems: 'center', alignItems: 'end', height: 230, padding: '10px 0', boxSizing: 'border-box', borderRadius: 12, background: GREY_FILL }}>
-        <Doc label="PDF" w={62} />
-        <Drawing w={98} />
-        <Db w={58} />
-        <SitePhoto w={98} />
+      <div data-picture="sources" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 18px', justifyItems: 'center', alignContent: 'space-evenly', alignItems: 'end', flex: 1, minHeight: 230, padding: '14px 0', boxSizing: 'border-box', borderRadius: 12, background: GREY_FILL }}>
+        <Doc label="PDF" w={78} />
+        <Drawing w={122} />
+        <Db w={72} />
+        <SitePhoto w={122} />
       </div>
     ) : (
-      <div style={{ display: 'flex', justifyContent: 'center', height: 230 }}>{n === 2 ? <CrackCloseup w={400} h={230} delay={0.6} /> : <RustCloseup w={400} h={230} delay={0.3} />}</div>
+      <div style={{ display: 'flex', justifyContent: 'center', flex: 1, minHeight: 230 }}>{n === 2 ? <CrackCloseup w="100%" h="100%" delay={0.6} /> : <RustCloseup w="100%" h="100%" delay={0.3} />}</div>
     );
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16, flex: 1, minHeight: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18, marginTop: 18, flex: 1, minHeight: 0 }}>
       {picture}
-      <div data-question style={{ fontSize: 21, lineHeight: 1.4, color: 'var(--ink)' }}>{lab.question}</div>
-      <div style={{ marginTop: 'auto', fontSize: 18, color: DIM, borderTop: '1px solid var(--line)', paddingTop: 14 }}>
+      <div data-question style={{ fontSize: 24, lineHeight: 1.4, color: 'var(--ink)', minHeight: '4.2em' }}>{lab.question}</div>
+      <div style={{ fontSize: 20, color: DIM, borderTop: '1px solid var(--line)', paddingTop: 16 }}>
         You build: <b style={{ color: TEAL }}>{lab.build}</b>
       </div>
     </div>
@@ -521,25 +520,25 @@ const QUESTION_SHORT: Record<1 | 2 | 3, string> = {
 function Closed({ n }: { n: 1 | 2 | 3 }) {
   const picture =
     n === 1 ? (
-      <div data-picture="sources" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, justifyItems: 'center', alignItems: 'end', padding: '8px 0', borderRadius: 10, background: GREY_FILL }}>
-        <Doc label="PDF" w={30} />
-        <Drawing w={48} />
-        <Db w={28} />
-        <SitePhoto w={48} />
+      <div data-picture="sources" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, justifyItems: 'center', alignItems: 'end', padding: '12px 0', borderRadius: 10, background: GREY_FILL }}>
+        <Doc label="PDF" w={36} />
+        <Drawing w={56} />
+        <Db w={34} />
+        <SitePhoto w={56} />
       </div>
     ) : n === 2 ? (
-      <CrackCloseup w={156} h={110} delay={0.3} />
+      <CrackCloseup w="100%" h={130} delay={0.3} />
     ) : (
-      <RustCloseup w={156} h={110} delay={0.3} />
+      <RustCloseup w="100%" h={130} delay={0.3} />
     );
   return (
-    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12, marginTop: 14 }}>
       {picture}
-      <div data-question style={{ fontSize: 15, lineHeight: 1.35, color: 'var(--ink)' }}>{QUESTION_SHORT[n]}</div>
-      <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', color: DIM, marginTop: 2 }}>YOU BUILD</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div data-question style={{ fontSize: 17, lineHeight: 1.35, color: 'var(--ink)' }}>{QUESTION_SHORT[n]}</div>
+      <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', color: DIM, marginTop: 'auto' }}>YOU BUILD</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {STEPS_SHORT[n].map((text, i) => (
-          <div key={text} data-chip={i + 1} style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '6px 8px', borderRadius: 8, background: TEAL_FILL, fontSize: 13, fontWeight: 600, lineHeight: 1.25, color: 'var(--ink)' }}>
+          <div key={text} data-chip={i + 1} style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '8px 9px', borderRadius: 8, background: TEAL_FILL, fontSize: 14, fontWeight: 600, lineHeight: 1.25, color: 'var(--ink)' }}>
             <span style={{ flex: 'none', width: 20, height: 20, borderRadius: '50%', background: TEAL, color: '#fff', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{i + 1}</span>
             {text}
           </div>
@@ -611,7 +610,8 @@ export function ThreeLabs({ step, kicker = 'Harbor Bridge', message = 'One bridg
           <motion.span key={d} data-dot={d} data-on={step === d} initial={false} animate={{ width: step === d ? 34 : 12, backgroundColor: step === d ? '#1b8a9c' : 'rgba(127, 127, 127, 0.35)' }} transition={{ duration: 0.4, ease: EASE }} style={{ height: 12, borderRadius: 6, display: 'block' }} />
         ))}
       </div>
-      <div style={{ display: 'flex', gap: 20, height: CARDS_H }}>
+      {/* the cards take all the height the panel has (owner, 29 Oct: use the stage) */}
+      <div style={{ display: 'flex', gap: 20, flex: 1, minHeight: 0 }}>
         {([1, 2, 3] as const).map((n) => (
           <Card key={n} n={n} step={step} />
         ))}
