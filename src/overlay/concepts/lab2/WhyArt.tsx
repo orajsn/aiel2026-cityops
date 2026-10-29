@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import vancePortrait from '../../../assets/portraits/vance.png';
 import { EASE } from '../WidePanel';
 import { Fill } from '../Fill';
+import { AgentAvatar } from './AgentAvatar';
 import { CARD, ChiefInspector, DIM, INK, SOFT, TEAL, TEAL_D, TINT, TINT2, capTeal } from './parts';
 
 /**
@@ -134,7 +135,7 @@ function BarrierScene({ start }: { start: number }) {
   return (
     <svg {...svgProps} aria-label="no trust: the barrier stays down">
       <g transform="translate(4 40)">
-        <ChiefInspector size={150} />
+        <AgentAvatar size={150} />
       </g>
       {/* what it wants to do: fix the bridge */}
       <Bubble x={176} y={26} w={180} h={84}>
@@ -256,11 +257,45 @@ const LEVEL_ART: ReactNode[] = [
 ];
 
 export const LEVELS = [
-  { level: 'Chatbot', q: '“What is a hairline crack?”', who: 'nobody: one reply', free: 0.12 },
-  { level: 'RAG', q: '“What does the record say about this bridge?”', who: 'the application', free: 0.35 },
-  { level: 'Workflow', q: '“Triage this incident predictably.”', who: 'the code', free: 0.6 },
-  { level: 'Agent', q: '“Reason it through and tell me what to do.”', who: 'the model', free: 0.9 },
+  { level: 'Chatbot', q: ['“What is a ', 'hairline crack', '?”'], who: 'nobody: one reply', free: 0.12 },
+  { level: 'RAG', q: ['“What does ', 'the record', ' say about this bridge?”'], who: 'the application', free: 0.35 },
+  { level: 'Workflow', q: ['“Triage this incident ', 'predictably', '.”'], who: 'the code', free: 0.6 },
+  { level: 'Agent', q: ['“', 'Reason it through', ' and tell me what to do.”'], who: 'the model', free: 0.9 },
 ];
+
+/** the agent's own loop around its picture: look, pick a tool, read, decide, and round again */
+const LOOP = ['look', 'pick a tool', 'read', 'decide'];
+function AgentLoop() {
+  const spots = [
+    { left: '50%', top: '0%', transform: 'translate(-50%, 0)' },
+    { right: '0%', top: '50%', transform: 'translate(0, -50%)' },
+    { left: '50%', bottom: '0%', transform: 'translate(-50%, 0)' },
+    { left: '0%', top: '50%', transform: 'translate(0, -50%)' },
+  ];
+  return (
+    <div data-agent-loop style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ position: 'relative', width: '100%', height: '100%', maxWidth: 320, maxHeight: 340 }}>
+        <svg viewBox="0 0 200 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" aria-hidden style={{ position: 'absolute', inset: 0 }}>
+          <circle cx="100" cy="100" r="80" fill="none" stroke={T} strokeWidth={2.4} strokeDasharray="5 7" opacity={0.7} />
+          <g transform="translate(100 100)">
+            <motion.g animate={{ rotate: 360 }} transition={{ delay: 2, duration: 8, repeat: Infinity, ease: 'linear' }}>
+              <circle cx="0" cy="0" r="80" fill="none" stroke="none" />
+              <circle cx="0" cy="-80" r="7" fill={T} />
+            </motion.g>
+          </g>
+          <foreignObject x="54" y="54" width="92" height="96">
+            <AgentAvatar size={92} live />
+          </foreignObject>
+        </svg>
+        {LOOP.map((w, i) => (
+          <motion.span key={w} data-loop-word={w} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 + i * 0.3, duration: 0.4 }} style={{ position: 'absolute', ...spots[i], padding: '3px 10px', borderRadius: 999, background: CARD, border: `2px solid ${TEAL}`, fontSize: 16, fontWeight: 700, color: TEAL_D, whiteSpace: 'nowrap' }}>
+            {i + 1} · {w}
+          </motion.span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function Ladder() {
   return (
@@ -285,11 +320,19 @@ export function Ladder() {
               <span style={{ fontSize: 30, fontWeight: 700, color: INK }}>{l.level}</span>
             </div>
             <div style={{ flex: 1, minHeight: 56, position: 'relative' }}>
-              <svg viewBox="0 0 122 84" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" aria-hidden style={{ position: 'absolute', inset: 0, maxHeight: 170, margin: 'auto' }}>
-                {LEVEL_ART[i]}
-              </svg>
+              {i === 3 ? (
+                <AgentLoop />
+              ) : (
+                <svg viewBox="0 0 122 84" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" aria-hidden style={{ position: 'absolute', inset: 0, maxHeight: 170, margin: 'auto' }}>
+                  {LEVEL_ART[i]}
+                </svg>
+              )}
             </div>
-            <div style={{ fontSize: 22, lineHeight: 1.35, color: '#fff', background: 'rgba(31,42,51,0.9)', borderRadius: 14, padding: '10px 14px' }}>{l.q}</div>
+            <div style={{ fontSize: 22, lineHeight: 1.35, color: '#fff', background: 'rgba(31,42,51,0.9)', borderRadius: 14, padding: '10px 14px' }}>
+              {l.q[0]}
+              <b style={{ color: '#7fd3df' }}>{l.q[1]}</b>
+              {l.q[2]}
+            </div>
             <div>
               <div style={{ fontSize: 22, color: DIM }}>
                 next step: <b style={{ color: TEAL_D, fontSize: 24 }}>{l.who}</b>
