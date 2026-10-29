@@ -28,11 +28,13 @@ test('every shot and overlay referenced by chapter 0 exists', () => {
 });
 
 test('Lab 2 pages are panels only: one held view, no sky stage, no camera move (owner, 29 Oct)', () => {
-  const lab2 = chapter1.filter((s) => s.id !== '2.9');
+  // except one query, four lenses: the owner kept its database-in-the-sky sequence (29 Oct)
+  const lab2 = chapter1.filter((s) => s.id !== '2.9' && !s.id.startsWith('2.6'));
   for (const s of lab2) {
     expect(s.shot).toBe('bridge');
     expect(s.world?.sky).toBeUndefined();
   }
+  for (const s of chapter1.filter((s) => s.id.startsWith('2.6'))) expect(s.world?.sky).toBe('unified');
 });
 
 test('the recap subset is marked', () => {

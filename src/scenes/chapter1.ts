@@ -42,6 +42,8 @@ interface Page {
   world: World;
   group?: string;
   sameAngleAs?: string;
+  /** keep this page's own shot and world (the sky stage) instead of the held bridge view */
+  stage?: boolean;
 }
 
 const page = (p: Page): SceneDef => ({
@@ -49,9 +51,8 @@ const page = (p: Page): SceneDef => ({
   chapter: 1,
   title: p.title,
   // Lab 2 is panels only (owner, 29 Oct): one held view, no sky stage, no camera move between pages
-  shot: LAB2_VIEW.shot,
-  world: LAB2_VIEW.world,
-  heldView: true,
+  // one page set keeps its sky stage (owner, 29 Oct: "use the old database on sky sequence" for one query, four lenses)
+  ...(p.stage ? { shot: p.shot, world: p.world } : { shot: LAB2_VIEW.shot, world: LAB2_VIEW.world, heldView: true }),
   overlay: p.overlay,
   overlayGroup: p.group,
   overlayProps: { ...p.props, focusId: p.id } as unknown as Record<string, unknown>,
@@ -157,7 +158,7 @@ const tools: SceneDef[] = [
 ];
 
 /* ---------------- Query · one query, four lenses ---------------- */
-const QUERY = { shot: 'sky', world: sky('unified', false) };
+const QUERY = { shot: 'sky', world: sky('unified', false), stage: true };
 const query: SceneDef[] = [
   page({ id: '2.6', title: 'Why one query', overlay: 'L2OneQuery', group: 'l2-query', ...QUERY, props: { kicker: K.query, step: 1, message: 'Four systems mean **four copies to keep in sync**.', takeaway: 'Rows, JSON, graph and vectors in four places: **ETL, sync jobs, stale copies**.' } }),
   page({ id: '2.6a', title: 'One database, four lenses', overlay: 'L2OneQuery', group: 'l2-query', ...QUERY, props: { kicker: K.query, step: 2, message: 'Why **one query**.', takeaway: 'No ETL between systems, no sync jobs, no stale copies: **one consistency boundary**.', terms: [['Four lenses on one record', 'Relational · JSON · SQL/PGQ graph · vector']] } }),
