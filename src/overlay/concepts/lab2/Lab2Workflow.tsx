@@ -4,6 +4,8 @@ import { EASE } from '../WidePanel';
 import { LineIcon, type IconName } from '../icons';
 import { Story, stepAt } from './Story';
 import { Triage } from './everyday';
+import { Fill, FitBox } from '../Fill';
+import { InfoDesk, Junction, Recipe, Taxi, Tram, WorkOrder } from './workflowArt';
 import {
   Arrow, ArrowDown, CARD, ChiefInspector, Chip, DIM, INK, L2Page, Net, Num, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
   cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props,
@@ -232,92 +234,221 @@ export function Station1(p: L2Props) {
   );
 }
 
-/* ---------------- 2.4g · §2.5 station three: draft the plan ---------------- */
+/* ---------------- 2.4g · station three: draft the plan ---------------- */
 
+/** the drawer's step n is the one being talked about: it stands out, the rest steps back */
+const lit = (focusN: number | null, n: number) => ({
+  opacity: focusN === null || focusN === n ? 1 : 0.4,
+  boxShadow: focusN === n ? '0 0 0 6px rgba(27,138,156,0.22)' : 'none',
+  transition: 'opacity 300ms, box-shadow 300ms',
+});
+
+const DRAFT_FIELDS = [
+  { f: 'recommendation', d: 'One-line recommended action' },
+  { f: 'rationale', d: 'Why, in 2-4 sentences, referencing the context' },
+  { f: 'next_steps', d: 'Ordered list of concrete next steps' },
+];
+const FIELD_AT = [3.4, 3.9, 4.4];
+
+/**
+ * One big picture (owner, 29 Oct): the empty form waits on the right; the three inputs arrive on the left, pass the
+ * "only the context" filter and the language model, and the form's three boxes fill one after another. A garage
+ * work order is the everyday picture.
+ */
 export function Station3(p: L2Props) {
   const focusN = useFocusN(p.focusId);
+  const label = { ...cap, fontSize: 17, letterSpacing: '0.14em' };
   return (
     <L2Page testId="l2-station3" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-        <motion.div {...fadeUp(0.1)} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 21, color: INK }}>
-          <span style={cap}>In</span>
-          <Chip>incident</Chip>
-          <span style={{ color: TEAL }}>+</span>
-          <Chip>severity</Chip>
-          <span style={{ color: TEAL }}>+</span>
-          <Chip>context</Chip>
-        </motion.div>
-        <StepRow
-          focusN={focusN}
-          steps={[
+      <Fill>
+        <FitBox w={1400} h={640} max={1.15}>
+          {/* the inputs */}
+          <div style={{ position: 'absolute', left: 0, top: 0, width: 700 }}>
+            <motion.div {...fade(1)} style={label}>In: from stations one and two</motion.div>
+          </div>
+          {[
             {
-              title: 'Three fields to fill',
+              k: 'report',
               body: (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12 }}>
-                  {['recommendation: ____', 'rationale: ____', 'next_steps: [ … ]'].map((f) => (
-                    <div key={f} style={{ ...mono(22, INK), padding: '12px 16px', borderRadius: 10, border: '2px dashed rgba(27,138,156,0.55)', background: CARD }}>{f}</div>
-                  ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', borderRadius: 12, background: 'rgba(31,42,51,0.92)', color: '#fff', fontSize: 22, lineHeight: 1.3 }}>
+                  <LineIcon name="clipboard" size={40} color="#fff" />
+                  <span>Crack near the bearing plate · 0.12 mm × 85 mm</span>
                 </div>
               ),
             },
             {
-              title: 'Facts only from context',
+              k: 'severity',
               body: (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
-                  <LineIcon name="funnel" size={80} />
-                  <Quote style={{ fontSize: 20 }}>Use ONLY the provided context for facts.</Quote>
+                <div style={{ ...card(), padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <span style={{ padding: '6px 16px', borderRadius: 8, background: TEAL, ...mono(22, '#fff'), fontWeight: 700 }}>warning</span>
+                  <span style={{ fontSize: 22, color: DIM }}>the rating</span>
                 </div>
               ),
             },
             {
-              title: 'Prompt into the model',
+              k: 'context',
               body: (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
-                  <Net w={150} live />
-                  <Chip style={{ fontSize: 18, alignSelf: 'flex-start' }}>(DRAFT_PROMPT | llm).invoke(…)</Chip>
+                <div style={{ ...card(), padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <svg width="62" height="50" viewBox="0 0 62 50" aria-hidden>
+                    {[0, 1, 2, 3, 4].map((i) => (
+                      <rect key={i} x={2 + i * 7} y={2 + i * 4} width="30" height="26" rx="3" fill={i === 4 ? 'var(--panel-strong)' : 'rgba(127,127,127,0.25)'} stroke="var(--teal)" strokeWidth="2" />
+                    ))}
+                  </svg>
+                  <span style={{ fontSize: 22, color: INK }}>
+                    <b>5</b> similar incidents
+                  </span>
                 </div>
               ),
             },
-          ]}
-        />
-        <Saved label="Saved output, cell 50">Recommendation. Follow-up NDT (mag particle or phased-array) within 14 days</Saved>
-      </div>
+          ].map((c, i) => (
+            <motion.div key={c.k} data-input={c.k} {...fadeUp(1.2 + i * 0.35)} style={{ position: 'absolute', left: 0, top: 40 + i * 122, width: 380 }}>
+              {c.body}
+            </motion.div>
+          ))}
+          {/* three lines run from the inputs into the filter */}
+          <svg width="80" height="340" viewBox="0 0 80 340" style={{ position: 'absolute', left: 384, top: 40, overflow: 'visible' }} aria-hidden>
+            {[50, 168, 282].map((y, i) => (
+              <motion.path key={y} d={`M0 ${y} C40 ${y} 40 120 78 120`} stroke="var(--teal)" strokeWidth="2.6" strokeDasharray="4 6" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 2.0 + i * 0.1, duration: 0.6 }} />
+            ))}
+          </svg>
+          {/* the filter, then the language model */}
+          <motion.div data-filter {...fadeUp(2.3)} style={{ position: 'absolute', left: 466, top: 40, width: 370, padding: '12px 18px', borderRadius: 14, background: 'var(--panel-strong)', border: '2px solid var(--teal)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, ...lit(focusN, 2) }}>
+            <LineIcon name="funnel" size={70} />
+            <div style={{ fontSize: 22, color: INK, textAlign: 'center', lineHeight: 1.35 }}>
+              Use <b style={{ color: TEAL_D }}>ONLY</b> the provided context for facts.
+            </div>
+          </motion.div>
+          <div style={{ position: 'absolute', left: 640, top: 204 }}>
+            <ArrowDown h={36} />
+          </div>
+          <motion.div data-model {...fadeUp(2.8)} style={{ position: 'absolute', left: 466, top: 246, width: 370, padding: '10px 18px', borderRadius: 14, background: TINT, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, ...lit(focusN, 3) }}>
+            <Net w={120} live />
+            <div style={{ fontSize: 22, fontWeight: 700, color: INK }}>the language model</div>
+            <span style={{ ...mono(18, TEAL_D), whiteSpace: 'nowrap' }}>(DRAFT_PROMPT | llm).invoke(…)</span>
+          </motion.div>
+          <div style={{ position: 'absolute', left: 842, top: 320 }}>
+            <Arrow w={44} delay={3.1} />
+          </div>
+          {/* the everyday picture */}
+          <motion.div {...fade(0.6)} style={{ position: 'absolute', left: 0, top: 462, width: 836, height: 178, display: 'grid', gridTemplateColumns: '190px 1fr', gap: 22, alignItems: 'center', borderTop: '1px solid var(--line)', paddingTop: 14, boxSizing: 'border-box' }}>
+            <div style={{ height: 160 }}>
+              <WorkOrder />
+            </div>
+            <div>
+              <div style={label}>In everyday life</div>
+              <div style={{ fontSize: 24, color: INK, lineHeight: 1.45, marginTop: 8 }}>
+                A garage work order has <b>three boxes</b>. The mechanic fills each one, and writes only <b>what the inspection found</b>.
+              </div>
+            </div>
+          </motion.div>
+          {/* the form, the page's main picture */}
+          <motion.div data-form {...fadeUp(0.3)} style={{ position: 'absolute', left: 892, top: 0, width: 508, height: 640, boxSizing: 'border-box', borderRadius: 18, background: 'var(--panel-strong)', border: '2px solid var(--teal)', padding: '22px 28px', display: 'flex', flexDirection: 'column', gap: 16, ...lit(focusN, 1) }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span style={{ fontSize: 30, fontWeight: 700, color: INK }}>The plan form</span>
+              <span style={{ ...mono(18, DIM) }}>class Draft(BaseModel)</span>
+            </div>
+            {DRAFT_FIELDS.map((d, i) => (
+              <div key={d.f} data-field={d.f} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <Num n={i + 1} size={36} />
+                  <span style={{ ...mono(24, TEAL_D), fontWeight: 700 }}>{d.f}</span>
+                </div>
+                <div style={{ fontSize: 20, color: DIM }}>{d.d}</div>
+                <div style={{ flex: 1, minHeight: 56, borderRadius: 10, border: '2px dashed rgba(27,138,156,0.55)', padding: '10px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8, boxSizing: 'border-box' }}>
+                  {i === 0 ? (
+                    <motion.span {...fade(FIELD_AT[0])} style={{ fontSize: 22, color: INK, lineHeight: 1.35 }}>
+                      Follow-up NDT (mag particle or phased-array) within 14 days
+                    </motion.span>
+                  ) : (
+                    (i === 1 ? [100, 92, 60] : [70, 82, 64]).map((w, k) => (
+                      <motion.span key={k} initial={{ width: '0%' }} animate={{ width: `${w}%` }} transition={{ delay: FIELD_AT[i] + k * 0.15, duration: 0.5, ease: EASE }} style={{ height: 8, borderRadius: 4, background: 'rgba(127,127,127,0.3)', display: 'block' }} />
+                    ))
+                  )}
+                </div>
+              </div>
+            ))}
+            <div style={{ fontSize: 16, color: DIM }}>recommendation: saved output, cell 50</div>
+          </motion.div>
+        </FitBox>
+      </Fill>
     </L2Page>
   );
 }
 
-/* ---------------- 2.4h · §2.6 the order lives in the code ---------------- */
+/* ---------------- 2.4h · the order lives in the code ---------------- */
 
+const CALLS = [
+  { t: 'Rate', ms: 2623, code: 'triage, u1 = classify_incident(incident)', by: 'the language model' },
+  { t: 'Fetch', ms: 3512, code: 'chunks = retrieve_context(incident, k=k, asset_filter=asset)', by: 'the database · oracle/V_CHUNKS_UNIFIED' },
+  { t: 'Draft', ms: 25515, code: 'draft, u2 = draft_response(incident, triage, chunks)', by: 'the language model' },
+  { t: 'Format', ms: 0, code: 'report = format_report(incident, triage, draft)', by: 'plain Python, no language model' },
+];
+/** the run replayed in about five seconds, each call's bar in proportion to its time */
+const RUN_FROM = 0.9;
+const RUN_DUR = CALLS.map((c) => Math.max(0.25, (c.ms / 31650) * 4.6));
+const RUN_AT = CALLS.map((_, i) => RUN_FROM + RUN_DUR.slice(0, i).reduce((a, b) => a + b, 0));
+
+/**
+ * The recipe card on the left (same steps, same order; each cake a little different), and on the right the crack
+ * report's one run as a time line: each call's bar fills in turn, in proportion to its time, and its line of
+ * run_workflow lights up as it starts.
+ */
 export function Order(p: L2Props) {
   const focusN = useFocusN(p.focusId);
-  const runs = [
-    { t: 'Rate', f: 'classify', ms: '2,623 ms', by: 'the language model', icon: 'target' as IconName },
-    { t: 'Fetch', f: 'retrieve', ms: '3,512 ms', by: 'oracle/V_CHUNKS_UNIFIED', icon: 'lookup' as IconName },
-    { t: 'Draft', f: 'draft', ms: '25,515 ms', by: 'the language model', icon: 'prompt' as IconName },
-    { t: 'Format', f: 'format', ms: '0 ms', by: 'python', icon: 'clipboard' as IconName },
-  ];
+  const label = { ...cap, fontSize: 17, letterSpacing: '0.14em', marginBottom: 14 };
   return (
     <L2Page testId="l2-order" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
-        <StepRow
-          focusN={focusN}
-          steps={runs.map((r) => ({
-            title: r.t,
-            body: (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
-                <LineIcon name={r.icon} size={88} color={r.by === 'the language model' ? TEAL : '#8a97a3'} />
-                <Chip style={{ fontSize: 22, alignSelf: 'flex-start' }}>{r.f}</Chip>
-                <div style={{ fontSize: 34, fontWeight: 700, color: INK }}>{r.ms}</div>
-                <div style={{ ...mono(17, DIM) }}>{r.by}</div>
-              </div>
-            ),
-          }))}
-        />
-        <motion.div {...fadeUp(2.6)} style={{ alignSelf: 'center', padding: '10px 24px', borderRadius: 999, background: TINT, fontSize: 22, color: INK }}>
-          Same four calls, same order, every run. Format is plain Python, no LLM.
-        </motion.div>
-        <div style={{ fontSize: 15, color: DIM, textAlign: 'center' }}>Timings: saved output, cell 50 (one CPU run)</div>
-      </div>
+      <Fill>
+        <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '330px minmax(0, 1fr)', columnGap: 34, marginTop: 4 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--line)', paddingRight: 28 }}>
+            <div style={label}>In everyday life</div>
+            <motion.div {...fade(0.2)} style={{ flex: 1, minHeight: 170 }}>
+              <Recipe />
+            </motion.div>
+            <div style={{ fontSize: 23, color: INK, lineHeight: 1.4, marginTop: 12 }}>
+              A recipe fixes <b>the steps and their order</b>. Every cake comes out a little different.
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <div style={label}>One run on the crack report · saved output, cell 50</div>
+            <div data-track style={{ display: 'flex', gap: 10, alignItems: 'stretch' }}>
+              {CALLS.map((c, i) => (
+                <motion.div key={c.t} data-call={c.t} {...fade(RUN_AT[i] - 0.3)} style={{ flexGrow: c.ms ? c.ms : 0, flexBasis: 0, minWidth: c.ms ? 170 : 156, display: 'flex', flexDirection: 'column', gap: 8, opacity: focusN === null || focusN === i + 1 ? 1 : 0.4, transition: 'opacity 300ms' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <Num n={i + 1} size={36} />
+                    <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>{c.t}</span>
+                  </div>
+                  <div style={{ height: 30, borderRadius: 8, background: 'rgba(127,127,127,0.14)', overflow: 'hidden' }}>
+                    <motion.div initial={{ width: '0%' }} animate={{ width: '100%' }} transition={{ delay: RUN_AT[i], duration: RUN_DUR[i], ease: 'linear' }} style={{ height: '100%', background: c.by === 'the language model' ? TEAL : 'rgba(27,138,156,0.45)' }} />
+                  </div>
+                  <span style={{ ...mono(22, INK), fontWeight: 700 }}>{c.ms.toLocaleString('en-US')} ms</span>
+                </motion.div>
+              ))}
+            </div>
+            <div style={{ ...label, marginTop: 22 }}>The order, written in run_workflow()</div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {CALLS.map((c, i) => (
+                <motion.div
+                  key={c.t}
+                  data-line={i + 1}
+                  initial={{ opacity: 0.25, backgroundColor: 'rgba(27,138,156,0)', borderColor: 'rgba(127,127,127,0.3)' }}
+                  animate={{ opacity: 1, backgroundColor: 'rgba(27,138,156,0.10)', borderColor: 'rgba(27,138,156,0.85)' }}
+                  transition={{ delay: RUN_AT[i], duration: 0.4 }}
+                  style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '44px minmax(0, 1fr)', columnGap: 16, alignItems: 'center', padding: '6px 18px', borderRadius: 12, border: '2px solid', boxShadow: focusN === i + 1 ? '0 0 0 6px rgba(27,138,156,0.22)' : 'none' }}
+                >
+                  <Num n={i + 1} size={40} />
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ ...mono(21, INK), overflowWrap: 'anywhere' }}>{c.code}</div>
+                    <div style={{ fontSize: 20, color: TEAL_D, marginTop: 4 }}>
+                      {c.t} · {c.by}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Fill>
     </L2Page>
   );
 }
