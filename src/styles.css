@@ -223,23 +223,26 @@ code,
 .title__org { margin-top: 14px; font-size: 20px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-dim); }
 
 /* 0.2 legend: the count, and the seven districts by name, at once */
-.legend { position: absolute; left: 48px; bottom: 170px; width: 470px; padding: 22px 26px; border-radius: 14px; background: var(--panel); font-size: 18px; }
-.legend__count { color: var(--ink-dim); margin-bottom: 14px; }
-.legend__big { font-size: 56px; font-weight: 600; color: #fff; margin-right: 8px; font-family: var(--font-mono); }
-.legend__districts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 22px; }
+.legend { position: absolute; left: 48px; bottom: 170px; width: 580px; padding: 22px 26px; border-radius: 14px; background: var(--panel); font-size: 22px; }
+/* the script is off: down to the corner buttons' line */
+.legend.is-low { bottom: 96px; }
+.legend__count { color: var(--ink-dim); margin-bottom: 16px; }
+.legend__big { font-size: 76px; font-weight: 600; color: #fff; margin-right: 8px; font-family: var(--font-mono); }
+.legend__districts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 28px; }
 .legend__row { display: flex; align-items: center; gap: 10px; color: var(--ink); }
-.legend__row i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; background: var(--teal); box-shadow: 0 0 10px var(--teal); }
+.legend__row i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: var(--teal); box-shadow: 0 0 10px var(--teal); }
 
 /* 0.3 counters: a band along the bottom, above the script bar; three big numbers side by side */
 .counters { position: absolute; left: 48px; right: 48px; bottom: 170px; padding: 20px 30px 18px; border-radius: 14px; background: var(--panel); }
-.counters__day { font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 8px; }
+.counters.is-low { bottom: 96px; }
+.counters__day { font-size: 15px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 8px; }
 .counters__rows { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
 .counters__row { min-width: 0; }
-.counters__n { font-size: 64px; line-height: 1; color: #fff; }
-.counters__label { font-size: 18px; color: var(--ink-dim); margin: 4px 0 8px; }
-.counters__bar { height: 3px; background: rgba(255,255,255,0.08); }
+.counters__n { font-size: 80px; line-height: 1; color: #fff; }
+.counters__label { font-size: 22px; color: var(--ink-dim); margin: 6px 0 10px; }
+.counters__bar { height: 4px; background: rgba(255,255,255,0.08); }
 .counters__bar div { height: 100%; background: var(--teal); transition: width 120ms linear; }
-.counters__note { font-size: 19px; color: var(--ink); margin-top: 16px; border-left: 3px solid var(--teal); padding-left: 12px; }
+.counters__note { font-size: 23px; color: var(--ink); margin-top: 16px; border-left: 3px solid var(--teal); padding-left: 12px; }
 /* teal, not red: the Ops Center pin is this page's one red thing */
 .counters__note b { color: var(--teal); }
 
@@ -263,15 +266,15 @@ code,
 
 /* 0.6 small brain */
 .brain { position: absolute; right: 48px; top: 50%; transform: translateY(-50%); }
-.brain__card { width: 480px; padding: 26px 28px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; backdrop-filter: blur(8px); }
+.brain__card { width: 600px; padding: 32px 36px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; backdrop-filter: blur(8px); }
 .brain__kicker { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-dim); }
-.brain__name { font-size: 40px; font-weight: 600; color: #fff; margin: 0 0 12px; }
+.brain__name { font-size: 50px; font-weight: 600; color: #fff; margin: 0 0 16px; }
 .brain__facts { list-style: none; margin: 0; padding: 0; }
-.brain__facts li { padding: 10px 0; border-top: 1px solid var(--line); font-size: 24px; color: var(--ink); }
+.brain__facts li { padding: 15px 0; border-top: 1px solid var(--line); font-size: 29px; color: var(--ink); }
 .brain__facts b, .brain__line b { color: var(--teal); font-weight: 700; }
 .brain__gauge { display: block; margin: 0 auto; }
 .brain__speed { text-align: center; font-size: 15px; color: #fff; margin-top: -8px; }
-.brain__line { margin-top: 14px; font-size: 24px; color: var(--ink); line-height: 1.45; border-left: 2px solid var(--red); padding-left: 10px; }
+.brain__line { margin-top: 20px; font-size: 29px; color: var(--ink); line-height: 1.45; border-left: 2px solid var(--red); padding-left: 10px; }
 
 /* 0.7 markers */
 .markers { position: absolute; right: 48px; top: 110px; width: 440px; }
@@ -305,6 +308,8 @@ code,
 /* (the strip keeps its backing in both themes: it sits over the city) */
 :root[data-theme='light'] .tag { background: var(--panel); }
 :root[data-theme='light'] .title { left: 48px; bottom: 150px; padding: 36px 44px; }
+/* the script is off: the title card steps down to the corner buttons' line */
+.title.title--low, :root[data-theme='light'] .title.title--low { bottom: 96px; }
 
 /* database diorama labels */
 .dio-label { font-size: 19px; font-weight: 500; color: var(--ink-dim); white-space: nowrap; letter-spacing: 0.02em; transition: color 300ms; }
@@ -379,6 +384,19 @@ code,
 .sky-label { white-space: nowrap; padding: 6px 12px; border-radius: 8px; background: var(--panel-strong); border-left: 3px solid var(--tone); color: var(--ink); font-size: 16px; transition: opacity 0.5s ease; }
 /* compact beat panel: the 3D carries the idea, the panel only names it */
 .beat__panel--compact { width: 560px; padding: 20px 24px; }
+/* the chat pages (CopilotChat): the panel runs from the strip to above the script, the chat window takes the rest;
+   with the script off it runs down to the corner buttons and the type grows */
+.beat__panel--tall { top: 104px; bottom: 170px; max-height: none; display: flex; flex-direction: column; }
+.beat__panel--tall.is-free { bottom: 96px; }
+.beat__panel--tall > * { flex: none; }
+.beat__panel--tall .beat__kicker { font-size: min(calc(14px * var(--chat-k, 1)), 18px); }
+.beat__panel--tall .beat__headline { font-size: min(calc(30px * var(--chat-k, 1)), 37px); }
+.beat__panel--tall .beat__notebook { font-size: min(calc(14px * var(--chat-k, 1)), 18px); }
+/* 3.0 the cast: same place, larger type with the script off (the panel stays beside the rust) */
+.beat__panel--cast { max-height: none; --cast-k: 1.06; }
+.beat__panel--cast.is-free { --cast-k: 1.22; }
+.beat__panel--cast .beat__kicker { font-size: calc(14px * var(--cast-k)); }
+.beat__panel--cast .beat__headline { font-size: calc(30px * var(--cast-k)); }
 
 /* Camera mode bar */
 .cam-edit { position: absolute; left: 50%; top: 24px; transform: translateX(-50%); width: 1080px; padding: 14px 18px; border-radius: 12px; background: rgba(15, 20, 28, 0.9); color: #f3f1ec; display: flex; flex-direction: column; gap: 10px; z-index: 40; }
@@ -397,6 +415,9 @@ code,
 .qb__bubble, .qb__arrows, .qb__shape { left: 64%; }
 .qb__line { bottom: 150px; font-size: 26px; }
 .qb .tag { top: 110px; bottom: auto; }
+/* the script is off: the page's line steps down to the corner buttons' line */
+/* centred by margins, not a transform: the fade-in's own transform would undo translateX(-50%) */
+.qb__line.is-low { bottom: 96px; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: 1500px; transform: none; font-size: 28px; }
 /* 0.4: the inspector's question, anchored in 3D */
 .q3d { width: 520px; padding: 16px 20px; border-radius: 14px; background: var(--panel-strong); border: 1px solid var(--line); box-shadow: 0 6px 24px rgba(0,0,0,0.18); text-align: center; }
 .q3d__who { font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 6px; }

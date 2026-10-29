@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { UNIFIED_PARTS } from '../../content/lab2Tools';
 import { BRIEF_AT, DB_WIDE, UNIFIED_PANELS, px, py, skyScreen } from '../../world/skyPlaces';
 import { Rich } from '../Rich';
+import { useUiStore } from '../../engine/ui';
 
 const fade = (delay: number) => ({ initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.45 } });
 const line = (delay: number) => ({ initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { delay, duration: 0.5 } });
@@ -15,6 +16,8 @@ const BRIEF = { w: 0.36, h: 0.34 };
  */
 export function UnifiedQuery({ message }: { message?: string }) {
   const db = skyScreen(DB_WIDE);
+  // the script is off: the bottom of the screen is free for the page's line, just above the corner buttons
+  const low = useUiStore((s) => !s.scriptOpen);
   const bx0 = BRIEF_AT.x - BRIEF.w / 2;
   const by1 = BRIEF_AT.y + BRIEF.h / 2;
   void bx0;
@@ -57,9 +60,12 @@ export function UnifiedQuery({ message }: { message?: string }) {
           ))}
         </ul>
       </motion.div>
-      <motion.div className="qb__line" {...fade(5.2)}>
-        <Rich text={message ?? '**One call, four data models, one transaction.** No ETL, no sync jobs, no stale copies.'} />
-      </motion.div>
+      {/* the page's line, once the script is off: with the script on, the script says these same words */}
+      {low && (
+        <motion.div className="qb__line is-low" {...fade(5.2)}>
+          <Rich text={message ?? '**One call, four data models, one transaction.** No ETL, no sync jobs, no stale copies.'} />
+        </motion.div>
+      )}
     </div>
   );
 }

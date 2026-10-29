@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { useSceneStore } from '../../engine/store';
+import { useUiStore } from '../../engine/ui';
 
 /** how long the day's data takes to come in (DataStream on this page uses the same) */
 export const STREAM_MS = 4000;
@@ -11,13 +12,15 @@ export const STREAM_MS = 4000;
  */
 export function DataCounters() {
   const c = useSceneStore((s) => s.counters);
+  // the script is off: the bottom of the screen is free, so this steps down towards the corner buttons
+  const low = useUiStore((s) => !s.scriptOpen);
   const rows = [
     { n: c.logs, label: 'maintenance logs', max: 308 },
     { n: c.reports, label: 'inspection reports', max: 60 },
     { n: c.findings, label: 'findings', max: 220 },
   ];
   return (
-    <motion.div className="counters" data-testid="data-counters" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.45 }}>
+    <motion.div className={`counters${low ? ' is-low' : ''}`} data-testid="data-counters" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.45 }}>
       <div className="counters__day">in 24 hours</div>
       <div className="counters__rows">
         {rows.map((r) => (
