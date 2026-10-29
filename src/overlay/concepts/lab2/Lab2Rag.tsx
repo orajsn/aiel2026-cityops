@@ -7,7 +7,7 @@ import {
   cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props,
 } from './parts';
 import { Fill, FitBox } from '../Fill';
-import { BigFolder, Cabinet, DeskPerson, Pile } from './ragArt';
+import { BigFolder, CAB_DARK, CAB_GREY, CAB_LIGHT, Cabinet, DeskPerson, Pile } from './ragArt';
 
 /**
  * Lab 2 · RAG, the filing cabinet (the deck's chapter 4): look it up before answering, then the notebook's
@@ -687,109 +687,160 @@ export function Checkable(p: L2Props) {
 
 /* ---------------- 2.4, 2.4a, 2.4b · a question is not a job ---------------- */
 
-function RowLabel({ title, sub }: { title: string; sub: ReactNode }) {
+/** a balance scale: escalate on one pan, monitor on the other; it tips slowly once (a judgment, not a search) */
+function Scale() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <span style={{ ...cap, fontSize: 14 }}>{title}</span>
-      <span style={{ fontSize: 22, fontWeight: 600, color: INK, lineHeight: 1.3 }}>{sub}</span>
-    </div>
+    <svg width="120" height="84" viewBox="0 0 120 84" aria-hidden style={{ flex: 'none', overflow: 'visible' }}>
+      <path d="M60 14v62M40 80h40" stroke={CAB_DARK} strokeWidth="4" strokeLinecap="round" />
+      <motion.g style={{ transformOrigin: '60px 16px' }} initial={{ rotate: 0 }} animate={{ rotate: [0, -7, 4, -3] }} transition={{ delay: 1.6, duration: 2.4, ease: 'easeInOut' }}>
+        <path d="M14 16h92" stroke={CAB_DARK} strokeWidth="4" strokeLinecap="round" />
+        <path d="M14 16l-10 26h20zM106 16l-10 26h20z" fill="none" stroke={CAB_GREY} strokeWidth="2" />
+        <path d="M2 42h24a12 6 0 0 1-24 0z" fill={TEAL} />
+        <path d="M94 42h24a12 6 0 0 1-24 0z" fill={CAB_GREY} />
+      </motion.g>
+      <circle cx="60" cy="14" r="5" fill={CAB_DARK} />
+    </svg>
   );
 }
 
+/** a clipboard with a ticked list: the fixed checklist (a workflow) */
+function Clipboard({ w = 74 }: { w?: number }) {
+  return (
+    <svg width={w} height={w * 1.2} viewBox="0 0 60 72" aria-hidden style={{ flex: 'none' }}>
+      <rect x="4" y="8" width="52" height="62" rx="5" fill={CAB_LIGHT} />
+      <rect x="10" y="14" width="40" height="50" rx="2" fill="#fff" />
+      <rect x="20" y="3" width="20" height="10" rx="3" fill={CAB_DARK} />
+      {[24, 36, 48].map((y) => (
+        <g key={y}>
+          <path d={`M14 ${y}l3 3 5-6`} stroke={TEAL} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <path d={`M26 ${y}h18`} stroke={CAB_GREY} strokeWidth="3" strokeLinecap="round" />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+const JOBS: { n: number; t: string; tag: string; sub: string; pic: ReactNode }[] = [
+  {
+    n: 1, t: 'Recurring?', tag: 'RAG × many', sub: 'many retrievals, then compare',
+    pic: (
+      <div style={{ display: 'flex', gap: 6 }}>
+        {['Mar', 'Apr', 'Jun', 'Jul'].map((m) => (
+          <div key={m} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <Folder size={46} />
+            <span style={{ fontSize: 16, color: DIM }}>{m}</span>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    n: 2, t: 'Cross-check work orders', tag: 'RAG again', sub: 'a second, independent lookup',
+    pic: (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+        <Chip style={{ fontSize: 19 }}>Findings</Chip>
+        <span style={{ color: TEAL, fontSize: 24, lineHeight: 1 }}>⇅</span>
+        <Chip style={{ fontSize: 19 }}>Work orders</Chip>
+      </div>
+    ),
+  },
+  { n: 3, t: 'Escalate?', tag: 'needs judgment', sub: 'escalate or monitor: a judgment', pic: <Scale /> },
+];
+const JOB_Y = (i: number) => 196 + i * 140;
+
 export function NotAJob(p: L2Props) {
   const step = p.step ?? 1;
+  const job = upTo(step, 2);
+  const coord = upTo(step, 3);
   return (
     <L2Page testId="l2-job" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
-        {/* a lookup */}
-        <motion.div data-row="lookup" {...fadeUp(0.2)} style={{ ...card(), padding: '14px 22px', display: 'grid', gridTemplateColumns: '300px 50px minmax(0, 1fr) 50px minmax(0, 1fr) 50px minmax(0, 1fr)', alignItems: 'center', gap: 8 }}>
-          <RowLabel title="A lookup" sub="“What does the record say?”" />
-          <Arrow w={44} delay={0.5} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Folder size={40} />
-            <div>
-              <div style={{ fontSize: 21, fontWeight: 700, color: INK }}>1 retrieval</div>
-              <div style={{ fontSize: 17, color: DIM }}>find the right folder</div>
-            </div>
-          </div>
-          <Arrow w={44} delay={0.9} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Net w={64} />
-            <div>
-              <div style={{ fontSize: 21, fontWeight: 700, color: INK }}>1 LLM call</div>
-              <div style={{ fontSize: 17, color: DIM }}>answer from it</div>
-            </div>
-          </div>
-          <Arrow w={44} delay={1.3} />
-          <div style={{ fontSize: 21, fontWeight: 700, color: TEAL_D }}>Grounded answer · done</div>
-        </motion.div>
-        {/* a job: three jobs hide inside it */}
-        <motion.div data-row="job" {...reveal(upTo(step, 2), 0.2)} style={{ ...card(true), padding: '14px 22px', flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '300px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', gap: 18 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>
-            <RowLabel title="A job" sub="“What is the status of this bridge?”" />
-            <span style={{ fontSize: 19, color: TEAL_D, fontWeight: 600 }}>…hides three jobs ▾</span>
-          </div>
-          {[
-            {
-              n: 1, t: 'Recurring?', tag: 'RAG × many', sub: 'many retrievals, then compare',
-              pic: (
-                <div style={{ display: 'flex', gap: 8 }}>
-                  {['Mar', 'Apr', 'Jun', 'Jul'].map((m) => (
-                    <div key={m} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                      <Folder size={58} />
-                      <span style={{ fontSize: 17, color: DIM }}>{m}</span>
-                    </div>
-                  ))}
-                </div>
-              ),
-              q: 'same failure again?',
-            },
-            {
-              n: 2, t: 'Cross-check work orders', tag: 'RAG again', sub: 'a second, independent lookup',
-              pic: (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18, color: INK, flexWrap: 'wrap' }}>
-                  <Chip style={{ fontSize: 21 }}>Findings</Chip>
-                  <span style={{ color: TEAL, fontSize: 30 }}>⇄</span>
-                  <Chip style={{ fontSize: 21 }}>Work orders</Chip>
-                </div>
-              ),
-            },
-            {
-              n: 3, t: 'Escalate?', tag: 'needs judgment', sub: 'a judgment, not a search',
-              pic: (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18 }}>
-                  <Chip style={{ fontSize: 21 }}>escalate?</Chip>
-                  <span style={{ color: DIM }}>or</span>
-                  <Chip dim style={{ fontSize: 21 }}>monitor</Chip>
-                </div>
-              ),
-            },
-          ].map((j, i) => (
-            <motion.div key={j.t} data-subjob={j.n} {...reveal(upTo(step, 2), 0.5 + i * 0.35)} style={{ ...card(), background: CARD, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Num n={j.n} size={32} />
-                <span style={{ fontSize: 22, fontWeight: 700, color: INK }}>{j.t}</span>
+      <Fill>
+        <FitBox w={1400} h={620} max={1.06}>
+          <div style={{ position: 'relative', width: 1400, height: 620 }}>
+            {/* a lookup: one trip to the cabinet and back */}
+            <motion.div data-row="lookup" {...fadeUp(0.2)} style={{ ...at(0, 0, 1400), height: 160, display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px', boxSizing: 'border-box', ...card(), background: SOFT }}>
+              <div style={{ width: 112, flex: 'none' }}>
+                <div style={{ ...cap, fontSize: 16 }}>A lookup</div>
+                <div style={{ fontSize: 22, color: DIM }}>one trip</div>
               </div>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>{j.pic}</div>
-              <div style={{ fontSize: 20, color: DIM }}>{j.sub}</div>
-              <span style={{ alignSelf: 'flex-start', padding: '3px 12px', borderRadius: 999, background: TINT2, color: TEAL_D, fontSize: 16, fontWeight: 700 }}>{j.tag}</span>
+              <Portrait who="vance" size={84} />
+              <div style={{ fontSize: 23, padding: '10px 16px', borderRadius: 14, border: `2px solid ${TEAL}`, background: CARD, color: INK, whiteSpace: 'nowrap' }}>“What does the record say?”</div>
+              <Arrow w={38} delay={0.6} />
+              <motion.div {...fadeUp(0.8)} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Cabinet w={58} lit={[1]} />
+                <Folder size={46} />
+                <div style={{ whiteSpace: 'nowrap' }}>
+                  <div style={{ fontSize: 23, fontWeight: 700, color: INK }}>1 retrieval</div>
+                  <div style={{ fontSize: 19, color: DIM }}>the right folder</div>
+                </div>
+              </motion.div>
+              <Arrow w={38} delay={1.2} />
+              <motion.div {...fadeUp(1.4)} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Net w={70} />
+                <div style={{ whiteSpace: 'nowrap' }}>
+                  <div style={{ fontSize: 23, fontWeight: 700, color: INK }}>1 LLM call</div>
+                  <div style={{ fontSize: 19, color: DIM }}>answer from it</div>
+                </div>
+              </motion.div>
+              <Arrow w={38} delay={1.8} />
+              <motion.span {...fadeUp(2)} style={{ fontSize: 23, fontWeight: 700, color: '#fff', background: TEAL, borderRadius: 999, padding: '8px 18px', whiteSpace: 'nowrap' }}>done ✓</motion.span>
             </motion.div>
-          ))}
-        </motion.div>
-        {/* something has to coordinate it */}
-        <motion.div data-row="coordinate" {...reveal(upTo(step, 3), 0.2)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 26, padding: '6px 0' }}>
-          <span style={{ fontSize: 24, fontWeight: 700, color: INK }}>Something has to coordinate it all:</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, ...card(), padding: '8px 18px' }}>
-            <LineIcon name="clipboard" size={40} color="#8a97a3" />
-            <span style={{ fontSize: 22, fontWeight: 700, color: INK }}>Checklist</span>
+
+            {/* a job: Vance's real question opens into three jobs */}
+            <motion.div data-row="job" {...reveal(job, 0.2)} style={{ ...at(0, 300, 380), display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div>
+                <div style={{ ...capTeal, fontSize: 16 }}>A job</div>
+                <div style={{ fontSize: 22, color: DIM }}>…hides three jobs</div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <Portrait who="vance" size={84} />
+                <div style={{ fontSize: 24, lineHeight: 1.3, padding: '10px 18px', borderRadius: 14, border: `2px solid ${TEAL}`, background: TINT, color: INK }}>“What is the status of this bridge?”</div>
+              </div>
+            </motion.div>
+            <svg width={1400} height={620} viewBox="0 0 1400 620" aria-hidden style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none' }}>
+              {JOBS.map((_, i) => (
+                <motion.path key={`b${i}`} d={`M390 420 C 430 420, 410 ${JOB_Y(i) + 60}, 452 ${JOB_Y(i) + 60}`} fill="none" stroke={job ? TEAL : 'rgba(127,127,127,0.25)'} strokeWidth={3} strokeDasharray="6 6" initial={{ pathLength: 0 }} animate={{ pathLength: job ? 1 : 0 }} transition={{ delay: 0.5 + i * 0.3, duration: 0.6, ease: EASE }} />
+              ))}
+              {JOBS.map((_, i) => (
+                <motion.path key={`c${i}`} d={`M1022 ${JOB_Y(i) + 60} C 1066 ${JOB_Y(i) + 60}, 1050 400, 1094 400`} fill="none" stroke={TEAL} strokeWidth={3} initial={{ pathLength: 0 }} animate={{ pathLength: coord ? 1 : 0 }} transition={{ delay: 0.3 + i * 0.2, duration: 0.6, ease: EASE }} />
+              ))}
+            </svg>
+            {JOBS.map((j, i) => (
+              <motion.div key={j.t} data-subjob={j.n} {...reveal(job, 0.6 + i * 0.35)} style={{ ...at(452, JOB_Y(i), 570), height: 128, boxSizing: 'border-box', ...card(), background: CARD, padding: '10px 18px', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', columnGap: 16 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <Num n={j.n} size={34} />
+                    <span style={{ fontSize: 24, fontWeight: 700, color: INK }}>{j.t}</span>
+                  </div>
+                  <div style={{ fontSize: 19, color: DIM, lineHeight: 1.3 }}>{j.sub}</div>
+                  <span style={{ alignSelf: 'flex-start', padding: '2px 12px', borderRadius: 999, background: TINT2, color: TEAL_D, fontSize: 16, fontWeight: 700 }}>{j.tag}</span>
+                </div>
+                {j.pic}
+              </motion.div>
+            ))}
+
+            {/* who coordinates: a checklist, or the chief inspector */}
+            <motion.div data-row="coordinate" {...reveal(coord, 0.9)} style={{ ...at(1094, 196, 306), height: 400, boxSizing: 'border-box', ...card(true), background: TINT, padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 14, justifyContent: 'center' }}>
+              <div style={{ fontSize: 24, fontWeight: 700, color: INK, lineHeight: 1.25 }}>Something has to coordinate it all:</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, ...card(), background: CARD, padding: '8px 14px' }}>
+                <Clipboard w={56} />
+                <div>
+                  <div style={{ fontSize: 23, fontWeight: 700, color: INK }}>Checklist</div>
+                  <div style={{ fontSize: 18, color: DIM }}>a workflow</div>
+                </div>
+              </div>
+              <div style={{ fontSize: 20, color: DIM, textAlign: 'center' }}>or</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, ...card(true), background: CARD, padding: '8px 14px' }}>
+                <ChiefInspector size={64} />
+                <div>
+                  <div style={{ fontSize: 23, fontWeight: 700, color: INK }}>Chief inspector</div>
+                  <div style={{ fontSize: 18, color: DIM }}>an agent</div>
+                </div>
+              </div>
+            </motion.div>
           </div>
-          <span style={{ fontSize: 20, color: DIM }}>or</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, ...card(true), background: TINT, padding: '6px 18px' }}>
-            <ChiefInspector size={52} />
-            <span style={{ fontSize: 22, fontWeight: 700, color: INK }}>Chief inspector</span>
-          </div>
-        </motion.div>
-      </div>
+        </FitBox>
+      </Fill>
     </L2Page>
   );
 }
