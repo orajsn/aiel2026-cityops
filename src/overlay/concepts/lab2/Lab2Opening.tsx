@@ -3,13 +3,14 @@ import type { ReactNode } from 'react';
 import { EASE } from '../WidePanel';
 import { LineIcon, type IconName } from '../icons';
 import {
-  Arrow, CARD, ChiefInspector, Chip, CrackPlate, DIM, Folder, INK, L2Page, Net, Portrait, RED, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
+  Arrow, CARD, ChiefInspector, Chip, DIM, Folder, INK, L2Page, Net, RED, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
   cap, capTeal, card, fade, fadeUp, mono, useFocusN, type L2Props,
 } from './parts';
 import { RouteMap } from './RouteMap';
 import { Ladder, WhyLayers } from './WhyArt';
 import { Bench, SiteCheck } from './BenchArt';
 import { CaseFile, ThreeDrills } from './SeesArt';
+import { CrackReport, WhatProves } from './StoryArt';
 
 /**
  * Lab 2 · the opening chapters of the Harbor Bridge deck: Story (one crack), Why (AI needs your data), and Setup
@@ -52,79 +53,13 @@ export const ROUTE: { n: number; ch: string; name: string; kinds: ('idea' | 'not
 ];
 
 
-function CrackFacts({ compact = false }: { compact?: boolean }) {
-  return (
-    <div style={{ display: 'flex', gap: compact ? 22 : 34, alignItems: 'center' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <div data-fact="width" style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-          <span style={{ fontSize: compact ? 44 : 92, fontWeight: 700, color: INK, lineHeight: 1.1 }}>0.12</span>
-          <span style={{ fontSize: compact ? 20 : 28, color: DIM }}>mm</span>
-        </div>
-        <span style={{ fontSize: compact ? 16 : 20, color: DIM }}>reported crack width</span>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <div data-fact="length" style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-          <span style={{ fontSize: compact ? 44 : 92, fontWeight: 700, color: INK, lineHeight: 1.1 }}>85</span>
-          <span style={{ fontSize: compact ? 20 : 28, color: DIM }}>mm</span>
-        </div>
-        <span style={{ fontSize: compact ? 16 : 20, color: DIM }}>reported crack length</span>
-      </div>
-    </div>
-  );
-}
-
 export function CrackStory(p: L2Props) {
   const step = p.step ?? 1;
   return (
     <L2Page testId="l2-story" hasRed={step === 1} {...p}>
-      <Swap k={step === 3 ? 'route' : 'crack'}>
+      <Swap k={step}>
         {step < 3 ? (
-          <div style={{ flex: 1, display: 'grid', gridTemplateRows: step === 1 ? '1fr' : 'auto 1fr', gap: 18, minHeight: 0 }}>
-            {/* Mercer reports the crack: a drawing, the two numbers, the facts */}
-            <motion.div layout transition={{ duration: 0.5, ease: EASE }} style={{ display: 'grid', gridTemplateColumns: step === 1 ? '320px minmax(0, 1fr) minmax(0, 1fr)' : '220px 220px minmax(0, 1fr)', gap: 28, alignItems: 'center', ...card(), padding: step === 1 ? '24px 30px' : '14px 22px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, textAlign: 'center' }}>
-                <Portrait who="mercer" size={step === 1 ? 210 : 72} />
-                <div style={{ fontSize: step === 1 ? 30 : 19, fontWeight: 700, color: INK }}>Mercer</div>
-                {step === 1 && <div style={{ fontSize: 22, color: DIM }}>senior inspector, reports the crack</div>}
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                {/* the crack is the page's one red thing on the first click; after that the question takes over */}
-                <CrackPlate w={step === 1 ? 520 : 200} red={step === 1} />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <CrackFacts compact={step > 1} />
-                <div style={{ fontSize: step === 1 ? 26 : 18, color: INK, lineHeight: 1.4 }}>
-                  South side · weld seam between girder and bearing plate
-                  <br />
-                  <span style={{ color: DIM }}>No visible movement · no lane closure</span>
-                </div>
-              </div>
-            </motion.div>
-            {step === 2 && (
-              <div data-evidence style={{ display: 'grid', gridTemplateColumns: '270px minmax(0, 1fr) 60px 300px', gap: 22, alignItems: 'stretch', minHeight: 0, padding: '10px 0' }}>
-                <motion.div {...fadeUp(0.2)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, textAlign: 'center' }}>
-                  <Portrait who="vance" size={130} />
-                  <div style={{ fontSize: 22, fontWeight: 700, color: INK }}>Vance asks</div>
-                  <div style={{ fontSize: 22, lineHeight: 1.35, padding: '12px 16px', borderRadius: 14, background: 'rgba(31,42,51,0.92)', color: '#fff' }}>“What should operations do, and what proves it?”</div>
-                </motion.div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 14 }}>
-                  {EVIDENCE.map((e, i) => (
-                    <motion.div key={e.label} data-kind={e.label} {...fadeUp(0.6 + i * 0.25)} style={{ ...card(true), padding: '20px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, textAlign: 'center' }}>
-                      <LineIcon name={e.icon} size={72} />
-                      <div style={{ fontSize: 21, fontWeight: 700, color: INK, overflowWrap: 'anywhere' }}>{e.label}</div>
-                      
-                    </motion.div>
-                  ))}
-                </div>
-                <Arrow w={56} delay={2} />
-                <motion.div data-brief {...fadeUp(2.2)} style={{ ...card(true), background: TINT, padding: '24px 22px', display: 'flex', flexDirection: 'column', gap: 14, alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                  <LineIcon name="clipboard" size={96} />
-                  <div style={{ fontSize: 26, fontWeight: 700, color: INK }}>One incident brief</div>
-                  <div style={{ fontSize: 19, color: DIM }}>before anyone recommends anything</div>
-                </motion.div>
-              </div>
-            )}
-          </div>
+          step === 1 ? <CrackReport /> : <WhatProves kinds={EVIDENCE.map((e) => e.label)} />
         ) : (
           <div data-route style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             <RouteMap stops={ROUTE} />
