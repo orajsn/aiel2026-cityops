@@ -108,7 +108,7 @@ test('Lab 3 page 15: a closed tab first; opening it shows the notebook cells wit
 });
 
 test('Lab 2 page 4: the optional section says it is optional', () => {
-  const { container, getByRole } = render(<JupyterDrawer sceneId="2.4" />);
+  const { container, getByRole } = render(<JupyterDrawer sceneId="2.4b" />);
   fireEvent.click(getByRole('button', { name: /(run|open) in jupyter/i }));
   expect(container.querySelector('.jd__file')?.textContent).toContain('rag_to_agents_lab.ipynb');
   expect(container.querySelector('.jd__todo-line')?.textContent).toMatch(/optional/i);

@@ -39,7 +39,8 @@ const SCOPE_GUIDE: GuideBlock[] = [
 export const LAB_GUIDE: Record<string, GuideBlock[]> = {
   // Lab 2 · rag_to_agents_lab.ipynb, from the owner's Thai block-by-block guide
   // page 2.1 · Section 0: prerequisites and the readiness probe
-  '2.1': [
+  // owner, 29 Oct: Lab 2 now follows the deck; this run-it-yourself stop sits on the page whose band says "Next in the notebook" for it
+  '2.1a': [
     { cell: 4, title: '0.4 Configuration', note: 'The lab’s one settings panel: which database, which model, and which incident to try (by default, the crack on Harbor Bridge). Change a value here, and run the cells that use it again.' },
     { cell: 6, title: '0.5 Imports and helpers', note: 'Basic tools for the notebook: show a table, tidy JSON, show the agent’s trace. extract_json pulls the JSON out of a model’s answer, even when it adds words around it. No AI yet.' },
     { cell: 8, title: '0.6 Connect to Oracle', note: 'Connects, then reads the version and the user, to prove we reached the right database.' },
@@ -49,7 +50,8 @@ export const LAB_GUIDE: Record<string, GuideBlock[]> = {
     { cell: 17, title: '0.10 Connect to Ollama', note: 'Asks the model to reply READY, to prove Ollama answers. It tests the connection, not how well the model reasons.' },
   ],
   // page 2.2 · Section 1.2 to 1.5: embeddings and the retriever
-  '2.2': [
+  // owner, 29 Oct: Lab 2 now follows the deck; this run-it-yourself stop sits on the page whose band says "Next in the notebook" for it
+  '2.2b': [
     { cell: 21, title: '1.2 Embed a query', note: 'Turns a sentence into numbers that stand for its meaning, inside Oracle. What you see is the vector’s size, not an answer.' },
     {
       cell: 23,
@@ -71,20 +73,23 @@ export const LAB_GUIDE: Record<string, GuideBlock[]> = {
     { cell: 36, title: '1.9 Ask a grounded question', note: 'The whole path at once: the answer, with the passages it used. Try it: pick one claim in the answer and find it in the sources.' },
   ],
   // page 2.4 · Section 2 (optional): the workflow
-  '2.4': [
+  // owner, 29 Oct: Lab 2 now follows the deck; this run-it-yourself stop sits on the page whose band says "Next in the notebook" for it
+  '2.4b': [
     { cell: 43, title: '2.3 The classifier', note: 'The model reads the incident and rates it routine, warning or critical, with a reason. Pydantic checks the answer has the right shape, and asks again if not: it checks the shape, not whether the rating is right.' },
     { cell: 46, title: '2.5 The drafter', note: 'With the rating and the evidence, the model drafts three things: a recommendation, its rationale, and next steps. It reuses retrieve_context: no new search code.' },
     { cell: 48, title: '2.6 Formatter and pipeline', note: 'run_workflow runs the steps in a fixed order, Classify → Retrieve → Draft → Format, and times each one. The formatter is plain Python: not every step needs a model.' },
     { cell: 50, title: '2.7 Run the workflow', note: 'One incident through the whole pipeline: the report, and a trace of each step’s time and tokens. The path is fixed: the model never picks a tool.' },
   ],
   // page 2.5 · Section 3: tools and the skill
-  '2.5': [
+  // owner, 29 Oct: Lab 2 now follows the deck; this run-it-yourself stop sits on the page whose band says "Next in the notebook" for it
+  '2.5b': [
     { cell: 55, title: '3.2 The data tools', note: '@tool turns a Python function into a tool the model can choose: it sees the name, the inputs and the docstring. The model asks; Python runs it. Here: get_asset_overview, get_connected_assets, search_incidents_semantic.' },
     { cell: 57, title: '3.2 Recent incidents', note: 'get_recent_incidents looks back by time: what happened lately. Semantic search looks by meaning: what was like this.' },
     { cell: 60, title: '3.3 The skill', note: 'INCIDENT_TRIAGE_SKILL is the agent’s procedure: recall memory, pull the brief, search more if needed, remember, then answer. Its escalation rule is the lab’s example policy, not an engineering standard.' },
   ],
   // page 2.6 · Section 4: the unified query
-  '2.6': [
+  // owner, 29 Oct: Lab 2 now follows the deck; this run-it-yourself stop sits on the page whose band says "Next in the notebook" for it
+  '2.6a': [
     {
       cell: 63,
       title: '4.3 The unified query',

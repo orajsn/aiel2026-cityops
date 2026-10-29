@@ -109,7 +109,7 @@ const setup: SceneDef[] = [
 
 /* ---------------- §1 RAG · the filing cabinet ---------------- */
 const RAG2 = { shot: 'sky', world: sky('embed'), sameAngleAs: '2.2' };
-const RAG3 = { shot: 'sky', world: sky('envelope'), sameAngleAs: '2.3' };
+const RAG3 = { shot: 'sky', world: sky('embed'), sameAngleAs: '2.3' };
 const rag: SceneDef[] = [
   page({ id: '2.2', title: 'Look it up before answering', overlay: 'L2Rag', group: 'l2-rag', ...RAG2, sameAngleAs: undefined, props: { kicker: K.rag, step: 1, message: 'Look it up before answering: **RAG**.', takeaway: 'RAG fetches **the right evidence** before answering. Retrieval quality decides answer quality.', terms: [['Filing cabinet', 'Vector index over document chunks'], ['Pulling the right folder', 'Retrieval'], ['Answering from the folder', 'Grounded generation']] } }),
   page({ id: '2.2a', title: 'Not every file', overlay: 'L2Rag', group: 'l2-rag', ...RAG2, props: { kicker: K.rag, step: 2, message: 'Handing over **every file** is not the answer.', takeaway: 'You do not need all the data. You need **the right data at the right moment**.', terms: [['Every bridge file at once', 'Naive prompt stuffing'], ['Labelled folders', 'Chunking'], ['The 5 most relevant', 'Top-k retrieval']] } }),

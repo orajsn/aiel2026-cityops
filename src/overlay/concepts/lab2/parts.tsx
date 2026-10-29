@@ -65,7 +65,7 @@ function Footer({ takeaway, terms, next }: Pick<L2Props, 'takeaway' | 'terms' | 
   if (!takeaway && !terms?.length && !next) return null;
   return (
     <div data-footer style={{ flex: 'none', display: 'flex', flexDirection: 'column', gap: 10, marginTop: 14 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: terms?.length ? 'minmax(0, 1fr) minmax(0, 0.95fr)' : '1fr', gap: 18, alignItems: 'stretch' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: terms?.length ? 'minmax(0, 1fr) minmax(0, 0.95fr)' : 'minmax(0, 1fr)', gap: 18, alignItems: 'stretch' }}>
         <AnimatePresence mode="wait">
           {takeaway && (
             <motion.div key={takeaway} data-takeaway initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4, ease: EASE, delay: 0.2 }} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '12px 20px', borderLeft: `5px solid ${TEAL}`, background: TINT, borderRadius: '0 10px 10px 0' }}>
@@ -251,7 +251,7 @@ export function Folder({ size = 44, on = true }: { size?: number; on?: boolean }
 /** the hairline crack, drawn: a grey plate with one jagged line (red only where the page allows it) */
 export function CrackPlate({ w = 300, red = false }: { w?: number; red?: boolean }) {
   return (
-    <svg data-crack width={w} height={w * 0.5} viewBox="0 0 300 150" aria-label="the crack" role="img" style={{ flex: 'none' }}>
+    <svg data-crack width={w} height={w * 0.5} viewBox="0 0 300 150" aria-label="the crack" role="img" style={{ flex: 'none', maxWidth: '100%', height: 'auto' }}>
       {/* girder above, bearing plate below, the weld seam between */}
       <rect x="10" y="12" width="280" height="56" rx="4" fill="#b8c0c8" />
       <rect x="10" y="12" width="280" height="10" rx="3" fill="#a3acb5" />
@@ -296,7 +296,7 @@ export interface PicStep {
 
 /** steps across the panel, arrows between; each builds in turn, the drawer's current one stands out */
 export function StepRow({ steps, focusN, start = 0.3, gap = 0.55, arrows = true }: { steps: PicStep[]; focusN: number | null; start?: number; gap?: number; arrows?: boolean }) {
-  const cols = steps.flatMap((s, i) => (i === 0 || !arrows ? [`${s.grow ?? 1}fr`] : ['54px', `${s.grow ?? 1}fr`])).join(' ');
+  const cols = steps.flatMap((s, i) => (i === 0 || !arrows ? [`minmax(0, ${s.grow ?? 1}fr)`] : ['54px', `minmax(0, ${s.grow ?? 1}fr)`])).join(' ');
   return (
     <div data-steps style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: cols, alignItems: 'stretch', columnGap: arrows ? 8 : 18 }}>
       {steps.map((s, i) => {
@@ -312,7 +312,7 @@ export function StepRow({ steps, focusN, start = 0.3, gap = 0.55, arrows = true 
               <Num n={i + 1} on={on} />
               <div style={{ fontSize: 24, fontWeight: 700, color: INK, lineHeight: 1.2 }}>{s.title}</div>
             </div>
-            <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 10, fontSize: 20, color: INK, lineHeight: 1.4 }}>{s.body}</div>
+            <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14, fontSize: 22, color: INK, lineHeight: 1.4 }}>{s.body}</div>
           </motion.div>,
         ];
       })}
@@ -337,8 +337,9 @@ export function Saved({ children, label = 'Saved output' }: { children: ReactNod
 
 /** a column of the build: shown from `from` on, faint before it (one panel, several clicks) */
 export const upTo = (step: number | undefined, from: number) => (step ?? 99) >= from;
+/** a part still to come waits faint and grey, as Lab 3's waiting columns do (LikeAPerson), so no band sits empty */
 export const reveal = (shown: boolean, delay = 0.15) => ({
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: shown ? 1 : 0, y: shown ? 0 : 10 },
+  initial: { opacity: 0, y: 10, filter: 'grayscale(1)' },
+  animate: { opacity: shown ? 1 : 0.16, y: 0, filter: shown ? 'grayscale(0)' : 'grayscale(1)' },
   transition: { delay: shown ? delay : 0, duration: 0.5, ease: EASE },
 });

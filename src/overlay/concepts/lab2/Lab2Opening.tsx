@@ -47,19 +47,21 @@ export const ROUTE: { n: number; ch: string; name: string; kinds: ('idea' | 'not
   { n: 11, ch: '§6 Wrap', name: 'Wrap-up', kinds: ['idea', 'notebook'] },
 ];
 
+const ROUTE_ICON: IconName[] = ['inspect', 'database', 'gear', 'lookup', 'steps', 'branch', 'wrench', 'converge', 'loop', 'lock', 'clipboard'];
+
 function CrackFacts({ compact = false }: { compact?: boolean }) {
   return (
     <div style={{ display: 'flex', gap: compact ? 22 : 34, alignItems: 'center' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <div data-fact="width" style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-          <span style={{ fontSize: compact ? 44 : 76, fontWeight: 700, color: INK, lineHeight: 1 }}>0.12</span>
+          <span style={{ fontSize: compact ? 44 : 92, fontWeight: 700, color: INK, lineHeight: 1.1 }}>0.12</span>
           <span style={{ fontSize: compact ? 20 : 28, color: DIM }}>mm</span>
         </div>
         <span style={{ fontSize: compact ? 16 : 20, color: DIM }}>reported crack width</span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <div data-fact="length" style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-          <span style={{ fontSize: compact ? 44 : 76, fontWeight: 700, color: INK, lineHeight: 1 }}>85</span>
+          <span style={{ fontSize: compact ? 44 : 92, fontWeight: 700, color: INK, lineHeight: 1.1 }}>85</span>
           <span style={{ fontSize: compact ? 20 : 28, color: DIM }}>mm</span>
         </div>
         <span style={{ fontSize: compact ? 16 : 20, color: DIM }}>reported crack length</span>
@@ -76,19 +78,19 @@ export function CrackStory(p: L2Props) {
         {step < 3 ? (
           <div style={{ flex: 1, display: 'grid', gridTemplateRows: step === 1 ? '1fr' : 'auto 1fr', gap: 18, minHeight: 0 }}>
             {/* Mercer reports the crack: a drawing, the two numbers, the facts */}
-            <motion.div layout transition={{ duration: 0.5, ease: EASE }} style={{ display: 'grid', gridTemplateColumns: step === 1 ? '300px 1fr 1fr' : '220px 220px 1fr', gap: 28, alignItems: 'center', ...card(), padding: step === 1 ? '24px 30px' : '14px 22px' }}>
+            <motion.div layout transition={{ duration: 0.5, ease: EASE }} style={{ display: 'grid', gridTemplateColumns: step === 1 ? '320px minmax(0, 1fr) minmax(0, 1fr)' : '220px 220px minmax(0, 1fr)', gap: 28, alignItems: 'center', ...card(), padding: step === 1 ? '24px 30px' : '14px 22px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, textAlign: 'center' }}>
-                <Portrait who="mercer" size={step === 1 ? 132 : 72} />
-                <div style={{ fontSize: step === 1 ? 24 : 19, fontWeight: 700, color: INK }}>Mercer</div>
-                {step === 1 && <div style={{ fontSize: 19, color: DIM }}>senior inspector, reports the crack</div>}
+                <Portrait who="mercer" size={step === 1 ? 210 : 72} />
+                <div style={{ fontSize: step === 1 ? 30 : 19, fontWeight: 700, color: INK }}>Mercer</div>
+                {step === 1 && <div style={{ fontSize: 22, color: DIM }}>senior inspector, reports the crack</div>}
               </div>
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 {/* the crack is the page's one red thing on the first click; after that the question takes over */}
-                <CrackPlate w={step === 1 ? 420 : 200} red={step === 1} />
+                <CrackPlate w={step === 1 ? 520 : 200} red={step === 1} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 <CrackFacts compact={step > 1} />
-                <div style={{ fontSize: step === 1 ? 22 : 18, color: INK, lineHeight: 1.4 }}>
+                <div style={{ fontSize: step === 1 ? 26 : 18, color: INK, lineHeight: 1.4 }}>
                   South side · weld seam between girder and bearing plate
                   <br />
                   <span style={{ color: DIM }}>No visible movement · no lane closure</span>
@@ -96,24 +98,24 @@ export function CrackStory(p: L2Props) {
               </div>
             </motion.div>
             {step === 2 && (
-              <div data-evidence style={{ display: 'grid', gridTemplateColumns: '260px 1fr 60px 300px', gap: 22, alignItems: 'center', minHeight: 0 }}>
-                <motion.div {...fadeUp(0.2)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-                  <Portrait who="vance" size={104} />
+              <div data-evidence style={{ display: 'grid', gridTemplateColumns: '270px minmax(0, 1fr) 60px 300px', gap: 22, alignItems: 'stretch', minHeight: 0, padding: '10px 0' }}>
+                <motion.div {...fadeUp(0.2)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, textAlign: 'center' }}>
+                  <Portrait who="vance" size={130} />
                   <div style={{ fontSize: 22, fontWeight: 700, color: INK }}>Vance asks</div>
                   <div style={{ fontSize: 22, lineHeight: 1.35, padding: '12px 16px', borderRadius: 14, background: 'rgba(31,42,51,0.92)', color: '#fff' }}>“What should operations do, and what proves it?”</div>
                 </motion.div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 14 }}>
                   {EVIDENCE.map((e, i) => (
-                    <motion.div key={e.label} data-kind={e.label} {...fadeUp(0.6 + i * 0.25)} style={{ ...card(true), padding: '20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-                      <LineIcon name={e.icon} size={52} />
-                      <div style={{ fontSize: 21, fontWeight: 700, color: INK }}>{e.label}</div>
+                    <motion.div key={e.label} data-kind={e.label} {...fadeUp(0.6 + i * 0.25)} style={{ ...card(true), padding: '20px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, textAlign: 'center' }}>
+                      <LineIcon name={e.icon} size={72} />
+                      <div style={{ fontSize: 21, fontWeight: 700, color: INK, overflowWrap: 'anywhere' }}>{e.label}</div>
                       <Chip>{e.where}</Chip>
                     </motion.div>
                   ))}
                 </div>
                 <Arrow w={56} delay={2} />
-                <motion.div data-brief {...fadeUp(2.2)} style={{ ...card(true), background: TINT, padding: '24px 22px', display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', textAlign: 'center' }}>
-                  <LineIcon name="clipboard" size={64} />
+                <motion.div data-brief {...fadeUp(2.2)} style={{ ...card(true), background: TINT, padding: '24px 22px', display: 'flex', flexDirection: 'column', gap: 14, alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                  <LineIcon name="clipboard" size={96} />
                   <div style={{ fontSize: 26, fontWeight: 700, color: INK }}>One incident brief</div>
                   <div style={{ fontSize: 19, color: DIM }}>before anyone recommends anything</div>
                 </motion.div>
@@ -121,14 +123,17 @@ export function CrackStory(p: L2Props) {
             )}
           </div>
         ) : (
-          <div data-route style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gridTemplateRows: '1fr 1fr', gap: 14, minHeight: 0 }}>
+          <div data-route style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gridTemplateRows: '1fr 1fr', gap: 14, minHeight: 0 }}>
             {ROUTE.map((r, i) => (
               <motion.div key={r.n} data-stop={r.ch} {...fadeUp(0.15 + i * 0.12)} style={{ ...card(r.n <= 2), background: r.n <= 2 ? TINT : SOFT, padding: '16px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <Num n={r.n} size={36} />
                   <span style={{ fontSize: 19, fontWeight: 700, color: TEAL_D }}>{r.ch}</span>
                 </div>
-                <div style={{ fontSize: 22, fontWeight: 600, color: INK, lineHeight: 1.25, flex: 1 }}>{r.name}</div>
+                <div style={{ fontSize: 23, fontWeight: 600, color: INK, lineHeight: 1.25 }}>{r.name}</div>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <LineIcon name={ROUTE_ICON[r.n - 1]} size={64} color={r.n <= 2 ? TEAL : '#8a97a3'} />
+                </div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {r.kinds.map((k) => (
                     <span key={k} style={{ padding: '3px 10px', borderRadius: 999, fontSize: 15, fontWeight: 700, background: k === 'idea' ? TINT2 : 'rgba(31,42,51,0.88)', color: k === 'idea' ? TEAL_D : '#fff' }}>{k}</span>
@@ -176,32 +181,32 @@ export function WhyData(p: L2Props) {
     <L2Page testId="l2-why" {...p}>
       <Swap k={step}>
         {step === 1 ? (
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1.25fr 1fr', gap: 34, minHeight: 0 }}>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(0, 1fr)', gap: 34, minHeight: 0 }}>
             {/* the three layers stack up from the data */}
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
-              <div style={{ fontSize: 22, color: DIM, marginBottom: 4 }}>A smart engineer who has never seen this bridge can still give bad advice.</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ fontSize: 23, color: DIM, marginBottom: 4 }}>A smart engineer who has never seen this bridge can still give bad advice.</div>
               {LAYERS.map((l, i) => (
-                <motion.div key={l.title} data-layer={i} {...fadeUp(1.4 - i * 0.45)} style={{ ...card(i === 2), background: i === 2 ? TEAL : i === 1 ? TINT2 : SOFT, color: i === 2 ? '#fff' : INK, padding: '20px 26px', marginLeft: (2 - i) * 34, marginRight: (2 - i) * 34, display: 'flex', alignItems: 'center', gap: 20 }}>
-                  <LineIcon name={l.icon} size={46} color={i === 2 ? '#fff' : TEAL} />
+                <motion.div key={l.title} data-layer={i} {...fadeUp(1.4 - i * 0.45)} style={{ ...card(i === 2), background: i === 2 ? TEAL : i === 1 ? TINT2 : SOFT, color: i === 2 ? '#fff' : INK, padding: '20px 26px', marginLeft: (2 - i) * 34, marginRight: (2 - i) * 34, flex: 1, display: 'flex', alignItems: 'center', gap: 22 }}>
+                  <LineIcon name={l.icon} size={64} color={i === 2 ? '#fff' : TEAL} />
                   <div>
-                    <div style={{ fontSize: 26, fontWeight: 700 }}>{l.title}</div>
-                    <div style={{ fontSize: 19, opacity: 0.85 }}>{l.sub}</div>
+                    <div style={{ fontSize: 29, fontWeight: 700 }}>{l.title}</div>
+                    <div style={{ fontSize: 21, opacity: 0.85 }}>{l.sub}</div>
                   </div>
                 </motion.div>
               ))}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
-              <div style={cap}>What breaks without each layer</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ ...cap, marginTop: 6 }}>What breaks without each layer</div>
               {BREAKS.map((b, i) => (
-                <motion.div key={b.without} data-break={b.without} {...fadeUp(1.8 + i * 0.35)} style={{ ...card(), padding: '18px 22px', borderLeft: `6px solid ${TEAL}` }}>
-                  <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: TEAL_D }}>{b.without}</div>
-                  <div style={{ fontSize: 22, color: INK, marginTop: 4 }}>{b.what}</div>
+                <motion.div key={b.without} data-break={b.without} {...fadeUp(1.8 + i * 0.35)} style={{ ...card(), flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '18px 24px', borderLeft: `6px solid ${TEAL}` }}>
+                  <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: TEAL_D }}>{b.without}</div>
+                  <div style={{ fontSize: 25, color: INK, marginTop: 6 }}>{b.what}</div>
                 </motion.div>
               ))}
             </div>
           </div>
         ) : (
-          <div data-levels style={{ flex: 1, display: 'grid', gridTemplateColumns: '240px 1.6fr 1fr 1fr', gridTemplateRows: 'auto repeat(4, 1fr)', columnGap: 0, rowGap: 10, minHeight: 0 }}>
+          <div data-levels style={{ flex: 1, display: 'grid', gridTemplateColumns: '240px minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr)', gridTemplateRows: 'auto repeat(4, 1fr)', columnGap: 0, rowGap: 10, minHeight: 0 }}>
             {['Level', 'A question it fits', 'Who picks the next step?', 'Freedom'].map((h) => (
               <div key={h} style={{ ...cap, padding: '0 18px 4px' }}>{h}</div>
             ))}
@@ -231,7 +236,7 @@ export function WhyData(p: L2Props) {
 
 function Bubble({ who, children, delay }: { who: 'q' | 'a'; children: ReactNode; delay: number }) {
   return (
-    <motion.div {...fadeUp(delay)} style={{ alignSelf: who === 'q' ? 'flex-end' : 'flex-start', maxWidth: '88%', padding: '14px 18px', borderRadius: 16, fontSize: 22, lineHeight: 1.4, background: who === 'q' ? 'rgba(31,42,51,0.92)' : CARD, color: who === 'q' ? '#fff' : INK, border: who === 'a' ? '1.5px solid var(--line)' : 'none' }}>
+    <motion.div {...fadeUp(delay)} style={{ alignSelf: who === 'q' ? 'flex-end' : 'flex-start', maxWidth: '90%', padding: '16px 20px', borderRadius: 16, fontSize: 25, lineHeight: 1.4, background: who === 'q' ? 'rgba(31,42,51,0.92)' : CARD, color: who === 'q' ? '#fff' : INK, border: who === 'a' ? '1.5px solid var(--line)' : 'none' }}>
       {children}
     </motion.div>
   );
@@ -243,7 +248,7 @@ export function BareModel(p: L2Props) {
     <L2Page testId="l2-bare" hasRed={step === 2} {...p}>
       <Swap k={step}>
         {step === 1 ? (
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 90px 1fr', alignItems: 'center', gap: 20, minHeight: 0 }}>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 90px minmax(0, 1fr)', alignItems: 'center', gap: 20, minHeight: 0 }}>
             <motion.div {...fadeUp(0.2)} style={{ ...card(), height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 22, padding: 24 }}>
               <ChiefInspector size={170} grey label="a well-read engineer" />
               <div style={{ fontSize: 28, fontWeight: 700, color: INK }}>A well-read engineer</div>
@@ -266,7 +271,7 @@ export function BareModel(p: L2Props) {
             </motion.div>
           </div>
         ) : (
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 26, minHeight: 0 }}>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 26, minHeight: 0 }}>
             <motion.div data-side="alone" {...fadeUp(0.2)} style={{ ...card(), padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 <Net w={86} dim />
@@ -330,7 +335,7 @@ export function Workbench(p: L2Props) {
         {step === 1 ? (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
             <div style={{ fontSize: 23, color: TEAL_D, fontWeight: 600, borderLeft: `5px solid ${TEAL}`, paddingLeft: 14 }}>Before any AI: check the database, the data and the model are ready.</div>
-            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 22, minHeight: 0 }}>
+            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 22, minHeight: 0 }}>
               {BENCH.map((b, i) => (
                 <motion.div key={b.title} data-bench={b.n} {...fadeUp(0.3 + i * 0.4)} style={{ ...card(focusN === b.n), background: focusN === null || focusN === b.n ? CARD : SOFT, opacity: focusN === null || focusN === b.n ? 1 : 0.45, padding: '22px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }}>
                   <div style={{ width: 150, height: 150, borderRadius: '50%', background: TINT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{b.icon}</div>
@@ -347,25 +352,25 @@ export function Workbench(p: L2Props) {
             </div>
           </div>
         ) : (
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '300px 1fr', gap: 28, minHeight: 0 }}>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '270px minmax(0, 1fr)', gap: 24, minHeight: 0 }}>
             <motion.div data-tally {...fadeUp(0.2)} style={{ ...card(true), background: TINT, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, textAlign: 'center', padding: 20 }}>
-              <div style={{ fontSize: 96, fontWeight: 700, color: TEAL_D, lineHeight: 1 }}>25/25</div>
+              <div style={{ fontSize: 84, fontWeight: 700, color: TEAL_D, lineHeight: 1.1 }}>25/25</div>
               <div style={{ fontSize: 26, fontWeight: 700, color: INK }}>checks OK</div>
               <div style={{ fontSize: 18, color: DIM, lineHeight: 1.4 }}>tables · views · graph · model · vector index · memory library</div>
             </motion.div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridAutoRows: 'min-content', gap: '12px 22px', alignContent: 'center' }}>
+            <div style={{ columnCount: 3, columnGap: 16, minHeight: 0 }}>
               {CHECKS.map((g, i) => {
                 const on = focusN === null || focusN === g.n;
                 return (
-                  <motion.div key={g.group} data-check-group={g.n} {...fadeUp(0.4 + i * 0.18)} style={{ ...card(focusN === g.n), padding: '10px 14px', opacity: on ? 1 : 0.4, gridRow: g.n === 4 ? 'span 2' : undefined }}>
+                  <motion.div key={g.group} data-check-group={g.n} {...fadeUp(0.4 + i * 0.18)} style={{ ...card(focusN === g.n), padding: '10px 14px', opacity: on ? 1 : 0.4, breakInside: 'avoid', marginBottom: 14 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
                       <Num n={g.n} size={28} on={on} />
                       <span style={{ fontSize: 19, fontWeight: 700, color: INK }}>{g.group}</span>
                     </div>
                     {g.items.map((it) => (
-                      <div key={it} data-check={it} style={{ display: 'flex', gap: 8, alignItems: 'baseline', fontSize: 15.5, color: INK, lineHeight: 1.45 }}>
+                      <div key={it} data-check={it} style={{ display: 'flex', gap: 8, alignItems: 'baseline', fontSize: 16.5, color: INK, lineHeight: 1.5 }}>
                         <span style={{ ...mono(13, '#fff'), background: TEAL, borderRadius: 4, padding: '0 5px', fontWeight: 700 }}>OK</span>
-                        <span>{it}</span>
+                        <span style={{ overflowWrap: 'anywhere', minWidth: 0 }}>{it}</span>
                       </div>
                     ))}
                   </motion.div>
@@ -410,7 +415,7 @@ export function AgentSees(p: L2Props) {
     <L2Page testId="l2-sees" {...p}>
       <Swap k={step}>
         {step === 1 ? (
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1.55fr 1fr', gridTemplateRows: 'auto 1fr', gap: 18, minHeight: 0 }}>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1.55fr) minmax(0, 1fr)', gridTemplateRows: 'auto 1fr', gap: 18, minHeight: 0 }}>
             <motion.div data-part={1} {...fadeUp(0.2)} style={{ gridColumn: '1 / 3', ...card(true), background: TINT, opacity: lit(1) ? 1 : 0.4, padding: '14px 22px', display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
               <Num n={1} on={lit(1)} size={34} />
               <span style={capTeal}>Asset row + JSON specs</span>
@@ -425,7 +430,7 @@ export function AgentSees(p: L2Props) {
                 <span style={cap}>Most recent evidence</span>
               </div>
               {RECENT.map((r, i) => (
-                <motion.div key={r.d} {...fadeUp(0.8 + i * 0.15)} style={{ display: 'grid', gridTemplateColumns: '120px 92px 1fr', gap: 12, alignItems: 'baseline', fontSize: 18, lineHeight: 1.35 }}>
+                <motion.div key={r.d} {...fadeUp(0.8 + i * 0.15)} style={{ flex: 1, display: 'grid', gridTemplateColumns: '130px 100px minmax(0, 1fr)', gap: 12, alignItems: 'center', fontSize: 21, lineHeight: 1.35 }}>
                   <span style={mono(16, DIM)}>{r.d}</span>
                   <span style={{ ...mono(15, r.sev === 'critical' ? '#fff' : DIM), background: r.sev === 'critical' ? '#4a5560' : 'rgba(127,127,127,0.15)', borderRadius: 5, padding: '1px 7px', textAlign: 'center' }}>{r.sev}</span>
                   <span style={{ color: INK }}>{r.t}</span>
@@ -438,7 +443,7 @@ export function AgentSees(p: L2Props) {
                 <span style={cap}>Graph edges into the bridge</span>
               </div>
               {EDGES.map(([from, rel], i) => (
-                <motion.div key={from} {...fadeUp(1.4 + i * 0.15)} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 19, color: INK }}>
+                <motion.div key={from} {...fadeUp(1.4 + i * 0.15)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, fontSize: 22, color: INK }}>
                   <span style={{ flex: 1 }}>{from}</span>
                   <span style={{ color: TEAL }}>→</span>
                   <Chip style={{ fontSize: 16 }}>{rel}</Chip>
@@ -447,7 +452,7 @@ export function AgentSees(p: L2Props) {
             </motion.div>
           </div>
         ) : (
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gridTemplateRows: '1fr auto', gap: 22, minHeight: 0 }}>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gridTemplateRows: '1fr auto', gap: 22, minHeight: 0 }}>
             {CASES.map((c, i) => (
               <motion.div key={c.name} data-case={c.asset} data-active={i === 0} {...fadeUp(0.2 + i * 0.35)} style={{ ...card(i === 0), background: i === 0 ? TINT : SOFT, opacity: lit(i + 1) ? 1 : 0.4, padding: '22px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

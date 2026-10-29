@@ -38,7 +38,7 @@ export function Toolkit(p: L2Props) {
   return (
     <L2Page testId="l2-toolkit" {...p}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, minHeight: 0 }}>
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, minHeight: 0 }}>
           <Pane on n={1} title="Tools" sub="the hands" icon="wrench" delay={0.2}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {['get_asset', 'search_incidents', 'remember'].map((t) => (
@@ -68,7 +68,7 @@ export function Toolkit(p: L2Props) {
             <div style={{ fontSize: 18, color: DIM, marginTop: 'auto' }}>only the description sits in context; the body loads when needed</div>
           </Pane>
           <Pane on={upTo(step, 3)} n={3} title="MCP" sub="the standard plug" icon="converge" delay={0.2}>
-            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 60px 1fr', alignItems: 'center', gap: 6 }}>
+            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 60px minmax(0, 1fr)', alignItems: 'center', gap: 6 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {['Agent A', 'Agent B'].map((a) => (
                   <div key={a} style={{ padding: '8px 12px', borderRadius: 10, background: TINT, fontSize: 19, fontWeight: 600, color: INK }}>{a}</div>
@@ -103,7 +103,7 @@ export function Instruments(p: L2Props) {
   return (
     <L2Page testId="l2-instruments" {...p}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '220px 1fr', gap: 22, minHeight: 0 }}>
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '220px minmax(0, 1fr)', gap: 22, minHeight: 0 }}>
           <motion.div {...fadeUp(0.1)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, textAlign: 'center' }}>
             <div style={{ width: 130, height: 130, borderRadius: '50%', background: 'rgba(31,42,51,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <svg width="76" height="76" viewBox="0 0 48 48" fill="none" stroke="#fff" strokeWidth="2.6" aria-hidden>
@@ -150,7 +150,7 @@ export function Manual(p: L2Props) {
   const lit = (n?: number) => focusN === null || (n !== undefined && focusN === n);
   return (
     <L2Page testId="l2-manual" hasRed {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 24, minHeight: 0 }}>
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)', gap: 24, minHeight: 0 }}>
         <motion.div data-sop {...fadeUp(0.2)} style={{ ...card(true), background: CARD, padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <LineIcon name="book" size={44} />
@@ -195,10 +195,10 @@ export function OneQuery(p: L2Props) {
   const step = p.step ?? 1;
   return (
     <L2Page testId="l2-onequery" {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 90px 1.2fr', alignItems: 'stretch', gap: 10, minHeight: 0 }}>
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 90px minmax(0, 1.2fr)', alignItems: 'stretch', gap: 10, minHeight: 0 }}>
         <motion.div data-four-systems {...fadeUp(0.2)} style={{ ...card(), padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14, opacity: step === 2 ? 0.55 : 1, transition: 'opacity 500ms' }}>
           <div style={cap}>Four systems</div>
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             {LENSES.map((l, i) => (
               <motion.div key={l.k} {...fadeUp(0.4 + i * 0.25)} style={{ ...card(), background: CARD, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                 <Db size={46} color="#8a97a3" />
@@ -218,7 +218,7 @@ export function OneQuery(p: L2Props) {
             <Db size={56} />
             <span style={{ fontSize: 28, fontWeight: 700, color: INK }}>One Oracle AI Database</span>
           </div>
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             {LENSES.map((l, i) => (
               <motion.div key={l.k} data-lens={l.k} {...reveal(upTo(step, 2), 0.7 + i * 0.25)} style={{ ...card(true), background: CARD, display: 'flex', alignItems: 'center', gap: 14, padding: '10px 16px' }}>
                 <LineIcon name={l.icon} size={44} />
@@ -314,16 +314,15 @@ export function StateGraph(p: L2Props) {
   const lit = (n: number) => focusN === null || focusN === n;
   return (
     <L2Page testId="l2-graph" {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 24, minHeight: 0 }}>
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: 24, minHeight: 0 }}>
         <motion.div data-graph {...fade(0.2)} style={{ position: 'relative', ...card(), minHeight: 0 }}>
           <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
             <g fill="none" stroke="#1b8a9c" strokeWidth="0.5" strokeDasharray="1.4 1.4" vectorEffect="non-scaling-stroke">
-              <path d="M14 22H34" />
-              <path d="M50 30V46" />
-              <path d="M44 56L28 74" />
-              <path d="M28 82H70" style={{ opacity: 0.6 }} />
-              <path d="M58 56L76 72" />
-              <path d="M76 72V86" />
+              <path d="M19 16L40 21" />
+              <path d="M50 28V46" />
+              <path d="M44 57L30 74" />
+              <path d="M57 57L76 72" />
+              <path d="M76 72V83" />
             </g>
           </svg>
           <motion.svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
@@ -377,23 +376,23 @@ export function TwoMemories(p: L2Props) {
             <Db size={40} />
             <span style={capTeal}>Oracle AI Database</span>
           </div>
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 20 }}>
             {[
               { t: 'Visit notebook', k: 'short-term · checkpointer', s: 'one per visit, kept per thread_id', icon: 'prompt' as IconName, who: 'vance' as const },
               { t: 'Bridge logbook', k: 'long-term · store', s: 'permanent, found by name or by meaning', icon: 'book' as IconName, who: 'mercer' as const },
             ].map((m, i) => (
               <motion.div key={m.t} data-memory={m.t} {...fadeUp(0.5 + i * 0.4)} style={{ ...card(true), background: CARD, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 20 }}>
-                <LineIcon name={m.icon} size={84} />
+                <LineIcon name={m.icon} size={130} />
                 <div>
-                  <div style={{ fontSize: 30, fontWeight: 700, color: INK }}>{m.t}</div>
-                  <div style={{ ...mono(19) }}>{m.k}</div>
-                  <div style={{ fontSize: 20, color: DIM, marginTop: 6 }}>{m.s}</div>
+                  <div style={{ fontSize: 36, fontWeight: 700, color: INK }}>{m.t}</div>
+                  <div style={{ ...mono(22) }}>{m.k}</div>
+                  <div style={{ fontSize: 23, color: DIM, marginTop: 8 }}>{m.s}</div>
                 </div>
               </motion.div>
             ))}
           </div>
         </motion.div>
-        <motion.div data-lifecycle {...reveal(upTo(step, 2), 0.2)} style={{ display: 'grid', gridTemplateColumns: '1fr 54px 1fr 54px 1fr', alignItems: 'stretch' }}>
+        <motion.div data-lifecycle {...reveal(upTo(step, 2), 0.2)} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 54px minmax(0, 1fr) 54px minmax(0, 1fr)', alignItems: 'stretch' }}>
           {[
             { t: 'What to keep', s: 'decide what is worth writing down' },
             { t: 'What to forget, and when', s: 'stale facts must expire' },
@@ -610,7 +609,7 @@ export function FirstRun(p: L2Props) {
         </motion.div>
         <AnimatePresence mode="wait">
           {step === 1 ? (
-            <motion.div key="run" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease: EASE }} style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+            <motion.div key="run" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease: EASE }} style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 18 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <motion.div {...fadeUp(2.2)} style={{ ...card(), padding: '12px 16px', fontSize: 20, color: INK }}>
                   <b>recall</b> returned empty: memory was empty on the first run
@@ -619,26 +618,26 @@ export function FirstRun(p: L2Props) {
                   a longer place name <span style={{ color: TEAL }}>→</span> <Chip>“Harbor Bridge”</Chip>
                   <span style={{ fontSize: 17, color: DIM }}>the agent passes the asset’s exact name</span>
                 </motion.div>
-                <motion.div data-part={2} {...fadeUp(2.8)} style={{ ...card(focusN === 2), opacity: lit(2) ? 1 : 0.4, flex: 1, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <motion.div data-part={2} {...fadeUp(2.8)} style={{ ...card(focusN === 2), opacity: lit(2) ? 1 : 0.4, flex: 1, padding: '12px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <Num n={2} on={lit(2)} size={30} />
                     <span style={{ fontSize: 21, fontWeight: 700, color: INK }}>remember must come before the final answer</span>
                   </div>
-                  <Quote style={{ fontSize: 16 }}>{'That message must come AFTER you have called `remember(asset_name, note)`\nsuccessfully, per step 4 of the SOP.'}</Quote>
+                  <Quote style={{ fontSize: 19 }}>{'That message must come AFTER you have called `remember(asset_name, note)`\nsuccessfully, per step 4 of the SOP.'}</Quote>
                 </motion.div>
               </div>
-              <motion.div data-part={3} {...fadeUp(3.2)} style={{ ...card(true), background: TINT, opacity: lit(3) ? 1 : 0.4, padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <motion.div data-part={3} {...fadeUp(3.2)} style={{ ...card(true), background: TINT, opacity: lit(3) ? 1 : 0.4, padding: '16px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 18 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <Num n={3} on={lit(3)} size={30} />
                   <span style={capTeal}>Stored by remember · saved output</span>
                 </div>
-                <div style={{ fontSize: 23, lineHeight: 1.5, color: INK }}>
+                <div style={{ fontSize: 29, lineHeight: 1.5, color: INK }}>
                   “Hairline cracking near bearing plate at Harbor Bridge … south side, approximately 85 mm crack length. Recommend immediate structural engineering review and propose a load restriction.”
                 </div>
               </motion.div>
             </motion.div>
           ) : (
-            <motion.div key="trace" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease: EASE }} style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 18 }}>
+            <motion.div key="trace" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease: EASE }} style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)', gap: 18 }}>
               <div data-part={4} style={{ ...card(focusN === 4), opacity: lit(4) ? 1 : 0.4, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <Num n={4} on={lit(4)} size={30} />
@@ -646,7 +645,7 @@ export function FirstRun(p: L2Props) {
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-around' }}>
                   {TRACE.map((t, i) => (
-                    <motion.div key={i} {...fadeUp(0.3 + i * 0.15)} style={{ display: 'grid', gridTemplateColumns: '250px 1fr', alignItems: 'center', gap: 10 }}>
+                    <motion.div key={i} {...fadeUp(0.3 + i * 0.15)} style={{ display: 'grid', gridTemplateColumns: '250px minmax(0, 1fr)', alignItems: 'center', gap: 10 }}>
                       <span style={{ ...mono(15, INK) }}>{t.t}</span>
                       <div style={{ position: 'relative', height: 14 }}>
                         <div style={{ position: 'absolute', left: 0, right: 0, top: 6, height: 2, background: 'rgba(127,127,127,0.25)' }} />
@@ -655,7 +654,7 @@ export function FirstRun(p: L2Props) {
                     </motion.div>
                   ))}
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: 10, alignItems: 'center' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '250px minmax(0, 1fr)', gap: 10, alignItems: 'center' }}>
                   <span style={{ ...mono(15, DIM) }}>the language model</span>
                   <div style={{ display: 'flex', justifyContent: 'space-between', ...mono(15, DIM) }}>
                     <span>0</span>

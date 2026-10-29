@@ -51,7 +51,7 @@ test('5.4’s eight parts each start on a real line of the cell, in order, so a 
 test('page 2.7b steps through 5 blocks and 5.4’s 8 parts: 13 steps, and the clicker walks the same', () => {
   expect(guideSteps('2.7b')).toHaveLength(13);
   expect(stopStepCount('2.7b')).toBe(13);
-  expect(stopStepCount('2.1')).toBe(7); // pages without a guide still step through their cells to run
+  expect(stopStepCount('2.1a')).toBe(7); // pages without a guide still step through their cells to run
 });
 
 test('on a block the drawer shows its note under the heading; on a part it highlights that part’s lines', () => {
@@ -90,7 +90,7 @@ test('a step runs its cell: [*] for a moment, then [n] and its output; 5.4 runs 
 
 test('a quick clicker does not lose a run: each cell started finishes, in order', () => {
   vi.useFakeTimers();
-  const c = render(<JupyterDrawer sceneId="2.1" />).container; // two plain steps: 0.4, then 0.5
+  const c = render(<JupyterDrawer sceneId="2.1a" />).container; // two plain steps: 0.4, then 0.5
   act(() => useDrawerStore.setState({ open: true, focus: 1 }));
   act(() => vi.advanceTimersByTime(300));
   act(() => useDrawerStore.setState({ focus: 2 }));
@@ -102,7 +102,7 @@ test('a quick clicker does not lose a run: each cell started finishes, in order'
 test('while the Jupyter drawer is open the caption steps aside, and comes back when it closes', async () => {
   const { Overlay } = await import('../../src/overlay/Overlay');
   const { useSceneStore } = await import('../../src/engine/store');
-  useSceneStore.getState().setScenes([{ id: '2.6', chapter: 1, title: 'One query', shot: 'sky', script: 'One call, four data models.' }]);
+  useSceneStore.getState().setScenes([{ id: '2.6a', chapter: 1, title: 'One query', shot: 'sky', script: 'One call, four data models.' }]);
   useSceneStore.getState().setSettled(true);
   const c = render(<Overlay />).container;
   expect(c.querySelector('.script')).not.toBeNull();

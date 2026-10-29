@@ -22,14 +22,13 @@ export function ThreeRisks(p: L2Props) {
   return (
     <L2Page testId="l2-risks" hasRed {...p}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, minHeight: 0 }}>
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, minHeight: 0 }}>
           {RISKS.map((r, i) => {
             const shown = upTo(step, i + 1);
             const now = step === i + 1;
             return (
               <motion.div key={r.term} data-risk={r.term} data-now={now} {...reveal(shown, 0.2)} style={{ ...card(), background: now ? CARD : SOFT, borderTop: `6px solid ${now ? RED : '#8a97a3'}`, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <LineIcon name={r.icon} size={52} color={now ? RED : '#8a97a3'} />
                   <div>
                     <div style={{ fontSize: 27, fontWeight: 700, color: INK }}>{r.pic}</div>
                     <div style={{ ...mono(18) }}>{r.term}</div>
@@ -41,6 +40,9 @@ export function ThreeRisks(p: L2Props) {
                     <span>{pt}</span>
                   </motion.div>
                 ))}
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <LineIcon name={r.icon} size={110} color={now ? RED : '#8a97a3'} />
+                </div>
               </motion.div>
             );
           })}
@@ -81,15 +83,15 @@ const DIMS: { t: string; icon: IconName }[] = [
 export function Observability(p: L2Props) {
   return (
     <L2Page testId="l2-observe" {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 24, minHeight: 0 }}>
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)', gap: 24, minHeight: 0 }}>
         <motion.div {...fadeUp(0.2)} style={{ ...card(), padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 40px 1fr', ...cap }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 40px minmax(0, 1fr)', ...cap }}>
             <span>Traditional</span>
             <span />
             <span style={{ color: TEAL_D }}>AI agents</span>
           </div>
           {SHIFTS.map(([a, b], i) => (
-            <motion.div key={a} data-shift={b} {...fadeUp(0.4 + i * 0.35)} style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 40px 1fr', alignItems: 'center' }}>
+            <motion.div key={a} data-shift={b} {...fadeUp(0.4 + i * 0.35)} style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 40px minmax(0, 1fr)', alignItems: 'center' }}>
               <span style={{ fontSize: 22, color: DIM }}>{a}</span>
               <span style={{ color: TEAL, fontSize: 24 }}>→</span>
               <span style={{ fontSize: 23, fontWeight: 700, color: INK, padding: '10px 14px', borderRadius: 10, background: TINT }}>{b}</span>
@@ -98,7 +100,7 @@ export function Observability(p: L2Props) {
         </motion.div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={cap}>What to watch, beyond uptime and errors</div>
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             {DIMS.map((d, i) => (
               <motion.div key={d.t} data-dim={d.t} {...fadeUp(1.6 + i * 0.2)} style={{ ...card(true), background: CARD, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, textAlign: 'center', padding: 12 }}>
                 <LineIcon name={d.icon} size={46} />
@@ -132,7 +134,7 @@ export function Dashboard(p: L2Props) {
   return (
     <L2Page testId="l2-dashboard" {...p}>
       <div style={{ flex: 1, display: 'grid', gridTemplateRows: 'auto 1fr', gap: 16, minHeight: 0 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16 }}>
           {kpis.map((k, i) => (
             <motion.div key={k.s} data-kpi={k.v} {...fadeUp(0.2 + i * 0.3)} style={{ ...card(focusN === k.n), opacity: lit(k.n) ? 1 : 0.4, padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 4 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
@@ -143,11 +145,11 @@ export function Dashboard(p: L2Props) {
             </motion.div>
           ))}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 16, minHeight: 0 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr)', gap: 16, minHeight: 0 }}>
           <motion.div {...fadeUp(1)} style={{ ...card(), opacity: lit(2) ? 1 : 0.4, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={cap}>Latency per step, ms · cell 50</div>
             {LAT.map((l, i) => (
-              <div key={l.s} data-lat={l.s} style={{ flex: 1, display: 'grid', gridTemplateColumns: '100px 1fr 80px', alignItems: 'center', gap: 10 }}>
+              <div key={l.s} data-lat={l.s} style={{ flex: 1, display: 'grid', gridTemplateColumns: '100px minmax(0, 1fr) 80px', alignItems: 'center', gap: 10 }}>
                 <span style={{ ...mono(17, INK) }}>{l.s}</span>
                 <div style={{ height: 22, background: 'rgba(127,127,127,0.12)', borderRadius: 5, overflow: 'hidden' }}>
                   <motion.div initial={{ width: 0 }} animate={{ width: `${(l.ms / 25515) * 100}%` }} transition={{ delay: 1.2 + i * 0.2, duration: 0.8, ease: EASE }} style={{ height: '100%', background: l.s === 'draft' ? TEAL : 'rgba(27,138,156,0.45)' }} />
@@ -203,16 +205,18 @@ export function PickTool(p: L2Props) {
   return (
     <L2Page testId="l2-pick" {...p}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, minHeight: 0 }}>
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, minHeight: 0 }}>
           {SHAPES.map((s, i) => (
             <motion.div key={s.t} data-shape={s.t} {...fadeUp(0.2 + i * 0.4)} style={{ ...card(i === 0), background: i === 0 ? TINT : SOFT, padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                <LineIcon name={s.icon} size={56} />
                 <span style={{ fontSize: 34, fontWeight: 700, color: INK }}>{s.t}</span>
                 <Chip style={{ marginLeft: 'auto' }}>{s.sec}</Chip>
               </div>
               <div style={{ fontSize: 23, color: '#fff', background: 'rgba(31,42,51,0.9)', borderRadius: 14, padding: '12px 16px' }}>{s.q}</div>
-              <div style={{ marginTop: 'auto', ...cap, fontSize: 14 }}>How predictable</div>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <LineIcon name={s.icon} size={110} color={i === 0 ? TEAL : '#8a97a3'} />
+              </div>
+              <div style={{ ...cap, fontSize: 14 }}>How predictable</div>
               <div style={{ fontSize: 30, fontWeight: 700, color: s.pred === 'High' ? TEAL_D : INK }}>{s.pred}</div>
               <div style={{ fontSize: 20, color: DIM }}>{s.how}</div>
             </motion.div>

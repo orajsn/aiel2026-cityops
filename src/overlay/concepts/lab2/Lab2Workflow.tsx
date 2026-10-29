@@ -49,7 +49,7 @@ export function WhoPicks(p: L2Props) {
     <L2Page testId="l2-pen" {...p}>
       <Swap k={step}>
         {step === 1 ? (
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1.3fr 1fr', gap: 22, minHeight: 0 }}>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr)', gap: 22, minHeight: 0 }}>
             {PENS.map((c, i) => (
               <motion.div key={c.name} data-pen={c.name} {...fadeUp(0.2 + i * 0.4)} style={{ ...card(i === 1), background: i === 1 ? TINT : SOFT, padding: '22px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, textAlign: 'center' }}>
                 <div style={cap}>Who holds the pen?</div>
@@ -73,36 +73,36 @@ export function WhoPicks(p: L2Props) {
         ) : (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18, minHeight: 0 }}>
             <div style={capTeal}>Success path · the lab implements this</div>
-            <div style={{ display: 'flex', alignItems: 'stretch', gap: 6 }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'stretch', gap: 6 }}>
               {SUCCESS.map((s, i) => [
                 i > 0 ? (
                   <div key={`a${i}`} style={{ display: 'flex', alignItems: 'center' }}>
                     <Arrow w={42} delay={0.3 + i * 0.35} />
                   </div>
                 ) : null,
-                <motion.div key={s.t} data-success={i + 1} {...fadeUp(0.2 + i * 0.35)} style={{ flex: 1, ...card(true), background: i === 4 ? TEAL : CARD, color: i === 4 ? '#fff' : INK, padding: '16px 16px' }}>
-                  <div style={{ fontSize: 23, fontWeight: 700 }}>{s.t}</div>
-                  <div style={{ fontSize: 18, opacity: 0.85, marginTop: 4 }}>{s.s}</div>
+                <motion.div key={s.t} data-success={i + 1} {...fadeUp(0.2 + i * 0.35)} style={{ flex: 1, ...card(true), background: i === 4 ? TEAL : CARD, color: i === 4 ? '#fff' : INK, padding: '16px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div style={{ fontSize: 25, fontWeight: 700 }}>{s.t}</div>
+                  <div style={{ fontSize: 20, opacity: 0.85, marginTop: 6 }}>{s.s}</div>
                 </motion.div>,
               ])}
             </div>
             <div style={{ ...cap, marginTop: 10 }}>Failure path · designed, not built in the lab</div>
-            <div style={{ display: 'flex', alignItems: 'stretch', gap: 6 }}>
-              <motion.div {...fadeUp(2.2)} style={{ flex: 1, ...card(), padding: '16px 16px', borderStyle: 'dashed' }}>
-                <div style={{ fontSize: 23, fontWeight: 700, color: INK }}>4. Evaluate</div>
-                <div style={{ fontSize: 18, color: DIM }}>the result looks weak</div>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'stretch', gap: 6 }}>
+              <motion.div {...fadeUp(2.2)} style={{ flex: 1, ...card(), padding: '16px 16px', borderStyle: 'dashed', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ fontSize: 25, fontWeight: 700, color: INK }}>4. Evaluate</div>
+                <div style={{ fontSize: 20, color: DIM, marginTop: 6 }}>the result looks weak</div>
               </motion.div>
               {FAILURE.map((s, i) => [
                 <div key={`a${i}`} style={{ display: 'flex', alignItems: 'center' }}>
                   <Arrow w={42} delay={2.4 + i * 0.3} color="#8a97a3" />
                 </div>,
-                <motion.div key={s.t} data-failure={s.t} {...fadeUp(2.5 + i * 0.3)} style={{ flex: 1, ...card(), padding: '16px 16px', borderStyle: 'dashed' }}>
-                  <div style={{ fontSize: 23, fontWeight: 700, color: INK }}>{s.t}</div>
-                  <div style={{ fontSize: 18, color: DIM }}>{s.s}</div>
+                <motion.div key={s.t} data-failure={s.t} {...fadeUp(2.5 + i * 0.3)} style={{ flex: 1, ...card(), padding: '16px 16px', borderStyle: 'dashed', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div style={{ fontSize: 25, fontWeight: 700, color: INK }}>{s.t}</div>
+                  <div style={{ fontSize: 20, color: DIM, marginTop: 6 }}>{s.s}</div>
                 </motion.div>,
               ])}
             </div>
-            <motion.div {...fade(3.8)} style={{ marginTop: 'auto', alignSelf: 'center', fontSize: 22, color: INK, padding: '10px 22px', borderRadius: 999, background: TINT }}>
+            <motion.div {...fade(3.8)} style={{ alignSelf: 'center', fontSize: 22, color: INK, padding: '10px 22px', borderRadius: 999, background: TINT }}>
               Every exit is planned: <b>success · review · replan · abort</b>. The code makes the routing decisions.
             </motion.div>
           </div>
@@ -127,25 +127,27 @@ export function Conveyor(p: L2Props) {
   return (
     <L2Page testId="l2-conveyor" {...p}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18, minHeight: 0 }}>
-        <div style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
           {/* the crack report rides the belt */}
           <motion.div data-rider initial={{ x: 0, opacity: 0 }} animate={{ x: ['0%', '0%', '82%'], opacity: [0, 1, 1] }} transition={{ duration: 6, times: [0, 0.1, 1], ease: 'easeInOut', repeat: Infinity, repeatDelay: 2 }} style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 999, background: 'rgba(31,42,51,0.92)', color: '#fff', fontSize: 19, marginBottom: 12 }}>
             <LineIcon name="clipboard" size={26} color="#fff" /> crack 0.12 mm rides the belt →
           </motion.div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 50px 1fr 50px 1fr 50px 1fr', alignItems: 'stretch' }}>
+          <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 50px minmax(0, 1fr) 50px minmax(0, 1fr) 50px minmax(0, 1fr)', alignItems: 'stretch' }}>
             {STATIONS.map((s, i) => [
               i > 0 ? (
                 <div key={`a${i}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Arrow w={44} delay={0.4 + i * 0.4} />
                 </div>
               ) : null,
-              <motion.div key={s.name} data-station={s.name} {...fadeUp(0.2 + i * 0.4)} style={{ ...card(s.name === 'Drafter'), background: s.name === 'Drafter' ? TINT : SOFT, padding: '18px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <motion.div key={s.name} data-station={s.name} {...fadeUp(0.2 + i * 0.4)} style={{ ...card(s.name === 'Drafter'), background: s.name === 'Drafter' ? TINT : SOFT, padding: '18px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <Num n={i + 1} size={34} />
-                  <LineIcon name={s.icon} size={40} />
-                  <span style={{ fontSize: 25, fontWeight: 700, color: INK }}>{s.name}</span>
+                  <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>{s.name}</span>
                 </div>
-                <div style={{ fontSize: 21, color: INK, lineHeight: 1.35 }}>{s.out}</div>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <LineIcon name={s.icon} size={84} color={s.name === 'Drafter' ? TEAL : '#8a97a3'} />
+                </div>
+                <div style={{ fontSize: 22, color: INK, lineHeight: 1.35 }}>{s.out}</div>
                 <Chip dim={s.name !== 'Drafter'} style={{ alignSelf: 'flex-start', fontSize: 17 }}>{s.tok}</Chip>
               </motion.div>,
             ])}
@@ -285,10 +287,10 @@ export function Station3(p: L2Props) {
 export function Order(p: L2Props) {
   const focusN = useFocusN(p.focusId);
   const runs = [
-    { t: 'Rate', f: 'classify', ms: '2,623 ms', by: 'the language model' },
-    { t: 'Fetch', f: 'retrieve', ms: '3,512 ms', by: 'oracle/V_CHUNKS_UNIFIED' },
-    { t: 'Draft', f: 'draft', ms: '25,515 ms', by: 'the language model' },
-    { t: 'Format', f: 'format', ms: '0 ms', by: 'python' },
+    { t: 'Rate', f: 'classify', ms: '2,623 ms', by: 'the language model', icon: 'target' as IconName },
+    { t: 'Fetch', f: 'retrieve', ms: '3,512 ms', by: 'oracle/V_CHUNKS_UNIFIED', icon: 'lookup' as IconName },
+    { t: 'Draft', f: 'draft', ms: '25,515 ms', by: 'the language model', icon: 'prompt' as IconName },
+    { t: 'Format', f: 'format', ms: '0 ms', by: 'python', icon: 'clipboard' as IconName },
   ];
   return (
     <L2Page testId="l2-order" {...p}>
@@ -298,7 +300,8 @@ export function Order(p: L2Props) {
           steps={runs.map((r) => ({
             title: r.t,
             body: (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12 }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
+                <LineIcon name={r.icon} size={88} color={r.by === 'the language model' ? TEAL : '#8a97a3'} />
                 <Chip style={{ fontSize: 22, alignSelf: 'flex-start' }}>{r.f}</Chip>
                 <div style={{ fontSize: 34, fontWeight: 700, color: INK }}>{r.ms}</div>
                 <div style={{ ...mono(17, DIM) }}>{r.by}</div>
@@ -330,7 +333,7 @@ export function Chief(p: L2Props) {
   const step = p.step ?? 1;
   return (
     <L2Page testId="l2-chief" hasRed={step === 1} {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '360px 1fr', gap: 26, minHeight: 0 }}>
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '360px minmax(0, 1fr)', gap: 26, minHeight: 0 }}>
         {/* the fixed checklist, with no step for the new failure */}
         <motion.div data-checklist {...fadeUp(0.2)} style={{ ...card(), padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -385,7 +388,7 @@ export function Chief(p: L2Props) {
             </div>
           </motion.div>
           {/* what it does, and the signed recommendation */}
-          <motion.div data-does {...reveal(upTo(step, 3), 0.2)} style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr 300px', gap: 12, alignItems: 'stretch' }}>
+          <motion.div data-does {...reveal(upTo(step, 3), 0.2)} style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) 300px', gap: 12, alignItems: 'stretch' }}>
             {DOES.map((d, i) => (
               <motion.div key={d} {...reveal(upTo(step, 3), 0.3 + i * 0.25)} style={{ gridColumn: (i % 2) + 1, ...card(), padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10, fontSize: 21, fontWeight: 600, color: INK }}>
                 <span style={{ color: TEAL, fontWeight: 700 }}>✓</span> {d}
@@ -410,19 +413,24 @@ const WAYS = [
   { t: 'Deep research', loop: 'explore → gather → synthesize', mem: 'the most', m: 0.95, icon: 'lookup' as IconName },
 ];
 
+const WAY_ICON: IconName[] = ['speech', 'loop', 'nodes'];
+
 export function ThreeWays(p: L2Props) {
   return (
     <L2Page testId="l2-ways" {...p}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18, minHeight: 0 }}>
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, minHeight: 0 }}>
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, minHeight: 0 }}>
           {WAYS.map((w, i) => (
             <motion.div key={w.t} data-way={w.t} {...fadeUp(0.2 + i * 0.4)} style={{ ...card(!!w.ours), background: w.ours ? TINT : SOFT, padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 <LineIcon name={w.icon} size={50} />
                 <span style={{ fontSize: 29, fontWeight: 700, color: INK }}>{w.t}</span>
               </div>
-              <div style={{ ...mono(19) }}>{w.loop}</div>
-              <div style={{ ...cap, fontSize: 14, marginTop: 'auto' }}>Memory: {w.mem}</div>
+              <div style={{ ...mono(20) }}>{w.loop}</div>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <LineIcon name={WAY_ICON[i]} size={110} color={w.ours ? TEAL : '#8a97a3'} />
+              </div>
+              <div style={{ ...cap, fontSize: 14 }}>Memory: {w.mem}</div>
               <div style={{ height: 14, borderRadius: 7, background: 'rgba(127,127,127,0.18)', overflow: 'hidden' }}>
                 <motion.div initial={{ width: 0 }} animate={{ width: `${w.m * 100}%` }} transition={{ delay: 0.6 + i * 0.4, duration: 0.8, ease: EASE }} style={{ height: '100%', background: TEAL }} />
               </div>
@@ -430,7 +438,7 @@ export function ThreeWays(p: L2Props) {
             </motion.div>
           ))}
         </div>
-        <motion.div data-split {...fadeUp(1.6)} style={{ display: 'grid', gridTemplateColumns: '1fr 70px 1fr', alignItems: 'stretch', gap: 8 }}>
+        <motion.div data-split {...fadeUp(1.6)} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 70px minmax(0, 1fr)', alignItems: 'stretch', gap: 8 }}>
           <div style={{ ...card(true), background: CARD, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 16 }}>
             <Net w={90} live />
             <div>

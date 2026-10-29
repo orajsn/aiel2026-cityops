@@ -50,7 +50,7 @@ export function RagIdea(p: L2Props) {
         <AnimatePresence mode="wait">
           <motion.div key={step} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease: EASE }} style={{ flex: 1, minHeight: 0, display: 'flex' }}>
             {step === 1 && (
-              <div data-cabinet style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 70px 1fr 70px 1fr', alignItems: 'center', gap: 6 }}>
+              <div data-cabinet style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 70px minmax(0, 1fr) 70px minmax(0, 1fr)', alignItems: 'center', gap: 6 }}>
                 <motion.div {...fadeUp(2.4)} style={{ ...card(), height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
                   {/* a filing cabinet: three drawers, one lit */}
                   <svg width="130" height="150" viewBox="0 0 130 150" aria-hidden>
@@ -80,7 +80,7 @@ export function RagIdea(p: L2Props) {
               </div>
             )}
             {step === 2 && (
-              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 24 }}>
                 <div data-side="every-file" style={{ ...card(), borderColor: RED, background: 'rgba(199,70,52,0.06)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 20 }}>
                   <div style={{ ...cap, color: INK }}>Every file at once</div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 26px)', gap: 6 }}>
@@ -113,7 +113,7 @@ export function RagIdea(p: L2Props) {
             )}
             {step === 3 && (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18 }}>
-                <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+                <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 24 }}>
                   {[
                     { t: 'Right data', s: 'the reports about this bridge, not every bridge', icon: 'target' as IconName },
                     { t: 'Right moment', s: 'this morning’s inspection, not last year’s', icon: 'clock' as IconName },
@@ -163,9 +163,9 @@ export function Embed(p: L2Props) {
             body: (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, textAlign: 'center' }}>
                 <Db size={110} />
-                <Chip style={{ fontSize: 22 }}>ALL_MINILM_L12_V2</Chip>
+                <Chip style={{ fontSize: 19 }}>ALL_MINILM_L12_V2</Chip>
                 <div style={{ fontSize: 21, color: DIM }}>no outside service</div>
-                <Chip dim style={{ fontSize: 16 }}>VECTOR_EMBEDDING(… USING :q AS data)</Chip>
+                <Chip dim style={{ fontSize: 16, whiteSpace: 'normal' }}>VECTOR_EMBEDDING(… USING :q AS data)</Chip>
               </div>
             ),
           },
@@ -211,14 +211,14 @@ export function Nearest(p: L2Props) {
   const lit = (n: number) => focusN === null || focusN === n;
   return (
     <L2Page testId="l2-nearest" {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: 24, minHeight: 0 }}>
-        <motion.div data-part={1} {...fadeUp(0.2)} style={{ ...card(focusN === 1), opacity: lit(1) ? 1 : 0.4, padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)', gridTemplateRows: 'minmax(0, 1fr)', gap: 24, minHeight: 0 }}>
+        <motion.div data-part={1} {...fadeUp(0.2)} style={{ ...card(focusN === 1), opacity: lit(1) ? 1 : 0.4, padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <Num n={1} on={lit(1)} />
             <span style={{ fontSize: 24, fontWeight: 700, color: INK }}>Measure distance in meaning</span>
           </div>
           <div style={{ alignSelf: 'flex-start', fontSize: 20, color: '#fff', background: TEAL, borderRadius: 999, padding: '6px 16px' }}>“cracks or corrosion on bridge bearings”</div>
-          <svg viewBox="0 0 320 320" style={{ flex: 1, minHeight: 0, width: '100%' }} aria-label="the question among the chunks" role="img">
+          <svg viewBox="0 0 320 320" preserveAspectRatio="xMidYMid meet" style={{ flex: 1, minHeight: 0, width: '100%', height: '100%' }} aria-label="the question among the chunks" role="img">
             {[60, 110, 150].map((r) => <circle key={r} cx="165" cy="165" r={r} fill="none" stroke="rgba(27,138,156,0.25)" strokeDasharray="4 6" />)}
             {DOTS.map(([x, y], i) => <circle key={i} cx={x} cy={y} r="7" fill="rgba(127,127,127,0.35)" />)}
             {NEAR_DOTS.map(([x, y], i) => (
@@ -244,7 +244,7 @@ export function Nearest(p: L2Props) {
               <span style={{ fontSize: 24, fontWeight: 700, color: INK }}>Closest first</span>
             </div>
             {NEAREST.map((r, i) => (
-              <motion.div key={i} data-near={r.asset} {...fadeUp(1.3 + i * 0.25)} style={{ display: 'grid', gridTemplateColumns: '36px 1fr auto', alignItems: 'center', gap: 12, padding: '8px 12px', borderRadius: 10, background: r.asset === 'Harbor Bridge' ? TINT : 'rgba(127,127,127,0.12)', fontSize: 22 }}>
+              <motion.div key={i} data-near={r.asset} {...fadeUp(1.3 + i * 0.25)} style={{ display: 'grid', gridTemplateColumns: '36px minmax(0, 1fr) auto', alignItems: 'center', gap: 12, padding: '8px 12px', borderRadius: 10, background: r.asset === 'Harbor Bridge' ? TINT : 'rgba(127,127,127,0.12)', fontSize: 22 }}>
                 <span style={{ ...mono(18, DIM) }}>{i + 1}</span>
                 <span style={{ fontWeight: r.asset === 'Harbor Bridge' ? 700 : 500, color: INK }}>{r.asset}</span>
                 <span style={mono(19, TEAL_D)}>{r.d}</span>
@@ -300,7 +300,7 @@ export function Rule(p: L2Props) {
                   <div style={{ ...mono(18) }}>&lt;context&gt;</div>
                   <div style={{ fontSize: 21, color: INK, margin: '10px 0' }}>retrieved inspection notes</div>
                   <div style={{ ...mono(18) }}>&lt;/context&gt;</div>
-                  <motion.div data-sticky initial={{ opacity: 0, rotate: 0, y: -10 }} animate={{ opacity: 1, rotate: 4, y: 0 }} transition={{ delay: 2, duration: 0.5 }} style={{ position: 'absolute', right: 12, top: 30, padding: '10px 14px', background: '#f6f1df', border: `2px solid ${RED}`, borderRadius: 4, fontSize: 19, color: '#1f2a33', boxShadow: '0 3px 8px rgba(0,0,0,0.2)' }}>
+                  <motion.div data-sticky initial={{ opacity: 0, rotate: 0, y: -10 }} animate={{ opacity: 1, rotate: 4, y: 0 }} transition={{ delay: 2, duration: 0.5 }} style={{ position: 'absolute', right: -8, top: -26, padding: '10px 14px', background: '#f6f1df', border: `2px solid ${RED}`, borderRadius: 4, fontSize: 19, color: '#1f2a33', boxShadow: '0 3px 8px rgba(0,0,0,0.2)' }}>
                     “ignore your rules”
                   </motion.div>
                 </div>
@@ -396,7 +396,7 @@ export function Checkable(p: L2Props) {
   const lit = (n: number) => focusN === null || focusN === n;
   return (
     <L2Page testId="l2-check" {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: 24, minHeight: 0 }}>
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.15fr)', gap: 24, minHeight: 0 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
           <motion.div data-part={1} {...fadeUp(0.2)} style={{ display: 'flex', alignItems: 'center', gap: 12, opacity: lit(1) ? 1 : 0.4 }}>
             <Num n={1} on={lit(1)} />
@@ -424,7 +424,7 @@ export function Checkable(p: L2Props) {
             <span style={cap}>Sources used: top-5 rows</span>
           </div>
           {SOURCES.map((s, i) => (
-            <motion.div key={i} data-source={i + 1} data-claim-of={s.claim} {...fadeUp(1.5 + i * 0.22)} style={{ display: 'grid', gridTemplateColumns: '30px 1fr auto', gap: 10, alignItems: 'center', padding: '8px 12px', borderRadius: 10, background: s.claim ? TINT : 'rgba(127,127,127,0.10)', border: s.claim ? `2px solid ${TEAL}` : '2px solid transparent' }}>
+            <motion.div key={i} data-source={i + 1} data-claim-of={s.claim} {...fadeUp(1.5 + i * 0.22)} style={{ display: 'grid', gridTemplateColumns: '30px minmax(0, 1fr) auto', gap: 10, alignItems: 'center', padding: '8px 12px', borderRadius: 10, background: s.claim ? TINT : 'rgba(127,127,127,0.10)', border: s.claim ? `2px solid ${TEAL}` : '2px solid transparent' }}>
               <span style={mono(17, DIM)}>{i + 1}</span>
               <div style={{ minWidth: 0 }}>
                 <div style={{ ...mono(15, TEAL_D) }}>{s.src}</div>
@@ -460,7 +460,7 @@ export function NotAJob(p: L2Props) {
     <L2Page testId="l2-job" {...p}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
         {/* a lookup */}
-        <motion.div data-row="lookup" {...fadeUp(0.2)} style={{ ...card(), padding: '14px 22px', display: 'grid', gridTemplateColumns: '300px 50px 1fr 50px 1fr 50px 1fr', alignItems: 'center', gap: 8 }}>
+        <motion.div data-row="lookup" {...fadeUp(0.2)} style={{ ...card(), padding: '14px 22px', display: 'grid', gridTemplateColumns: '300px 50px minmax(0, 1fr) 50px minmax(0, 1fr) 50px minmax(0, 1fr)', alignItems: 'center', gap: 8 }}>
           <RowLabel title="A lookup" sub="“What does the record say?”" />
           <Arrow w={44} delay={0.5} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -482,7 +482,7 @@ export function NotAJob(p: L2Props) {
           <div style={{ fontSize: 21, fontWeight: 700, color: TEAL_D }}>Grounded answer · done</div>
         </motion.div>
         {/* a job: three jobs hide inside it */}
-        <motion.div data-row="job" {...reveal(upTo(step, 2), 0.2)} style={{ ...card(true), padding: '14px 22px', flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '300px 1fr 1fr 1fr', gap: 18 }}>
+        <motion.div data-row="job" {...reveal(upTo(step, 2), 0.2)} style={{ ...card(true), padding: '14px 22px', flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '300px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', gap: 18 }}>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>
             <RowLabel title="A job" sub="“What is the status of this bridge?”" />
             <span style={{ fontSize: 19, color: TEAL_D, fontWeight: 600 }}>…hides three jobs ▾</span>
@@ -494,8 +494,8 @@ export function NotAJob(p: L2Props) {
                 <div style={{ display: 'flex', gap: 8 }}>
                   {['Mar', 'Apr', 'Jun', 'Jul'].map((m) => (
                     <div key={m} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                      <Folder size={36} />
-                      <span style={{ fontSize: 14, color: DIM }}>{m}</span>
+                      <Folder size={58} />
+                      <span style={{ fontSize: 17, color: DIM }}>{m}</span>
                     </div>
                   ))}
                 </div>
@@ -505,10 +505,10 @@ export function NotAJob(p: L2Props) {
             {
               n: 2, t: 'Cross-check work orders', tag: 'RAG again', sub: 'a second, independent lookup',
               pic: (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18, color: INK }}>
-                  <Chip>Findings</Chip>
-                  <span style={{ color: TEAL, fontSize: 24 }}>⇄</span>
-                  <Chip>Work orders</Chip>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18, color: INK, flexWrap: 'wrap' }}>
+                  <Chip style={{ fontSize: 21 }}>Findings</Chip>
+                  <span style={{ color: TEAL, fontSize: 30 }}>⇄</span>
+                  <Chip style={{ fontSize: 21 }}>Work orders</Chip>
                 </div>
               ),
             },
@@ -516,9 +516,9 @@ export function NotAJob(p: L2Props) {
               n: 3, t: 'Escalate?', tag: 'needs judgment', sub: 'a judgment, not a search',
               pic: (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18 }}>
-                  <Chip>escalate?</Chip>
+                  <Chip style={{ fontSize: 21 }}>escalate?</Chip>
                   <span style={{ color: DIM }}>or</span>
-                  <Chip dim>monitor</Chip>
+                  <Chip dim style={{ fontSize: 21 }}>monitor</Chip>
                 </div>
               ),
             },
@@ -529,7 +529,7 @@ export function NotAJob(p: L2Props) {
                 <span style={{ fontSize: 22, fontWeight: 700, color: INK }}>{j.t}</span>
               </div>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>{j.pic}</div>
-              <div style={{ fontSize: 18, color: DIM }}>{j.sub}</div>
+              <div style={{ fontSize: 20, color: DIM }}>{j.sub}</div>
               <span style={{ alignSelf: 'flex-start', padding: '3px 12px', borderRadius: 999, background: TINT2, color: TEAL_D, fontSize: 16, fontWeight: 700 }}>{j.tag}</span>
             </motion.div>
           ))}

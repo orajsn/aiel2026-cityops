@@ -54,7 +54,8 @@ const run = (cell: number, expect?: string, say?: string): CellMark => ({ cell, 
 /* ---------- Lab 2 · RAG to Agents (rag_to_agents_lab.ipynb, no TODOs: every cell runs as it is) ---------- */
 const L2: Record<string, LabStop> = {
   // page 1 · The bare model: set up first
-  '2.1': {
+  // owner, 29 Oct: Lab 2 now follows the deck; this run-it-yourself stop sits on the page whose band says "Next in the notebook" for it
+  '2.1a': {
     notebook: LAB2,
     where: 'Section 0: Prerequisites and readiness probe',
     from: 1,
@@ -71,7 +72,8 @@ const L2: Record<string, LabStop> = {
     ],
   },
   // page 2 · Text becomes a point
-  '2.2': {
+  // owner, 29 Oct: Lab 2 now follows the deck; this run-it-yourself stop sits on the page whose band says "Next in the notebook" for it
+  '2.2b': {
     notebook: LAB2,
     where: 'Section 1: RAG, grounded · 1.2 to 1.5',
     from: 19,
@@ -97,7 +99,8 @@ const L2: Record<string, LabStop> = {
     ],
   },
   // page 4 · One folder is not enough: the notebook's optional workflow section
-  '2.4': {
+  // owner, 29 Oct: Lab 2 now follows the deck; this run-it-yourself stop sits on the page whose band says "Next in the notebook" for it
+  '2.4b': {
     notebook: LAB2,
     where: 'OPTIONAL: Section 2: LLM-driven workflow',
     from: 40,
@@ -112,7 +115,8 @@ const L2: Record<string, LabStop> = {
     ],
   },
   // page 5 · Tools and the skill
-  '2.5': {
+  // owner, 29 Oct: Lab 2 now follows the deck; this run-it-yourself stop sits on the page whose band says "Next in the notebook" for it
+  '2.5b': {
     notebook: LAB2,
     where: 'Section 3: Tools and skills',
     from: 53,
@@ -125,7 +129,8 @@ const L2: Record<string, LabStop> = {
     ],
   },
   // page 6 · One query, four shapes
-  '2.6': {
+  // owner, 29 Oct: Lab 2 now follows the deck; this run-it-yourself stop sits on the page whose band says "Next in the notebook" for it
+  '2.6a': {
     notebook: LAB2,
     where: 'Section 4: The marquee unified query',
     from: 61,
