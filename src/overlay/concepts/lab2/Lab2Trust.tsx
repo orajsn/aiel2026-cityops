@@ -91,7 +91,7 @@ function ToolArt({ w, red }: { w: number; red: boolean }) {
         <path d="M262 100h40M262 128h40" stroke={G3} strokeWidth="3" />
         <path d="M300 58l40-26" stroke={G3} strokeWidth="3" />
         <rect x="324" y="10" width="54" height="40" rx="6" fill="#fff" stroke={red ? 'var(--red)' : G2} strokeWidth="4" />
-        <text x="351" y="40" textAnchor="middle" fontSize="28" fontWeight="700" fontFamily="Inter, sans-serif" fill={red ? 'var(--red)' : G3}>?</text>
+        <text x="351" y="40" textAnchor="middle" fontSize="28" fontWeight="700" fontFamily="Inter, sans-serif" fill={G3}>?</text>
       </motion.g>
       {/* the box */}
       <path d="M60 170h280l-16 128H76z" fill={G2} />
