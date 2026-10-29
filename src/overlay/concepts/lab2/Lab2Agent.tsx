@@ -9,8 +9,6 @@ import {
   Arrow, ArrowDown, CARD, Chip, Db, DIM, INK, L2Page, Net, Num, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
   cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props,
 } from './parts';
-import { Fill, FitBox } from '../Fill';
-import { AgentAvatar } from './AgentAvatar';
 
 /**
  * Lab 2 · Tools (tools, skills, MCP), Query (one query, four lenses) and Agent (build the agent): the deck's
