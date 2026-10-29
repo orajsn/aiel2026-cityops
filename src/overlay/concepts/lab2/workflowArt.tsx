@@ -4,7 +4,7 @@ import { Figure } from './everyday';
 
 /**
  * The Workflow chapter's everyday pictures (owner, 29 Oct), in the flat style of everyday.tsx: two greys, teal for
- * the thing that matters, one slow motion each. A desk, a tram and a taxi (who picks the next step), a rail
+ * the thing that matters, one slow motion each. A library, a train and a taxi (who picks the next step), a rail
  * junction (every exit laid in advance), a garage work order (a fixed form) and a recipe card (a fixed order).
  */
 
@@ -14,56 +14,81 @@ const G_DARK = '#5c6b78';
 const TEAL = 'var(--teal)';
 const svgFill = { width: '100%', height: '100%', display: 'block' } as const;
 
-/** RAG: an information desk. One question in, the clerk looks once, one answer card out */
-export function InfoDesk() {
+/** RAG: a library. A tall bookshelf; the librarian takes one book off it and hands it over, once */
+export function Library() {
+  const shelves = [30, 82, 134];
+  const widths = [14, 18, 12, 16, 20, 13, 17, 15, 12, 19];
   return (
-    <svg data-art="info-desk" viewBox="0 0 340 230" style={svgFill}>
+    <svg data-art="library" viewBox="0 0 340 230" style={svgFill}>
       <ellipse cx="170" cy="222" rx="150" ry="6" fill="rgba(127,127,127,0.18)" />
-      {/* the shelf of folders behind: one of them is looked up */}
-      <rect x="196" y="22" width="126" height="104" rx="8" fill={G_LIGHT} stroke={G_DARK} strokeWidth="2" />
-      {[0, 1, 2, 3, 4].map((i) => (
-        <rect key={i} x={208 + i * 22} y="36" width="16" height="76" rx="2" fill={i === 2 ? TEAL : G_MID} />
-      ))}
-      <Figure x={110} y={18} shirt="#5d7f8c" />
-      <rect x="40" y="150" width="200" height="14" rx="4" fill={G_MID} />
-      <rect x="46" y="164" width="188" height="54" rx="3" fill={G_DARK} />
-      {/* the question comes in, the answer goes out */}
-      <motion.g initial={{ opacity: 0, x: 30 }} animate={{ opacity: [0, 1, 1, 0], x: [30, 0, 0, 0] }} transition={{ delay: 0.6, duration: 2.6, times: [0, 0.2, 0.8, 1], repeat: Infinity, repeatDelay: 2.4 }}>
-        <rect x="262" y="150" width="56" height="44" rx="12" fill={G_MID} />
-        <text x="290" y="182" textAnchor="middle" fontSize="28" fontWeight="700" fill="#fff">?</text>
-      </motion.g>
-      <motion.g initial={{ opacity: 0, x: 0 }} animate={{ opacity: [0, 0, 1, 1], x: [0, 0, 70, 70] }} transition={{ delay: 0.6, duration: 2.6, times: [0, 0.55, 0.8, 1], repeat: Infinity, repeatDelay: 2.4 }}>
-        <rect x="140" y="114" width="56" height="34" rx="4" fill="#fff" stroke={TEAL} strokeWidth="3" />
-        <path d="M148 125h38M148 136h26" stroke={TEAL} strokeWidth="3" strokeLinecap="round" />
+      {/* the bookshelf: three shelves of books, one gap where the teal book was */}
+      <rect x="120" y="14" width="206" height="196" rx="6" fill={G_LIGHT} stroke={G_DARK} strokeWidth="2.5" />
+      {shelves.map((y, r) => {
+        let x = 130;
+        return (
+          <g key={y}>
+            {widths.map((w, i) => {
+              const k = (i + r * 3) % widths.length;
+              const bw = widths[k];
+              const h = 40 + ((k * 7) % 9);
+              const gap = r === 1 && i === 4;
+              const el = gap ? null : <rect key={i} x={x} y={y + 48 - h} width={bw - 2} height={h} rx="2" fill={[G_MID, G_DARK, '#a3abb5'][(k + r) % 3]} />;
+              x += bw;
+              return x < 318 ? el : null;
+            })}
+            <rect x="122" y={y + 48} width="202" height="5" fill={G_DARK} />
+          </g>
+        );
+      })}
+      {/* the librarian */}
+      <Figure x={66} y={40} shirt="#5d7f8c" scale={0.95} />
+      {/* the one book, handed out */}
+      <motion.g initial={{ x: 120, y: -40, opacity: 0 }} animate={{ x: [120, 120, 0, 0], y: [-40, -40, 0, 0], opacity: [0, 1, 1, 1] }} transition={{ delay: 0.8, duration: 2.2, times: [0, 0.2, 0.7, 1], ease: EASE }}>
+        <rect x="84" y="140" width="22" height="34" rx="3" fill={TEAL} />
+        <path d="M88 148h14" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" />
       </motion.g>
     </svg>
   );
 }
 
-/** workflow: a tram on rails. The track and its four stops are laid before it leaves */
-export function Tram() {
+/** workflow: a train on its rails. The track and its four stations are laid before it leaves */
+export function Train() {
   const stops = [46, 124, 202, 280];
   return (
-    <svg data-art="tram" viewBox="0 0 340 230" style={svgFill}>
+    <svg data-art="train" viewBox="0 0 340 230" style={svgFill}>
       <ellipse cx="170" cy="222" rx="150" ry="6" fill="rgba(127,127,127,0.18)" />
       {Array.from({ length: 22 }, (_, i) => (
-        <rect key={i} x={14 + i * 14.5} y="170" width="6" height="30" rx="1" fill={G_LIGHT} />
+        <rect key={i} x={14 + i * 14.5} y="180" width="6" height="24" rx="1" fill={G_LIGHT} />
       ))}
-      <path d="M8 176H332M8 194H332" stroke={TEAL} strokeWidth="4" strokeLinecap="round" />
+      <path d="M8 186H332M8 198H332" stroke={TEAL} strokeWidth="4" strokeLinecap="round" />
       {stops.map((x, i) => (
         <g key={x}>
-          <rect x={x - 2} y="60" width="4" height="110" fill={G_DARK} />
-          <circle cx={x} cy="52" r="16" fill={TEAL} />
-          <text x={x} y="58" textAnchor="middle" fontSize="17" fontWeight="700" fill="#fff">{i + 1}</text>
+          <rect x={x - 2} y="60" width="4" height="58" fill={G_DARK} />
+          <circle cx={x} cy="44" r="16" fill={TEAL} />
+          <text x={x} y="50" textAnchor="middle" fontSize="17" fontWeight="700" fill="#fff">{i + 1}</text>
         </g>
       ))}
-      {/* the tram rides stop to stop, pausing at each */}
+      {/* the train rides station to station, pausing at each: an engine with a chimney and a cab, then a carriage, on wheels */}
       <motion.g initial={{ x: 0 }} animate={{ x: [0, 0, 78, 78, 156, 156, 234, 234] }} transition={{ delay: 1, duration: 7, times: [0, 0.1, 0.25, 0.4, 0.55, 0.7, 0.85, 1], ease: 'easeInOut', repeat: Infinity, repeatDelay: 1.5 }}>
-        <rect x="10" y="118" width="72" height="50" rx="10" fill={G_DARK} />
-        <rect x="18" y="127" width="16" height="17" rx="3" fill="#dfe6ea" />
-        <rect x="38" y="127" width="16" height="17" rx="3" fill="#dfe6ea" />
-        <rect x="58" y="127" width="16" height="17" rx="3" fill="#dfe6ea" />
-        <path d="M46 118V104M36 104h20" stroke={G_DARK} strokeWidth="3" strokeLinecap="round" />
+        {/* carriage */}
+        <rect x="-38" y="134" width="50" height="34" rx="5" fill={G_MID} />
+        <rect x="-32" y="140" width="14" height="12" rx="2" fill="#dfe6ea" />
+        <rect x="-14" y="140" width="14" height="12" rx="2" fill="#dfe6ea" />
+        <rect x="12" y="158" width="8" height="4" fill={G_DARK} />
+        {/* engine */}
+        <rect x="20" y="140" width="46" height="28" rx="4" fill={G_DARK} />
+        <rect x="56" y="122" width="26" height="46" rx="4" fill={G_DARK} />
+        <rect x="61" y="128" width="16" height="12" rx="2" fill="#dfe6ea" />
+        <rect x="28" y="126" width="10" height="14" rx="2" fill={G_DARK} />
+        <path d="M82 168l8 6H20" fill={G_DARK} />
+        {/* wheels */}
+        {[-28, -2, 30, 50, 72].map((cx) => (
+          <g key={cx}>
+            <circle cx={cx} cy="176" r="8" fill="#2f3842" />
+            <circle cx={cx} cy="176" r="3" fill="#dfe6ea" />
+          </g>
+        ))}
+        <path d="M30 176H72" stroke="#dfe6ea" strokeWidth="2.5" />
       </motion.g>
     </svg>
   );

@@ -5,7 +5,7 @@ import { LineIcon, type IconName } from '../icons';
 import { Story, stepAt } from './Story';
 import { Triage } from './everyday';
 import { Fill, FitBox } from '../Fill';
-import { InfoDesk, Junction, Recipe, Taxi, Tram, WorkOrder } from './workflowArt';
+import { Junction, Library, Recipe, Taxi, Train, WorkOrder } from './workflowArt';
 import {
   Arrow, ArrowDown, CARD, ChiefInspector, Chip, DIM, INK, L2Page, Net, Num, Portrait, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
   cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props,
@@ -28,13 +28,13 @@ function Swap({ k, children }: { k: string | number; children: ReactNode }) {
 /* ---------------- 2.4c, 2.4d · who holds the pen, the anatomy of a workflow ---------------- */
 
 const PENS = [
-  { name: 'RAG', like: 'an information desk', who: 'the application', sub: 'one lookup, one answer', art: <InfoDesk /> },
-  { name: 'Workflow', like: 'a tram on its rails', who: 'the code', sub: '', art: <Tram />, ticks: ['Path fixed in advance', 'LLM only inside steps', 'Human sign-off (design option)', 'Replayable'] },
+  { name: 'RAG', like: 'a library desk', who: 'the application', sub: 'one lookup, one answer', art: <Library /> },
+  { name: 'Workflow', like: 'a train on its rails', who: 'the code', sub: '', art: <Train />, ticks: ['Path fixed in advance', 'LLM only inside steps', 'Human sign-off (design option)', 'Replayable'] },
   { name: 'Agent', like: 'a taxi in the city', who: 'the model', sub: 'flexible, less predictable', art: <Taxi /> },
 ];
 const PEN_AT = [0.3, 1.1, 1.9];
 
-/** 2.4c · three ways to get somewhere: a desk, a tram, a taxi; the workflow's tram in the middle, its four promises after */
+/** 2.4c · three ways to get somewhere: a library, a train, a taxi; the workflow's train in the middle, its four promises after */
 function WhoChooses() {
   return (
     <Fill>
@@ -42,17 +42,17 @@ function WhoChooses() {
         {PENS.map((c, i) => {
           const mid = i === 1;
           return (
-            <motion.div key={c.name} data-pen={c.name} {...fadeUp(PEN_AT[i])} style={{ ...card(mid), background: mid ? TINT : SOFT, padding: '18px 22px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-              <div style={{ fontSize: 34, fontWeight: 700, color: INK }}>{c.name}</div>
+            <motion.div key={c.name} data-pen={c.name} {...fadeUp(PEN_AT[i])} style={{ ...card(mid), background: mid ? TINT : SOFT, padding: '12px 22px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <div style={{ fontSize: 32, fontWeight: 700, color: INK }}>{c.name}</div>
               <div style={{ fontSize: 22, color: DIM }}>is like {c.like}</div>
-              <div style={{ flex: '1 1 0', minHeight: 150, width: '100%', margin: '10px 0', position: 'relative' }}>
+              <div style={{ flex: '1 1 0', minHeight: 110, width: '100%', margin: '6px 0', position: 'relative' }}>
                 <div style={{ position: 'absolute', inset: 0 }}>{c.art}</div>
               </div>
               <div style={{ fontSize: 21, color: DIM }}>The next step is picked by</div>
               <div style={{ fontSize: 30, fontWeight: 700, color: mid ? TEAL_D : INK }}>{c.who}</div>
               {c.sub && <div style={{ fontSize: 22, color: DIM, marginTop: 4 }}>{c.sub}</div>}
               {c.ticks && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10, textAlign: 'left' }}>
+                <div style={{ flex: 'none', display: 'flex', flexDirection: 'column', gap: 2, marginTop: 6, textAlign: 'left' }}>
                   {c.ticks.map((t, k) => (
                     <motion.div key={t} {...fadeUp(2.8 + k * 0.3)} style={{ fontSize: 22, color: INK, lineHeight: 1.3 }}>
                       <span style={{ color: TEAL, fontWeight: 700 }}>✓</span> {t}
