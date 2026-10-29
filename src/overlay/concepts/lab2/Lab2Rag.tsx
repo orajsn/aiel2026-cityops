@@ -3,9 +3,11 @@ import type { ReactNode } from 'react';
 import { EASE } from '../WidePanel';
 import { LineIcon, type IconName } from '../icons';
 import {
-  Arrow, ArrowDown, CARD, ChiefInspector, Chip, Db, DIM, Folder, INK, L2Page, Net, Num, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
+  Arrow, ArrowDown, CARD, ChiefInspector, Chip, Db, DIM, Folder, GREY, INK, L2Page, Net, Num, Portrait, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
   cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props,
 } from './parts';
+import { Fill, FitBox } from '../Fill';
+import { BigFolder, Cabinet, DeskPerson, Pile } from './ragArt';
 
 /**
  * Lab 2 · RAG, the filing cabinet (the deck's chapter 4): look it up before answering, then the notebook's
@@ -14,126 +16,207 @@ import {
 
 /* ---------------- 2.2, 2.2a, 2.2b · look it up before answering ---------------- */
 
-const PIPE: { label: string; icon: IconName }[] = [
-  { label: 'Question', icon: 'speech' },
-  { label: 'Embed', icon: 'nodes' },
-  { label: 'Similarity search', icon: 'inspect' },
-  { label: 'Top-k into prompt', icon: 'prompt' },
-  { label: 'Grounded answer', icon: 'quote' },
+/** the five steps of RAG, along the foot of the picture: the technical name, the plain words under it */
+const PIPE: { label: string; plain: string }[] = [
+  { label: 'Question', plain: 'ask' },
+  { label: 'Embed', plain: 'label it' },
+  { label: 'Similarity search', plain: 'find the folders' },
+  { label: 'Top-k into prompt', plain: 'hand over five' },
+  { label: 'Grounded answer', plain: 'answer from them' },
 ];
 
-function Pipeline({ compact }: { compact: boolean }) {
+function Pipeline({ hi }: { hi: number[] | 'all' }) {
   return (
-    <div data-pipeline style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-      {PIPE.map((s, i) => [
-        i > 0 ? <Arrow key={`a${i}`} w={compact ? 40 : 60} delay={0.3 + i * 0.45} loop={i === 4} /> : null,
-        <motion.div key={s.label} data-pipe={s.label} {...fadeUp(0.2 + i * 0.45)} style={{ display: 'flex', flexDirection: compact ? 'row' : 'column', alignItems: 'center', gap: compact ? 10 : 12, padding: compact ? '8px 14px' : '18px 18px', ...card(i === 4), background: i === 4 ? TINT : SOFT, minWidth: compact ? 0 : 170 }}>
-          <LineIcon name={s.icon} size={compact ? 32 : 60} />
-          <span style={{ fontSize: compact ? 19 : 23, fontWeight: 700, color: INK, whiteSpace: 'nowrap' }}>{s.label}</span>
-        </motion.div>,
-      ])}
+    <div data-pipeline style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+      {PIPE.map((s, i) => {
+        const on = hi === 'all' || hi.includes(i);
+        return [
+          i > 0 ? <Arrow key={`a${i}`} w={44} delay={0.2 + i * 0.3} /> : null,
+          <motion.div key={s.label} data-pipe={s.label} data-on={on} initial={{ opacity: 0, y: 8 }} animate={{ opacity: on ? 1 : 0.4, y: 0 }} transition={{ delay: hi === 'all' ? 0.2 + i * 0.3 : 0.2, duration: 0.5, ease: EASE }} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px', borderRadius: 12, border: `2px solid ${on ? TEAL : 'var(--line)'}`, background: on ? TINT : SOFT }}>
+            <Num n={i + 1} on={on} size={32} />
+            <div style={{ lineHeight: 1.15 }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: INK, whiteSpace: 'nowrap' }}>{s.label}</div>
+              <div style={{ fontSize: 17, color: DIM, whiteSpace: 'nowrap' }}>{s.plain}</div>
+            </div>
+          </motion.div>,
+        ];
+      })}
     </div>
   );
 }
 
-const GRID = Array.from({ length: 72 }, (_, i) => i);
-const TOP5 = [6, 17, 27, 39, 52];
+const capBig = { fontSize: 26, fontWeight: 700, color: INK, lineHeight: 1.25 } as const;
+const subBig = { fontSize: 22, color: DIM, lineHeight: 1.35 } as const;
+const at = (x: number, y: number, w: number) => ({ position: 'absolute' as const, left: x, top: y, width: w });
+
+/** one column of the picture: the drawing standing on a common floor line, the caption under it */
+function Col({ x, w, delay, title, sub, children }: { x: number; w: number; delay: number; title: string; sub: ReactNode; children: ReactNode }) {
+  return (
+    <motion.div {...fadeUp(delay)} style={{ ...at(x, 0, w), display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+      <div style={{ height: 330, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>{children}</div>
+      <div style={{ ...capBig, marginTop: 14 }}>{title}</div>
+      <div style={{ ...subBig, marginTop: 4 }}>{sub}</div>
+    </motion.div>
+  );
+}
+
+/** the answer, drawn: a teal speech bubble with its lines, a folder tag in the corner */
+function AnswerBubble() {
+  return (
+    <svg width="240" height="210" viewBox="0 0 240 210" aria-hidden style={{ display: 'block', overflow: 'visible' }}>
+      <path d="M14 20a14 14 0 0 1 14-14h184a14 14 0 0 1 14 14v116a14 14 0 0 1-14 14H90l-36 34 6-34H28a14 14 0 0 1-14-14z" fill="#1b8a9c" />
+      {[44, 74, 104].map((y, i) => (
+        <motion.path key={y} d={`M40 ${y}H${i === 2 ? 150 : 196}`} stroke="#fff" strokeWidth="8" strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 4.2 + i * 0.3, duration: 0.5, ease: EASE }} />
+      ))}
+      <g transform="translate(170 118)">
+        <path d="M0 6a4 4 0 0 1 4-4h16l6 6h26a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4z" fill="#fff" />
+        <path d="M0 16h56" stroke="#1b8a9c" strokeWidth="2" opacity="0.5" />
+      </g>
+    </svg>
+  );
+}
+
+/** click 1: Vance asks, the cabinet's drawer opens, one folder flies to the engineer's desk, the answer comes from it */
+function LookItUp() {
+  return (
+    <div data-cabinet style={{ position: 'relative', width: 1400, height: 470 }}>
+      <Col x={0} w={330} delay={0.2} title="Vance asks" sub="a plain question">
+        <Portrait who="vance" size={120} />
+        <div style={{ marginTop: 14, fontSize: 22, lineHeight: 1.35, padding: '12px 16px', borderRadius: 16, border: `2px solid ${TEAL}`, background: TINT, color: INK }}>“What recent issues have been reported on Harbor Bridge?”</div>
+      </Col>
+      <div style={{ ...at(318, 200, 70) }}>
+        <Arrow w={64} delay={0.9} />
+      </div>
+      <Col x={380} w={300} delay={0.7} title="The filing cabinet" sub="every inspection report, labelled">
+        <Cabinet w={230} open={0} openAt={1.4} />
+      </Col>
+      {/* the one folder: out of the drawer, across to the desk */}
+      <motion.div data-flying-folder initial={{ opacity: 0, x: 470, y: 40, scale: 0.6 }} animate={{ opacity: [0, 1, 1], x: [470, 470, 838], y: [40, 0, 196], scale: [0.6, 0.8, 1] }} transition={{ delay: 2.2, duration: 1.6, times: [0, 0.3, 1], ease: EASE }} style={{ position: 'absolute', left: 0, top: 0, zIndex: 2 }}>
+        <BigFolder w={104} />
+      </motion.div>
+      <Col x={720} w={340} delay={1} title="Pull the right folder" sub="the engineer reads it at the desk">
+        <DeskPerson w={320} />
+      </Col>
+      <div style={{ ...at(1072, 200, 70) }}>
+        <Arrow w={64} delay={3.6} />
+      </div>
+      <Col x={1140} w={260} delay={3.9} title="Answer from it" sub={<>the evidence first, <b style={{ color: INK }}>then</b> the answer</>}>
+        <AnswerBubble />
+      </Col>
+    </div>
+  );
+}
+
+
+/** click 2: the same cabinet, two ways to hand it over: everything onto the desk, or the five folders that matter */
+function NotEveryFile() {
+  return (
+    <div style={{ position: 'relative', width: 1400, height: 470 }}>
+      <div data-side="every-file" style={{ ...at(0, 0, 480), display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, textAlign: 'center' }}>
+        <div style={{ ...cap, fontSize: 19, color: INK }}>Every file at once</div>
+        <div style={{ position: 'relative', width: 340, height: 272, marginTop: 24 }}>
+          <DeskPerson w={340} />
+          <div style={{ position: 'absolute', left: -24, top: 16 }}>
+            <Pile n={15} w={230} at={0.5} />
+          </div>
+        </div>
+        <div style={{ ...subBig, display: 'flex', gap: 22 }}>
+          <span>Slow</span>
+          <span>Costly</span>
+          <span>Worse answers</span>
+        </div>
+        <motion.div {...fadeUp(2)} style={{ fontSize: 26, fontWeight: 700, color: RED }}>✗ the answer drowns in noise</motion.div>
+      </div>
+      <motion.div {...fadeUp(0.2)} style={{ ...at(520, 60, 360), display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <svg width="60" height="24" viewBox="0 0 60 24" aria-hidden style={{ transform: 'scaleX(-1)', flex: 'none' }}>
+            <path d="M2 12H50" stroke={GREY} strokeWidth="3" strokeDasharray="5 6" />
+            <path d="M44 5l8 7-8 7" stroke={GREY} strokeWidth="3" fill="none" strokeLinecap="round" />
+          </svg>
+          <Cabinet w={170} lit={[0, 1, 2]} />
+          <Arrow w={60} delay={2.4} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: 19, fontWeight: 600, marginTop: -8 }}>
+          <span style={{ color: DIM }}>everything</span>
+          <span style={{ color: TEAL_D }}>top 5</span>
+        </div>
+        <div style={{ ...capBig, textAlign: 'center' }}>The same cabinet</div>
+        <div style={{ ...subBig, textAlign: 'center' }}>cut into labelled folders</div>
+      </motion.div>
+      <motion.div data-side="top-5" {...fadeUp(2.4)} style={{ ...at(920, 0, 480), display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, textAlign: 'center' }}>
+        <div style={{ ...capTeal, fontSize: 19 }}>The 5 most relevant</div>
+        <div style={{ position: 'relative', width: 340, height: 272, marginTop: 24 }}>
+          <DeskPerson w={340} />
+          <div style={{ position: 'absolute', left: 26, top: 120, display: 'flex', gap: 6 }}>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.8 + i * 0.2, duration: 0.4, ease: EASE }}>
+                <Folder size={52} />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+        <div style={{ ...subBig, display: 'flex', gap: 22 }}>
+          <span>Fast</span>
+          <span>Cheap</span>
+          <span>Grounded answers</span>
+        </div>
+        <div style={{ fontSize: 26, fontWeight: 700, color: TEAL_D }}>✓ only the right evidence gets through</div>
+      </motion.div>
+    </div>
+  );
+}
+
+const PILLARS = [
+  { t: 'Right data', s: 'the reports about this bridge, not every bridge' },
+  { t: 'Right moment', s: 'this morning’s inspection, not last year’s' },
+  { t: 'Right amount', s: 'five folders, not the whole cabinet' },
+];
+
+/** click 3: the cabinet opens, three folders fan out: what makes a retrieval good */
+function RightFolder() {
+  return (
+    <div style={{ position: 'relative', width: 1400, height: 470 }}>
+      <motion.div {...fade(0.1)} style={{ ...at(30, 20, 320), display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textAlign: 'center' }}>
+        <Cabinet w={260} open={1} openAt={0.3} />
+        <div style={capBig}>Pull the right folder</div>
+      </motion.div>
+      <svg width="140" height="470" viewBox="0 0 140 470" aria-hidden style={{ position: 'absolute', left: 350, top: 0, overflow: 'visible' }}>
+        {[82, 232, 382].map((y, i) => (
+          <motion.path key={y} d={`M4 232 C70 232 60 ${y} 130 ${y}`} fill="none" stroke={TEAL} strokeWidth={3} strokeDasharray="6 7" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.8 + i * 0.5, duration: 0.6, ease: EASE }} />
+        ))}
+      </svg>
+      {PILLARS.map((x, i) => (
+        <motion.div key={x.t} data-pillar={x.t} initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1 + i * 0.5, duration: 0.6, ease: EASE }} style={{ ...at(500, 20 + i * 150, 900), height: 124, display: 'flex', alignItems: 'center', gap: 26, padding: '0 26px', boxSizing: 'border-box', borderRadius: 16, border: `2px solid ${TEAL}`, background: CARD }}>
+          <BigFolder w={110} />
+          <div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: INK }}>{x.t}</div>
+            <div style={{ fontSize: 24, color: DIM }}>{x.s}</div>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
 
 export function RagIdea(p: L2Props) {
   const step = p.step ?? 1;
   return (
     <L2Page testId="l2-rag" hasRed={step === 2} {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20, minHeight: 0 }}>
-        <motion.div layout transition={{ duration: 0.5, ease: EASE }}>
-          <Pipeline compact={step > 1} />
-        </motion.div>
+      <Fill gap={14}>
         <AnimatePresence mode="wait">
-          <motion.div key={step} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease: EASE }} style={{ flex: 1, minHeight: 0, display: 'flex' }}>
-            {step === 1 && (
-              <div data-cabinet style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 70px minmax(0, 1fr) 70px minmax(0, 1fr)', alignItems: 'center', gap: 6 }}>
-                <motion.div {...fadeUp(2.4)} style={{ ...card(), height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-                  {/* a filing cabinet: three drawers, one lit */}
-                  <svg width="130" height="150" viewBox="0 0 130 150" aria-hidden>
-                    <rect x="10" y="6" width="110" height="138" rx="8" fill="rgba(127,127,127,0.15)" stroke="#8a97a3" strokeWidth="3" />
-                    {[0, 1, 2].map((i) => (
-                      <g key={i}>
-                        <rect x="20" y={16 + i * 42} width="90" height="34" rx="4" fill={i === 1 ? 'rgba(27,138,156,0.25)' : 'rgba(127,127,127,0.12)'} stroke={i === 1 ? '#1b8a9c' : '#8a97a3'} strokeWidth="2.5" />
-                        <rect x="55" y={30 + i * 42} width="20" height="6" rx="3" fill={i === 1 ? '#1b8a9c' : '#8a97a3'} />
-                      </g>
-                    ))}
-                  </svg>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>The filing cabinet</div>
-                  <div style={{ fontSize: 19, color: DIM }}>every inspection report, labelled</div>
-                </motion.div>
-                <Arrow w={60} delay={2.8} />
-                <motion.div {...fadeUp(3)} style={{ ...card(true), background: TINT, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-                  <Folder size={110} />
-                  <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>Pull the right folder</div>
-                  <div style={{ fontSize: 19, color: DIM }}>the right report, for this question</div>
-                </motion.div>
-                <Arrow w={60} delay={3.4} />
-                <motion.div {...fadeUp(3.6)} style={{ ...card(), height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-                  <ChiefInspector size={120} grey label="the engineer" />
-                  <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>Answer from it</div>
-                  <div style={{ fontSize: 19, color: DIM }}>RAG fetches the evidence first</div>
-                </motion.div>
-              </div>
-            )}
-            {step === 2 && (
-              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 24 }}>
-                <div data-side="every-file" style={{ ...card(), borderColor: RED, background: 'rgba(199,70,52,0.06)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 20 }}>
-                  <div style={{ ...cap, color: INK }}>Every file at once</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 26px)', gap: 6 }}>
-                    {GRID.map((i) => (
-                      <motion.div key={i} {...fade(0.2 + (i % 12) * 0.03)} style={{ width: 26, height: 26, borderRadius: 4, background: 'rgba(127,127,127,0.35)' }} />
-                    ))}
-                  </div>
-                  <div style={{ display: 'flex', gap: 30, fontSize: 21, color: DIM }}>
-                    <span>Slow</span>
-                    <span>Costly</span>
-                    <span>Worse answers</span>
-                  </div>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: RED }}>✗ the answer drowns in noise</div>
-                </div>
-                <div data-side="top-5" style={{ ...card(true), background: TINT, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 20 }}>
-                  <div style={capTeal}>Top 5 labelled folders</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 26px)', gap: 6 }}>
-                    {GRID.map((i) => (
-                      <motion.div key={i} initial={{ opacity: 0.25 }} animate={{ opacity: TOP5.includes(i) ? 1 : 0.18, scale: TOP5.includes(i) ? 1.15 : 1 }} transition={{ delay: 1 + TOP5.indexOf(i) * 0.25, duration: 0.5 }} style={{ width: 26, height: 26, borderRadius: 4, background: TOP5.includes(i) ? TEAL : 'rgba(127,127,127,0.4)' }} />
-                    ))}
-                  </div>
-                  <div style={{ display: 'flex', gap: 30, fontSize: 21, color: DIM }}>
-                    <span>Fast</span>
-                    <span>Cheap</span>
-                    <span>Grounded answers</span>
-                  </div>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: TEAL_D }}>✓ only the right evidence reaches the model</div>
-                </div>
-              </div>
-            )}
-            {step === 3 && (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18 }}>
-                <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 24 }}>
-                  {[
-                    { t: 'Right data', s: 'the reports about this bridge, not every bridge', icon: 'target' as IconName },
-                    { t: 'Right moment', s: 'this morning’s inspection, not last year’s', icon: 'clock' as IconName },
-                    { t: 'Right amount', s: 'five folders, not the whole cabinet', icon: 'funnel' as IconName },
-                  ].map((x, i) => (
-                    <motion.div key={x.t} data-pillar={x.t} {...fadeUp(0.3 + i * 0.35)} style={{ ...card(true), background: CARD, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center', padding: 22 }}>
-                      <LineIcon name={x.icon} size={84} />
-                      <div style={{ fontSize: 30, fontWeight: 700, color: INK }}>{x.t}</div>
-                      <div style={{ fontSize: 21, color: DIM }}>{x.s}</div>
-                    </motion.div>
-                  ))}
-                </div>
-                <motion.div {...fadeUp(1.5)} style={{ alignSelf: 'center', padding: '12px 26px', borderRadius: 999, background: 'rgba(31,42,51,0.92)', color: '#fff', fontSize: 24, fontWeight: 600 }}>
-                  Bad answer? Check retrieval first.
-                </motion.div>
-              </div>
-            )}
+          <motion.div key={step} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease: EASE }} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <FitBox w={1400} h={470} max={1.05}>
+              {step === 1 ? <LookItUp /> : step === 2 ? <NotEveryFile /> : <RightFolder />}
+            </FitBox>
           </motion.div>
         </AnimatePresence>
-      </div>
+        {step === 3 && (
+          <motion.div {...fadeUp(2.6)} style={{ alignSelf: 'center', padding: '12px 28px', borderRadius: 999, background: 'rgba(31,42,51,0.92)', color: '#fff', fontSize: 25, fontWeight: 600 }}>
+            Bad answer? Check retrieval first.
+          </motion.div>
+        )}
+        <Pipeline hi={step === 1 ? 'all' : step === 2 ? [3] : [1, 2]} />
+      </Fill>
     </L2Page>
   );
 }
