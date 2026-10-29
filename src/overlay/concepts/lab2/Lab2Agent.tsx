@@ -511,7 +511,7 @@ const LIFE = [
 /** step 1's two memories side by side on the database shelf; on step 2 the whole scene steps back to make room */
 function MemoryShelf({ compact }: { compact: boolean }) {
   return (
-    <motion.div data-shelf animate={{ height: compact ? 250 : 450 }} initial={false} transition={{ duration: 0.7, ease: EASE }} style={{ flex: 'none', display: 'flex', flexDirection: 'column' }}>
+    <motion.div data-shelf animate={{ height: compact ? 250 : 420 }} initial={false} transition={{ duration: 0.7, ease: EASE }} style={{ flex: 'none', display: 'flex', flexDirection: 'column' }}>
       <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr)', alignItems: 'end', columnGap: 20 }}>
         {MEMS.map((m, i) => {
           const art = m.key === 'notebook' ? <PocketNotebook /> : <Logbook />;
@@ -524,13 +524,13 @@ function MemoryShelf({ compact }: { compact: boolean }) {
           );
           return (
             <motion.div key={m.key} data-memory={m.t} {...fadeUp(0.4 + i * 0.8)} style={{ gridColumn: i === 0 ? 1 : 3, height: '100%', minHeight: 0, display: 'flex', flexDirection: i === 0 ? 'row' : 'row-reverse', alignItems: 'flex-end', gap: 22, textAlign: i === 0 ? 'left' : 'right', paddingBottom: 6 }}>
-              <div style={{ height: '100%', maxHeight: compact ? 190 : 350, aspectRatio: '1 / 1.15', flex: 'none', display: 'flex', alignItems: 'flex-end' }}>{art}</div>
+              <div style={{ height: '100%', maxHeight: compact ? 190 : 340, aspectRatio: '1 / 1.15', flex: 'none', display: 'flex', alignItems: 'flex-end' }}>{art}</div>
               {words}
             </motion.div>
           );
         })}
         <motion.div {...fadeUp(0.2)} style={{ gridColumn: 2, gridRow: 1, alignSelf: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <ChiefInspector size={compact ? 90 : 150} />
+          <ChiefInspector size={compact ? 90 : 170} />
           {!compact && <div style={{ fontSize: 22, color: DIM, textAlign: 'center' }}>writes in both</div>}
         </motion.div>
       </div>
@@ -647,63 +647,141 @@ export function TwoMemories(p: L2Props) {
         <MemoryShelf compact={step >= 2} />
         <AnimatePresence>{step >= 2 && <Lifecycle key="life" />}</AnimatePresence>
         {step < 2 && (
-          <motion.div {...fade(2.4)} style={{ flex: '1 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, color: INK, paddingTop: 16 }}>
-            One notebook for this visit, one permanent logbook with an index: <b style={{ marginLeft: 8, color: TEAL_D }}>both on one database.</b>
-          </motion.div>
+          <div data-inside style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 40, paddingTop: 16 }}>
+            {[
+              { t: 'Inside the notebook', s: 'the steps of this conversation, per thread', rows: ['checkpoints', 'checkpoint_blobs', 'checkpoint_writes'] },
+              { t: 'Inside the logbook', s: 'the notes, and their index for search by meaning', rows: ['store_incident', 'store_vectors_incident'] },
+            ].map((c, i) => (
+              <motion.div key={c.t} {...fadeUp(2.2 + i * 0.5)} style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '14px 20px', borderRadius: 14, background: SOFT, borderTop: `4px solid ${TEAL}` }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>{c.t}</span>
+                  <span style={{ fontSize: 22, color: DIM }}>{c.s}</span>
+                </div>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
+                  {c.rows.map((r) => (
+                    <Chip key={r} style={{ fontSize: 20, padding: '6px 12px' }}>{r}</Chip>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
         )}
       </Fill>
     </L2Page>
   );
 }
 
-/* ---------------- 2.7c · §5.3 wipe only this lab's notes ---------------- */
+/* ---------------- 2.7c · wipe only this lab's notes ---------------- */
+
+/** a locker: a grey door with vents and a handle; `open` swings it away to show what is inside */
+function Locker({ open, at, inside, padlock = false, w }: { open: boolean; at: number; inside?: ReactNode; padlock?: boolean; w?: number }) {
+  return (
+    <div data-locker={open ? 'emptied' : 'shut'} style={{ position: 'relative', width: w, flex: 1, minHeight: 0, borderRadius: 10, background: 'rgba(20, 26, 34, 0.78)', perspective: 900 }}>
+      {inside && (
+        <motion.div {...fade(at + 0.5)} style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 10, textAlign: 'center', color: '#e6e9ef' }}>
+          {inside}
+        </motion.div>
+      )}
+      <motion.div
+        aria-hidden
+        initial={{ rotateY: 0 }}
+        animate={{ rotateY: open ? -112 : 0 }}
+        transition={{ delay: at, duration: 1, ease: EASE }}
+        style={{ position: 'absolute', inset: 0, transformOrigin: 'left center', borderRadius: 10, background: open ? '#9aa4ae' : '#aab1ba', border: `2px solid ${G_DARK}`, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 0' }}
+      >
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} style={{ width: '46%', height: 5, borderRadius: 3, background: G_DARK, opacity: 0.55, marginBottom: 7 }} />
+        ))}
+        <div style={{ flex: 1 }} />
+        {padlock ? (
+          <svg width="34" height="40" viewBox="0 0 34 40" aria-hidden>
+            <path d="M9 18v-6a8 8 0 0 1 16 0v6" fill="none" stroke={G_DARK} strokeWidth="4" />
+            <rect x="4" y="17" width="26" height="20" rx="4" fill={G_DARK} />
+          </svg>
+        ) : (
+          <div style={{ width: 12, height: 44, borderRadius: 6, background: G_DARK }} />
+        )}
+        <div style={{ flex: 1 }} />
+      </motion.div>
+    </div>
+  );
+}
+
+const CITY_RECORDS = ['PRISM data', 'graph', 'chunks', 'embeddings', 'vector indexes'];
 
 export function Wipe(p: L2Props) {
   const focusN = useFocusN(p.focusId);
+  const on = (n: number) => focusN === null || focusN === n;
+  const ring = (n: number) => (focusN === n ? `0 0 0 4px ${TINT2}` : 'none');
+  const count = (t: ReactNode) => <div style={{ ...mono(21, '#fff'), fontWeight: 700, lineHeight: 1.3 }}>{t}</div>;
   return (
     <L2Page testId="l2-wipe" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-        <StepRow
-          focusN={focusN}
-          steps={[
-            { title: 'This lab’s namespace', body: <><LineIcon name="lock" size={60} /><Chip style={{ fontSize: 18, alignSelf: 'flex-start' }}>prism_incident_decisions</Chip></> },
-            {
-              title: 'Delete logbook rows there',
-              grow: 1.2,
-              body: (
-                <>
-                  {['STORE_INCIDENT', 'STORE_VECTORS_INCIDENT'].map((t) => (
-                    <div key={t} style={{ padding: '10px 14px', borderRadius: 10, background: SOFT }}>
-                      <div style={{ ...mono(18, INK), fontWeight: 700 }}>{t}</div>
-                      <div style={{ fontSize: 17, color: DIM }}>rows cleared: 1</div>
+      <Fill gap={16}>
+        <motion.div {...fade(0.1)} style={{ fontSize: 24, lineHeight: 1.45, color: INK }}>
+          Like clearing out <b>only your own lockers</b> in a shared changing room: find your name tag, empty those, and leave everyone else’s shut.
+        </motion.div>
+        <div style={{ flex: '1 0 auto', minHeight: 430, display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(0, 1fr)', columnGap: 40 }}>
+          {/* ours: the name tag over three lockers */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <motion.div data-step={1} data-on={on(1)} {...fadeUp(0.3)} style={{ alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 14, padding: '10px 16px', borderRadius: 12, border: `2px solid ${TEAL}`, background: TINT, opacity: on(1) ? 1 : 0.4, boxShadow: ring(1), transition: 'opacity 300ms' }}>
+              <Num n={1} size={38} on={on(1)} />
+              <div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>This lab’s name tag</div>
+                <div style={{ ...mono(21) }}>prism_incident_decisions</div>
+              </div>
+            </motion.div>
+            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '2fr 1fr', columnGap: 18 }}>
+              <div data-step={2} data-on={on(2)} style={{ display: 'flex', flexDirection: 'column', gap: 10, opacity: on(2) ? 1 : 0.4, transition: 'opacity 300ms' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Num n={2} size={34} on={on(2)} />
+                  <span style={{ fontSize: 24, fontWeight: 700, color: INK }}>Logbook pages</span>
+                </div>
+                <div style={{ flex: 1, display: 'flex', gap: 12 }}>
+                  {['STORE_INCIDENT', 'STORE_VECTORS_INCIDENT'].map((t, i) => (
+                    <div key={t} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <Locker open at={1.2 + i * 0.4} inside={<>{count('rows cleared: 1')}</>} />
+                      <div style={{ ...mono(18, INK), fontWeight: 700, textAlign: 'center', overflowWrap: 'anywhere' }}>{t}</div>
                     </div>
                   ))}
-                </>
-              ),
-            },
-            {
-              title: 'Delete this thread’s notebook',
-              grow: 1.2,
-              body: (
-                <>
-                  <div style={{ padding: '10px 14px', borderRadius: 10, background: SOFT }}>
-                    <div style={{ ...mono(18, INK), fontWeight: 700 }}>CHECKPOINTS · BLOBS · WRITES</div>
-                    <div style={{ fontSize: 17, color: DIM }}>rows cleared: 9 · 9 · 17</div>
-                  </div>
-                  <Chip style={{ fontSize: 16, alignSelf: 'flex-start' }}>thread_id = prism-agent-demo-001</Chip>
-                </>
-              ),
-            },
-          ]}
-        />
-        <motion.div data-untouched {...fadeUp(2.2)} style={{ ...card(true), background: TINT, padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-          <span style={capTeal}>Not touched</span>
-          {['PRISM data', 'graph', 'chunks', 'embeddings', 'vector indexes'].map((x) => (
-            <Chip key={x} style={{ fontSize: 18, background: CARD }}>{x}</Chip>
-          ))}
-          <span style={{ marginLeft: 'auto', fontSize: 15, color: DIM }}>Row counts: saved output, cell 71</span>
-        </motion.div>
-      </div>
+                </div>
+              </div>
+              <div data-step={3} data-on={on(3)} style={{ display: 'flex', flexDirection: 'column', gap: 10, opacity: on(3) ? 1 : 0.4, transition: 'opacity 300ms' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Num n={3} size={34} on={on(3)} />
+                  <span style={{ fontSize: 24, fontWeight: 700, color: INK }}>This visit</span>
+                </div>
+                <Locker open at={2.2} inside={<>{count('9 · 9 · 17')}<div style={{ fontSize: 18, color: '#c7ced6' }}>rows cleared</div></>} />
+                <div style={{ ...mono(18, INK), fontWeight: 700, textAlign: 'center' }}>CHECKPOINTS · BLOBS · WRITES</div>
+              </div>
+            </div>
+            <motion.div {...fade(2.8)} style={{ alignSelf: 'flex-start' }}>
+              <Chip style={{ fontSize: 19 }}>thread_id = prism-agent-demo-001</Chip>
+            </motion.div>
+          </div>
+          {/* the city's: shut and locked */}
+          <motion.div data-untouched {...fadeUp(0.5)} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ padding: '10px 16px', borderRadius: 12, border: '2px dashed var(--line)', display: 'flex', alignItems: 'center', gap: 14 }}>
+              <svg width="38" height="38" viewBox="0 0 34 40" aria-hidden style={{ flex: 'none' }}>
+                <path d="M9 18v-6a8 8 0 0 1 16 0v6" fill="none" stroke={G_DARK} strokeWidth="4" />
+                <rect x="4" y="17" width="26" height="20" rx="4" fill={G_DARK} />
+              </svg>
+              <div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>The city records</div>
+                <div style={{ fontSize: 22, color: DIM }}>not touched</div>
+              </div>
+            </div>
+            <div style={{ flex: 1, display: 'flex', gap: 10 }}>
+              {CITY_RECORDS.map((t) => (
+                <div key={t} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <Locker open={false} at={0} padlock />
+                  <div style={{ fontSize: 19, color: INK, textAlign: 'center', lineHeight: 1.2, minHeight: 46 }}>{t}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize: 18, color: DIM, textAlign: 'right' }}>Row counts: saved output, cell 71</div>
+          </motion.div>
+        </div>
+      </Fill>
     </L2Page>
   );
 }
