@@ -475,68 +475,122 @@ export function Rule(p: L2Props) {
 
 /* ---------------- 2.3a · §1.7–1.8 RAG plumbing, by hand then LangChain ---------------- */
 
+/** a horizontal pipe drawn behind a row: grey with hand-fitted joints, or one smooth teal run with couplings */
+function PipeLine({ smooth, joints }: { smooth: boolean; joints: number[] }) {
+  const c = smooth ? TEAL : '#9aa4ae';
+  const d = smooth ? '#146f7f' : '#7d8791';
+  return (
+    <svg width="100%" height="56" viewBox="0 0 1000 56" preserveAspectRatio="none" aria-hidden style={{ position: 'absolute', left: 0, right: 0, top: '50%', marginTop: -28, display: 'block' }}>
+      <rect x="0" y="12" width="1000" height="32" rx="16" fill={c} opacity={smooth ? 0.85 : 0.7} />
+      <rect x="0" y="16" width="1000" height="7" rx="3" fill="#fff" opacity="0.25" />
+      {joints.map((x) => (
+        <rect key={x} x={x - 9} y="4" width="18" height="48" rx="4" fill={d} />
+      ))}
+    </svg>
+  );
+}
+
+/** a station standing on the pipe: its number, its words, its picture; lights with the drawer's focus */
+function Station({ n, focusN, delay, title, children }: { n: number; focusN: number | null; delay: number; title: string; children: ReactNode }) {
+  const on = focusN === null || focusN === n;
+  return (
+    <motion.div data-step={n} data-on={on} {...fadeUp(delay)} style={{ position: 'relative', zIndex: 1, flex: '1 1 0', minWidth: 0, ...card(focusN === n), background: CARD, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 10, opacity: on ? 1 : 0.35, transition: 'opacity 300ms', boxShadow: '0 3px 10px rgba(0,0,0,0.08)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <Num n={n} on={on} size={40} />
+        <span style={{ fontSize: 26, fontWeight: 700, color: INK, lineHeight: 1.2 }}>{title}</span>
+      </div>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>{children}</div>
+    </motion.div>
+  );
+}
+
+/** a wrench over a joint: the by-hand fitting between two stations */
+function Wrench({ delay }: { delay: number }) {
+  return (
+    <motion.svg {...fade(delay)} width="54" height="54" viewBox="0 0 48 48" fill="none" stroke="#7d8791" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ flex: 'none', position: 'relative', zIndex: 1, background: CARD, borderRadius: '50%', padding: 4 }}>
+      <path d="M30 6a10 10 0 0 0-9 14L7 34a4 4 0 0 0 6 6l14-14a10 10 0 0 0 14-9l-6 6-6-2-2-6z" />
+    </motion.svg>
+  );
+}
+
+const rowLabel = { flex: 'none', width: 215, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4 } as const;
+
 export function Plumbing(p: L2Props) {
   const focusN = useFocusN(p.focusId);
+  const lit4 = focusN === null || focusN === 4;
   return (
     <L2Page testId="l2-plumbing" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
-        <StepRow
-          focusN={focusN}
-          steps={[
-            {
-              title: 'Fetch the folders',
-              body: (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    <Folder size={62} />
-                    <Folder size={62} />
-                    <Folder size={62} />
-                  </div>
-                  <Chip>retrieve_context</Chip>
-                  
-                </div>
-              ),
-            },
-            {
-              title: 'Write the brief',
-              body: <Quote style={{ fontSize: 18, flex: 1 }}>{'<context>\n[1] asset=…\n[2] asset=…\n</context>\n\nQuestion: …'}</Quote>,
-            },
-            {
-              title: 'One call to the model',
-              body: (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 14 }}>
-                  <Net w={150} live />
-                  <Chip>POST /api/chat</Chip>
-                  <span style={{ fontSize: 18, color: DIM }}>by hand</span>
-                </div>
-              ),
-            },
-            {
-              title: 'Same path, one pipe',
-              grow: 1.25,
-              body: (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
-                    <Chip style={{ fontSize: 19 }}>rag_prompt</Chip>
-                    <b style={{ ...mono(24, TEAL) }}>|</b>
-                    <Chip style={{ fontSize: 19 }}>llm</Chip>
-                    <b style={{ ...mono(24, TEAL) }}>|</b>
-                    <Chip style={{ fontSize: 19 }}>StrOutputParser()</Chip>
-                  </div>
-                  <span style={{ fontSize: 18, color: DIM }}>LangChain</span>
-                  <Saved>✓ LangChain RAG chain ready: rag_prompt, rag_chain, rag_answer</Saved>
-                </div>
-              ),
-            },
-          ]}
-        />
-        <motion.div {...fadeUp(2.8)} style={{ alignSelf: 'center', padding: '10px 24px', borderRadius: 999, border: `2px solid ${TEAL}`, background: TINT, fontSize: 22, fontWeight: 600, color: INK }}>
+      <Fill gap={18}>
+        {/* by hand: three stations on a grey pipe, a hand-fitted joint between each */}
+        <div data-row="by-hand" style={{ flex: '1 0 auto', display: 'flex', alignItems: 'stretch', gap: 18 }}>
+          <motion.div {...fadeUp(0.1)} style={rowLabel}>
+            <span style={{ fontSize: 30, fontWeight: 700, color: INK }}>By hand</span>
+            <span style={{ fontSize: 22, color: DIM, lineHeight: 1.35 }}>three moving parts, fitted one by one</span>
+          </motion.div>
+          <div style={{ position: 'relative', flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <PipeLine smooth={false} joints={[]} />
+            <Station n={1} focusN={focusN} delay={0.3} title="Fetch the folders">
+              <div style={{ display: 'flex', gap: 6 }}>
+                <Folder size={84} />
+                <Folder size={84} />
+                <Folder size={84} />
+              </div>
+              <Chip style={{ alignSelf: 'flex-start', fontSize: 21 }}>retrieve_context</Chip>
+            </Station>
+            <div style={{ alignSelf: 'center' }}>
+              <Wrench delay={0.8} />
+            </div>
+            <Station n={2} focusN={focusN} delay={0.9} title="Write the brief">
+              <Quote style={{ fontSize: 20, padding: '12px 16px' }}>{'<context>\n[1] asset=…\n[2] asset=…\n</context>\n\nQuestion: …'}</Quote>
+            </Station>
+            <div style={{ alignSelf: 'center' }}>
+              <Wrench delay={1.4} />
+            </div>
+            <Station n={3} focusN={focusN} delay={1.5} title="One call to the model">
+              <Net w={200} live />
+              <Chip style={{ alignSelf: 'flex-start', fontSize: 21 }}>POST /api/chat</Chip>
+            </Station>
+          </div>
+        </div>
+        <motion.div {...fadeUp(1.9)} style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 16, paddingLeft: 233 }}>
+          <ArrowDown h={44} delay={1.9} />
+          <span style={{ fontSize: 23, color: DIM }}>
+            Like a plumber who stops fitting each joint by hand: <b style={{ color: INK }}>the same three steps, screwed into one pipe</b>.
+          </span>
+        </motion.div>
+        {/* LangChain: the same path as one smooth pipe; a drop of light runs through it */}
+        <div data-row="langchain" data-step={4} data-on={lit4} style={{ flex: '0 0 auto', display: 'flex', alignItems: 'stretch', gap: 18, opacity: lit4 ? 1 : 0.35, transition: 'opacity 300ms' }}>
+          <motion.div {...fadeUp(2.1)} style={rowLabel}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Num n={4} on={lit4} size={40} />
+              <span style={{ fontSize: 28, fontWeight: 700, color: INK }}>LangChain</span>
+            </span>
+            <span style={{ fontSize: 22, color: DIM, lineHeight: 1.35 }}>same path, one pipe</span>
+          </motion.div>
+          <motion.div {...fadeUp(2.3)} style={{ position: 'relative', flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 18, padding: '26px 22px', ...card(focusN === 4), background: TINT }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: 0, alignSelf: 'stretch', minHeight: 90, display: 'flex', alignItems: 'center', justifyContent: 'space-evenly' }}>
+              <PipeLine smooth joints={[]} />
+              <motion.div aria-hidden initial={{ left: '0%', opacity: 0 }} animate={{ left: ['0%', '96%'], opacity: [0, 1, 1, 0] }} transition={{ delay: 3, duration: 2.6, ease: 'easeInOut', repeat: Infinity, repeatDelay: 2.5 }} style={{ position: 'absolute', top: '50%', marginTop: -9, width: 18, height: 18, borderRadius: '50%', background: '#fff', boxShadow: '0 0 12px rgba(27,138,156,0.9)', zIndex: 0 }} />
+              {['rag_prompt', 'llm', 'StrOutputParser()'].flatMap((t, i) => [
+                i > 0 ? <span key={`j${i}`} aria-label="|" style={{ position: 'relative', zIndex: 1, width: 18, height: 50, borderRadius: 4, background: '#146f7f' }} /> : null,
+                <motion.span key={t} {...fadeUp(2.6 + i * 0.3)} style={{ position: 'relative', zIndex: 1, padding: '8px 16px', borderRadius: 10, background: CARD, border: `2px solid ${TEAL}`, ...mono(22, TEAL_D), fontWeight: 700 }}>
+                  {t}
+                </motion.span>,
+              ])}
+            </div>
+            <div style={{ flex: 'none', width: 360 }}>
+              <Saved>✓ LangChain RAG chain ready: rag_prompt, rag_chain, rag_answer</Saved>
+            </div>
+          </motion.div>
+        </div>
+        <motion.div {...fadeUp(3.4)} style={{ flex: 'none', alignSelf: 'center', padding: '12px 28px', borderRadius: 999, border: `2px solid ${TEAL}`, background: TINT, fontSize: 24, fontWeight: 600, color: INK }}>
           LangChain saves two or three lines. <span style={{ color: TEAL_D }}>Grounding is still your job.</span>
         </motion.div>
-      </div>
+      </Fill>
     </L2Page>
   );
 }
+
 
 /* ---------------- 2.3b · §1.9 a grounded answer you can check ---------------- */
 
