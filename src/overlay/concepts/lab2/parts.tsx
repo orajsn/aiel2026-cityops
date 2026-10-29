@@ -49,7 +49,7 @@ export interface L2Props {
   terms?: [string, string][];
   /** the chapter's last page: "Next in the notebook → …" */
   next?: string;
-  /** the notebook reference, e.g. "§1.2, cell 21" */
+  /** the notebook reference, e.g. "cell 21" */
   notebook?: string;
   /** the scene id, so a notebook page can follow the drawer's focus steps (LAB2_FOCUS) */
   focusId?: string;

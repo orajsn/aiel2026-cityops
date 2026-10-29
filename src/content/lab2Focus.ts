@@ -24,7 +24,7 @@ export interface FocusStep {
 
 /** per scene id: the notebook focus sequence that plays AFTER the page's own explanation */
 export const LAB2_FOCUS: Record<string, FocusStep[]> = {
-  // §0.4 · the workbench: one configuration cell (deck: "Notebook §0.2–0.6, cells 4, 8")
+  // §0.4 · the workbench: one configuration cell (deck: "Notebook cells 4, 8")
   '0.5': [
     { cell: 4, lines: [[5, 9]], n: 1, label: 'The database: user, address, embedding model', note: 'the records room, and the embedding model that lives inside it' },
     { cell: 4, lines: [[11, 13]], n: 2, label: 'The language model: where it runs, which one' },
@@ -139,7 +139,7 @@ export const LAB2_FOCUS: Record<string, FocusStep[]> = {
     { cell: 68, lines: [[1, 1]], n: 1, label: 'Make it a tool' },
     { cell: 68, lines: [[2, 2]], n: 2, label: 'Name and inputs' },
     { cell: 68, lines: [[7, 8]], n: 3, label: 'When to prefer it' },
-    { cell: 68, lines: [[9, 9]], n: 4, label: 'Calls the §4.3 query', note: 'the model sees the label, the SQL stays yours', output: true },
+    { cell: 68, lines: [[9, 9]], n: 4, label: 'Calls the one-brief query', note: 'the model sees the label, the SQL stays yours', output: true },
   ],
   // §5.1 · the loop as a state graph, built in §5.4 (cell 73)
   '2.7': [
@@ -171,7 +171,7 @@ export const LAB2_FOCUS: Record<string, FocusStep[]> = {
   ],
   // §5.5 · the system prompt, three layers (cell 75)
   '2.7f': [
-    { cell: 75, lines: [[2, 2]], n: 1, label: 'The SOP from §3.3' },
+    { cell: 75, lines: [[2, 2]], n: 1, label: 'The inspection manual (SOP)' },
     { cell: 75, lines: [[4, 5]], n: 2, label: 'Tool output is data' },
     { cell: 75, lines: [[7, 11]], n: 3, label: 'The report form', note: 'the procedure, the rule, the report form' },
     { cell: 75, lines: [[14, 14]], n: 3, label: 'AGENT_SYSTEM assembled', output: true },
