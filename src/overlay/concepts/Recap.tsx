@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { useLayoutEffect, useRef } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { Rich } from '../Rich';
 import { EASE, WidePanel } from './WidePanel';
@@ -108,7 +109,7 @@ export function CrackBand({ at }: { at: number }) {
     transition: { delay: d, duration: len, times: [0, 0.35, 0.85, 1], ease: 'easeOut' as const, repeat: Infinity },
   });
   return (
-    <svg data-band="crack" width={150} height={76} viewBox="0 0 300 152" role="img" aria-label="The crack on the bridge pier" style={{ flex: 'none', borderRadius: 8, display: 'block' }}>
+    <svg data-band="crack" width={180} height={91} viewBox="0 0 300 152" role="img" aria-label="The crack on the bridge pier" style={{ flex: 'none', borderRadius: 8, display: 'block' }}>
       <rect width="300" height="152" rx="12" fill="#bfc5cc" />
       <g fill="#a7aeb7" opacity={0.7}>
         <circle cx="40" cy="34" r="4" />
@@ -133,7 +134,7 @@ const RUST_SPOTS: [number, number, number, number, number][] = [
 ];
 
 /** rust spreading on a steel bearing plate, patch by patch, then breathing slowly (a muted brown, not red) */
-export function RustBand({ at, w = 150 }: { at: number; w?: number }) {
+export function RustBand({ at, w = 180 }: { at: number; w?: number }) {
   return (
     <svg data-band="rust" width={w} height={Math.round(w * 0.507)} viewBox="0 0 300 152" role="img" aria-label="Rust spreading on a steel bearing plate" style={{ flex: 'none', borderRadius: 8, display: 'block' }}>
       <rect width="300" height="152" rx="12" fill="#c3c8ce" />
@@ -165,13 +166,13 @@ export function LabsBand({ at }: { at: number }) {
       {labs.map(([a, t], i) => (
         <motion.div
           key={a}
-          style={{ padding: '7px 14px', borderRadius: 10, border: '2px solid rgba(27,138,156,0.35)' }}
+          style={{ padding: '9px 16px', borderRadius: 10, border: '2px solid rgba(27,138,156,0.35)' }}
           initial={{ backgroundColor: 'rgba(255,255,255,0)', color: 'var(--ink)' }}
           animate={{ backgroundColor: ['rgba(27,138,156,0)', 'rgba(27,138,156,1)', 'rgba(27,138,156,1)', 'rgba(27,138,156,0)', 'rgba(27,138,156,0)'], color: ['#1f2a33', '#ffffff', '#ffffff', '#1f2a33', '#1f2a33'] }}
           transition={{ delay: at + 0.6 + i * 1.5, duration: 4.5, times: [0, 0.1, 0.28, 0.4, 1], ease: 'easeInOut', repeat: Infinity }}
         >
           <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.8 }}>{a}</div>
-          <div style={{ fontSize: 16, fontWeight: 700 }}>{t}</div>
+          <div style={{ fontSize: 18, fontWeight: 700 }}>{t}</div>
         </motion.div>
       ))}
     </div>
@@ -181,30 +182,58 @@ export function LabsBand({ at }: { at: number }) {
 /* ---------- the shared recap ---------- */
 
 const BOX: CSSProperties = { minWidth: 0, borderRadius: 16, border: '2px solid rgba(27,138,156,0.35)', background: 'rgba(127,127,127,0.06)', padding: 16, display: 'flex', flexDirection: 'column', boxSizing: 'border-box' };
-const PIC: CSSProperties = { position: 'relative', height: PIC_H, borderRadius: 12, background: CARD, border: '1px solid var(--line)', overflow: 'hidden', boxSizing: 'border-box' };
+const PIC: CSSProperties = { position: 'relative', flex: 1, minHeight: PIC_H, borderRadius: 12, background: CARD, border: '1px solid var(--line)', overflow: 'hidden', boxSizing: 'border-box' };
+
+/** a picture is drawn on a PIC_W x PIC_H stage; the stage sits in the middle of its box and grows with it */
+const PIC_W = 420;
+function Stage({ children }: { children: ReactNode }) {
+  const box = useRef<HTMLDivElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const b = box.current;
+    const st = stage.current;
+    if (!b || !st) return;
+    const fit = () => {
+      const k = Math.max(0.6, Math.min(1.3, b.clientWidth / PIC_W, b.clientHeight / PIC_H));
+      if (!b.clientWidth) return;
+      st.style.transform = `translate(-50%, -50%) scale(${k})`;
+    };
+    fit();
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(fit);
+    ro?.observe(b);
+    return () => ro?.disconnect();
+  }, []);
+  return (
+    <div ref={box} style={{ position: 'absolute', inset: 0 }}>
+      <div ref={stage} style={{ position: 'absolute', left: '50%', top: '50%', width: PIC_W, height: PIC_H, transform: 'translate(-50%, -50%)', transformOrigin: 'center' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export function Recap({ kicker, message, notebook, points, next, pictures, band, bandLast = false, testId }: RecapProps & { pictures: ReactNode[]; band: ReactNode; /** the band's graphic after the line, not before */ bandLast?: boolean; testId: string }) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId={testId} kickerColor="var(--teal)">
-      <div data-recap style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 18 }}>
+      <div data-recap style={{ display: 'flex', flexDirection: 'column', gap: 20, flex: 1, minHeight: 0, marginTop: 6 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 18, flex: 1, minHeight: 0 }}>
           {points.map((p, i) => (
             <motion.div key={p.title} data-point={i + 1} style={BOX} {...fadeUp(pointAt(i), 14)}>
               <div data-picture={i + 1} style={PIC}>
-                {pictures[i]}
+                <Stage>{pictures[i]}</Stage>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 14 }}>
-                <span style={{ flex: 'none', width: 34, height: 34, borderRadius: '50%', background: TEAL, color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700 }}>{i + 1}</span>
-                <span style={{ fontSize: 24, fontWeight: 700, color: INK, lineHeight: 1.2 }}>{p.title}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 18 }}>
+                <span style={{ flex: 'none', width: 38, height: 38, borderRadius: '50%', background: TEAL, color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 700 }}>{i + 1}</span>
+                <span style={{ fontSize: 27, fontWeight: 700, color: INK, lineHeight: 1.2 }}>{p.title}</span>
               </div>
-              <div style={{ fontSize: 18, lineHeight: 1.4, color: DIM, marginTop: 6 }}>{p.text}</div>
+              <div style={{ fontSize: 20, lineHeight: 1.4, color: DIM, marginTop: 8, minHeight: '2.8em' }}>{p.text}</div>
             </motion.div>
           ))}
         </div>
-        <motion.div data-next style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '10px 18px', borderRadius: 14, background: 'rgba(27,138,156,0.10)', border: `2px solid ${TEAL}` }} {...fadeUp(NEXT_AT, 10)}>
-          <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '0.1em', color: TEAL_D, flex: 'none' }}>NEXT</div>
+        <motion.div data-next style={{ display: 'flex', alignItems: 'center', gap: 24, padding: '14px 22px', borderRadius: 14, background: 'rgba(27,138,156,0.10)', border: `2px solid ${TEAL}` }} {...fadeUp(NEXT_AT, 10)}>
+          <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '0.1em', color: TEAL_D, flex: 'none' }}>NEXT</div>
           {!bandLast && band}
-          <div style={{ fontSize: 22, lineHeight: 1.35, color: INK, flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 25, lineHeight: 1.35, color: INK, flex: 1, minWidth: 0 }}>
             <Rich text={next} />
           </div>
           {bandLast && band}
