@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { DATA_TOOLS, MEMORY_TOOLS, SOP_STEPS, SOP_THRESHOLD } from '../../content/lab2Tools';
 import { DB_WIDE, MODEL_WIDE, MODEL_WIDE_IN, px, py, skyScreen } from '../../world/skyPlaces';
 import { Rich } from '../Rich';
+import { useUiStore } from '../../engine/ui';
 
 const SHAPE_WORD = { table: 'table', json: 'JSON', graph: 'graph', vectors: 'vectors' } as const;
 
@@ -24,6 +25,8 @@ export function Toolbelt({ message }: { message?: string }) {
   const db = skyScreen(DB_WIDE);
   const into = skyScreen(MODEL_WIDE_IN);
   const under = skyScreen(MODEL_WIDE);
+  // the script is off: the bottom of the screen is free for the page's line, just above the corner buttons
+  const low = useUiStore((s) => !s.scriptOpen);
   const rows = DATA_TOOLS.map((tool, i) => ({ tool, i, y1: COL.top - i * (COL.h + COL.gap), y0: COL.top - i * (COL.h + COL.gap) - COL.h }));
   return (
     <div className="tb">
@@ -73,9 +76,12 @@ export function Toolbelt({ message }: { message?: string }) {
         </div>
         <div className="tb__red">{SOP_THRESHOLD}</div>
       </motion.div>
-      <motion.div className="qb__line" {...fade(4.2)}>
-        <Rich text={message ?? '**Tools** are what the agent can do. **The skill** is how you want it done.'} />
-      </motion.div>
+      {/* the page's line, once the script is off: with the script on, the script says these same words */}
+      {low && (
+        <motion.div className="qb__line is-low" {...fade(4.2)}>
+          <Rich text={message ?? '**Tools** are what the agent can do. **The skill** is how you want it done.'} />
+        </motion.div>
+      )}
       {/* keeps the model's bottom clear: nothing is drawn here */}
       <span hidden>{Math.round(under.y * 100)}</span>
     </div>

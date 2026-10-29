@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Rich } from '../Rich';
+import { useUiStore } from '../../engine/ui';
 
 const EASE = [0.2, 0.8, 0.2, 1] as const;
 
@@ -29,20 +30,22 @@ export interface CastProps {
  */
 export function Cast({ kicker, message, heading, people, question }: CastProps) {
   const at = (i: number) => 0.3 + i * 0.4;
+  // larger type when the script is off: the panel grows down into the freed space, still beside the rust
+  const scriptOpen = useUiStore((s) => s.scriptOpen);
   return (
     <div className="beat">
-      <motion.div className="beat__panel" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, ease: EASE }}>
+      <motion.div className={`beat__panel beat__panel--cast${scriptOpen ? '' : ' is-free'}`} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, ease: EASE }}>
         <div className="beat__kicker">{kicker}</div>
         <div className="beat__headline">
           <Rich text={message} />
         </div>
-        <div style={{ fontSize: 22, fontWeight: 600, color: 'var(--ink)', margin: '4px 0 14px' }}>{heading}</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ fontSize: 'calc(22px * var(--cast-k, 1))', fontWeight: 600, color: 'var(--ink)', margin: '4px 0 14px' }}>{heading}</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'calc(14px * var(--cast-k, 1))' }}>
           {people.map((p, i) => (
             <motion.div
               key={p.name}
               data-cast={p.name}
-              style={{ display: 'flex', alignItems: 'center', gap: 18, padding: '12px 16px', borderRadius: 12, background: 'rgba(127, 127, 127, 0.08)' }}
+              style={{ display: 'flex', alignItems: 'center', gap: 18, padding: 'calc(12px * var(--cast-k, 1)) 16px', borderRadius: 12, background: 'rgba(127, 127, 127, 0.08)' }}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: at(i), duration: 0.45, ease: EASE }}
@@ -52,20 +55,20 @@ export function Cast({ kicker, message, heading, people, question }: CastProps) 
                   src={p.portrait}
                   alt={p.name}
                   data-portrait={p.name}
-                  style={{ flex: 'none', width: 104, height: 104, borderRadius: '50%', border: '3px solid var(--teal)', background: 'rgba(27, 138, 156, 0.16)', objectFit: 'cover' }}
+                  style={{ flex: 'none', width: 'calc(104px * var(--cast-k, 1))', height: 'calc(104px * var(--cast-k, 1))', borderRadius: '50%', border: '3px solid var(--teal)', background: 'rgba(27, 138, 156, 0.16)', objectFit: 'cover' }}
                 />
               )}
               <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <span style={{ fontSize: 15, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-dim)', fontWeight: 600 }}>{p.when}</span>
-                <span style={{ fontSize: 28, color: 'var(--teal)', fontWeight: 700 }}>{p.name}</span>
-                <span style={{ fontSize: 21, color: 'var(--ink)', lineHeight: 1.35 }}>{p.text}</span>
+                <span style={{ fontSize: 'calc(15px * var(--cast-k, 1))', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-dim)', fontWeight: 600 }}>{p.when}</span>
+                <span style={{ fontSize: 'calc(28px * var(--cast-k, 1))', color: 'var(--teal)', fontWeight: 700 }}>{p.name}</span>
+                <span style={{ fontSize: 'calc(21px * var(--cast-k, 1))', color: 'var(--ink)', lineHeight: 1.35 }}>{p.text}</span>
               </span>
             </motion.div>
           ))}
         </div>
         {question && (
           <motion.div
-            style={{ marginTop: 18, paddingTop: 14, borderTop: '1px solid var(--line)', fontSize: 24, fontWeight: 600, color: 'var(--ink)' }}
+            style={{ marginTop: 'calc(18px * var(--cast-k, 1))', paddingTop: 14, borderTop: '1px solid var(--line)', fontSize: 'calc(24px * var(--cast-k, 1))', fontWeight: 600, color: 'var(--ink)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: at(people.length) + 0.2, duration: 0.5 }}

@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { useUiStore } from '../../engine/ui';
 
 const EASE = [0.2, 0.8, 0.2, 1] as const;
 
@@ -17,8 +18,10 @@ function OracleO() {
 const Oracle = () => <span className="title__oracle">Oracle</span>;
 
 export function TitleCard() {
+  // the script is off: the bottom of the screen is free, so this steps down towards the corner buttons
+  const low = useUiStore((s) => !s.scriptOpen);
   return (
-    <div className="title">
+    <div className={`title${low ? ' title--low' : ''}`}>
       <motion.div className="title__kicker" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}>
         <Oracle /> AI Experience Live 2026 · Bangkok, Thailand
       </motion.div>

@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { FOLDER, OPS_TOP, px, py, skyScreen } from '../../world/skyPlaces';
 import { Rich } from '../Rich';
+import { useUiStore } from '../../engine/ui';
 
 /** the three questions, where each stops above the folder (screen units, relative to the folder) */
 const QUESTIONS: { text: string; dx: number; dy: number }[] = [
@@ -18,6 +19,8 @@ const fade = (delay: number) => ({ initial: { opacity: 0, y: 8 }, animate: { opa
 export function Overflow({ message }: { message?: string }) {
   const f = skyScreen(FOLDER);
   const ops = skyScreen(OPS_TOP);
+  // the script is off: the bottom of the screen is free for the page's line, just above the corner buttons
+  const low = useUiStore((s) => !s.scriptOpen);
   return (
     <div className="ov">
       <svg className="tb__svg" viewBox="0 0 1920 1080" aria-hidden>
@@ -67,9 +70,12 @@ export function Overflow({ message }: { message?: string }) {
         </div>
         <div className="ov__verdict ov__verdict--red">A workflow, not a RAG call.</div>
       </motion.div>
-      <motion.div className="qb__line" {...fade(4.2)}>
-        <Rich text={message ?? '**One folder answers one question.** Operations ask **three at once**.'} />
-      </motion.div>
+      {/* the page's line, once the script is off: with the script on, the script says these same words */}
+      {low && (
+        <motion.div className="qb__line is-low" {...fade(4.2)}>
+          <Rich text={message ?? '**One folder answers one question.** Operations ask **three at once**.'} />
+        </motion.div>
+      )}
     </div>
   );
 }
