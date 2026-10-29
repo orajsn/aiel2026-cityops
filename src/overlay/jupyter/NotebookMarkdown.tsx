@@ -51,7 +51,9 @@ export function PythonCode({ source, marked, tone = 'todo' }: { source: string; 
  * Just enough Markdown for these notebooks: headings, paragraphs, quotes, lists, fenced code and the
  * <details> answer blocks (shown closed, as in JupyterLab).
  */
-export function NotebookMarkdown({ source }: { source: string }) {
+export function NotebookMarkdown({ source: raw }: { source: string }) {
+  // the notebook's section marks ("§0.2") are for its authors, not the audience; the file itself stays as it is
+  const source = raw.replace(/§\s?/g, '');
   const details = source.match(/<details>\s*<summary>([\s\S]*?)<\/summary>([\s\S]*?)<\/details>/);
   if (details) {
     return (

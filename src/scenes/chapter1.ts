@@ -71,15 +71,15 @@ const K = {
 };
 
 const NEXT = {
-  bench: '§0.2–0.6 Lab §0: the workbench',
-  embed: '§1.2 The database turns the question into numbers',
-  belt: '§2.2–2.7 The lab’s four-station workflow',
-  tools: '§3.2 The inspector’s instruments: tools',
-  brief: '§4.2 One brief from one SQL statement',
-  graph: '§5.1 The agent is a state graph',
-  wipe: '§5.3 Wipe only this lab’s notes',
-  dash: '§2.8 A dashboard for this crack',
-  wrap: '§6.1–6.3 What you built, and where next',
+  bench: 'The workbench',
+  embed: 'The database turns the question into numbers',
+  belt: 'The lab’s four-station workflow',
+  tools: 'The inspector’s instruments: tools',
+  brief: 'One brief from one SQL statement',
+  graph: 'The agent is a state graph',
+  wipe: 'Wipe only this lab’s notes',
+  dash: 'A dashboard for this crack',
+  wrap: 'What you built, and where next',
 };
 
 /* ---------------- Story · one crack (at the whole bridge) ---------------- */
@@ -101,7 +101,7 @@ const why: SceneDef[] = [
 /* ---------------- Setup · the workbench ---------------- */
 const setup: SceneDef[] = [
   // the database page stays in the recap subset, as it was
-  { recapMode: true, ...page({ id: '0.5', title: 'The workbench', overlay: 'L2Bench', group: 'l2-bench', shot: 'sky', world: { sky: 'shapes' }, props: { kicker: K.setup, step: 1, message: 'The workbench: **database, model, notebook**.', takeaway: 'The records room, the engineer on call, and **one clipboard of settings**.', terms: [['Records room', 'Oracle AI Database 26ai'], ['Engineer on call', 'the language model, served locally'], ['Clipboard of settings', 'Configuration cell §0.4']], notebook: `${NB} · cell 4` } }) },
+  { recapMode: true, ...page({ id: '0.5', title: 'The workbench', overlay: 'L2Bench', group: 'l2-bench', shot: 'sky', world: { sky: 'shapes' }, props: { kicker: K.setup, step: 1, message: 'The workbench: **database, model, notebook**.', takeaway: 'The records room, the engineer on call, and **one clipboard of settings**.', terms: [['Records room', 'Oracle AI Database 26ai'], ['Engineer on call', 'the language model, served locally'], ['Clipboard of settings', 'Configuration cell ']], notebook: `${NB} · cell 4` } }) },
   page({ id: '0.5a', title: 'Check the site first', overlay: 'L2Bench', group: 'l2-bench', shot: 'sky', world: { sky: 'shapes' }, props: { kicker: K.setup, step: 2, message: 'Check the site **before work starts**.', takeaway: 'Tables, views, the property graph, the embedding model and the vector index are **all there**.', notebook: `${NB} · cells 8, 10` } }),
   // the city's data, over the city (the owner's saved angle on 0.3)
   page({ id: '0.3', title: 'What the agent can see', overlay: 'L2Sees', group: 'l2-sees', shot: 'city', world: { pins: 'all', dataStream: true, highlight: [OPS] }, props: { kicker: K.setup, step: 1, message: 'What the agent will be **allowed to see**.', takeaway: '**Look at the data first**, before any model touches it. Later tool calls become easy to audit.', notebook: `${NB} · cell 12` } }),
@@ -167,7 +167,7 @@ const query: SceneDef[] = [
 /* ---------------- Agent · build the agent ---------------- */
 const BUILD = { shot: 'sky', world: sky('brain') };
 const build: SceneDef[] = [
-  page({ id: '2.7', title: 'The agent is a state graph', overlay: 'L2Graph', ...BUILD, props: { kicker: K.build, message: 'The agent is **a state graph**.', takeaway: 'Yes: run the tool and loop back to the model. No: finish. **That cycle is the whole agent.**', terms: [['The inspector’s loop', 'LangGraph StateGraph: model ⇄ tools']], notebook: `${NB} · §5.1 · cell 73` } }),
+  page({ id: '2.7', title: 'The agent is a state graph', overlay: 'L2Graph', ...BUILD, props: { kicker: K.build, message: 'The agent is **a state graph**.', takeaway: 'Yes: run the tool and loop back to the model. No: finish. **That cycle is the whole agent.**', terms: [['The inspector’s loop', 'LangGraph StateGraph: model ⇄ tools']], notebook: `${NB} · · cell 73` } }),
   page({ id: '2.7a', title: 'Two memories', overlay: 'L2Memories', group: 'l2-memories', ...BUILD, props: { kicker: K.build, step: 1, message: 'Two memories, **one database**.', takeaway: 'One notebook for this visit, **one permanent logbook** with an index, both on one database.', terms: [['Visit notebook', 'Short-term memory · checkpointer'], ['Bridge logbook', 'Long-term memory · store']] } }),
   page({ id: '2.7b', title: 'Memory needs a lifecycle', overlay: 'L2Memories', group: 'l2-memories', ...BUILD, props: { kicker: K.build, step: 2, message: 'Memory needs **a lifecycle**.', takeaway: 'Without a lifecycle, an agent will happily act on **stale facts**.', terms: [['Visit notebook', 'Short-term memory · checkpointer'], ['Bridge logbook', 'Long-term memory · store']], next: NEXT.wipe } }),
   page({ id: '2.7c', title: 'Wipe only this lab’s notes', overlay: 'L2Wipe', ...BUILD, props: { kicker: K.build, message: 'Wipe **only this lab’s** notes.', takeaway: 'Clear this visit’s notebook and this lab’s logbook pages. **The city records are not touched.**', notebook: `${NB} · cell 71` } }),
@@ -185,7 +185,7 @@ const trust: SceneDef[] = [
   page({ id: '2.8b', title: 'Keys to every gate', overlay: 'L2Risks', group: 'l2-risks', ...PLACES.ops, props: { kicker: K.trust, step: 2, message: 'Three risks, told with the bridge: **keys to every gate**.', takeaway: 'Too many permissions, and **attackers borrow them**.', terms: [['A fake warning sign', 'Prompt injection'], ['Keys to every gate', 'Excessive agency']] } }),
   page({ id: '2.8c', title: 'An unverified tool', overlay: 'L2Risks', group: 'l2-risks', ...PLACES.ops, props: { kicker: K.trust, step: 3, message: 'Three risks, told with the bridge: **an unverified tool**.', takeaway: 'The lab does not demonstrate these attacks. Three real guardrails are useful, and **not a complete security boundary**.', terms: [['A fake warning sign', 'Prompt injection'], ['Keys to every gate', 'Excessive agency'], ['An unverified tool', 'Malicious component']] } }),
   page({ id: '2.8d', title: 'Observability', overlay: 'L2Observe', ...PLACES.ops, props: { kicker: K.trust, message: 'The site’s CCTV and time log: **observability**.', takeaway: 'Without the camera and the time log, you cannot tell whether the agent is **slow, expensive, or wrong**.', terms: [['CCTV and time log', 'Observability'], ['Agents rarely crash', 'Behavioral drift']], next: NEXT.dash } }),
-  page({ id: '2.8e', title: 'A dashboard for this crack', overlay: 'L2Dashboard', ...PLACES.ops, props: { kicker: K.trust, message: 'A dashboard **for this crack**.', takeaway: 'Real numbers from the saved run, plus a drift line that is **a concept, not data**.', terms: [['Cost per word read and written', 'Tokens: tok_in, tok_out'], ['Time per station', 'Latency per step']], notebook: `${NB} · §2.8 · cells 50, 79`, next: NEXT.wrap } }),
+  page({ id: '2.8e', title: 'A dashboard for this crack', overlay: 'L2Dashboard', ...PLACES.ops, props: { kicker: K.trust, message: 'A dashboard **for this crack**.', takeaway: 'Real numbers from the saved run, plus a drift line that is **a concept, not data**.', terms: [['Cost per word read and written', 'Tokens: tok_in, tok_out'], ['Time per station', 'Latency per step']], notebook: `${NB} · · cells 50, 79`, next: NEXT.wrap } }),
 ];
 
 /* ---------------- Wrap ---------------- */

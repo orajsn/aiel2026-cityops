@@ -87,7 +87,7 @@ test('Lab 2: every page has a takeaway, each chapter ends on a "Next in the note
   for (const s of chapter1.filter((x) => x.id !== '2.9')) expect((s.overlayProps as { takeaway?: string }).takeaway?.length, s.id).toBeGreaterThan(20);
   for (const c of LAB2_CHAPTERS.slice(0, -1)) {
     const last = c.pages[c.pages.length - 1];
-    expect((last.overlayProps as { next?: string }).next, last.id).toMatch(/^§\d/);
+    expect((last.overlayProps as { next?: string }).next, last.id).toMatch(/^\S/);
   }
 });
 
