@@ -41,7 +41,7 @@ export const useCameraStore = create<CameraState>((set) => ({
 /** The camera for a page: the owner's saved angle if there is one, else the page's place. */
 export function shotForScene(scene: SceneDef, overrides = useCameraStore.getState().overrides): Shot {
   const base = SHOTS[scene.shot];
-  const o = overrides[scene.id] ?? (scene.sameAngleAs ? overrides[scene.sameAngleAs] : undefined);
+  const o = scene.heldView ? undefined : overrides[scene.id] ?? (scene.sameAngleAs ? overrides[scene.sameAngleAs] : undefined);
   return o ? { ...base, position: o.position, target: o.target } : base;
 }
 

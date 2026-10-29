@@ -51,6 +51,7 @@ const page = (p: Page): SceneDef => ({
   // Lab 2 is panels only (owner, 29 Oct): one held view, no sky stage, no camera move between pages
   shot: LAB2_VIEW.shot,
   world: LAB2_VIEW.world,
+  heldView: true,
   overlay: p.overlay,
   overlayGroup: p.group,
   overlayProps: { ...p.props, focusId: p.id } as unknown as Record<string, unknown>,

@@ -20,6 +20,7 @@ const atBridge = (id: string, title: string, overlay: string, props: object): Sc
   title,
   shot: 'bridge',
   world: { bridge: true },
+  heldView: true,
   overlay,
   overlayProps: props as Record<string, unknown>,
 });

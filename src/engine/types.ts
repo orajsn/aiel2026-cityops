@@ -38,6 +38,8 @@ export interface SceneDef {
    * own: the steps of one panel, or the pages of one chapter, hold the camera where the owner put it.
    */
   sameAngleAs?: string;
+  /** the part holds one view on every page: angles saved for this page's id earlier (the old sky pages) do not apply */
+  heldView?: boolean;
   card?: HandoffCard;
   recap?: RecapRef;
   recapMode?: boolean;

@@ -58,6 +58,13 @@ export function CameraRig() {
       camera.lookAt(...from.target);
     }
     wasEditing.current = false;
+    // already there (the pages of a held view): no move, the panel comes straight in
+    const near = (a: Vec3, b: Vec3) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]) < 0.05;
+    if (!cut && near(from.position, to.position) && near(here, to.target)) {
+      tween.current = null;
+      setSettled(true);
+      return;
+    }
     setSettled(false);
     // as long as the move needs to stay calm (shots.ts CALM), never shorter than the page's own time
     tween.current = { from, to: { ...to, durationMs: moveDuration(from, to) }, start: performance.now() + (cut ? 400 : 0) };
