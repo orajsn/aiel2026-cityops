@@ -91,8 +91,7 @@ export function FocusDrawer({ sceneId }: { sceneId: string }) {
           <span className="jd__tab-text">
             <b>In the notebook</b>
             <span>
-              {section ? `§${section.num} · ` : ''}
-              {steps.length} {steps.length === 1 ? 'step' : 'steps'}
+                            {steps.length} {steps.length === 1 ? 'step' : 'steps'}
             </span>
           </span>
         </motion.button>
@@ -103,11 +102,6 @@ export function FocusDrawer({ sceneId }: { sceneId: string }) {
             <div className="jd__bar">
               <span className="jd__logo" aria-hidden />
               <span className="jd__file">{LAB2.file}</span>
-              {section && (
-                <span className="jd__sect" data-testid="focus-section">
-                  §{section.num}
-                </span>
-              )}
               <span className="jd__kernel">Python 3 (ipykernel) ○</span>
               <button type="button" className="jd__close" aria-label="Close Jupyter" onClick={() => useDrawerStore.getState().setOpen(false)}>
                 ✕

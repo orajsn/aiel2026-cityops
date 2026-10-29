@@ -241,7 +241,7 @@ export function Station3(p: L2Props) {
           <span style={{ color: TEAL }}>+</span>
           <Chip>severity</Chip>
           <span style={{ color: TEAL }}>+</span>
-          <Chip>context, §1.3</Chip>
+          <Chip>context</Chip>
         </motion.div>
         <StepRow
           focusN={focusN}

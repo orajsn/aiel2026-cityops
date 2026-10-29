@@ -457,7 +457,7 @@ export function AgentSees(p: L2Props) {
               <motion.div key={c.name} data-case={c.asset} data-active={i === 0} {...fadeUp(0.2 + i * 0.35)} style={{ ...card(i === 0), background: i === 0 ? TINT : SOFT, opacity: lit(i + 1) ? 1 : 0.4, padding: '22px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <Num n={i + 1} on={lit(i + 1)} size={32} />
-                  <span style={{ padding: '3px 12px', borderRadius: 999, fontSize: 16, fontWeight: 700, background: i === 0 ? TEAL : 'rgba(127,127,127,0.18)', color: i === 0 ? '#fff' : DIM }}>{i === 0 ? 'active' : 'switch in §0.4'}</span>
+                  <span style={{ padding: '3px 12px', borderRadius: 999, fontSize: 16, fontWeight: 700, background: i === 0 ? TEAL : 'rgba(127,127,127,0.18)', color: i === 0 ? '#fff' : DIM }}>{i === 0 ? 'active' : 'one setting'}</span>
                 </div>
                 <LineIcon name={c.icon} size={72} color={i === 0 ? TEAL : '#8a97a3'} />
                 <div style={{ fontSize: 28, fontWeight: 700, color: INK }}>{c.name}</div>

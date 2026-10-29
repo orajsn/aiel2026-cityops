@@ -196,9 +196,9 @@ export function Dashboard(p: L2Props) {
 /* ---------------- 2.8f · §6 pick the tool that fits the job ---------------- */
 
 export const SHAPES = [
-  { t: 'RAG', sec: '§1', q: '“What does the record say?”', pred: 'High', how: '1 retrieval + 1 LLM call', icon: 'lookup' as IconName },
-  { t: 'Workflow', sec: '§2', q: '“Triage this incident predictably.”', pred: 'High', how: 'Several LLM steps · ~32 s*', icon: 'steps' as IconName },
-  { t: 'Agent', sec: '§3–§5', q: '“Reason and tell me what to do.”', pred: 'Lower', how: 'Many turns · ~57 s*', icon: 'branch' as IconName },
+  { t: 'RAG', q: '“What does the record say?”', pred: 'High', how: '1 retrieval + 1 LLM call', icon: 'lookup' as IconName },
+  { t: 'Workflow', q: '“Triage this incident predictably.”', pred: 'High', how: 'Several LLM steps · ~32 s*', icon: 'steps' as IconName },
+  { t: 'Agent', q: '“Reason and tell me what to do.”', pred: 'Lower', how: 'Many turns · ~57 s*', icon: 'branch' as IconName },
 ];
 
 export function PickTool(p: L2Props) {
@@ -210,7 +210,7 @@ export function PickTool(p: L2Props) {
             <motion.div key={s.t} data-shape={s.t} {...fadeUp(0.2 + i * 0.4)} style={{ ...card(i === 0), background: i === 0 ? TINT : SOFT, padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 <span style={{ fontSize: 34, fontWeight: 700, color: INK }}>{s.t}</span>
-                <Chip style={{ marginLeft: 'auto' }}>{s.sec}</Chip>
+                
               </div>
               <div style={{ fontSize: 23, color: '#fff', background: 'rgba(31,42,51,0.9)', borderRadius: 14, padding: '12px 16px' }}>{s.q}</div>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

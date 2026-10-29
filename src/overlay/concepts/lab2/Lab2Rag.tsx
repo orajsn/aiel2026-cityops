@@ -335,7 +335,7 @@ export function Plumbing(p: L2Props) {
                     <Folder size={62} />
                   </div>
                   <Chip>retrieve_context</Chip>
-                  <span style={{ fontSize: 18, color: DIM }}>§1.3</span>
+                  
                 </div>
               ),
             },
@@ -349,7 +349,7 @@ export function Plumbing(p: L2Props) {
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 14 }}>
                   <Net w={150} live />
                   <Chip>POST /api/chat</Chip>
-                  <span style={{ fontSize: 18, color: DIM }}>by hand · §1.7</span>
+                  <span style={{ fontSize: 18, color: DIM }}>by hand</span>
                 </div>
               ),
             },
@@ -365,7 +365,7 @@ export function Plumbing(p: L2Props) {
                     <b style={{ ...mono(24, TEAL) }}>|</b>
                     <Chip style={{ fontSize: 19 }}>StrOutputParser()</Chip>
                   </div>
-                  <span style={{ fontSize: 18, color: DIM }}>LangChain · §1.8</span>
+                  <span style={{ fontSize: 18, color: DIM }}>LangChain</span>
                   <Saved>✓ LangChain RAG chain ready: rag_prompt, rag_chain, rag_answer</Saved>
                 </div>
               ),
