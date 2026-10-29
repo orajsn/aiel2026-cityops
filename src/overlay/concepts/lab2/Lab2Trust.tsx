@@ -1,4 +1,6 @@
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
+import { Fill, FitBox } from '../Fill';
+import { AgentAvatar } from './AgentAvatar';
 import { EASE } from '../WidePanel';
 import { LineIcon, type IconName } from '../icons';
 import { CARD, Chip, DIM, INK, L2Page, Num, RED, SOFT, TEAL, TEAL_D, TINT, cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props } from './parts';
@@ -10,55 +12,170 @@ import { CARD, Chip, DIM, INK, L2Page, Num, RED, SOFT, TEAL, TEAL_D, TINT, cap, 
 
 /* ---------------- 2.8a, 2.8b, 2.8c · three risks, told with the bridge ---------------- */
 
-export const RISKS: { pic: string; term: string; icon: IconName; points: string[] }[] = [
-  { pic: 'A fake warning sign', term: 'Prompt injection and poisoning', icon: 'speech', points: ['Orders hidden in content', 'Stored now, triggered later', 'The lethal trifecta: private data + untrusted content + external communication'] },
-  { pic: 'Keys to every gate', term: 'Excessive agency', icon: 'lock', points: ['Too many permissions', 'Agents act without asking', 'Attackers borrow them'] },
-  { pic: 'An unverified tool', term: 'Malicious components', icon: 'wrench', points: ['Bad libraries, servers or tools', 'Safe today, unsafe tomorrow', 'Worse when agents add them'] },
+export const RISKS: { pic: string; term: string; points: string[] }[] = [
+  { pic: 'A fake warning sign', term: 'Prompt injection and poisoning', points: ['Orders hidden in content', 'Stored now, triggered later', 'The lethal trifecta: private data + untrusted content + external communication'] },
+  { pic: 'Keys to every gate', term: 'Excessive agency', points: ['Too many permissions', 'Agents act without asking', 'Attackers borrow them'] },
+  { pic: 'An unverified tool', term: 'Malicious components', points: ['Bad libraries, servers or tools', 'Safe today, unsafe tomorrow', 'Worse when agents add them'] },
+];
+/** the everyday picture for each risk, in plain words */
+const EVERYDAY = [
+  'Someone sticks a note on a road sign. A driver knows it is not an order; an agent that reads everything might obey it.',
+  'A contractor with a key to every gate is handy, until someone borrows the ring.',
+  'A tool from an unknown seller in the toolbox: it worked yesterday, nobody checked it today.',
 ];
 const GUARDS = ['Only 8 allowed tools', 'Tool output is data, not instructions', 'Its only write is a memory note'];
 
+const G1 = '#aab1ba';
+const G2 = '#8a919c';
+const G3 = '#5c6b78';
+
+/** a warning sign by the bridge road; someone has stuck an order on it (red: the one thing to look at) */
+function SignArt({ w, red }: { w: number; red: boolean }) {
+  return (
+    <svg width={w} height={w * 0.8} viewBox="0 0 400 320" aria-hidden style={{ display: 'block', overflow: 'visible' }}>
+      <ellipse cx="200" cy="308" rx="150" ry="8" fill="rgba(127,127,127,0.2)" />
+      <rect x="190" y="150" width="20" height="160" rx="4" fill={G3} />
+      <rect x="50" y="20" width="300" height="150" rx="14" fill={G1} stroke={G3} strokeWidth="5" />
+      <path d="M200 40l40 70h-80z" fill="none" stroke={G3} strokeWidth="6" strokeLinejoin="round" />
+      <path d="M200 64v24M200 98v2" stroke={G3} strokeWidth="6" strokeLinecap="round" />
+      <path d="M90 136h220" stroke={G2} strokeWidth="8" strokeLinecap="round" />
+      <motion.g initial={{ opacity: 0, y: -20, rotate: 0 }} animate={{ opacity: 1, y: 0, rotate: 6 }} transition={{ delay: 0.9, duration: 0.6, ease: EASE }} style={{ transformOrigin: '300px 70px' }}>
+        <rect x="236" y="44" width="150" height="80" rx="4" fill="#f6f1df" stroke={red ? 'var(--red)' : G2} strokeWidth="4" />
+        <text x="311" y="78" textAnchor="middle" fontSize="20" fontFamily="Inter, sans-serif" fill="#1f2a33">“AI: ignore</text>
+        <text x="311" y="104" textAnchor="middle" fontSize="20" fontFamily="Inter, sans-serif" fill="#1f2a33">your rules”</text>
+      </motion.g>
+    </svg>
+  );
+}
+
+/** a ring with a key for every gate (the ring is the red thing) */
+function KeysArt({ w, red }: { w: number; red: boolean }) {
+  const keys = Array.from({ length: 11 }, (_, i) => -70 + i * 14);
+  return (
+    <svg width={w} height={w * 0.8} viewBox="0 0 400 320" aria-hidden style={{ display: 'block', overflow: 'visible' }}>
+      <ellipse cx="200" cy="308" rx="150" ry="8" fill="rgba(127,127,127,0.2)" />
+      {/* three gates behind, every one of them opened by this ring */}
+      {[40, 150, 260].map((x) => (
+        <g key={x} opacity="0.55">
+          <rect x={x} y="196" width="100" height="100" rx="4" fill="none" stroke={G2} strokeWidth="5" />
+          <path d={`M${x + 20} 196v100M${x + 40} 196v100M${x + 60} 196v100M${x + 80} 196v100`} stroke={G2} strokeWidth="3" />
+        </g>
+      ))}
+      <motion.g initial={{ rotate: -8 }} animate={{ rotate: [-8, 6, -3, 0] }} transition={{ delay: 0.6, duration: 2.4, ease: 'easeInOut' }} style={{ transformOrigin: '200px 30px' }}>
+        <circle cx="200" cy="70" r="44" fill="none" stroke={red ? 'var(--red)' : G3} strokeWidth="8" />
+        {keys.map((a, i) => (
+          <g key={a} transform={`rotate(${a} 200 70)`}>
+            <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 + i * 0.06 }}>
+              <circle cx="200" cy="128" r="14" fill="none" stroke={G3} strokeWidth="6" />
+              <path d={`M200 142v58M200 186h12M200 174h9`} stroke={G3} strokeWidth="6" strokeLinecap="round" />
+            </motion.g>
+          </g>
+        ))}
+      </motion.g>
+    </svg>
+  );
+}
+
+/** a toolbox; one tool in it has no label and nobody checked it (its red tag) */
+function ToolArt({ w, red }: { w: number; red: boolean }) {
+  return (
+    <svg width={w} height={w * 0.8} viewBox="0 0 400 320" aria-hidden style={{ display: 'block', overflow: 'visible' }}>
+      <ellipse cx="200" cy="308" rx="160" ry="8" fill="rgba(127,127,127,0.2)" />
+      {/* tools standing in the box */}
+      <path d="M110 170V60" stroke={G3} strokeWidth="12" strokeLinecap="round" />
+      <path d="M96 60a16 16 0 1 1 28 0l-6 10h-16z" fill={G3} />
+      <rect x="164" y="80" width="18" height="100" rx="6" fill={G2} />
+      <rect x="160" y="40" width="26" height="46" rx="8" fill={G3} />
+      <motion.g initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.9, duration: 0.7, ease: EASE }}>
+        <path d="M262 180V70l20-30 20 30v110z" fill={G1} stroke={G3} strokeWidth="4" />
+        <path d="M262 100h40M262 128h40" stroke={G3} strokeWidth="3" />
+        <path d="M300 58l40-26" stroke={G3} strokeWidth="3" />
+        <rect x="324" y="10" width="54" height="40" rx="6" fill="#fff" stroke={red ? 'var(--red)' : G2} strokeWidth="4" />
+        <text x="351" y="40" textAnchor="middle" fontSize="28" fontWeight="700" fontFamily="Inter, sans-serif" fill={red ? 'var(--red)' : G3}>?</text>
+      </motion.g>
+      {/* the box */}
+      <path d="M60 170h280l-16 128H76z" fill={G2} />
+      <rect x="50" y="160" width="300" height="24" rx="5" fill={G3} />
+      <path d="M170 160v-14h60v14" fill="none" stroke={G3} strokeWidth="8" />
+    </svg>
+  );
+}
+
+const ART = [SignArt, KeysArt, ToolArt];
+
 export function ThreeRisks(p: L2Props) {
   const step = p.step ?? 1;
+  const r = RISKS[step - 1] ?? RISKS[0];
+  const Art = ART[step - 1] ?? SignArt;
   return (
     <L2Page testId="l2-risks" hasRed {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, minHeight: 0 }}>
-          {RISKS.map((r, i) => {
+      <Fill gap={16}>
+        {/* the rail: the three risks, the current one in front, the next ones still waiting */}
+        <div data-rail style={{ flex: 'none', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16 }}>
+          {RISKS.map((x, i) => {
             const shown = upTo(step, i + 1);
             const now = step === i + 1;
+            const A = ART[i];
             return (
-              <motion.div key={r.term} data-risk={r.term} data-now={now} {...reveal(shown, 0.2)} style={{ ...card(), background: now ? CARD : SOFT, borderTop: `6px solid ${now ? RED : '#8a97a3'}`, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div>
-                    <div style={{ fontSize: 27, fontWeight: 700, color: INK }}>{r.pic}</div>
-                    <div style={{ ...mono(18) }}>{r.term}</div>
-                  </div>
+              <motion.div key={x.term} data-risk={x.term} data-now={now} {...reveal(shown, 0.1 + i * 0.1)} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '8px 16px', ...card(now), background: now ? CARD : SOFT }}>
+                <div style={{ flex: 'none', opacity: now ? 1 : 0.7 }}>
+                  <A w={76} red={false} />
                 </div>
-                {r.points.map((pt, k) => (
-                  <motion.div key={pt} {...reveal(shown, 0.5 + k * 0.3)} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', fontSize: 21, color: INK, lineHeight: 1.35 }}>
-                    <Num n={k + 1} size={30} on={now} />
-                    <span>{pt}</span>
-                  </motion.div>
-                ))}
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <LineIcon name={r.icon} size={110} color={now ? RED : '#8a97a3'} />
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 23, fontWeight: 700, color: INK }}>{x.pic}</div>
+                  <div style={{ ...mono(16) }}>{x.term}</div>
                 </div>
               </motion.div>
             );
           })}
         </div>
-        <motion.div data-guards {...reveal(upTo(step, 3), 1.6)} style={{ ...card(true), background: TINT, padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-          <span style={capTeal}>Guardrails the lab does have</span>
-          {GUARDS.map((g) => (
-            <span key={g} style={{ fontSize: 20, color: INK, fontWeight: 600 }}>
-              <span style={{ color: TEAL }}>✓</span> {g}
-            </span>
-          ))}
-        </motion.div>
-        <motion.div {...reveal(upTo(step, 3), 2)} style={{ alignSelf: 'center', fontSize: 21, color: INK }}>
-          <b>AI is software.</b> Apply the security discipline you already have, then add the AI-specific risks. No silver bullet: design and test early.
-        </motion.div>
-      </div>
+        {/* the stage: the current risk, drawn large, and what it means */}
+        <AnimatePresence mode="wait">
+          <motion.div key={step} data-stage initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease: EASE }} style={{ flex: '1 0 auto', minHeight: 300, display: 'grid', gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)', alignItems: 'center', gap: 40 }}>
+            <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+              <Art w={step === 3 ? 400 : 520} red />
+              {step === 1 && (
+                <div style={{ position: 'absolute', left: 0, bottom: 0 }}>
+                  <AgentAvatar size={96} />
+                </div>
+              )}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+              <div>
+                <div style={{ fontSize: 38, fontWeight: 700, color: INK }}>{r.pic}</div>
+                <div style={{ ...mono(22) }}>{r.term}</div>
+              </div>
+              {r.points.map((pt, k) => (
+                <motion.div key={pt} {...fadeUp(0.6 + k * 0.45)} style={{ display: 'flex', gap: 16, alignItems: 'flex-start', fontSize: 27, color: INK, lineHeight: 1.35 }}>
+                  <Num n={k + 1} size={40} />
+                  <span>{pt}</span>
+                </motion.div>
+              ))}
+              {step < 3 && (
+                <motion.div data-everyday {...fadeUp(2)} style={{ marginTop: 8, padding: '14px 20px', borderRadius: 14, background: SOFT, fontSize: 23, lineHeight: 1.4, color: INK }}>
+                  <span style={{ ...cap, fontSize: 15, display: 'block', marginBottom: 4 }}>In everyday life</span>
+                  {EVERYDAY[step - 1]}
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+        {step === 3 && (
+          <motion.div data-guards {...fadeUp(1.9)} style={{ flex: 'none', ...card(true), background: TINT, padding: '12px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <span style={{ ...capTeal, fontSize: 16 }}>Guardrails the lab does have</span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, auto)', justifyContent: 'start', gap: 30 }}>
+              {GUARDS.map((g) => (
+                <span key={g} style={{ fontSize: 22, color: INK, fontWeight: 600 }}>
+                  <span style={{ color: TEAL }}>✓</span> {g}
+                </span>
+              ))}
+            </div>
+            <div style={{ fontSize: 21, color: INK }}>
+              <b>AI is software.</b> Apply the security discipline you already have, then add the AI-specific risks. No silver bullet: design and test early.
+            </div>
+          </motion.div>
+        )}
+      </Fill>
     </L2Page>
   );
 }
