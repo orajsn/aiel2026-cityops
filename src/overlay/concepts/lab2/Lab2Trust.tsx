@@ -196,40 +196,88 @@ const DIMS: { t: string; icon: IconName }[] = [
   { t: 'Governance', icon: 'clipboard' },
   { t: 'Token usage', icon: 'clock' },
 ];
+/** the agent's day on site, as the camera sees it (illustration: no times are claimed) */
+const WORK = ['reads the report', 'looks up history', 'checks work orders', 'decides', 'writes a note'];
+
+/** a CCTV camera on a wall bracket, with its small light */
+function Cctv() {
+  return (
+    <svg width="190" height="150" viewBox="0 0 190 150" aria-hidden style={{ display: 'block', overflow: 'visible' }}>
+      <rect x="4" y="10" width="16" height="130" rx="4" fill="#5c6b78" />
+      <path d="M20 40h40v14H20z" fill="#5c6b78" />
+      <g transform="rotate(14 60 47)">
+        <rect x="56" y="26" width="110" height="46" rx="10" fill="#aab1ba" stroke="#5c6b78" strokeWidth="4" />
+        <rect x="160" y="34" width="22" height="30" rx="4" fill="#5c6b78" />
+        <rect x="56" y="18" width="116" height="10" rx="4" fill="#8a919c" />
+        <motion.circle cx="76" cy="49" r="6" fill={TEAL} animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 2, repeat: Infinity }} />
+      </g>
+    </svg>
+  );
+}
 
 export function Observability(p: L2Props) {
   return (
     <L2Page testId="l2-observe" {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)', gap: 24, minHeight: 0 }}>
-        <motion.div {...fadeUp(0.2)} style={{ ...card(), padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 40px minmax(0, 1fr)', ...cap }}>
-            <span>Traditional</span>
-            <span />
-            <span style={{ color: TEAL_D }}>AI agents</span>
-          </div>
-          {SHIFTS.map(([a, b], i) => (
-            <motion.div key={a} data-shift={b} {...fadeUp(0.4 + i * 0.35)} style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 40px minmax(0, 1fr)', alignItems: 'center' }}>
-              <span style={{ fontSize: 22, color: DIM }}>{a}</span>
-              <span style={{ color: TEAL, fontSize: 24 }}>→</span>
-              <span style={{ fontSize: 23, fontWeight: 700, color: INK, padding: '10px 14px', borderRadius: 10, background: TINT }}>{b}</span>
+      <Fill gap={16}>
+        {/* the site, under the camera: the agent's steps, and the time log under them */}
+        <FitBox w={1400} h={230} max={1.05}>
+          <div data-site style={{ position: 'relative', width: 1400, height: 230 }}>
+            <motion.div {...fade(0.2)} style={{ position: 'absolute', left: 0, top: 0 }}>
+              <Cctv />
             </motion.div>
-          ))}
-        </motion.div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={cap}>What to watch, beyond uptime and errors</div>
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
-            {DIMS.map((d, i) => (
-              <motion.div key={d.t} data-dim={d.t} {...fadeUp(1.6 + i * 0.2)} style={{ ...card(true), background: CARD, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, textAlign: 'center', padding: 12 }}>
-                <LineIcon name={d.icon} size={46} />
-                <span style={{ fontSize: 21, fontWeight: 700, color: INK }}>{d.t}</span>
+            <motion.svg initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 0.8 }} width="1400" height="230" viewBox="0 0 1400 230" aria-hidden style={{ position: 'absolute', left: 0, top: 0 }}>
+              <path d="M186 60 L1400 0 L1400 176 L186 96 Z" fill="rgba(27,138,156,0.10)" />
+            </motion.svg>
+            <motion.div {...fadeUp(0.8)} style={{ position: 'absolute', left: 230, top: 30 }}>
+              <AgentAvatar size={84} live />
+            </motion.div>
+            {WORK.map((w, i) => (
+              <motion.div key={w} data-work={w} {...fadeUp(1 + i * 0.3)} style={{ position: 'absolute', left: 340 + i * 212, top: 44, width: 196, boxSizing: 'border-box', padding: '12px 10px', borderRadius: 12, background: CARD, border: `2px solid ${TEAL}`, textAlign: 'center', fontSize: 21, fontWeight: 600, color: INK }}>
+                {w}
+              </motion.div>
+            ))}
+            {/* the time log: a ruler under the steps, a light walking it */}
+            <motion.div {...fade(2.4)} style={{ position: 'absolute', left: 340, right: 0, top: 150, height: 34, borderTop: `3px solid ${'#5c6b78'}`, backgroundImage: 'repeating-linear-gradient(90deg, #8a919c 0 2px, transparent 2px 53px)', backgroundSize: '100% 14px', backgroundRepeat: 'no-repeat' }}>
+              <motion.span aria-hidden initial={{ left: '0%' }} animate={{ left: ['0%', '98%'] }} transition={{ delay: 2.8, duration: 6, ease: 'linear', repeat: Infinity, repeatDelay: 1.5 }} style={{ position: 'absolute', top: -9, width: 14, height: 14, borderRadius: '50%', background: TEAL }} />
+            </motion.div>
+            <motion.div {...fade(2.6)} style={{ position: 'absolute', left: 0, top: 168, width: 330, fontSize: 21, lineHeight: 1.3, color: INK }}>
+              <b>CCTV</b>: what it did
+              <br />
+              <b>Time log</b>: how long, how much
+            </motion.div>
+            <motion.div {...fade(2.6)} style={{ position: 'absolute', left: 340, top: 192, fontSize: 17, color: DIM }}>steps: illustration</motion.div>
+          </div>
+        </FitBox>
+        <div style={{ flex: 'none', display: 'grid', gridTemplateColumns: 'minmax(0, 1.15fr) minmax(0, 1fr)', gap: 24 }}>
+          {/* what changes: the old failures cross out, the agent's ones arrive */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ fontSize: 26, fontWeight: 700, color: INK }}>Agents rarely crash. They drift.</div>
+            {SHIFTS.map(([a, b], i) => (
+              <motion.div key={a} data-shift={b} {...fadeUp(3 + i * 0.35)} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.85fr) 34px minmax(0, 1fr)', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 21, color: DIM, textDecoration: 'line-through', textDecorationColor: 'rgba(127,127,127,0.6)' }}>{a}</span>
+                <span style={{ color: TEAL, fontSize: 24 }}>→</span>
+                <span style={{ fontSize: 22, fontWeight: 700, color: INK, padding: '6px 12px', borderRadius: 10, background: TINT }}>{b}</span>
               </motion.div>
             ))}
           </div>
+          {/* what the camera and the log watch */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ fontSize: 26, fontWeight: 700, color: INK }}>What to watch, beyond uptime</div>
+            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
+              {DIMS.map((d, i) => (
+                <motion.div key={d.t} data-dim={d.t} {...fadeUp(4.4 + i * 0.2)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 12, border: `2px solid ${TEAL}`, background: CARD }}>
+                  <LineIcon name={d.icon} size={34} />
+                  <span style={{ fontSize: 21, fontWeight: 700, color: INK, lineHeight: 1.2 }}>{d.t}</span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      </Fill>
     </L2Page>
   );
 }
+
 
 /* ---------------- 2.8e · §2.8 a dashboard for this crack ---------------- */
 
