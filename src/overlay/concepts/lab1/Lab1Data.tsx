@@ -444,33 +444,40 @@ function TableIcon() {
 
 const STEP: CSSProperties = { ...card(), borderColor: 'rgba(27,138,156,0.35)', background: CARD, padding: '14px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 6 };
 
+/** what a supplier recommendation looks like: generic labels, the real values come from the lab's governed views */
+const SAMPLE_ROWS: string[][] = [
+  ['Supplier A', 'recommended', 'high', 'low', 'certified for this repair, delivered on time on similar work'],
+  ['Supplier B', 'conditional', 'medium', 'medium', 'certification renewal pending'],
+  ['Supplier C', 'not recommended', 'low', 'high', 'two late deliveries on past orders'],
+];
+
 export function L1Suppliers({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-suppliers" kickerColor="var(--teal)">
       <Fill>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 1fr 30px 1fr 30px 1fr 30px 1fr', alignItems: 'stretch', columnGap: 4, marginTop: 4, flex: 1, minHeight: 290 }}>
-        <motion.div data-question="supplier" {...fadeUp(0.2)} style={{ ...card(), border: 'none', padding: '14px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6 }}>
-          <Avatar who="project manager" size={56} />
-          <div style={{ fontSize: 14, fontWeight: 600, color: DIM }}>the project manager</div>
-          <div style={{ ...cap, fontSize: 11 }}>Try a prompt › Supplier recommendation</div>
-          <div style={{ fontSize: 18, fontStyle: 'italic', color: 'var(--ink)', lineHeight: 1.3 }}>“Which suppliers do you recommend for this project?”</div>
+        <motion.div data-question="supplier" {...fadeUp(0.2)} style={{ ...card(), border: 'none', padding: '18px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>
+          <Avatar who="project manager" size={76} />
+          <div style={{ fontSize: 17, fontWeight: 600, color: DIM }}>the project manager</div>
+          <div style={{ ...cap, fontSize: 13 }}>Try a prompt › Supplier recommendation</div>
+          <div style={{ fontSize: 23, fontStyle: 'italic', color: 'var(--ink)', lineHeight: 1.3 }}>“Which suppliers do you recommend for this project?”</div>
         </motion.div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Flow w={28} delay={0.8} head={false} />
         </div>
         <motion.div data-step="semantic" {...fadeUp(0.6)} style={{ ...STEP, justifyContent: 'center' }}>
-          <TableIcon />
-          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>Semantic store</div>
-          <Chip style={{ fontSize: 12 }}>seer-construction-semantic</Chip>
-          <div style={{ fontSize: 14, color: DIM, lineHeight: 1.35 }}>knows what each governed view and column means (semantic enrichment)</div>
+          <div style={{ transform: 'scale(1.5)', margin: '10px 0' }}><TableIcon /></div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)' }}>Semantic store</div>
+          <Chip style={{ fontSize: 15 }}>seer-construction-semantic</Chip>
+          <div style={{ fontSize: 18, color: DIM, lineHeight: 1.4 }}>knows what each governed view and column means (semantic enrichment)</div>
         </motion.div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Flow w={28} delay={1.4} head={false} />
         </div>
         <motion.div data-step="nl2sql" {...fadeUp(1)} style={{ ...STEP, justifyContent: 'center' }}>
-          <div style={{ ...mono(20), fontWeight: 700 }}>NL2SQL</div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>Question → SQL</div>
-          <div style={{ alignSelf: 'stretch', textAlign: 'left', borderRadius: 6, background: SOFT, padding: '6px 10px', ...mono(13, 'var(--ink)'), lineHeight: 1.6 }}>
+          <div style={{ ...mono(28), fontWeight: 700 }}>NL2SQL</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)' }}>Question → SQL</div>
+          <div style={{ alignSelf: 'stretch', textAlign: 'left', borderRadius: 6, background: SOFT, padding: '10px 14px', ...mono(17, 'var(--ink)'), lineHeight: 1.7 }}>
             SELECT …<br />
             FROM …<br />
             WHERE <b style={{ color: TEAL_D }}>this project</b>
@@ -480,10 +487,10 @@ export function L1Suppliers({ kicker, message, notebook }: Lab1Props) {
           <Flow w={28} delay={2} head={false} />
         </div>
         <motion.div data-step="sql-check" {...fadeUp(1.4)} style={{ ...STEP, borderColor: TEAL, justifyContent: 'center' }}>
-          <Shield size={44} />
-          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>SQL check</div>
-          <div style={{ fontSize: 14, color: DIM, lineHeight: 1.35 }}>the app checks the SQL stays inside this one project</div>
-          <motion.div data-blocked {...fadeUp(2.4)} style={{ alignSelf: 'stretch', borderRadius: 6, border: '1.5px solid var(--red)', color: 'var(--red)', padding: '4px 8px', fontSize: 13, fontWeight: 700, lineHeight: 1.25 }}>
+          <Shield size={64} />
+          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)' }}>SQL check</div>
+          <div style={{ fontSize: 18, color: DIM, lineHeight: 1.4 }}>the app checks the SQL stays inside this one project</div>
+          <motion.div data-blocked {...fadeUp(2.4)} style={{ alignSelf: 'stretch', borderRadius: 6, border: '1.5px solid var(--red)', color: 'var(--red)', padding: '6px 10px', fontSize: 16, fontWeight: 700, lineHeight: 1.25 }}>
             × SQL that widens to other projects
           </motion.div>
         </motion.div>
@@ -491,10 +498,10 @@ export function L1Suppliers({ kicker, message, notebook }: Lab1Props) {
           <Flow w={28} delay={2.6} head={false} />
         </div>
         <motion.div data-step="mcp" {...fadeUp(1.8)} style={{ ...STEP, justifyContent: 'center' }}>
-          <DbIcon size={46} />
-          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>ADB MCP Server</div>
-          <div style={{ fontSize: 14, color: DIM, lineHeight: 1.35 }}>runs it on the Autonomous AI Database, schema</div>
-          <span style={{ ...mono(12), fontWeight: 700 }}>CONSTRUCTION_ENGINEERING</span>
+          <DbIcon size={66} />
+          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)' }}>ADB MCP Server</div>
+          <div style={{ fontSize: 18, color: DIM, lineHeight: 1.4 }}>runs it on the Autonomous AI Database, schema</div>
+          <span style={{ ...mono(15), fontWeight: 700 }}>CONSTRUCTION_ENGINEERING</span>
         </motion.div>
       </div>
 
@@ -503,20 +510,26 @@ export function L1Suppliers({ kicker, message, notebook }: Lab1Props) {
         <motion.path d="M1290 0v16H140v18" fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 3, duration: 1.2 }} />
       </svg>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 330px', gap: 18 }}>
-        <motion.div data-answer {...fadeUp(3.6)} style={{ ...card(true), padding: '12px 22px' }}>
-          <div style={{ ...capTeal, marginBottom: 8 }}>The answer · from governed data, with its evidence</div>
+        <motion.div data-answer {...fadeUp(3.6)} style={{ ...card(true), padding: '18px 26px' }}>
+          <div style={{ ...capTeal, marginBottom: 12, fontSize: 15 }}>The answer · from governed data, with its evidence <span style={{ color: DIM, fontWeight: 500, letterSpacing: 0, textTransform: 'none' }}>· sample answer, the shape of the real output</span></div>
           <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.4fr 0.8fr 0.8fr 2.2fr', columnGap: 28, rowGap: 14 }}>
             {SUPPLIER_FIELDS.map((f) => (
-              <span key={f} data-field={f} style={mono(15, TEAL_D)}>
+              <span key={f} data-field={f} style={mono(17, TEAL_D)}>
                 {f}
               </span>
             ))}
-            {[0, 1, 2].flatMap((r) => SUPPLIER_FIELDS.map((f, c) => <motion.span key={`${r}${f}`} {...fade(4 + r * 0.25)} style={{ display: 'block', height: 14, borderRadius: 7, background: 'rgba(138,151,163,0.3)', width: ['65%', '70%', '45%', '50%', '90%'][c] }} />))}
+            {SAMPLE_ROWS.flatMap((row, r) =>
+              row.map((v, c) => (
+                <motion.span key={`${r}-${c}`} data-sample-cell {...fade(4 + r * 0.3)} style={{ fontSize: 18, color: 'var(--ink)', fontWeight: c === 0 ? 700 : 500, lineHeight: 1.3 }}>
+                  {c === 1 ? <Chip style={{ fontSize: 15 }}>{v}</Chip> : v}
+                </motion.span>
+              )),
+            )}
           </div>
         </motion.div>
         <motion.div {...fadeUp(4.4)} style={{ ...card(), border: 'none', padding: '16px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--ink)', marginBottom: 6 }}>Only what the data says</div>
-          <div style={{ fontSize: 15, color: DIM, lineHeight: 1.45 }}>No approval the database does not hold. Values come from the views, not from the model.</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--ink)', marginBottom: 8 }}>Only what the data says</div>
+          <div style={{ fontSize: 19, color: DIM, lineHeight: 1.45 }}>No approval the database does not hold. Values come from the views, not from the model.</div>
         </motion.div>
       </div>
       </Fill>
