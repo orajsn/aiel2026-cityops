@@ -33,6 +33,7 @@ test('the highlighted lines are the ones the deck points at', () => {
   expect(at('2.4h', 3)).toContain('format_report(incident, triage, draft)');
   expect(at('2.5c', 0)).toBe('@tool');
   expect(at('2.5d', 3)).toContain('Crack width > 1.0 mm');
+  for (const steps of Object.values(LAB2_FOCUS)) for (const s of steps) expect(s.note ?? '').not.toMatch(/^Here:/); // the drawer writes “Here:” itself
   expect(at('2.6c', 3)).toContain('get_asset_incident_brief_raw');
   expect(at('2.7', 2)).toContain('add_conditional_edges("model"');
   expect(at('2.7', 3)).toContain('graph.add_edge("tools", "model")');
