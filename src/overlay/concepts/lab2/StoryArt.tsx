@@ -76,7 +76,7 @@ function BridgeWithZoom() {
 
 function Clear({ children, delay }: { children: ReactNode; delay: number }) {
   return (
-    <motion.div initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay, duration: 0.45, ease: EASE }} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 24, fontWeight: 600, color: INK }}>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay, duration: 0.45, ease: EASE }} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 24, fontWeight: 600, color: INK }}>
       <svg width={32} height={32} viewBox="0 0 34 34" aria-hidden style={{ flex: 'none' }}>
         <circle cx="17" cy="17" r="16" fill={T} />
         <path d="M9.5 17.5l5 5 10-11" stroke="#fff" strokeWidth={3.2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
@@ -88,7 +88,7 @@ function Clear({ children, delay }: { children: ReactNode; delay: number }) {
 
 function Big({ n, label, delay }: { n: string; label: string; delay: number }) {
   return (
-    <motion.div data-fact={label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.5, ease: EASE }} style={{ display: 'flex', flexDirection: 'column' }}>
+    <motion.div data-fact={label} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay, duration: 0.5, ease: EASE }} style={{ display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
         <span style={{ fontSize: 72, fontWeight: 700, color: INK, lineHeight: 1.25 }}>{n}</span>
         <span style={{ fontSize: 28, color: DIM }}>mm</span>
