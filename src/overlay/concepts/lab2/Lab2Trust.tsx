@@ -2,9 +2,10 @@ import { AnimatePresence, motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { Fill, FitBox } from '../Fill';
 import { AgentAvatar } from './AgentAvatar';
+import { Clipboard } from './Lab2Rag';
 import { EASE } from '../WidePanel';
 import { LineIcon, type IconName } from '../icons';
-import { CARD, Chip, DIM, INK, L2Page, Num, RED, SOFT, TEAL, TEAL_D, TINT, cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props } from './parts';
+import { CARD, Chip, DIM, Folder, TINT2, INK, L2Page, Num, RED, SOFT, TEAL, TEAL_D, TINT, cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props } from './parts';
 
 /**
  * Lab 2 · Trust (security and observability) and Wrap: the deck's chapters 10 and 11, in the Ops Center's
@@ -398,36 +399,48 @@ export function Dashboard(p: L2Props) {
 /* ---------------- 2.8f · §6 pick the tool that fits the job ---------------- */
 
 export const SHAPES = [
-  { t: 'RAG', q: '“What does the record say?”', pred: 'High', how: '1 retrieval + 1 LLM call', icon: 'lookup' as IconName },
-  { t: 'Workflow', q: '“Triage this incident predictably.”', pred: 'High', how: 'Several LLM steps · ~32 s*', icon: 'steps' as IconName },
-  { t: 'Agent', q: '“Reason and tell me what to do.”', pred: 'Lower', how: 'Many turns · ~57 s*', icon: 'branch' as IconName },
+  { t: 'RAG', q: '“What does the record say?”', pred: 'High', how: '1 retrieval + 1 LLM call' },
+  { t: 'Workflow', q: '“Triage this incident predictably.”', pred: 'High', how: 'Several LLM steps · ~32 s*' },
+  { t: 'Agent', q: '“Reason and tell me what to do.”', pred: 'Lower', how: 'Many turns · ~57 s*' },
 ];
+/** how high each stair stands: one step up for each tool */
+const STAIR = [0, 80, 160];
 
 export function PickTool(p: L2Props) {
+  const pics = [<Folder key="f" size={84} />, <Clipboard key="c" w={70} />, <AgentAvatar key="a" size={96} />];
   return (
     <L2Page testId="l2-pick" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, minHeight: 0 }}>
+      <Fill gap={12}>
+        <div data-stairs style={{ position: 'relative', flex: '1 0 auto', minHeight: 400, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', alignItems: 'end' }}>
           {SHAPES.map((s, i) => (
-            <motion.div key={s.t} data-shape={s.t} {...fadeUp(0.2 + i * 0.4)} style={{ ...card(i === 0), background: i === 0 ? TINT : SOFT, padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                <span style={{ fontSize: 34, fontWeight: 700, color: INK }}>{s.t}</span>
-                
+            <motion.div key={s.t} data-shape={s.t} {...fadeUp(0.2 + i * 0.5)} style={{ position: 'relative', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+              {/* what the tool is for, standing on its stair */}
+              <div style={{ margin: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  {pics[i]}
+                  <span style={{ fontSize: 36, fontWeight: 700, color: INK }}>{s.t}</span>
+                </div>
+                <div style={{ fontSize: 23, color: '#fff', background: 'rgba(31,42,51,0.9)', borderRadius: 14, padding: '12px 16px' }}>{s.q}</div>
               </div>
-              <div style={{ fontSize: 23, color: '#fff', background: 'rgba(31,42,51,0.9)', borderRadius: 14, padding: '12px 16px' }}>{s.q}</div>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <LineIcon name={s.icon} size={110} color={i === 0 ? TEAL : '#8a97a3'} />
-              </div>
-              <div style={{ ...cap, fontSize: 14 }}>How predictable</div>
-              <div style={{ fontSize: 30, fontWeight: 700, color: s.pred === 'High' ? TEAL_D : INK }}>{s.pred}</div>
-              <div style={{ fontSize: 20, color: DIM }}>{s.how}</div>
+              {/* the stair itself, with the facts written on it */}
+              <motion.div initial={{ height: 0 }} animate={{ height: STAIR[i] + 130 }} transition={{ delay: 0.1 + i * 0.5, duration: 0.6, ease: EASE }} style={{ overflow: 'hidden', background: i === 0 ? TINT2 : 'rgba(127,127,127,0.16)', borderTop: `5px solid ${i === 0 ? TEAL : '#8a97a3'}`, padding: '12px 16px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <span style={{ ...cap, fontSize: 14 }}>How predictable</span>
+                <span style={{ fontSize: 30, fontWeight: 700, color: s.pred === 'High' ? TEAL_D : INK }}>{s.pred}</span>
+                <span style={{ fontSize: 21, color: DIM }}>{s.how}</span>
+              </motion.div>
             </motion.div>
           ))}
+          <motion.div {...fade(2.2)} style={{ position: 'absolute', left: 14, top: 0, fontSize: 24, color: TEAL_D, fontWeight: 600 }}>
+            each stair up: more freedom, less predictable ↗
+          </motion.div>
         </div>
-        <motion.div {...fade(1.6)} style={{ fontSize: 17, color: DIM, textAlign: 'center' }}>
-          * One saved CPU run each, different prompts: not a benchmark. <b style={{ color: INK }}>Use the simplest tool that works.</b>
+        <motion.div {...fade(2.4)} style={{ flex: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 20 }}>
+          <span style={{ fontSize: 23, color: INK }}>
+            Start on the lowest stair that reaches the job: <b style={{ color: TEAL_D }}>use the simplest tool that works.</b>
+          </span>
+          <span style={{ fontSize: 16, color: DIM, flex: 'none' }}>* One saved CPU run each, different prompts: not a benchmark.</span>
         </motion.div>
-      </div>
+      </Fill>
     </L2Page>
   );
 }

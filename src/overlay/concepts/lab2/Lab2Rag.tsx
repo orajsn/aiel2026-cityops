@@ -704,7 +704,7 @@ function Scale() {
 }
 
 /** a clipboard with a ticked list: the fixed checklist (a workflow) */
-function Clipboard({ w = 74 }: { w?: number }) {
+export function Clipboard({ w = 74 }: { w?: number }) {
   return (
     <svg width={w} height={w * 1.2} viewBox="0 0 60 72" aria-hidden style={{ flex: 'none' }}>
       <rect x="4" y="8" width="52" height="62" rx="5" fill={CAB_LIGHT} />
