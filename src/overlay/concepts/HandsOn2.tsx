@@ -17,36 +17,36 @@ const GREY_TINT = 'rgba(127, 127, 127, 0.1)';
 export function DoorsAndHall({ kicker, message, notebook }: HandsOnProps) {
   return (
     <SidePanel kicker={kicker} message={message} notebook={notebook} testId="doors-and-hall">
-      <motion.div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', fontSize: 19, color: 'var(--ink)', marginBottom: 16 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+      <motion.div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', fontSize: 23, color: 'var(--ink)', marginBottom: 20 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
         <Rich text="**Three keys:**" />
         {['user_id', 'agent_id', 'thread_id'].map((k) => (
-          <span key={k} className="code" data-key={k} style={{ padding: '4px 12px', borderRadius: 8, background: TEAL_TINT, color: 'var(--teal)', fontWeight: 700, fontSize: 18 }}>
+          <span key={k} className="code" data-key={k} style={{ padding: '6px 14px', borderRadius: 8, background: TEAL_TINT, color: 'var(--teal)', fontWeight: 700, fontSize: 21 }}>
             {k}
           </span>
         ))}
       </motion.div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
-        <motion.div data-room="private" style={{ padding: '18px 20px', borderRadius: 14, background: GREY_TINT, border: '2px solid var(--line)', position: 'relative' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.45, ease: EASE }}>
-          <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink)' }}>Mercer’s private room</div>
-          <div style={{ fontSize: 20, color: 'var(--ink)', margin: '12px 0' }}>“swap shifts Tuesday”</div>
-          <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--ink-dim)' }}>🔒 door locked</div>
+      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'minmax(260px, 420px)', alignContent: 'center', gap: 20 }}>
+        <motion.div data-room="private" style={{ display: 'flex', flexDirection: 'column', minHeight: 240, padding: '26px 26px', borderRadius: 14, background: GREY_TINT, border: '2px solid var(--line)', position: 'relative' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.45, ease: EASE }}>
+          <div style={{ fontSize: 29, fontWeight: 700, color: 'var(--ink)' }}>Mercer’s private room</div>
+          <div style={{ fontSize: 27, color: 'var(--ink)', margin: '26px 0' }}>“swap shifts Tuesday”</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink-dim)' }}>🔒 door locked</div>
           {/* Vance's search hits her door and bounces off: the one red thing on the page */}
-          <motion.div style={{ position: 'absolute', right: 14, bottom: 14, fontSize: 18, fontWeight: 700, color: 'var(--red)' }} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 2.0, duration: 0.4 }}>
+          <motion.div style={{ marginTop: 'auto', paddingTop: 20, alignSelf: 'flex-end', fontSize: 23, fontWeight: 700, color: 'var(--red)' }} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 2.0, duration: 0.4 }}>
             ✕ Vance bounces off
           </motion.div>
         </motion.div>
-        <motion.div data-room="hall" style={{ padding: '18px 20px', borderRadius: 14, background: TEAL_TINT, border: '2px solid var(--teal)' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1, duration: 0.45, ease: EASE }}>
-          <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--teal)' }}>Shared hall</div>
-          <div style={{ fontSize: 20, color: 'var(--ink)', margin: '12px 0' }}>Mercer’s guideline for Harbor Bridge</div>
-          <motion.div style={{ fontSize: 18, fontWeight: 700, color: 'var(--teal)' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5, duration: 0.4 }}>
+        <motion.div data-room="hall" style={{ display: 'flex', flexDirection: 'column', minHeight: 240, padding: '26px 26px', borderRadius: 14, background: TEAL_TINT, border: '2px solid var(--teal)' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1, duration: 0.45, ease: EASE }}>
+          <div style={{ fontSize: 29, fontWeight: 700, color: 'var(--teal)' }}>Shared hall</div>
+          <div style={{ fontSize: 27, color: 'var(--ink)', margin: '26px 0', lineHeight: 1.35 }}>Mercer’s guideline for Harbor Bridge</div>
+          <motion.div style={{ marginTop: 'auto', paddingTop: 20, alignSelf: 'flex-end', fontSize: 23, fontWeight: 700, color: 'var(--teal)' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5, duration: 0.4 }}>
             ✓ Vance finds it
           </motion.div>
         </motion.div>
       </div>
-      <motion.div data-result style={{ marginTop: 16, display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', fontSize: 20, color: 'var(--ink)' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 3.0, duration: 0.45 }}>
+      <motion.div data-result style={{ marginTop: 22, marginBottom: 40, display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', fontSize: 23, color: 'var(--ink)' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 3.0, duration: 0.45 }}>
         Vance’s search:
-        <span style={{ padding: '4px 12px', borderRadius: 8, background: GREY_TINT, fontWeight: 700 }}>her private memories 0</span>
-        <span style={{ padding: '4px 12px', borderRadius: 8, background: TEAL_TINT, color: 'var(--teal)', fontWeight: 700 }}>shared hall 1</span>
+        <span style={{ padding: '6px 14px', borderRadius: 8, background: GREY_TINT, fontWeight: 700 }}>her private memories 0</span>
+        <span style={{ padding: '6px 14px', borderRadius: 8, background: TEAL_TINT, color: 'var(--teal)', fontWeight: 700 }}>shared hall 1</span>
       </motion.div>
     </SidePanel>
   );
@@ -84,11 +84,11 @@ export function CopilotTurn({ kicker, message, notebook, step }: CopilotTurnProp
     <SidePanel kicker={kicker} message={message} notebook={notebook} testId="copilot-turn" step={step}>
       <AnimatePresence mode="wait">
         {step === 1 ? (
-          <motion.div key="steps" exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }}>
+          <motion.div key="steps" exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }} style={{ flex: '1 0 auto', display: 'flex', flexDirection: 'column' }}>
             <Steps />
           </motion.div>
         ) : (
-          <motion.div key="card" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: EASE }}>
+          <motion.div key="card" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: EASE }} style={{ flex: '1 0 auto', display: 'flex', flexDirection: 'column' }}>
             <Card />
           </motion.div>
         )}
@@ -109,7 +109,7 @@ function Steps() {
     };
   }, []);
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridAutoFlow: 'column', gridTemplateRows: 'repeat(4, auto)', gap: 12, marginTop: 6 }}>
+    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gridAutoFlow: 'column', gridTemplateRows: 'repeat(4, minmax(min-content, 1fr))', gap: 16, marginTop: 6 }}>
       {TURN_STEPS.map((s, i) => {
         const on = lit === i;
         return (
@@ -120,8 +120,8 @@ function Steps() {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 14,
-              padding: '14px 16px',
+              gap: 16,
+              padding: '16px 20px',
               borderRadius: 12,
               border: `2px solid ${on ? 'var(--teal)' : 'var(--line)'}`,
               background: on ? 'rgba(27, 138, 156, 0.18)' : GREY_TINT,
@@ -131,8 +131,8 @@ function Steps() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 + i * 0.12, duration: 0.4, ease: EASE }}
           >
-            <span style={{ flex: 'none', width: 34, height: 34, borderRadius: '50%', background: on ? 'var(--teal)' : 'rgba(27, 138, 156, 0.2)', color: on ? '#ffffff' : 'var(--teal)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 17 }}>{i + 1}</span>
-            <span style={{ fontSize: 20, fontWeight: on ? 700 : 500, color: 'var(--ink)' }}>{s}</span>
+            <span style={{ flex: 'none', width: 42, height: 42, borderRadius: '50%', background: on ? 'var(--teal)' : 'rgba(27, 138, 156, 0.2)', color: on ? '#ffffff' : 'var(--teal)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 20 }}>{i + 1}</span>
+            <span style={{ fontSize: 24, fontWeight: on ? 700 : 500, color: 'var(--ink)', lineHeight: 1.25 }}>{s}</span>
           </motion.div>
         );
       })}
@@ -142,11 +142,11 @@ function Steps() {
 
 function Card() {
   return (
-    <div data-card style={{ padding: 16, borderRadius: 16, border: '2px solid var(--teal)', background: TEAL_TINT, display: 'flex', flexDirection: 'column', gap: 10, marginTop: 6 }}>
+    <div data-card style={{ flex: 1, padding: 20, borderRadius: 16, border: '2px solid var(--teal)', background: TEAL_TINT, display: 'flex', flexDirection: 'column', gap: 14, marginTop: 6 }}>
       {CARD_BLOCKS.map((b, i) => (
-        <motion.div key={b.tag} data-block={b.tag} style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(27, 138, 156, 0.16)' }} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + i * 0.35, duration: 0.45, ease: EASE }}>
-          <div className="code" style={{ fontSize: 19, fontWeight: 700, color: 'var(--teal)' }}>{`<${b.tag}>`}</div>
-          <div style={{ fontSize: 20, color: 'var(--ink)', marginTop: 4 }}>{b.text}</div>
+        <motion.div key={b.tag} data-block={b.tag} style={{ flex: '1 0 auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '14px 22px', borderRadius: 12, background: 'rgba(27, 138, 156, 0.16)' }} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + i * 0.35, duration: 0.45, ease: EASE }}>
+          <div className="code" style={{ fontSize: 22, fontWeight: 700, color: 'var(--teal)' }}>{`<${b.tag}>`}</div>
+          <div style={{ fontSize: 24, color: 'var(--ink)', marginTop: 6 }}>{b.text}</div>
         </motion.div>
       ))}
     </div>

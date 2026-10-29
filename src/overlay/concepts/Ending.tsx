@@ -5,6 +5,7 @@ import { ChatWindow, type ChatItem } from './CopilotChat';
 import { EASE, WidePanel } from './WidePanel';
 import { CURATION } from './Glass';
 import { LineIcon, type IconName } from './icons';
+import { Fill } from './Fill';
 
 /**
  * Lab 3 pages 26 to 29, the ending (owner, 25 Oct; sketches agreed in chat): with and without memory, the four
@@ -40,24 +41,31 @@ export function WithWithout({ kicker, message, notebook, question, without, with
   ];
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="with-without">
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28, marginTop: 8 }}>
-        <div data-side="without">
-          <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink-dim)', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Without memory</div>
-          <ChatWindow items={chat(without)} testId="chat-without" />
+      <Fill justify="space-evenly" gap={24}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, marginTop: 8 }}>
+          <div data-side="without">
+            <div style={{ fontSize: 25, fontWeight: 700, color: 'var(--ink-dim)', marginBottom: 12, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Without memory</div>
+            {/* the chat window is laid out for a side panel: shown larger here, where the page has the room */}
+            <div style={{ zoom: 1.35 }}>
+              <ChatWindow items={chat(without)} testId="chat-without" />
+            </div>
+          </div>
+          <div data-side="with">
+            <div style={{ fontSize: 25, fontWeight: 700, color: 'var(--teal)', marginBottom: 12, letterSpacing: '0.06em', textTransform: 'uppercase' }}>With memory</div>
+            <div style={{ zoom: 1.35 }}>
+              <ChatWindow items={chat(withMemory)} testId="chat-with" />
+            </div>
+          </div>
         </div>
-        <div data-side="with">
-          <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--teal)', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>With memory</div>
-          <ChatWindow items={chat(withMemory)} testId="chat-with" />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+          {COMPARE_ROWS.map((r, i) => (
+            <motion.div key={r} data-row={r} style={{ display: 'flex', alignItems: 'center', gap: 18, padding: '24px 26px', borderRadius: 14, background: TEAL_TINT, border: '2px solid var(--teal)', fontSize: 27, color: 'var(--ink)' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.6 + i * 0.25, duration: 0.45, ease: EASE }}>
+              <LineIcon name={ROW_ICONS[i]} size={44} />
+              {r}
+            </motion.div>
+          ))}
         </div>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 22 }}>
-        {COMPARE_ROWS.map((r, i) => (
-          <motion.div key={r} data-row={r} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '10px 18px', borderRadius: 12, background: TEAL_TINT, border: '2px solid var(--teal)', fontSize: 22, color: 'var(--ink)' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.6 + i * 0.25, duration: 0.45, ease: EASE }}>
-            <LineIcon name={ROW_ICONS[i]} size={36} />
-            {r}
-          </motion.div>
-        ))}
-      </div>
+      </Fill>
     </WidePanel>
   );
 }
@@ -75,18 +83,19 @@ export const SOLVED = [
 export function FailuresSolved({ kicker, message, notebook }: EndingProps) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="failures-solved">
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 10 }}>
+      <Fill>
+      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 26, marginTop: 10 }}>
         {SOLVED.map((s, i) => (
-          <motion.div key={s.word} data-solved={s.word} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 22, padding: '24px 26px', borderRadius: 16, background: TEAL_TINT, border: '2px solid var(--teal)', minHeight: 150 }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.35, duration: 0.45, ease: EASE }}>
+          <motion.div key={s.word} data-solved={s.word} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 30, padding: '30px 34px', borderRadius: 18, background: TEAL_TINT, border: '2px solid var(--teal)', minHeight: 180 }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.35, duration: 0.45, ease: EASE }}>
             {/* the same icon the problem had on the glass */}
-            <LineIcon name={CURATION.find((c) => c.word === s.word)!.icon} size={64} />
-            <div style={{ flex: 1, minWidth: 0, paddingRight: 120 }}>
-              <div style={{ fontSize: 30, fontWeight: 700, color: 'var(--teal)', marginBottom: 12 }}>{s.word}</div>
-              <div style={{ fontSize: 24, color: 'var(--ink)', lineHeight: 1.4 }}>{s.text}</div>
+            <LineIcon name={CURATION.find((c) => c.word === s.word)!.icon} size={88} />
+            <div style={{ flex: 1, minWidth: 0, paddingRight: 130 }}>
+              <div style={{ fontSize: 36, fontWeight: 700, color: 'var(--teal)', marginBottom: 14 }}>{s.word}</div>
+              <div style={{ fontSize: 28, color: 'var(--ink)', lineHeight: 1.4 }}>{s.text}</div>
             </div>
             {/* the stamp lands after the card */}
             <motion.span
-              style={{ position: 'absolute', top: 22, right: 22, padding: '6px 14px', borderRadius: 8, border: '3px solid var(--teal)', color: 'var(--teal)', fontWeight: 800, fontSize: 20, letterSpacing: '0.1em' }}
+              style={{ position: 'absolute', top: 26, right: 26, padding: '7px 16px', borderRadius: 8, border: '3px solid var(--teal)', color: 'var(--teal)', fontWeight: 800, fontSize: 22, letterSpacing: '0.1em' }}
               initial={{ opacity: 0, scale: 1.6, rotate: -8 }}
               animate={{ opacity: 1, scale: 1, rotate: -8 }}
               transition={{ delay: 0.9 + i * 0.35, duration: 0.35, ease: EASE }}
@@ -96,6 +105,7 @@ export function FailuresSolved({ kicker, message, notebook }: EndingProps) {
           </motion.div>
         ))}
       </div>
+      </Fill>
     </WidePanel>
   );
 }
