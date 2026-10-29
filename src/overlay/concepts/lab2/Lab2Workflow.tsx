@@ -293,9 +293,9 @@ const lit = (focusN: number | null, n: number) => ({
 });
 
 const DRAFT_FIELDS = [
-  { f: 'recommendation', d: 'One-line recommended action' },
-  { f: 'rationale', d: 'Why, in 2-4 sentences, referencing the context' },
-  { f: 'next_steps', d: 'Ordered list of concrete next steps' },
+  { f: 'recommendation', type: 'str', v: 'Follow-up NDT (mag particle or phased-array) within 14 days', d: 'One-line recommended action · for the crack, saved output, cell 50' },
+  { f: 'rationale', type: 'str', v: 'Why, in 2-4 sentences, referencing the context', d: 'the context: the 5 similar incidents' },
+  { f: 'next_steps', type: 'list[str]', v: 'Ordered list of concrete next steps', d: 'a list of short strings' },
 ];
 const FIELD_AT = [3.4, 3.9, 4.4];
 
@@ -401,22 +401,14 @@ export function Station3(p: L2Props) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <Num n={i + 1} size={36} />
                   <span style={{ ...mono(24, TEAL_D), fontWeight: 700 }}>{d.f}</span>
+                  <span style={{ ...mono(18, DIM) }}>{d.type}</span>
                 </div>
-                <div style={{ fontSize: 20, color: DIM }}>{d.d}</div>
-                <div style={{ flex: 1, minHeight: 56, borderRadius: 10, border: '2px dashed rgba(27,138,156,0.55)', padding: '10px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8, boxSizing: 'border-box' }}>
-                  {i === 0 ? (
-                    <motion.span {...fade(FIELD_AT[0])} style={{ fontSize: 22, color: INK, lineHeight: 1.35 }}>
-                      Follow-up NDT (mag particle or phased-array) within 14 days
-                    </motion.span>
-                  ) : (
-                    (i === 1 ? [100, 92, 60] : [70, 82, 64]).map((w, k) => (
-                      <motion.span key={k} initial={{ width: '0%' }} animate={{ width: `${w}%` }} transition={{ delay: FIELD_AT[i] + k * 0.15, duration: 0.5, ease: EASE }} style={{ height: 8, borderRadius: 4, background: 'rgba(127,127,127,0.3)', display: 'block' }} />
-                    ))
-                  )}
-                </div>
+                <motion.div {...fadeUp(FIELD_AT[i])} style={{ flex: 1, borderRadius: 10, border: `2px solid ${i === 0 ? TEAL : 'rgba(27,138,156,0.45)'}`, background: i === 0 ? TINT : 'transparent', padding: '8px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4, boxSizing: 'border-box' }}>
+                  <span style={{ fontSize: 22, color: INK, lineHeight: 1.3, fontWeight: i === 0 ? 600 : 400 }}>{d.v}</span>
+                  <span style={{ fontSize: 19, color: DIM, lineHeight: 1.3 }}>{d.d}</span>
+                </motion.div>
               </div>
             ))}
-            <div style={{ fontSize: 16, color: DIM }}>recommendation: saved output, cell 50</div>
           </motion.div>
         </FitBox>
       </Fill>
@@ -471,6 +463,7 @@ export function Order(p: L2Props) {
                     <motion.div initial={{ width: '0%' }} animate={{ width: '100%' }} transition={{ delay: RUN_AT[i], duration: RUN_DUR[i], ease: 'linear' }} style={{ height: '100%', background: c.by === 'the language model' ? TEAL : 'rgba(27,138,156,0.45)' }} />
                   </div>
                   <span style={{ ...mono(22, INK), fontWeight: 700 }}>{c.ms.toLocaleString('en-US')} ms</span>
+                  {c.ms === 0 && <span style={{ fontSize: 19, color: DIM, lineHeight: 1.25 }}>plain Python, under 1 ms</span>}
                 </motion.div>
               ))}
             </div>
