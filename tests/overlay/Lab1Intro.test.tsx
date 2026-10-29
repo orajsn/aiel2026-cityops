@@ -1,42 +1,40 @@
 import { render } from '@testing-library/react';
-import { L1Damage, L1Opening, L1Scattered } from '../../src/overlay/concepts/lab1/Lab1Intro';
+import { HANDS_ON_STEPS, L1Damage, L1Opening, L1Scattered, QUESTIONS } from '../../src/overlay/concepts/lab1/Lab1Intro';
+import { attrs, expectNoRed } from './lab1Helpers';
 
-const attrs = (c: HTMLElement, a: string) => [...c.querySelectorAll(`[${a}]`)].map((e) => e.getAttribute(a));
-
-function noRedAndSvgPeople(c: HTMLElement) {
-  expect(c.innerHTML).not.toMatch(/--red|#c74634/i);
-  expect(c.querySelectorAll('img')).toHaveLength(0);
-  expect(c.querySelectorAll('svg[data-person]').length).toBeGreaterThan(0);
-}
-
-test('opening: three jobs, two controls, the engineer decides, five hands-on exercises', () => {
+test('1.0 opening: three questions into one AI assistant (Seer Construction Intelligence), the engineer decides, five hands-on steps', () => {
   const c = render(<L1Opening kicker="k" message="m" />).container;
-  expect(attrs(c, 'data-job')).toEqual(['search', 'check', 'summarise']);
-  expect(attrs(c, 'data-control')).toEqual(['model', 'guardrails']);
-  for (const w of ['Search the specifications', 'Check contractors and materials', 'Summarise site photos', 'Choose the right model for each job', 'Guardrails against unsafe instructions', 'The engineer evaluates and decides on safety.', 'Unstructured RAG', 'Semantic Store + NL2SQL', 'The assistant app', 'Model routing', 'Guardrails'])
+  expect(attrs(c, 'data-question')).toEqual(['spec', 'supplier', 'photo']);
+  for (const q of QUESTIONS) expect(c.textContent).toContain(`“${q}”`);
+  expect(attrs(c, 'data-job')).toEqual(['1', '2', '3']);
+  expect(attrs(c, 'data-control')).toEqual(['routing', 'guardrails']);
+  for (const w of ['One AI assistant', 'Seer Construction Intelligence', 'Searches the specification', 'Looks up governed project data', 'Reads a site photo', 'The right model for each question', 'Guardrails check every request first', 'The engineer decides'])
     expect(c.textContent).toContain(w);
   expect(attrs(c, 'data-hands-on')).toEqual(['1', '2', '3', '4', '5']);
-  const eng = c.querySelector('[data-engineer]')!;
-  expect(eng.querySelector('svg[data-person="engineer"] [data-check]')).not.toBeNull();
-  noRedAndSvgPeople(c);
+  expect(HANDS_ON_STEPS).toEqual(['Unstructured RAG', 'Semantic Store', 'Run the app · 3A Build or 3B Launch', 'Model routing', 'Guardrails']);
+  expect(c.querySelector('[data-engineer] svg[data-person="engineer"]')).not.toBeNull();
+  expect(c.querySelector('[data-net]')).not.toBeNull();
+  expectNoRed(c);
 });
 
-test('damage: cracks, spalling concrete, exposed reinforcing steel, then project manager to engineer', () => {
+test('1.1 damage: three findings on Harbor Bridge, the project manager gathers three facts for the engineer', () => {
   const c = render(<L1Damage kicker="k" message="m" />).container;
   expect(attrs(c, 'data-damage')).toEqual(['cracks', 'spalling', 'rebar']);
-  for (const w of ['Cracks', 'Spalling concrete', 'concrete breaking away', 'Exposed reinforcing steel', 'rusty rebar showing', 'Prepare the information for the engineer to assess and plan the repair.'])
+  expect(attrs(c, 'data-mark')).toEqual(['cracks', 'spalling', 'rebar']);
+  for (const w of ['HARBOR BRIDGE · WHAT THE INSPECTION FOUND', 'Cracks', 'Spalling concrete', 'Exposed reinforcing steel', 'what the specification requires', 'which supplier can deliver', 'what the site photos show', 'assesses the damage and plans the repair'])
     expect(c.textContent).toContain(w);
   expect(attrs(c, 'data-who')).toEqual(['project manager', 'engineer']);
-  noRedAndSvgPeople(c);
+  expectNoRed(c);
 });
 
-test('scattered: four sources in four systems, the manager and the question', () => {
+test('1.2 scattered: each question, the place its answer lives, and how it is found by hand today', () => {
   const c = render(<L1Scattered kicker="k" message="m" />).container;
-  expect(attrs(c, 'data-source')).toEqual(['report', 'drawings', 'history', 'contractors']);
-  for (const w of ['Inspection report', 'Bridge drawings', 'Repair history', 'Contractor data', '(PDF)', '(pictures)', 'What if one question could gather all of this?'])
+  expect(attrs(c, 'data-place')).toEqual(['spec', 'data', 'photos']);
+  expect(attrs(c, 'data-by-hand')).toEqual(['spec', 'data', 'photos']);
+  for (const w of ['a long PDF in an Object Storage bucket', 'tables in the Autonomous AI Database', 'a structural-steel delivery, from the site', 'Read it page by page', 'Ask someone to write a query', 'Open each photo and look'])
     expect(c.textContent).toContain(w);
-  expect(c.textContent?.match(/\(database\)/g)).toHaveLength(2);
-  expect(c.querySelectorAll('[data-question]')).toHaveLength(1);
-  expect(c.querySelectorAll('[data-reach]')).toHaveLength(4);
-  noRedAndSvgPeople(c);
+  // field names only, never values
+  expect(c.querySelector('[data-fields]')?.textContent).toBe('supplierrecommendation statusfit scorerisk levelpurchase orders');
+  expect(c.querySelector('[data-question="all"]')?.textContent).toContain('What if one question, in one app, could reach all three?');
+  expectNoRed(c);
 });

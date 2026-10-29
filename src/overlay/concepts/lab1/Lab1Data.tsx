@@ -1,440 +1,515 @@
 import { motion } from 'motion/react';
-import type { ReactNode } from 'react';
-import { LineIcon } from '../icons';
-import { EASE, WidePanel } from '../WidePanel';
+import type { CSSProperties, ReactNode } from 'react';
+import { WidePanel } from '../WidePanel';
+import { Avatar, CARD, Clip, Chip, DbIcon, DIM, Flow, FlowDown, GREY, HandsOn, MONO, PdfIcon, SOFT, Shield, Spark, SteelPhoto, Switch, TEAL, TEAL_D, TINT, cap, capTeal, card, fade, fadeUp, mono } from './parts';
+import type { Lab1Props } from './parts';
 
 /**
- * Lab 1 · AI Economics, the data pages: 1.3 (the assistant and its three engines), 1.4 (Hands-on 1,
- * Unstructured RAG) and 1.5 (Hands-on 2, Semantic Store + NL2SQL). Flat teal/grey drawings, no red,
- * no invented names or numbers: only roles and generic labels.
+ * Lab 1 · AI Economics, the assistant and its data (V2, from the real workshop guide).
+ *   L1Assistant  1.3   one question through OCI Enterprise AI: check, pick the model, look it up, answer with sources
+ *   L1App        1.3a  Seer Construction Intelligence: the runtime bar, Try a prompt, Runtime configuration
+ *                      (one red element: the Guardrail challenge button)
+ *   L1Specs      1.4   Hands-on 1: Object Storage, data sync, vector store, file_search, an answer that cites
+ *   L1Suppliers  1.5   Hands-on 2: semantic store, NL2SQL, the project-scope SQL check (its one red element), ADB MCP Server
  */
 
-const GREY = 'var(--ink-dim)';
-const MONO = 'JetBrains Mono, monospace';
-const TEAL_TINT = 'rgba(27, 138, 156, 0.12)';
-const G_LIGHT = 'rgba(138, 145, 156, 0.35)';
-const G_MID = '#8a919c';
-const G_DARK = '#5c6b78';
-const T_SOFT = 'rgba(27, 138, 156, 0.28)';
-const T_MID = 'rgba(27, 138, 156, 0.6)';
+/** the supplier fields the guide's Supplier recommendation prints; never sample values */
+export const SUPPLIER_FIELDS = ['supplier', 'recommendation status', 'fit score', 'risk level', 'explanation'];
+export const TRY_A_PROMPT = ['Specification requirements', 'Supplier recommendation', 'Guardrail challenge'];
 
-const label = { fontSize: 15, fontWeight: 700, letterSpacing: 2.4, color: GREY, textTransform: 'uppercase' as const, marginBottom: 12 };
+const Bar = ({ w, h = 9 }: { w: number | string; h?: number }) => <span style={{ display: 'block', width: w, height: h, borderRadius: h, background: 'rgba(138,151,163,0.3)' }} />;
+const Num = ({ n }: { n: number }) => <span style={{ fontWeight: 700 }}>{n} ·</span>;
 
-const rise = (delay: number) => ({ initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.5, ease: EASE } });
+/* ---------- 1.3 · one assistant ---------- */
 
-function Arrow({ delay = 0, w = 60 }: { delay?: number; w?: number }) {
+function Box({ title, ho, children, style, ...rest }: { title: ReactNode; ho: number; children: ReactNode; style?: CSSProperties } & Record<string, unknown>) {
   return (
-    <svg width={w} height={22} viewBox={`0 0 ${w} 22`} fill="none" stroke="var(--teal)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ flex: 'none' }}>
-      <path d={`M2 11H${w - 6}`} strokeDasharray="2 7" />
-      <path d={`M${w - 14} 3l9 8-9 8`} />
-      <motion.circle cx={6} cy={11} r={4} fill="var(--teal)" stroke="none" initial={{ cx: 6, opacity: 0 }} animate={{ cx: w - 16, opacity: [0, 1, 1, 0] }} transition={{ delay, duration: 0.9, ease: EASE }} />
-    </svg>
-  );
-}
-
-function Tag({ text }: { text: string }) {
-  return (
-    <motion.span data-tag={text} {...rise(0.2)} style={{ display: 'inline-block', fontSize: 17, fontWeight: 700, letterSpacing: 0.4, padding: '5px 14px', borderRadius: 999, background: 'var(--teal)', color: '#fff' }}>
-      {text}
-    </motion.span>
-  );
-}
-
-function Chip({ text }: { text: string }) {
-  // a block, so a long source wraps inside its own border
-  return <div style={{ display: 'inline-block', fontSize: 17, lineHeight: 1.3, padding: '5px 12px', borderRadius: 7, border: '1.5px solid var(--teal)', background: TEAL_TINT, color: 'var(--ink)' }}>{text}</div>;
-}
-
-/** a small database table drawing: header row in teal, `rows` grey rows */
-function MiniTable({ w = 70, rows = 3, head = 'var(--teal)' }: { w?: number; rows?: number; head?: string }) {
-  const h = 12 + rows * 10;
-  return (
-    <svg width={w} height={h + 2} viewBox={`0 0 ${w} ${h + 2}`} style={{ flex: 'none' }}>
-      <rect x="1" y="1" width={w - 2} height={h} rx="4" fill="rgba(138,145,156,0.18)" stroke={G_MID} strokeWidth={1.5} />
-      <path d={`M1 5a4 4 0 0 1 4-4h${w - 10}a4 4 0 0 1 4 4v7H1z`} fill={head} />
-      {Array.from({ length: rows }).map((_, i) => (
-        <rect key={i} x="7" y={17 + i * 10} width={(w - 14) * (i % 2 ? 0.6 : 0.85)} height="4" rx="2" fill={G_MID} opacity={0.7} />
-      ))}
-    </svg>
-  );
-}
-
-/** an illustrated person in a hard hat (flat shapes); `tone` picks the vest/shirt colour */
-function Worker({ hat = true, shirt = G_DARK, size = 110 }: { hat?: boolean; shirt?: string; size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 110 110" style={{ flex: 'none' }}>
-      <ellipse cx="55" cy="104" rx="40" ry="4" fill="rgba(127,127,127,0.2)" />
-      <path d="M18 104V84c0-16 14-24 37-24s37 8 37 24v20z" fill={shirt} />
-      {hat && <path d="M40 104V78l15 12 15-12v26z" fill="var(--teal)" opacity={0.9} />}
-      <rect x="48" y="50" width="14" height="14" rx="5" fill="#c98e6b" />
-      <circle cx="55" cy="40" r="19" fill="#c98e6b" />
-      <path d="M48 41v3M62 41v3" stroke="var(--ink)" strokeWidth={2.4} strokeLinecap="round" />
-      <path d="M49 49q6 5 12 0" stroke="var(--ink)" strokeWidth={2} strokeLinecap="round" fill="none" />
-      {hat && (
-        <>
-          <path d="M34 34a21 18 0 0 1 42 0z" fill="var(--teal)" stroke="rgba(255,255,255,0.5)" strokeWidth={1.5} />
-          <rect x="30" y="32" width="50" height="6" rx="3" fill="var(--teal)" stroke="rgba(255,255,255,0.5)" strokeWidth={1.5} />
-          <rect x="51" y="14" width="8" height="12" rx="3" fill="rgba(255,255,255,0.45)" />
-        </>
-      )}
-    </svg>
-  );
-}
-
-function Bubble({ who, text, delay = 0.3, children }: { who: string; text: string; delay?: number; children: ReactNode }) {
-  return (
-    <motion.div data-question={who} {...rise(delay)} style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-      {children}
-      <div style={{ position: 'relative', fontSize: 22, lineHeight: 1.4, fontStyle: 'italic', padding: '14px 22px', borderRadius: 16, background: 'rgba(127,127,127,0.14)', color: 'var(--ink)', flex: 1 }}>
-        <span style={{ position: 'absolute', left: -9, top: '50%', width: 18, height: 18, background: 'rgba(127,127,127,0.14)', transform: 'translateY(-50%) rotate(45deg)' }} />
-        <div style={{ fontSize: 15, fontWeight: 700, fontStyle: 'normal', letterSpacing: 2, color: GREY, textTransform: 'uppercase', marginBottom: 4 }}>{who}</div>
-        “{text}”
+    <div {...rest} style={{ ...card(), borderColor: 'rgba(27,138,156,0.35)', background: CARD, padding: '12px 16px', ...style }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+        <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>{title}</div>
+        <HandsOn n={ho} solid />
       </div>
-    </motion.div>
-  );
-}
-
-/* ================= 1.3 · the assistant ================= */
-
-const SOURCES = [
-  { key: 'PDF files', icon: 'prompt' as const },
-  { key: 'Pictures', icon: 'photo' as const },
-  { key: 'Database tables', icon: 'database' as const },
-];
-
-/** engine 1: a document is scanned, split into chunk strips, embedded as dots, stored */
-function VectorAnim() {
-  const stage = (i: number) => 0.9 + i * 0.7;
-  return (
-    <svg data-anim="vector" width="236" height="96" viewBox="0 0 236 96">
-      <motion.g {...rise(stage(0))}>
-        <rect x="6" y="12" width="40" height="52" rx="4" fill={G_LIGHT} stroke={G_MID} strokeWidth={2} />
-        <path d="M13 24h26M13 32h26M13 40h26M13 48h16" stroke={G_DARK} strokeWidth={3} strokeLinecap="round" />
-        <motion.rect x="6" width="40" height="4" rx="2" fill="var(--teal)" initial={{ y: 12, opacity: 0 }} animate={{ y: [12, 58, 12], opacity: [0, 1, 0] }} transition={{ delay: stage(0), duration: 1.4, ease: EASE }} />
-      </motion.g>
-      <motion.g {...rise(stage(1))}>
-        {[0, 1, 2].map((i) => (
-          <rect key={i} x="68" y={14 + i * 17} width="40" height="12" rx="3" fill={T_SOFT} stroke="var(--teal)" strokeWidth={1.5} />
-        ))}
-      </motion.g>
-      <motion.g {...rise(stage(2))}>
-        {[0, 1, 2].map((i) => (
-          <motion.circle key={i} cx={134 + (i % 2) * 14} cy={22 + i * 17} r="6" fill="var(--teal)" animate={{ opacity: [1, 0.55, 1] }} transition={{ delay: 4 + i * 0.4, duration: 2.4, repeat: Infinity, ease: 'easeInOut' }} />
-        ))}
-      </motion.g>
-      <motion.g {...rise(stage(3))} transform="translate(188 8)">
-        <g fill="none" stroke="var(--teal)" strokeWidth={2.3}>
-          <ellipse cx="22" cy="10" rx="17" ry="6" fill={T_SOFT} />
-          <path d="M5 10v34c0 3.3 7.6 6 17 6s17-2.7 17-6V10M5 24c0 3.3 7.6 6 17 6s17-2.7 17-6" />
-        </g>
-      </motion.g>
-      <path d="M50 38h14M112 38h16M158 38h26" stroke="var(--teal)" strokeWidth={2} strokeDasharray="2 5" strokeLinecap="round" />
-      {['scan', 'split', 'embed', 'store'].map((t, i) => (
-        <text key={t} x={26 + i * 62} y={90} textAnchor="middle" fontSize="14" fontWeight="600" fill="var(--ink-dim)" fontFamily="Inter, sans-serif">
-          {t}
-        </text>
-      ))}
-    </svg>
-  );
-}
-
-const SEMANTIC_TABLES = ['project', 'supplier', 'inspection', 'schedule', 'compliance'];
-
-function SemanticAnim() {
-  return (
-    <div data-anim="semantic" style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 96, paddingBottom: 2 }}>
-      {SEMANTIC_TABLES.map((t, i) => (
-        <motion.div key={t} data-table={t} {...rise(1 + i * 0.25)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <MiniTable w={42} rows={2 + (i % 3)} head={i % 2 ? G_MID : 'var(--teal)'} />
-          <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink)', lineHeight: 1 }}>{t}</span>
-        </motion.div>
-      ))}
+      {children}
     </div>
   );
 }
 
-function RoutingAnim() {
-  const box = (w: number, h: number, t: string, big: boolean, delay: number) => (
-    <motion.div data-model={big ? 'multimodal' : 'lower-cost'} {...rise(delay)} style={{ width: w, height: h, borderRadius: 10, border: '2px solid var(--teal)', background: big ? 'var(--teal)' : TEAL_TINT, color: big ? '#fff' : 'var(--ink)', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: 14, fontWeight: 700, lineHeight: 1.15, padding: '0 6px' }}>
-      {t}
-    </motion.div>
-  );
-  const q = (icon: 'speech' | 'photo', t: string, delay: number) => (
-    <motion.div {...rise(delay)} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13.5, fontWeight: 600, color: 'var(--ink)', width: 96 }}>
-      <LineIcon name={icon} size={24} />
-      {t}
-    </motion.div>
-  );
+export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
   return (
-    <div data-anim="routing" style={{ display: 'grid', gridTemplateColumns: '96px 40px 1fr', rowGap: 8, alignItems: 'center', height: 96 }}>
-      {q('speech', 'text question', 1)}
-      <Arrow w={38} delay={1.4} />
-      {box(100, 34, 'lower-cost model', false, 1.7)}
-      {q('photo', 'image question', 2)}
-      <Arrow w={38} delay={2.4} />
-      {box(120, 48, 'multimodal model', true, 2.7)}
-    </div>
-  );
-}
-
-const ENGINES = [
-  { key: 'Vector store', line: 'finds passages by meaning', anim: <VectorAnim /> },
-  { key: 'Semantic store', line: 'answers questions about the project’s data', anim: <SemanticAnim /> },
-  { key: 'Model routing', line: 'sends each question to the model it needs', anim: <RoutingAnim /> },
-];
-
-export interface L1AssistantProps {
-  kicker: string;
-  message: string;
-  notebook?: string;
-}
-
-/** 1.3 · Three kinds of source flow into OCI Enterprise AI (three engines) and out as one assistant answering one question. */
-export function L1Assistant({ kicker, message, notebook }: L1AssistantProps) {
-  return (
-    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-assistant">
-      <div style={{ display: 'grid', gridTemplateColumns: '190px 44px 1fr 44px 200px', alignItems: 'center', marginTop: 8, borderTop: '1px solid var(--line)', paddingTop: 14 }}>
-        <div>
-          <div style={label}>Three kinds of source</div>
-          {SOURCES.map((s, i) => (
-            <motion.div key={s.key} data-source={s.key} {...rise(0.3 + i * 0.2)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', marginBottom: 14, borderRadius: 12, border: '2px solid var(--line)', background: 'rgba(127,127,127,0.1)', fontSize: 20, fontWeight: 600, color: 'var(--ink)' }}>
-              <LineIcon name={s.icon} size={34} />
-              {s.key}
-            </motion.div>
+    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-assistant" kickerColor="var(--teal)">
+      <div style={{ display: 'grid', gridTemplateColumns: '228px 34px 1fr 34px 212px', alignItems: 'stretch', columnGap: 4, marginTop: 4, height: 540 }}>
+        {/* the app */}
+        <motion.div data-app {...fadeUp(0.2)} style={{ borderRadius: 12, background: '#1f2a33', color: '#e6e9ef', padding: '14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ ...cap, color: '#aab4bf', fontSize: 12 }}>The app</span>
+            <HandsOn n={3} solid />
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.2 }}>Seer Construction Intelligence</div>
+          <div style={{ background: '#fff', color: '#1f2a33', borderRadius: 8, padding: '8px 10px', fontSize: 16 }}>“Which supplier is ready?”</div>
+          <div style={{ background: '#fff', color: '#1f2a33', borderRadius: 8, padding: '6px 10px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <SteelPhoto w={42} label={false} />
+            or attach a delivery photo
+          </div>
+          <div style={{ ...cap, color: '#aab4bf', fontSize: 12, marginTop: 4 }}>Try a prompt</div>
+          {TRY_A_PROMPT.map((t) => (
+            <span key={t} style={{ alignSelf: 'flex-start', border: '1px solid rgba(255,255,255,0.4)', borderRadius: 6, padding: '3px 8px', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}>{t}</span>
           ))}
+          <div style={{ marginTop: 'auto', fontSize: 13, color: '#aab4bf' }}>scoped to one project code</div>
+        </motion.div>
+
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Flow w={32} delay={0.9} loop />
         </div>
-        <Arrow w={44} delay={0.9} />
-        <motion.div data-block="oci-enterprise-ai" {...rise(0.6)} style={{ border: '2.5px solid var(--teal)', borderRadius: 18, padding: '14px 18px 16px', background: 'rgba(27, 138, 156, 0.06)' }}>
-          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--teal)', marginBottom: 10 }}>OCI Enterprise AI</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
-            {ENGINES.map((e, i) => (
-              <motion.div key={e.key} data-engine={e.key} {...rise(0.8 + i * 0.5)} style={{ borderRadius: 12, border: '1.5px solid var(--line)', background: 'rgba(127,127,127,0.1)', padding: '10px 12px 12px', minHeight: 230 }}>
-                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink)', marginBottom: 8 }}>
-                  <span style={{ color: 'var(--teal)', marginRight: 8 }}>{i + 1}</span>
-                  {e.key}
+
+        {/* OCI Enterprise AI */}
+        <motion.div data-oci {...fadeUp(0.5)} style={{ ...card(true), background: TINT, padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+            <span style={{ fontSize: 21, fontWeight: 700, color: TEAL_D }}>OCI Enterprise AI</span>
+            <span style={{ fontSize: 14, color: DIM }}>one project holds the stores and settings · the Responses API runs each request</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <Box data-step="check" title={<><Num n={1} /> Check the request</>} ho={5}>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                <Shield size={50} />
+                <div style={{ fontSize: 15, color: 'var(--ink)', lineHeight: 1.35 }}>
+                  <div style={mono(15)}>ApplyGuardrails</div>
+                  checks every request for prompt injection <b>before</b> the model is called
                 </div>
-                <div style={{ minHeight: 100, display: 'flex', alignItems: 'center' }}>{e.anim}</div>
-                <div style={{ fontSize: 19, lineHeight: 1.35, color: 'var(--ink)', marginTop: 8 }}>{e.line}</div>
-              </motion.div>
+              </div>
+            </Box>
+            <Box data-step="route" title={<><Num n={2} /> Pick the model</>} ho={4}>
+              {[
+                ['text', 'the lower-cost model', false],
+                ['image', 'the multimodal model', true],
+              ].map(([k, m, solid]) => (
+                <div key={String(k)} data-route={String(k)} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                  <span style={{ width: 64, padding: '3px 0', textAlign: 'center', borderRadius: 6, background: SOFT, fontSize: 15, fontWeight: 600, color: 'var(--ink)' }}>{String(k)}</span>
+                  <Flow w={30} delay={1.6} />
+                  <span style={{ padding: '3px 10px', borderRadius: 6, border: `2px solid ${TEAL}`, background: solid ? TEAL : CARD, color: solid ? '#fff' : TEAL_D, fontSize: 15, fontWeight: 700 }}>{String(m)}</span>
+                </div>
+              ))}
+              <div style={{ fontSize: 13, color: DIM }}>the runtime bar shows which model answered</div>
+            </Box>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <FlowDown h={22} delay={2} />
+            <span style={capTeal}>3 · Look it up</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, flex: 1 }}>
+            <Box data-store="vector" title="Vector store" ho={1} style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--ink)' }}>
+                <Chip style={{ background: '#1f2a33', color: '#fff' }}>file_search</Chip>
+                finds passages in the specification
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '10px 0', fontSize: 13, color: DIM }}>
+                <div style={{ display: 'grid', gap: 3 }}>
+                  {[0, 1, 2, 3].map((i) => (
+                    <span key={i} style={{ width: 44, height: 7, borderRadius: 2, border: `1.5px solid ${TEAL}`, background: TINT }} />
+                  ))}
+                </div>
+                split into chunks →
+                <svg width="46" height="28" viewBox="0 0 46 28" aria-hidden="true">
+                  {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                    <circle key={i} cx={6 + (i % 4) * 11} cy={i < 4 ? 6 : 20} r={4} fill={TEAL} />
+                  ))}
+                </svg>
+                embeddings, searched by meaning
+              </div>
+              <div style={{ marginTop: 'auto', borderRadius: 8, background: SOFT, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--ink)' }}>
+                <PdfIcon size={24} />
+                <b>Object Storage bucket</b>
+                <Flow w={26} delay={2.4} />
+                <span style={{ color: DIM }}>data sync connector</span>
+              </div>
+            </Box>
+            <Box data-store="semantic" title="Semantic store" ho={2} style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--ink)' }}>
+                <Chip style={{ background: '#1f2a33', color: '#fff' }}>NL2SQL</Chip>
+                turns the question into SQL, checked for project scope
+              </div>
+              <div style={{ margin: '8px 0 4px', borderRadius: 6, background: '#1f2a33', color: '#e6e9ef', padding: '6px 10px', fontFamily: MONO, fontSize: 13, lineHeight: 1.5 }}>
+                SELECT … FROM <span style={{ color: '#7fd3e0' }}>governed views</span>
+                <br />
+                WHERE project = <span style={{ color: '#7fd3e0' }}>&lt;one project&gt;</span>
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: TEAL_D }}>✓ SQL checked: it cannot reach other projects</div>
+              <div style={{ marginTop: 'auto', borderRadius: 8, background: SOFT, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--ink)' }}>
+                <DbIcon size={22} />
+                <b>Autonomous AI Database</b>
+                <Flow w={26} delay={2.6} />
+                <span style={{ color: DIM }}>ADB MCP Server</span>
+              </div>
+            </Box>
+          </div>
+        </motion.div>
+
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Flow w={32} delay={3} />
+        </div>
+
+        {/* the answer */}
+        <motion.div data-answer {...fadeUp(3)} style={{ ...card(true), background: TINT, padding: '14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={capTeal}>The answer</div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 17, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.2 }}>
+            <PdfIcon size={28} />
+            cites the specification
+          </div>
+          <div style={{ fontSize: 14, color: DIM }}>governed supplier fields:</div>
+          <div style={{ background: CARD, borderRadius: 6, padding: '6px 10px', ...mono(13, 'var(--ink)'), lineHeight: 1.7 }}>
+            {SUPPLIER_FIELDS.slice(1).map((f) => (
+              <div key={f}>{f}</div>
             ))}
           </div>
-        </motion.div>
-        <Arrow w={44} delay={3.2} />
-        <motion.div data-answer="assistant" {...rise(3.2)} style={{ textAlign: 'center' }}>
-          <div style={label}>One AI assistant</div>
-          <LineIcon name="speech" size={84} />
-          <div style={{ fontSize: 20, lineHeight: 1.35, color: 'var(--ink)', marginTop: 10 }}>answers one question</div>
+          <div style={{ fontSize: 14, color: DIM, lineHeight: 1.35 }}>for a photo: what it sees, kept apart from what it assumes</div>
+          <div data-engineer style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, fontSize: 17, fontWeight: 700, color: 'var(--ink)' }}>
+            <Avatar who="engineer" size={44} />
+            the engineer decides
+          </div>
         </motion.div>
       </div>
     </WidePanel>
   );
 }
 
-/* ================= 1.4 · Hands-on 1 ================= */
+/* ---------- 1.3a · meet the app ---------- */
 
-const PARTS = [
-  { key: 'Surface preparation', source: 'source: approved repair specification (PDF)' },
-  { key: 'Materials', source: 'source: approved repair specification (PDF)' },
-  { key: 'Inspection and acceptance', source: 'source: inspection report (PDF)' },
+export const SWITCHES = [
+  { name: 'Specification search', sub: 'search the specification', ho: 1 },
+  { name: 'Governed project data', sub: 'query the supplier data', ho: 2 },
+  { name: 'Model routing', sub: 'text to the lower-cost model', ho: 4 },
+  { name: 'Prompt-injection protection', sub: 'check every request first', ho: 5 },
 ];
-const PDFS = ['approved repair specification', 'maintenance manual', 'inspection report'];
 
-function Pdf({ name, delay }: { name: string; delay: number }) {
+const tag = (bold = false): CSSProperties => ({ padding: '4px 10px', borderRadius: 6, background: CARD, fontSize: 15, fontWeight: bold ? 700 : 600, color: bold ? TEAL_D : 'var(--ink)', whiteSpace: 'nowrap' });
+
+export function L1App({ kicker, message, notebook }: Lab1Props) {
   return (
-    <motion.div data-pdf={name} {...rise(delay)} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 18, color: 'var(--ink)' }}>
-      <LineIcon name="prompt" size={28} />
-      {name}
-    </motion.div>
-  );
-}
-
-function NumberDot({ n }: { n: number }) {
-  return <span style={{ width: 46, height: 46, borderRadius: '50%', background: 'var(--teal)', color: '#fff', fontWeight: 700, fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>{n}</span>;
-}
-
-const stepTitle = { fontSize: 23, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.3, marginBottom: 8 } as const;
-
-function Step({ n, at, last, children }: { n: number; at: number; last?: boolean; children: ReactNode }) {
-  return (
-    <motion.div data-step={n} {...rise(at)} style={{ display: 'grid', gridTemplateColumns: '46px 1fr', columnGap: 18 }}>
-      <div style={{ position: 'relative' }}>
-        <NumberDot n={n} />
-        {!last && <span style={{ position: 'absolute', left: 22, top: 50, bottom: -12, borderLeft: '2.5px dotted var(--teal)' }} />}
-      </div>
-      <div style={{ paddingBottom: last ? 0 : 14 }}>{children}</div>
-    </motion.div>
-  );
-}
-
-export interface L1SpecsProps {
-  kicker: string;
-  message: string;
-  notebook?: string;
-}
-
-/** 1.4 · The engineer asks the approved documents; three numbered steps; the answer comes back in three sourced parts. */
-export function L1Specs({ kicker, message, notebook }: L1SpecsProps) {
-  return (
-    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-specs">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 6 }}>
-        <Tag text="Hands-on 1 · Unstructured RAG" />
-      </div>
-      <div style={{ marginTop: 12 }}>
-        <Bubble who="The engineer asks" text="According to the project documents, how must we prepare the surface for this concrete repair, which materials do we use, and how is it inspected and accepted?">
-          <Worker />
-        </Bubble>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 330px', columnGap: 36, marginTop: 16, borderTop: '1px solid var(--line)', paddingTop: 16 }}>
-        <div>
-          <Step n={1} at={1.1}>
-            <div style={stepTitle}>
-              The approved PDFs sit in <span style={{ color: 'var(--teal)' }}>Object Storage</span>.
+    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-app" kickerColor="var(--teal)">
+      <motion.div data-window="app" {...fadeUp(0.2)} style={{ marginTop: 4, borderRadius: 12, border: '2px solid var(--line)', overflow: 'hidden', background: CARD }}>
+        {/* the browser bar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px', background: 'rgba(138,151,163,0.18)' }}>
+          {[0, 1, 2].map((i) => (
+            <i key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: GREY, opacity: 0.6 }} />
+          ))}
+          <span style={{ marginLeft: 14, padding: '3px 12px', borderRadius: 6, background: CARD, ...mono(13, 'var(--ink)') }}>http://&lt;application-url&gt;:8080/</span>
+        </div>
+        {/* the app header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--line)' }}>
+          <span style={{ width: 26, height: 26, borderRadius: 6, background: TEAL }} />
+          <span style={{ fontSize: 21, fontWeight: 700, color: 'var(--ink)' }}>Seer Construction Intelligence</span>
+          <HandsOn n={3} />
+          <span style={{ fontSize: 14, color: DIM }}>you get it running in Hands-on 3</span>
+          <span data-scope style={{ marginLeft: 'auto', padding: '4px 10px', borderRadius: 6, background: TINT, fontSize: 14, fontWeight: 600, color: 'var(--ink)' }}>
+            Project code · <span style={mono(13)}>&lt;one project&gt;</span>
+          </span>
+          <span style={{ fontSize: 13, color: DIM }}>answers stay inside this project</span>
+        </div>
+        {/* the runtime bar */}
+        <div data-runtime-bar style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 16px', background: TINT, borderBottom: '1px solid var(--line)' }}>
+          <span style={{ ...cap, fontSize: 12 }}>Runtime bar</span>
+          <span style={tag()}>
+            model · <i style={{ color: DIM }}>the model that answered</i>
+          </span>
+          <span style={tag(true)}>Routing enabled</span>
+          <span style={tag(true)}>Guardrails enabled</span>
+          <span style={{ marginLeft: 'auto' }}>
+            <HandsOn n={4} solid />
+          </span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px' }}>
+          {/* the chat */}
+          <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10, borderRight: '1px solid var(--line)' }}>
+            <motion.div {...fadeUp(0.8)} style={{ alignSelf: 'flex-end', padding: '6px 12px', borderRadius: 8, background: SOFT, fontSize: 16, color: 'var(--ink)' }}>
+              the <b>Specification requirements</b> sample question
+            </motion.div>
+            <motion.div data-reply="spec" {...fadeUp(1.1)} style={{ width: '88%', border: '1.5px solid var(--line)', borderRadius: 8, padding: '10px 14px', display: 'grid', gap: 7 }}>
+              <Bar w="92%" />
+              <Bar w="74%" />
+              <Bar w="54%" />
+              <span style={{ justifySelf: 'start', padding: '2px 9px', borderRadius: 999, border: `1.5px solid ${TEAL}`, fontSize: 13, fontWeight: 700, color: TEAL_D }}>cites the specification ✓</span>
+            </motion.div>
+            <motion.div {...fadeUp(1.5)} style={{ alignSelf: 'flex-end', padding: '6px 12px', borderRadius: 8, background: SOFT, fontSize: 16, color: 'var(--ink)' }}>
+              the <b>Supplier recommendation</b> sample question
+            </motion.div>
+            <motion.div data-reply="supplier" {...fadeUp(1.8)} style={{ width: '88%', border: '1.5px solid var(--line)', borderRadius: 8, padding: '10px 14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr 0.9fr 0.9fr 1.1fr', gap: 12 }}>
+                {SUPPLIER_FIELDS.map((f) => (
+                  <div key={f} data-field={f} style={{ display: 'grid', gap: 6 }}>
+                    <span style={mono(13, 'var(--ink)')}>{f}</span>
+                    <Bar w="100%" h={7} />
+                    <Bar w="100%" h={7} />
+                  </div>
+                ))}
+              </div>
+              <span style={{ display: 'inline-block', marginTop: 8, padding: '2px 9px', borderRadius: 999, border: `1.5px solid ${TEAL}`, fontSize: 13, fontWeight: 700, color: TEAL_D }}>from governed project data ✓</span>
+            </motion.div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, border: '1.5px solid var(--line)', borderRadius: 8, padding: '7px 10px' }}>
+              <Clip />
+              <span style={{ fontSize: 15, color: DIM }}>Ask about the project, or attach a photo</span>
+              <span style={{ marginLeft: 'auto', padding: '4px 12px', borderRadius: 6, background: TEAL, color: '#fff', fontSize: 14, fontWeight: 700 }}>Submit</span>
             </div>
-            <div style={{ display: 'flex', gap: 22 }}>
-              {PDFS.map((p, i) => (
-                <Pdf key={p} name={p} delay={1.4 + i * 0.2} />
+            <div data-try style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: DIM }}>Try a prompt</span>
+              {TRY_A_PROMPT.map((t, i) => (
+                <span key={t} data-prompt={t} style={{ padding: '5px 12px', borderRadius: 6, border: `1.5px solid ${i === 2 ? 'var(--red)' : 'var(--line)'}`, color: i === 2 ? 'var(--red)' : 'var(--ink)', fontSize: 15, fontWeight: i === 2 ? 700 : 500 }}>
+                  {t}
+                </span>
               ))}
             </div>
-          </Step>
-          <Step n={2} at={2.0}>
-            <div style={stepTitle}>
-              The <span style={{ color: 'var(--teal)' }}>Vector Store</span> on OCI Enterprise AI finds the matching passages.
+          </div>
+          {/* Runtime configuration */}
+          <div data-config style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', borderBottom: '1px solid var(--line)', paddingBottom: 6 }}>
+              <span style={{ fontSize: 19, fontWeight: 700, color: 'var(--ink)' }}>Runtime configuration</span>
+              <span style={{ fontSize: 13, color: DIM }}>Launch path</span>
             </div>
-          </Step>
-          <Step n={3} at={2.9} last>
-            <div style={stepTitle}>The answer comes back in three parts, each with its source.</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-              {PARTS.map((p, i) => (
-                <motion.div key={p.key} data-answer={p.key} {...rise(3.3 + i * 0.35)} style={{ borderRadius: 12, border: '2px solid var(--teal)', background: TEAL_TINT, padding: '10px 12px' }}>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)', marginBottom: 6 }}>{p.key}</div>
-                  <Chip text={p.source} />
+            {SWITCHES.map((s, i) => (
+              <motion.div
+                key={s.name}
+                data-config-switch={s.ho}
+                initial={{ backgroundColor: 'rgba(27,138,156,0)' }}
+                animate={{ backgroundColor: ['rgba(27,138,156,0)', 'rgba(27,138,156,0.12)', 'rgba(27,138,156,0)'] }}
+                transition={{ delay: 4 + i * 1.6, duration: 1.6, repeat: Infinity, repeatDelay: SWITCHES.length * 1.6 - 1.6 + 2, ease: 'easeInOut' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 6px', borderBottom: '1px solid var(--line)' }}
+              >
+                <Switch on delay={1.2 + i * 0.6} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.15 }}>{s.name}</div>
+                  <div style={{ fontSize: 13, color: DIM }}>{s.sub}</div>
+                </div>
+                <HandsOn n={s.ho} solid />
+              </motion.div>
+            ))}
+            <div style={{ marginTop: 10, borderRadius: 8, background: SOFT, padding: '8px 12px', fontSize: 14, color: 'var(--ink)', lineHeight: 1.4 }}>
+              <b>Build path (3A)</b> has no Runtime configuration: you add routing and guardrails in the code.
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </WidePanel>
+  );
+}
+
+/* ---------- 1.4 · Hands-on 1: what the specifications require ---------- */
+
+export const SPEC_ANSWER = ['surface preparation', 'materials', 'inspection and acceptance'];
+export const READY_WHEN: [string, string][] = [
+  ['data sync job', 'Succeeded'],
+  ['vector store', 'Completed'],
+  ['processed files', '1'],
+];
+
+function Bucket() {
+  return (
+    <svg width="86" height="86" viewBox="0 0 86 86" aria-hidden="true">
+      <ellipse cx="43" cy="14" rx="36" ry="9" fill={CARD} stroke={TEAL_D} strokeWidth={3} />
+      <path d="M7 14l8 62c1 5 13 8 28 8s27-3 28-8l8-62" fill={CARD} stroke={TEAL_D} strokeWidth={3} />
+      <g transform="translate(29 28)">
+        <PdfIcon size={36} />
+      </g>
+    </svg>
+  );
+}
+
+export function L1Specs({ kicker, message, notebook }: Lab1Props) {
+  return (
+    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-specs" kickerColor="var(--teal)">
+      <div style={{ display: 'grid', gridTemplateColumns: '232px 120px 1fr', alignItems: 'stretch', columnGap: 8, marginTop: 4 }}>
+        <motion.div data-source="object-storage" {...fadeUp(0.2)} style={{ ...card(), borderColor: 'rgba(27,138,156,0.35)', padding: '14px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 6 }}>
+          <Bucket />
+          <div style={{ fontSize: 21, fontWeight: 700, color: 'var(--ink)' }}>Object Storage</div>
+          <div style={{ fontSize: 14, color: DIM, lineHeight: 1.35 }}>the bucket already holds the structural engineering specification</div>
+          <Chip style={{ fontSize: 12, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>seer-construction-evidence-…</Chip>
+        </motion.div>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 4 }}>
+          <span style={{ fontSize: 15, fontWeight: 700, color: TEAL_D }}>data sync</span>
+          <Flow w={110} delay={0.8} loop />
+          <span style={mono(12, DIM)}>construction-evidence</span>
+        </div>
+        <motion.div data-project {...fade(0.4)} style={{ borderRadius: 14, border: `2px dashed ${TEAL}`, padding: '8px 12px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={capTeal}>OCI Enterprise AI project</span>
+            <Chip style={{ fontSize: 13 }}>seer-construction</Chip>
+            <span style={{ fontSize: 13, color: DIM }}>keeps the retention settings for responses and conversations</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 104px 1fr', gap: 6, flex: 1 }}>
+            <motion.div data-store="vector" {...fadeUp(0.8)} style={{ ...card(true), padding: '10px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+              <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--ink)' }}>Unstructured vector store</div>
+              <Chip style={{ fontSize: 12 }}>seer-construction-evidence</Chip>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '6px 0' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <PdfIcon size={40} />
+                  <div style={{ ...cap, fontSize: 10 }}>the PDF</div>
+                </div>
+                <span style={{ color: TEAL, fontSize: 18 }}>→</span>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ display: 'grid', gap: 3 }}>
+                    {[0, 1, 2, 3].map((i) => (
+                      <motion.span key={i} {...fadeUp(1.2 + i * 0.15)} style={{ display: 'block', width: [70, 56, 66, 50][i], height: 8, borderRadius: 2, border: `1.5px solid ${TEAL}`, background: TINT }} />
+                    ))}
+                  </div>
+                  <div style={{ ...cap, fontSize: 10, marginTop: 3 }}>chunks</div>
+                </div>
+                <span style={{ color: TEAL, fontSize: 18 }}>→</span>
+                <div style={{ textAlign: 'center' }}>
+                  <svg width="76" height="40" viewBox="0 0 76 40" aria-hidden="true">
+                    {Array.from({ length: 18 }, (_, i) => (
+                      <motion.circle key={i} cx={6 + (i % 6) * 13} cy={6 + Math.floor(i / 6) * 13} r={4.5} fill={TEAL} {...fade(1.8 + i * 0.04)} opacity={i % 4 === 1 ? 0.45 : 1} />
+                    ))}
+                  </svg>
+                  <div style={{ ...cap, fontSize: 10 }}>embeddings</div>
+                </div>
+              </div>
+              <div style={{ fontSize: 13, color: DIM, textAlign: 'center', lineHeight: 1.3 }}>the service splits the file into chunks and turns each into an embedding</div>
+            </motion.div>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
+              <span style={{ ...mono(14), fontWeight: 700 }}>file_search</span>
+              <Flow w={70} delay={2.4} />
+            </div>
+            <motion.div data-ai-card {...fadeUp(1.4)} style={{ ...card(), borderColor: 'rgba(27,138,156,0.35)', background: CARD, padding: '10px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+              <Spark size={32} />
+              <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--ink)' }}>AI assistant</div>
+              <div style={{ fontSize: 13, color: DIM, textAlign: 'center', lineHeight: 1.3 }}>
+                searches the store with the <b style={mono(13)}>file_search</b> tool, through the Responses API
+              </div>
+              {[0, 1, 2].map((i) => (
+                <motion.div key={i} data-passage {...fadeUp(2.8 + i * 0.25)} style={{ alignSelf: 'stretch', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 10px', borderRadius: 6, background: TINT, fontSize: 13, color: 'var(--ink)' }}>
+                  <span>• matching passage</span>
+                  <b style={{ color: TEAL_D }}>from the spec</b>
                 </motion.div>
               ))}
-            </div>
-          </Step>
-        </div>
-        <motion.div data-contrast {...rise(4.0)} style={{ alignSelf: 'center' }}>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '14px 16px', borderRadius: 12, border: '2px solid var(--teal)', background: TEAL_TINT, marginBottom: 12 }}>
-            <span data-mark="yes" style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--teal)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#fff" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 10.5l4 4 8-9" />
-              </svg>
-            </span>
-            <span style={{ fontSize: 20, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.3 }}>From the approved documents, with sources</span>
-          </div>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '14px 16px', borderRadius: 12, border: '2px dashed var(--line)', opacity: 0.6 }}>
-            <span data-mark="no" style={{ width: 34, height: 34, borderRadius: '50%', border: '2px solid var(--ink-dim)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
-              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="var(--ink-dim)" strokeWidth={3} strokeLinecap="round">
-                <path d="M4 4l12 12M16 4L4 16" />
-              </svg>
-            </span>
-            <span style={{ fontSize: 20, color: GREY, lineHeight: 1.3 }}>Not from general knowledge alone</span>
+            </motion.div>
           </div>
         </motion.div>
       </div>
-    </WidePanel>
-  );
-}
 
-/* ================= 1.5 · Hands-on 2 ================= */
-
-const DB_TABLES = [
-  { key: 'Contractors', cols: 'qualification · past work' },
-  { key: 'Certifications', cols: 'status' },
-  { key: 'Purchase orders', cols: 'material · delivery status' },
-];
-
-export interface L1ContractorsProps {
-  kicker: string;
-  message: string;
-  notebook?: string;
-}
-
-/** 1.5 · The project manager asks the database: tables, the Semantic Store that knows what they mean, NL2SQL, ADB MCP Server, a placeholder answer table. */
-/** the answer the assistant prints for the project manager (sample rows: names and items stay generic) */
-const ANSWER: { head: string; col: string; rows: [string, string, boolean, string][] }[] = [
-  {
-    head: 'Contractor',
-    col: 'Qualified for this repair',
-    rows: [
-      ['Contractor A', '✓ qualified', true, 'concrete repair certified, similar bridge work'],
-      ['Contractor B', '✗ not yet', false, 'certification expired'],
-    ],
-  },
-  {
-    head: 'Material',
-    col: 'Delivery status',
-    rows: [
-      ['Repair mortar', 'delivered', true, ''],
-      ['Bonding agent', 'in transit', false, ''],
-      ['Corrosion inhibitor', 'not shipped yet', false, ''],
-    ],
-  },
-];
-
-export function L1Contractors({ kicker, message, notebook }: L1ContractorsProps) {
-  return (
-    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-contractors">
-      <div style={{ marginTop: 6 }}>
-        <Tag text="Hands-on 2 · Semantic Store + NL2SQL" />
-      </div>
-      <div style={{ marginTop: 12 }}>
-        <Bubble who="The project manager asks" text="Which contractor is qualified for this repair, and what is the delivery status of the materials we need?">
-          <Worker hat={false} shirt="#6f6a8f" />
-        </Bubble>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 50px 270px 50px 1fr', alignItems: 'center', marginTop: 16, borderTop: '1px solid var(--line)', paddingTop: 16 }}>
-        <motion.div data-block="autonomous-database" {...rise(1.0)} style={{ border: '2.5px solid var(--teal)', borderRadius: 16, padding: '10px 14px 12px', background: 'rgba(27, 138, 156, 0.06)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 21, fontWeight: 700, color: 'var(--teal)', marginBottom: 8 }}>
-            <LineIcon name="database" size={30} />
-            Autonomous Database
+      <div style={{ display: 'grid', gridTemplateColumns: '520px 50px 1fr', alignItems: 'stretch', gap: 10, marginTop: 14 }}>
+        <motion.div data-question="spec" {...fadeUp(1)} style={{ ...card(), border: 'none', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ textAlign: 'center' }}>
+            <Avatar who="engineer" size={56} />
+            <div style={{ fontSize: 13, fontWeight: 600, color: DIM }}>the engineer</div>
           </div>
-          {DB_TABLES.map((t, i) => (
-            <motion.div key={t.key} data-table={t.key} {...rise(1.3 + i * 0.25)} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-              <MiniTable w={50} rows={2} head={i % 2 ? G_MID : 'var(--teal)'} />
-              <div>
-                <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--ink)' }}>{t.key}</div>
-                <div style={{ fontSize: 16, color: GREY }}>{t.cols}</div>
-              </div>
+          <div>
+            <div style={{ ...cap, fontSize: 12 }}>Try a prompt › Specification requirements</div>
+            <div style={{ fontSize: 21, fontStyle: 'italic', color: 'var(--ink)', lineHeight: 1.3 }}>“What does the specification require for this repair?”</div>
+          </div>
+        </motion.div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Flow w={46} delay={3.2} />
+        </div>
+        <motion.div data-answer {...fadeUp(3.4)} style={{ ...card(true), padding: '10px 18px' }}>
+          <div style={{ ...capTeal, marginBottom: 4 }}>The answer · every point from the specification</div>
+          {SPEC_ANSWER.map((a, i) => (
+            <motion.div key={a} data-cites={a} {...fadeUp(3.6 + i * 0.3)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '5px 0', borderTop: '1px solid var(--line)', fontSize: 18, color: 'var(--ink)' }}>
+              <span>
+                What the specification requires for <b>{a}</b>
+              </span>
+              <span style={{ padding: '2px 8px', borderRadius: 6, background: TINT, fontSize: 13, fontWeight: 700, color: TEAL_D, whiteSpace: 'nowrap' }}>cites the specification ↗</span>
             </motion.div>
           ))}
-          <motion.div data-layer="semantic-store" {...rise(2.2)} style={{ marginTop: 6, padding: '6px 10px', borderRadius: 8, background: 'var(--teal)', color: '#fff', fontSize: 17, fontWeight: 700 }}>
-            Semantic Store <span style={{ fontWeight: 500 }}>· knows what the tables mean</span>
-          </motion.div>
+          <div style={{ fontSize: 15, color: DIM, marginTop: 4 }}>Not in the specification? It says so. It does not invent a requirement.</div>
         </motion.div>
-        <Arrow w={50} delay={2.6} />
-        <motion.div {...rise(2.6)} style={{ textAlign: 'center' }}>
-          <div data-step="nl2sql" style={{ fontSize: 21, fontWeight: 700, color: 'var(--teal)', marginBottom: 6 }}>NL2SQL</div>
-          <div style={{ fontSize: 16, color: GREY, marginBottom: 6 }}>turns the question into SQL</div>
-          <pre data-sql style={{ margin: 0, textAlign: 'left', fontFamily: MONO, fontSize: 14.5, lineHeight: 1.5, padding: '10px 12px', borderRadius: 10, background: 'rgba(127,127,127,0.14)', color: 'var(--ink)', whiteSpace: 'pre-wrap' }}>
-            {'SELECT …\nFROM contractors\nJOIN certifications …\nJOIN purchase_orders …\nWHERE …'}
-          </pre>
-          <div data-step="adb-mcp" style={{ marginTop: 8, display: 'inline-block', fontSize: 17, fontWeight: 700, padding: '5px 14px', borderRadius: 8, border: '2px solid var(--teal)', background: TEAL_TINT, color: 'var(--ink)' }}>
-            ADB MCP Server
+      </div>
+
+      <div data-ready style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 14 }}>
+        <span style={cap}>Ready when</span>
+        {READY_WHEN.map(([k, v], i) => (
+          <motion.span key={k} {...fadeUp(4.6 + i * 0.2)} style={{ padding: '5px 14px', borderRadius: 999, border: '1.5px solid rgba(27,138,156,0.45)', background: TINT, fontSize: 17, color: 'var(--ink)' }}>
+            {k} <b style={{ color: TEAL_D }}>{v}</b>
+          </motion.span>
+        ))}
+      </div>
+    </WidePanel>
+  );
+}
+
+/* ---------- 1.5 · Hands-on 2: which supplier is ready ---------- */
+
+function TableIcon() {
+  return (
+    <svg width="64" height="48" viewBox="0 0 64 48" fill="none" stroke={TEAL} strokeWidth={2.6} aria-hidden="true">
+      <rect x="2" y="4" width="56" height="40" rx="4" />
+      <path d="M2 16h56M2 30h56M22 4v40M40 4v40" />
+      <circle cx="56" cy="6" r="6" fill={TEAL} stroke="#fff" strokeWidth={1.5} />
+      <path d="M53 6l2 2 4-4" stroke="#fff" strokeWidth={1.8} />
+    </svg>
+  );
+}
+
+const STEP: CSSProperties = { ...card(), borderColor: 'rgba(27,138,156,0.35)', background: CARD, padding: '14px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 6 };
+
+export function L1Suppliers({ kicker, message, notebook }: Lab1Props) {
+  return (
+    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-suppliers" kickerColor="var(--teal)">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 1fr 30px 1fr 30px 1fr 30px 1fr', alignItems: 'stretch', columnGap: 4, marginTop: 4, height: 290 }}>
+        <motion.div data-question="supplier" {...fadeUp(0.2)} style={{ ...card(), border: 'none', padding: '14px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6 }}>
+          <Avatar who="project manager" size={56} />
+          <div style={{ fontSize: 14, fontWeight: 600, color: DIM }}>the project manager</div>
+          <div style={{ ...cap, fontSize: 11 }}>Try a prompt › Supplier recommendation</div>
+          <div style={{ fontSize: 18, fontStyle: 'italic', color: 'var(--ink)', lineHeight: 1.3 }}>“Which suppliers do you recommend for this project?”</div>
+        </motion.div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Flow w={28} delay={0.8} head={false} />
+        </div>
+        <motion.div data-step="semantic" {...fadeUp(0.6)} style={{ ...STEP, justifyContent: 'center' }}>
+          <TableIcon />
+          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>Semantic store</div>
+          <Chip style={{ fontSize: 12 }}>seer-construction-semantic</Chip>
+          <div style={{ fontSize: 14, color: DIM, lineHeight: 1.35 }}>knows what each governed view and column means (semantic enrichment)</div>
+        </motion.div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Flow w={28} delay={1.4} head={false} />
+        </div>
+        <motion.div data-step="nl2sql" {...fadeUp(1)} style={{ ...STEP, justifyContent: 'center' }}>
+          <div style={{ ...mono(20), fontWeight: 700 }}>NL2SQL</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>Question → SQL</div>
+          <div style={{ alignSelf: 'stretch', textAlign: 'left', borderRadius: 6, background: SOFT, padding: '6px 10px', ...mono(13, 'var(--ink)'), lineHeight: 1.6 }}>
+            SELECT …<br />
+            FROM …<br />
+            WHERE <b style={{ color: TEAL_D }}>this project</b>
           </div>
         </motion.div>
-        <Arrow w={50} delay={3.4} />
-        <motion.div data-answer="table" {...rise(3.4)} style={{ borderRadius: 14, border: '2px solid var(--teal)', background: TEAL_TINT, padding: '12px 16px' }}>
-          <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: 2, color: GREY, textTransform: 'uppercase', marginBottom: 8 }}>The answer</div>
-          {/* a sample answer (owner, 29 Oct: print an answer, not a skeleton); no real company names, prices or dates */}
-          {ANSWER.map((group, g) => (
-            <div key={group.head} style={{ marginTop: g ? 10 : 0 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', fontSize: 15, fontWeight: 700, color: 'var(--ink-dim)', borderBottom: '1px solid var(--line)', paddingBottom: 3 }}>
-                <span>{group.head}</span>
-                <span>{group.col}</span>
-              </div>
-              {group.rows.map(([name, status, ok, why], r) => (
-                <motion.div key={name} data-row={name} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 3.8 + (g * 2 + r) * 0.18, duration: 0.45, ease: EASE }} style={{ display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: 10, padding: '5px 0', borderBottom: '1px solid var(--line)' }}>
-                  <span style={{ fontSize: 18, color: 'var(--ink)' }}>
-                    <b>{name}</b>
-                    {why && <span style={{ fontSize: 15, color: 'var(--ink-dim)' }}> · {why}</span>}
-                  </span>
-                  <span style={{ fontSize: 15, fontWeight: 700, padding: '3px 10px', borderRadius: 999, color: ok ? '#fff' : 'var(--ink)', background: ok ? 'var(--teal)' : 'rgba(127,127,127,0.18)' }}>{status}</span>
-                </motion.div>
-              ))}
-            </div>
-          ))}
-          <div style={{ marginTop: 6, fontSize: 13, color: 'var(--ink-dim)' }}>sample answer</div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Flow w={28} delay={2} head={false} />
+        </div>
+        <motion.div data-step="sql-check" {...fadeUp(1.4)} style={{ ...STEP, borderColor: TEAL, justifyContent: 'center' }}>
+          <Shield size={44} />
+          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>SQL check</div>
+          <div style={{ fontSize: 14, color: DIM, lineHeight: 1.35 }}>the app checks the SQL stays inside this one project</div>
+          <motion.div data-blocked {...fadeUp(2.4)} style={{ alignSelf: 'stretch', borderRadius: 6, border: '1.5px solid var(--red)', color: 'var(--red)', padding: '4px 8px', fontSize: 13, fontWeight: 700, lineHeight: 1.25 }}>
+            × SQL that widens to other projects
+          </motion.div>
+        </motion.div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Flow w={28} delay={2.6} head={false} />
+        </div>
+        <motion.div data-step="mcp" {...fadeUp(1.8)} style={{ ...STEP, justifyContent: 'center' }}>
+          <DbIcon size={46} />
+          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>ADB MCP Server</div>
+          <div style={{ fontSize: 14, color: DIM, lineHeight: 1.35 }}>runs it on the Autonomous AI Database, schema</div>
+          <span style={{ ...mono(12), fontWeight: 700 }}>CONSTRUCTION_ENGINEERING</span>
+        </motion.div>
+      </div>
+
+      {/* the answer comes back */}
+      <svg width="100%" height="34" viewBox="0 0 1420 34" preserveAspectRatio="none" aria-hidden="true" style={{ display: 'block' }}>
+        <motion.path d="M1290 0v16H140v18" fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 3, duration: 1.2 }} />
+      </svg>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 330px', gap: 18 }}>
+        <motion.div data-answer {...fadeUp(3.6)} style={{ ...card(true), padding: '12px 22px' }}>
+          <div style={{ ...capTeal, marginBottom: 8 }}>The answer · from governed data, with its evidence</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.4fr 0.8fr 0.8fr 2.2fr', columnGap: 28, rowGap: 14 }}>
+            {SUPPLIER_FIELDS.map((f) => (
+              <span key={f} data-field={f} style={mono(15, TEAL_D)}>
+                {f}
+              </span>
+            ))}
+            {[0, 1, 2].flatMap((r) => SUPPLIER_FIELDS.map((f, c) => <motion.span key={`${r}${f}`} {...fade(4 + r * 0.25)} style={{ display: 'block', height: 14, borderRadius: 7, background: 'rgba(138,151,163,0.3)', width: ['65%', '70%', '45%', '50%', '90%'][c] }} />))}
+          </div>
+        </motion.div>
+        <motion.div {...fadeUp(4.4)} style={{ ...card(), border: 'none', padding: '16px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--ink)', marginBottom: 6 }}>Only what the data says</div>
+          <div style={{ fontSize: 15, color: DIM, lineHeight: 1.45 }}>No approval the database does not hold. Values come from the views, not from the model.</div>
         </motion.div>
       </div>
     </WidePanel>

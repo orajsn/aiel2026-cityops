@@ -1,42 +1,56 @@
 import { render } from '@testing-library/react';
-import { L1Assistant, L1Contractors, L1Specs } from '../../src/overlay/concepts/lab1/Lab1Data';
+import { L1App, L1Assistant, L1Specs, L1Suppliers, SUPPLIER_FIELDS, SWITCHES, TRY_A_PROMPT } from '../../src/overlay/concepts/lab1/Lab1Data';
+import { attrs, expectNoRed, expectOneRed } from './lab1Helpers';
 
-const noRed = (c: HTMLElement) => expect(c.innerHTML).not.toMatch(/--red|#c74634/i);
-const attrs = (c: HTMLElement, a: string) => [...c.querySelectorAll(`[${a}]`)].map((e) => e.getAttribute(a));
-
-test('L1Assistant: three sources, OCI Enterprise AI with three engines, one assistant', () => {
-  const c = render(<L1Assistant kicker="k" message="One assistant" />).container;
-  expect(attrs(c, 'data-source')).toEqual(['PDF files', 'Pictures', 'Database tables']);
-  expect(c.textContent).toContain('OCI Enterprise AI');
-  expect(attrs(c, 'data-engine')).toEqual(['Vector store', 'Semantic store', 'Model routing']);
-  for (const w of ['scan', 'split', 'embed', 'store', 'project', 'supplier', 'inspection', 'schedule', 'compliance', 'lower-cost model', 'multimodal model', 'finds passages by meaning', 'answers questions about the project’s data', 'sends each question to the model it needs', 'One AI assistant'])
+test('1.3 one assistant: the app, then OCI Enterprise AI checks, picks the model, looks it up; the answer cites, the engineer decides', () => {
+  const c = render(<L1Assistant kicker="k" message="m" />).container;
+  expect(c.querySelector('[data-app]')?.textContent).toContain('Seer Construction Intelligence');
+  expect(attrs(c, 'data-step')).toEqual(['check', 'route']);
+  expect(attrs(c, 'data-store')).toEqual(['vector', 'semantic']);
+  expect(attrs(c, 'data-route')).toEqual(['text', 'image']);
+  expect(c.querySelector('[data-route="text"]')?.textContent).toContain('the lower-cost model');
+  expect(c.querySelector('[data-route="image"]')?.textContent).toContain('the multimodal model');
+  for (const w of ['OCI Enterprise AI', 'ApplyGuardrails', 'file_search', 'NL2SQL', 'Object Storage bucket', 'data sync connector', 'Autonomous AI Database', 'ADB MCP Server', 'SQL checked: it cannot reach other projects', 'scoped to one project code'])
     expect(c.textContent).toContain(w);
-  expect(c.querySelector('[data-answer="assistant"]')).not.toBeNull();
-  noRed(c);
+  // each piece names its hands-on step
+  expect(attrs(c, 'data-ho').sort()).toEqual(['1', '2', '3', '4', '5']);
+  expect(c.querySelector('[data-answer]')?.textContent).toContain('the engineer decides');
+  expectNoRed(c);
 });
 
-test('L1Specs: the engineer’s question, three steps, three sourced parts, the contrast', () => {
+test('1.3a meet the app: runtime bar, Try a prompt, Runtime configuration with one switch per hands-on; the one red is the Guardrail challenge', () => {
+  const c = render(<L1App kicker="k" message="m" />).container;
+  expect(c.textContent).toContain('Seer Construction Intelligence');
+  expect(c.querySelector('[data-runtime-bar]')?.textContent).toContain('Routing enabled');
+  expect(c.querySelector('[data-runtime-bar]')?.textContent).toContain('Guardrails enabled');
+  expect(attrs(c, 'data-prompt')).toEqual(TRY_A_PROMPT);
+  expect(attrs(c, 'data-config-switch')).toEqual(['1', '2', '4', '5']);
+  expect(SWITCHES.map((s) => s.name)).toEqual(['Specification search', 'Governed project data', 'Model routing', 'Prompt-injection protection']);
+  expect(c.querySelectorAll('[data-config] [data-switch="on"]')).toHaveLength(4);
+  expect(attrs(c, 'data-field')).toEqual(SUPPLIER_FIELDS);
+  expect(c.textContent).toContain('Build path (3A) has no Runtime configuration');
+  expect(c.querySelector('[data-scope]')?.textContent).toContain('Project code');
+  expectOneRed(c, '[data-prompt="Guardrail challenge"]');
+});
+
+test('1.4 Hands-on 1: Object Storage, data sync, the vector store, file_search; every point cites the specification', () => {
   const c = render(<L1Specs kicker="k" message="m" />).container;
-  expect(c.textContent).toContain('According to the project documents, how must we prepare the surface for this concrete repair, which materials do we use, and how is it inspected and accepted?');
-  expect(attrs(c, 'data-step')).toEqual(['1', '2', '3']);
-  expect(attrs(c, 'data-answer')).toEqual(['Surface preparation', 'Materials', 'Inspection and acceptance']);
-  expect(attrs(c, 'data-pdf')).toEqual(['approved repair specification', 'maintenance manual', 'inspection report']);
-  for (const w of ['Object Storage', 'Vector Store', 'OCI Enterprise AI', 'source: approved repair specification (PDF)', 'From the approved documents, with sources', 'Not from general knowledge alone'])
+  for (const w of ['Object Storage', 'data sync', 'OCI Enterprise AI project', 'Unstructured vector store', 'chunks', 'embeddings', 'file_search', 'Responses API', 'Not in the specification? It says so. It does not invent a requirement.'])
     expect(c.textContent).toContain(w);
-  expect(attrs(c, 'data-tag')).toEqual(['Hands-on 1 · Unstructured RAG']);
-  noRed(c);
+  expect(attrs(c, 'data-cites')).toEqual(['surface preparation', 'materials', 'inspection and acceptance']);
+  expect(c.querySelectorAll('[data-passage]')).toHaveLength(3);
+  expect(c.querySelector('[data-ready]')?.textContent).toContain('data sync job Succeeded');
+  expect(c.querySelector('[data-ready]')?.textContent).toContain('vector store Completed');
+  expectNoRed(c);
 });
 
-test('L1Contractors: tables, Semantic Store, NL2SQL, ADB MCP Server, a printed sample answer, no invented specifics', () => {
-  const c = render(<L1Contractors kicker="k" message="m" />).container;
-  expect(c.textContent).toContain('Which contractor is qualified for this repair, and what is the delivery status of the materials we need?');
-  expect(attrs(c, 'data-table')).toEqual(['Contractors', 'Certifications', 'Purchase orders']);
-  for (const w of ['Autonomous Database', 'Semantic Store', 'NL2SQL', 'ADB MCP Server', 'SELECT', 'JOIN certifications'])
-    expect(c.textContent).toContain(w);
-  // owner, 29 Oct: an actual answer, not a skeleton: which contractor qualifies, and each material's delivery status
-  expect([...c.querySelectorAll('[data-answer="table"] [data-row]')].map((r) => r.getAttribute('data-row'))).toEqual(['Contractor A', 'Contractor B', 'Repair mortar', 'Bonding agent', 'Corrosion inhibitor']);
-  expect(c.querySelector('[data-answer="table"]')?.textContent).toContain('✓ qualified');
-  expect(attrs(c, 'data-tag')).toEqual(['Hands-on 2 · Semantic Store + NL2SQL']);
-  expect(c.textContent).not.toMatch(/\$|\d{4}|Kirkland|fictional/);
-  noRed(c);
+test('1.5 Hands-on 2: semantic store, NL2SQL, the project-scope SQL check (its one red), ADB MCP Server, an answer of field names only', () => {
+  const c = render(<L1Suppliers kicker="k" message="m" />).container;
+  expect(attrs(c, 'data-step')).toEqual(['semantic', 'nl2sql', 'sql-check', 'mcp']);
+  expect(c.querySelector('[data-question="supplier"]')?.textContent).toContain('Supplier recommendation');
+  expect(c.querySelector('[data-blocked]')?.textContent).toContain('SQL that widens to other projects');
+  expect(attrs(c, 'data-field')).toEqual(SUPPLIER_FIELDS);
+  expect(c.textContent).toContain('Only what the data says');
+  expect(c.textContent).not.toMatch(/contractor/i);
+  expectOneRed(c, '[data-blocked]');
 });
