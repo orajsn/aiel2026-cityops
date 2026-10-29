@@ -8,7 +8,7 @@ import {
 } from './parts';
 
 /**
- * Lab 2 · §1 RAG, the filing cabinet (the deck's chapter 4): look it up before answering, then the notebook's
+ * Lab 2 · RAG, the filing cabinet (the deck's chapter 4): look it up before answering, then the notebook's
  * §1.2 to §1.9 as pictures with numbered steps, and where RAG runs out (a question is not a job).
  */
 

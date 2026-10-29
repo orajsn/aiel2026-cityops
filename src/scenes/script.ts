@@ -23,13 +23,13 @@ export const SCRIPT: Record<string, string> = {
   '2.0a': 'There are four levels of AI applications. A chatbot gives one reply. RAG looks something up, and the application picks the next step. A workflow triages predictably, and the code picks. An agent reasons it through, and **the model picks**. Each rung gives the system more freedom, and asks more of us in control and observation.',
   '2.1': 'The language model is like **a well-read engineer**. It has read the textbooks, up to its training date. But it has never seen our bridge. Ask it what to do about this crack, and it can only speak in general.',
   '2.1a': 'It does not even know what was inspected this morning. Same model, same question: on the left it answers from memory and gives generic advice. On the right it **looks up today’s record first**, and the answer is fresh, specific and traceable. Retraining is slower, costlier and still not fresh.',
-  // §0 Setup · the workbench
+  // Setup · the workbench
   '0.5': 'Lab section zero: the workbench. Three things on it: **Oracle AI Database** with the city’s data and the embedding model inside it; the language model, a small one that runs on a CPU; and the Jupyter notebook, where all the settings live in one cell. The records room, the engineer on call, and one clipboard of settings.',
   '0.5a': 'Before any AI runs, the notebook checks the site: **25 checks, 25 OK**. Tables, views, the property graph, the demo assets, the embedding model and the vector index are all there.',
   '0.3': 'Then we look at what the agent will be **allowed to see**: Harbor Bridge’s row and its specifications, its most recent evidence, and the graph edges into it. Look at the data first, before any model touches it. Later tool calls become easy to audit.',
   '0.3a': 'The notebook has three known-good cases: the bridge, a substation and a pipeline. Today we run **the bridge**. The same code runs the other two by changing one setting.',
   '0.6': 'Last check: is the language model awake? We ask it to reply with exactly one word, **READY**. If it does, the rest of the notebook can use it.',
-  // §1 RAG · the filing cabinet
+  // RAG · the filing cabinet
   '2.2': 'RAG means **look it up before answering**. The question becomes numbers, a similarity search finds the closest records, the top few go into the prompt, and the answer is grounded in them. Like an engineer who pulls the right inspection report from the filing cabinet, then answers from it.',
   '2.2a': 'Why not hand over every file? It is slow, costly, and the answer drowns in noise. The top five labelled folders are fast, cheap and grounded. You do not need all the data. You need **the right data at the right moment**.',
   '2.2b': 'So retrieval quality is everything: the right data, the right moment, the right amount. When you get a bad answer, **check retrieval first**. Most bad RAG answers start with the wrong folder, not the wrong model.',
@@ -41,7 +41,7 @@ export const SCRIPT: Record<string, string> = {
   '2.4': 'But a question is not a job. A lookup is simple: one retrieval, one call to the model, done.',
   '2.4a': 'A real question, what is the status of this bridge, **hides three jobs**: is it recurring, which means many lookups compared over time; cross-check the work orders, a second lookup; and should we escalate, which is a judgment, not a search.',
   '2.4b': 'Something has to coordinate it all: **a checklist, or a chief inspector**. RAG can contribute pieces. A workflow or an agent coordinates them.',
-  // §2 Workflow · the fixed checklist
+  // Workflow · the fixed checklist
   '2.4c': 'Who chooses the next step? In RAG, the application. In a workflow, **the code**: the path is fixed in advance, the model only works inside the steps, and every run can be replayed. In an agent, the model: flexible, and less predictable.',
   '2.4d': 'This is the anatomy of a workflow. The success path receives the task, plans, runs its tools, evaluates and formats the result. A real system also designs its failure path: human review, replan, or abort. **Every exit is planned**, and the code makes the routing decisions.',
   '2.4e': 'The lab’s workflow is a four-station conveyor belt. The crack report rides it: the classifier says warning, the retriever finds five similar incidents, the drafter writes a plan, the formatter makes the report. Drafting took about **25 of the 32 seconds**, because the model writes one token at a time.',
@@ -53,18 +53,18 @@ export const SCRIPT: Record<string, string> = {
   '2.4j': 'The chief inspector runs a loop, again and again: **look** at the situation, **pick a tool**, **read the result**, and **decide again**: done, or another step?',
   '2.4k': 'It plans and reasons, picks its tools, remembers across sessions, and adapts to what it finds. When it is ready, it **signs the recommendation**.',
   '2.4l': 'Agents are used in three ways: an assistant, like our bridge agent; a workflow agent; and deep research. Each needs more memory. In every case the language model decides, and **a framework runs the loop**: in the lab, LangGraph.',
-  // §3 Tools · tools, skills, MCP
+  // Tools · tools, skills, MCP
   '2.5': 'Section three: **tools are the hands**. Callable functions that act, not just think. The model asks for a call, and the framework runs it.',
   '2.5a': 'A **skill is the procedure**: the incident triage SOP. Only its description sits in the context window; the body loads when the job needs it, like the manual’s table of contents kept in the truck.',
   '2.5b': 'And **MCP is a standard plug**: connect once, use from any agent. In the lab it stays a concept. An agent is only as good as what it can reach.',
   '2.5c': 'Section 3.2: the inspector’s instruments. The @tool decorator turns a function into a tool. The model reads **only the label**: the name, the inputs and the docstring that says when to use it. And the allowlist holds eight tools.',
   '2.5d': 'Section 3.3: the inspection manual. Recall this bridge’s memory first, pull the incident brief, more tools only if needed, remember the decision, answer as JSON. And when to escalate: crack wider than 1 millimetre, **section loss over 25 percent**, bearing displacement over 15: an immediate structural review.',
-  // §4 Query · one query, four lenses
+  // Query · one query, four lenses
   '2.6': 'Section four: why one query? With four systems, rows, JSON, graph and vectors each live apart, joined by ETL and sync jobs, and the copies go stale.',
   '2.6a': 'In **one Oracle AI Database**, the four are lenses on the same record: relational, JSON, SQL/PGQ graph and vector similarity, in one statement and one transaction. One consistency boundary.',
   '2.6b': 'Sections 4.2 to 4.4: one SQL statement builds the brief. The bridge’s row and JSON specs, its five graph neighbours, five vector evidence chunks, and everything comes back as **one JSON brief**.',
   '2.6c': 'Section 4.5: the query becomes the agent’s main instrument, get_asset_incident_brief. The model fills three arguments. **It never sees or writes the SQL.**',
-  // §5 Agent · build the agent
+  // Agent · build the agent
   '2.7': 'Section five: the agent is a state graph. The model thinks; if it asked for a tool, the tools node acts and loops back to the model; if not, it finishes. **That cycle is the whole agent.**',
   '2.7a': 'The agent has two memories in one database: **a visit notebook**, short-term, kept per thread, and **a bridge logbook**, long-term and permanent, found by name or by meaning.',
   '2.7b': 'And memory needs a lifecycle: what to keep, what to forget and when, and reading memory, which is retrieval. Without a lifecycle, an agent will happily act on **stale facts**.',
@@ -81,7 +81,7 @@ export const SCRIPT: Record<string, string> = {
   '2.8c': 'Third, **an unverified tool**: malicious components, safe today and unsafe tomorrow. The lab has three real guardrails: only eight allowed tools, tool output is data, and its only write is a memory note. AI is software: apply the security discipline you already have.',
   '2.8d': 'And observability: the site’s CCTV and time log. Agents rarely crash; they **drift**. So we watch new things: groundedness, instruction alignment, governance, token usage. Without them, you cannot tell whether the agent is slow, expensive, or wrong.',
   '2.8e': 'Here is a dashboard for this crack, from the saved run: the draft step takes **25 seconds**, it reads 1,454 tokens and writes 234, and the agent answers after 57 seconds and five tool calls. The drift line is a concept, not data.',
-  // §6 Wrap
+  // Wrap
   '2.8f': 'So pick the tool that fits the job. RAG for what the record says; a workflow to triage predictably; an agent to reason and tell you what to do. Do not reach for an agent because agents are interesting. **Reach for it when the route must be chosen.**',
   '2.9': 'That is Lab 2: **ground the answer** in evidence, give the agent **tools and a skill**, and fetch all four shapes of data in **one query**. And **the rust** is still waiting on the bridge: in Lab 3 the AI agent learns to remember.',
 

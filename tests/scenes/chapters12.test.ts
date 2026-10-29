@@ -66,8 +66,8 @@ test('every scene has a presenter script', () => {
 
 test('Lab 2: the jump menu has the deck’s chapters in order, and one panel per group stays at one place', () => {
   expect(LAB2_CHAPTERS.map((c) => c.name)).toEqual([
-    'Story · one crack', 'Why AI needs your data', '§0 The workbench', '§1 RAG: the filing cabinet', '§2 Workflow: the fixed checklist',
-    'Agent: the chief inspector', '§3 Tools, skills, MCP', '§4 One query, four lenses', '§5 Build the agent', 'Trust: security and observability', '§6 Wrap-up', 'Closing Lab 2',
+    'Story · one crack', 'Why AI needs your data', 'The workbench', 'RAG: the filing cabinet', 'Workflow: the fixed checklist',
+    'Agent: the chief inspector', 'Tools, skills, MCP', 'One query, four lenses', 'Build the agent', 'Trust: security and observability', 'Wrap-up', 'Closing Lab 2',
   ]);
   expect(SECTIONS.filter((s) => s.chapter === 1).flatMap((s) => s.pages)).toEqual(CH1_BEATS);
   const groups = new Map<string, typeof chapter1>();

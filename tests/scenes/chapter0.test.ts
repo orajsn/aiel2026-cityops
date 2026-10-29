@@ -27,14 +27,12 @@ test('every shot and overlay referenced by chapter 0 exists', () => {
   }
 });
 
-test('the workbench (0.5) is on the sky stage with the database and its four shapes', () => {
-  const bench = chapter1.filter((s) => s.id.startsWith('0.5'));
-  expect(bench.map((s) => s.id)).toEqual(['0.5', '0.5a']);
-  for (const s of bench) {
-    expect(s.shot).toBe('sky');
-    expect(s.world?.sky).toBe('shapes');
+test('Lab 2 pages are panels only: one held view, no sky stage, no camera move (owner, 29 Oct)', () => {
+  const lab2 = chapter1.filter((s) => s.id !== '2.9');
+  for (const s of lab2) {
+    expect(s.shot).toBe('bridge');
+    expect(s.world?.sky).toBeUndefined();
   }
-  expect(chapter1.find((s) => s.id === '0.6')!.world?.sky).toBe('brain');
 });
 
 test('the recap subset is marked', () => {
@@ -52,18 +50,6 @@ test('page zero opens on the wide view over Bangkok, so Next flies down into pag
   expect(zero.overlay).toBeUndefined();
   // page 1 no longer cuts to a starting shot of its own: the move comes from page zero
   expect(chapter0[1].enterFrom).toBeUndefined();
-});
-
-test('0.3 frames the place the document flow lands, clear of the counters panel', () => {
-  const s = chapter1.find((x) => x.id === '0.3')!;
-  const shot = SHOTS[s.shot];
-  const ops = assetPosition('City Operations Control Center');
-  const p = projectToScreen(shot.position, shot.target, [ops.x, 1, ops.z]);
-  expect(p.front).toBe(true);
-  expect(p.x).toBeGreaterThan(-0.8);
-  expect(p.x).toBeLessThan(0.4); // the counters panel covers the right fifth
-  expect(Math.abs(p.y)).toBeLessThan(0.7);
-  expect((s.world as { highlight?: string[] }).highlight).toContain('City Operations Control Center');
 });
 
 test('the model is never named on screen or in the script: it is the language model (owner)', async () => {
