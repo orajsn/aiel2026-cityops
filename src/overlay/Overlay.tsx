@@ -6,6 +6,7 @@ import { useUiStore } from '../engine/ui';
 import { OVERLAYS } from './registry';
 import { HandoffCard } from './HandoffCard';
 import { JupyterDrawer } from './jupyter/JupyterDrawer';
+import { StepsDrawer } from './handsOn/StepsDrawer';
 import { JumpMenu } from './JumpMenu';
 import { CameraEditor } from './CameraEditor';
 import { TrafficEditor } from './TrafficEditor';
@@ -131,6 +132,8 @@ export function Overlay() {
 
       {/* lab guide: on a page with a notebook stop, the Jupyter drawer waits on the left edge */}
       {settled && !trafficEditing && <JupyterDrawer key={scene.id} sceneId={scene.id} />}
+      {/* Lab 1: on a hands-on page (lab1HandsOn.ts), the dark Hands-on drawer waits on the same edge */}
+      {settled && !trafficEditing && <StepsDrawer key={`hd-${scene.id}`} sceneId={scene.id} />}
 
       {/* presenter script under the page; CC (or S) hides it */}
       {scene.script && scriptOpen && !trafficEditing && !drawerOpen && (
