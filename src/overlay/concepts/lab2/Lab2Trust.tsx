@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
+import type { ReactNode } from 'react';
 import { Fill, FitBox } from '../Fill';
 import { AgentAvatar } from './AgentAvatar';
 import { EASE } from '../WidePanel';
@@ -288,75 +289,111 @@ const LAT = [
   { s: 'format', ms: 0 },
 ];
 
+/** a car-dashboard dial: the needle swings up to `v` (0..1) */
+function Dial({ v, delay }: { v: number; delay: number }) {
+  return (
+    <svg width="96" height="58" viewBox="0 0 96 58" aria-hidden style={{ flex: 'none', overflow: 'visible' }}>
+      <path d="M8 52a40 40 0 0 1 80 0" fill="none" stroke="rgba(127,127,127,0.25)" strokeWidth="9" strokeLinecap="round" />
+      <motion.path d="M8 52a40 40 0 0 1 80 0" fill="none" stroke={TEAL} strokeWidth="9" strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: v }} transition={{ delay, duration: 1, ease: EASE }} />
+      <motion.g initial={{ rotate: -90 }} animate={{ rotate: -90 + 180 * v }} transition={{ delay, duration: 1, ease: EASE }} style={{ transformOrigin: '48px 52px' }}>
+        <path d="M48 52V20" stroke="#1f2a33" strokeWidth="4" strokeLinecap="round" />
+      </motion.g>
+      <circle cx="48" cy="52" r="6" fill="#1f2a33" />
+    </svg>
+  );
+}
+
+/** one column of the dashboard: its dial and number on top, its chart under it, in one box so the rows line up */
+function Gauge({ n, focusN, delay, v, unit, sub, chartTitle, dial, children }: { n: number; focusN: number | null; delay: number; v: string; unit: string; sub: string; chartTitle: string; dial: number; children: ReactNode }) {
+  const on = focusN === null || focusN === n;
+  return (
+    <motion.div data-kpi={v} data-step={n} data-on={on} {...fadeUp(delay)} style={{ ...card(focusN === n), background: CARD, opacity: on ? 1 : 0.4, transition: 'opacity 300ms', display: 'grid', gridTemplateRows: 'auto 1fr', minWidth: 0 }}>
+      <div style={{ height: 122, boxSizing: 'border-box', padding: '14px 20px', borderBottom: '2px solid var(--line)', display: 'flex', alignItems: 'center', gap: 16 }}>
+        <Dial v={dial} delay={delay + 0.3} />
+        <div style={{ minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{ fontSize: 40, fontWeight: 700, color: INK, whiteSpace: 'nowrap' }}>{v}</span>
+            <span style={{ fontSize: 20, color: DIM }}>{unit}</span>
+          </div>
+          <div style={{ fontSize: 19, color: DIM, lineHeight: 1.3 }}>{sub}</div>
+        </div>
+      </div>
+      <div style={{ padding: '12px 20px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ ...cap, fontSize: 14 }}>{chartTitle}</div>
+        {children}
+      </div>
+    </motion.div>
+  );
+}
+
 export function Dashboard(p: L2Props) {
   const focusN = useFocusN(p.focusId);
-  const lit = (n: number) => focusN === null || focusN === n;
-  const kpis = [
-    { v: '25,515', u: 'ms', s: 'draft step: where the time goes', n: 2 },
-    { v: '1454 → 234', u: 'tokens', s: 'draft: in → out', n: 1 },
-    { v: '57,005', u: 'ms', s: 'agent: final answer after 5 tool calls', n: 3 },
-  ];
   return (
     <L2Page testId="l2-dashboard" {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateRows: 'auto 1fr', gap: 16, minHeight: 0 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16 }}>
-          {kpis.map((k, i) => (
-            <motion.div key={k.s} data-kpi={k.v} {...fadeUp(0.2 + i * 0.3)} style={{ ...card(focusN === k.n), opacity: lit(k.n) ? 1 : 0.4, padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                <span style={{ fontSize: 44, fontWeight: 700, color: INK }}>{k.v}</span>
-                <span style={{ fontSize: 20, color: DIM }}>{k.u}</span>
-              </div>
-              <span style={{ fontSize: 19, color: DIM }}>{k.s}</span>
-            </motion.div>
-          ))}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr)', gap: 16, minHeight: 0 }}>
-          <motion.div {...fadeUp(1)} style={{ ...card(), opacity: lit(2) ? 1 : 0.4, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={cap}>Latency per step, ms · cell 50</div>
+      <Fill gap={14}>
+        {/* three columns, each a dial and its chart in one box: the upper and lower parts line up */}
+        <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 18 }}>
+          <Gauge n={2} focusN={focusN} delay={0.2} v="25,515" unit="ms" sub="draft step: where the time goes" chartTitle="Latency per step, ms · cell 50" dial={0.82}>
             {LAT.map((l, i) => (
-              <div key={l.s} data-lat={l.s} style={{ flex: 1, display: 'grid', gridTemplateColumns: '100px minmax(0, 1fr) 80px', alignItems: 'center', gap: 10 }}>
-                <span style={{ ...mono(17, INK) }}>{l.s}</span>
+              <div key={l.s} data-lat={l.s} style={{ flex: 1, display: 'grid', gridTemplateColumns: '92px minmax(0, 1fr) 76px', alignItems: 'center', gap: 10 }}>
+                <span style={mono(18, INK)}>{l.s}</span>
                 <div style={{ height: 22, background: 'rgba(127,127,127,0.12)', borderRadius: 5, overflow: 'hidden' }}>
-                  <motion.div initial={{ width: 0 }} animate={{ width: `${(l.ms / 25515) * 100}%` }} transition={{ delay: 1.2 + i * 0.2, duration: 0.8, ease: EASE }} style={{ height: '100%', background: l.s === 'draft' ? TEAL : 'rgba(27,138,156,0.45)' }} />
+                  <motion.div initial={{ width: 0 }} animate={{ width: `${(l.ms / 25515) * 100}%` }} transition={{ delay: 0.8 + i * 0.2, duration: 0.8, ease: EASE }} style={{ height: '100%', background: l.s === 'draft' ? TEAL : 'rgba(27,138,156,0.45)' }} />
                 </div>
-                <span style={{ ...mono(17, INK), textAlign: 'right' }}>{l.ms.toLocaleString('en-US')}</span>
+                <span style={{ ...mono(18, INK), textAlign: 'right' }}>{l.ms.toLocaleString('en-US')}</span>
               </div>
             ))}
-          </motion.div>
-          <motion.div {...fadeUp(1.3)} style={{ ...card(), opacity: lit(1) ? 1 : 0.4, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={cap}>Tokens per LLM step · cell 50</div>
+          </Gauge>
+          <Gauge n={2} focusN={focusN} delay={0.5} v="1454 → 234" unit="tokens" sub="draft: words read in → written out" chartTitle="Tokens per LLM step · cell 50" dial={0.6}>
             {[
               { s: 'classify', i: 114, o: 30 },
               { s: 'draft', i: 1454, o: 234 },
             ].map((t) => (
               <div key={t.s} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6 }}>
-                <span style={{ ...mono(17, INK) }}>{t.s}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <motion.div initial={{ width: 0 }} animate={{ width: `${(t.i / 1454) * 75}%` }} transition={{ delay: 1.5, duration: 0.8, ease: EASE }} style={{ height: 20, background: TEAL, borderRadius: 4 }} />
-                  <span style={{ ...mono(15) }}>in {t.i}</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <motion.div initial={{ width: 0 }} animate={{ width: `${(t.o / 1454) * 75}%` }} transition={{ delay: 1.7, duration: 0.8, ease: EASE }} style={{ height: 20, background: 'rgba(27,138,156,0.45)', borderRadius: 4, minWidth: 4 }} />
-                  <span style={{ ...mono(15) }}>out {t.o}</span>
-                </div>
+                <span style={mono(18, INK)}>{t.s}</span>
+                {[
+                  { k: 'in', v: t.i, c: TEAL },
+                  { k: 'out', v: t.o, c: 'rgba(27,138,156,0.45)' },
+                ].map((b) => (
+                  <div key={b.k} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <motion.div initial={{ width: 0 }} animate={{ width: `${(b.v / 1454) * 72}%` }} transition={{ delay: 1.1, duration: 0.8, ease: EASE }} style={{ height: 20, background: b.c, borderRadius: 4, minWidth: 4 }} />
+                    <span style={mono(16)}>
+                      {b.k} {b.v}
+                    </span>
+                  </div>
+                ))}
               </div>
             ))}
-          </motion.div>
-          <motion.div {...fadeUp(1.6)} style={{ ...card(), padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 10, borderStyle: 'dashed' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <span style={cap}>Token drift over time</span>
-              <span style={{ fontSize: 14, color: DIM, fontStyle: 'italic' }}>concept, not data</span>
+          </Gauge>
+          <Gauge n={3} focusN={focusN} delay={0.8} v="57,005" unit="ms" sub="the agent, end to end" chartTitle="The agent’s trace · cell 79" dial={0.95}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <AgentAvatar size={58} />
+              {[1, 2, 3, 4, 5].map((k) => (
+                <motion.span key={k} {...fadeUp(1.3 + k * 0.2)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ width: 18, height: 2, background: TEAL }} />
+                  <span style={{ width: 34, height: 34, borderRadius: '50%', border: `2px solid ${TEAL}`, background: TINT, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', ...mono(15), fontWeight: 700 }}>{k}</span>
+                </motion.span>
+              ))}
             </div>
-            <svg viewBox="0 0 200 110" style={{ flex: 1, width: '100%' }} aria-hidden>
-              <path d="M5 100H195M5 100V5" stroke="#8a97a3" strokeWidth="1.5" fill="none" />
-              <motion.path d="M10 80 L40 78 L70 81 L100 76 L130 74 L150 50 L175 40 L195 34" stroke="#8a97a3" strokeWidth="3" strokeDasharray="6 5" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 2, duration: 1.5 }} />
-            </svg>
-          </motion.div>
+            <div style={{ fontSize: 19, color: DIM }}>5 tool calls, then the final answer</div>
+          </Gauge>
         </div>
-      </div>
+        {/* the drift line: a concept, not data */}
+        <motion.div {...fadeUp(1.8)} style={{ flex: 'none', ...card(), borderStyle: 'dashed', display: 'grid', gridTemplateColumns: '300px minmax(0, 1fr)', alignItems: 'center', gap: 20, padding: '10px 20px' }}>
+          <div>
+            <div style={{ fontSize: 23, fontWeight: 700, color: INK }}>Token drift over time</div>
+            <div style={{ fontSize: 18, color: DIM, fontStyle: 'italic' }}>concept, not data</div>
+          </div>
+          <svg viewBox="0 0 600 70" preserveAspectRatio="none" style={{ width: '100%', height: 70 }} aria-hidden>
+            <path d="M2 66H598" stroke="#8a97a3" strokeWidth="1.5" />
+            <motion.path d="M4 54 L90 52 L180 55 L270 50 L360 48 L430 32 L510 22 L596 14" stroke="#8a97a3" strokeWidth="3" strokeDasharray="8 6" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 2.2, duration: 1.5 }} />
+          </svg>
+        </motion.div>
+      </Fill>
     </L2Page>
   );
 }
+
 
 /* ---------------- 2.8f · §6 pick the tool that fits the job ---------------- */
 
