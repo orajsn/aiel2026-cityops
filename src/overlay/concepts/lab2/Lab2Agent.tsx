@@ -6,6 +6,8 @@ import {
   Arrow, ArrowDown, CARD, ChiefInspector, Chip, Db, DIM, INK, L2Page, Net, Num, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
   cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props,
 } from './parts';
+import { Fill, FitBox } from '../Fill';
+import { AgentAvatar } from './AgentAvatar';
 
 /**
  * Lab 2 · Tools (tools, skills, MCP), Query (one query, four lenses) and Agent (build the agent): the deck's
@@ -685,45 +687,84 @@ export function FirstRun(p: L2Props) {
 
 /* ---------------- 2.8 · §5.8 the key you save under decides what you find ---------------- */
 
+const at2 = (x: number, y: number, w: number) => ({ position: 'absolute' as const, left: x, top: y, width: w });
+
+/** one part of the drawer picture: its drawing, then its numbered caption; it lights with the drawer's focus */
+function DrawerPart({ n, focusN, x, w, delay, title, children }: { n: number; focusN: number | null; x: number; w: number; delay: number; title: string; children: ReactNode }) {
+  const on = focusN === null || focusN === n;
+  return (
+    <motion.div data-step={n} data-on={on} {...fadeUp(delay)} style={{ ...at2(x, 0, w), height: 440, display: 'flex', flexDirection: 'column', opacity: on ? 1 : 0.35, transition: 'opacity 300ms' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 14 }}>{children}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 12, borderTop: `3px solid ${focusN === n ? TEAL : 'var(--line)'}` }}>
+        <Num n={n} on={on} size={42} />
+        <span style={{ fontSize: 27, fontWeight: 700, color: INK }}>{title}</span>
+      </div>
+    </motion.div>
+  );
+}
+
+/** a cabinet drawer with its label card; `out` slides it towards us, `lit` makes it teal */
+function Drawer({ label, out, lit, delay, children }: { label: string; out?: boolean; lit?: boolean; delay: number; children?: ReactNode }) {
+  return (
+    <motion.div
+      data-drawer-key={label}
+      initial={{ x: 0, y: 0, scale: 1, backgroundColor: 'rgb(150, 157, 167)' }}
+      animate={{ x: out ? -46 : 0, y: out ? 18 : 0, scale: out ? 1.04 : 1, backgroundColor: lit ? 'rgb(104, 166, 178)' : 'rgb(150, 157, 167)' }}
+      transition={{ delay, duration: 0.8, ease: EASE }}
+      style={{ position: 'relative', height: 132, borderRadius: 8, border: '3px solid #5c6b78', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, zIndex: out ? 2 : 1, boxShadow: out ? '0 10px 18px rgba(0,0,0,0.25)' : 'none' }}
+    >
+      <span style={{ padding: '6px 16px', borderRadius: 6, background: 'rgba(255,255,255,0.9)', ...mono(22, INK), fontWeight: 700 }}>{label}</span>
+      <span style={{ width: 80, height: 14, borderRadius: 7, background: '#5c6b78' }} />
+      {children}
+    </motion.div>
+  );
+}
+
 export function WrongDrawer(p: L2Props) {
   const focusN = useFocusN(p.focusId);
   return (
     <L2Page testId="l2-drawer" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-        <StepRow
-          focusN={focusN}
-          steps={[
-            { title: 'Open the logbook', grow: 0.9, body: <><LineIcon name="book" size={70} /><Chip style={{ alignSelf: 'flex-start', fontSize: 17 }}>store.search(…, limit=5)</Chip></> },
-            {
-              title: 'Filed under which name?',
-              body: (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12 }}>
-                  {[
-                    { k: 'Harbor Bridge', v: 'empty', on: false },
-                    { k: 'bearing plate', v: '1 note', on: true },
-                  ].map((d) => (
-                    <div key={d.k} data-drawer-key={d.k} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderRadius: 12, border: `2px solid ${d.on ? TEAL : 'var(--line)'}`, background: d.on ? TINT : SOFT }}>
-                      <span style={{ ...mono(20, INK), fontWeight: 700 }}>{d.k}</span>
-                      <span style={{ fontSize: 19, color: d.on ? TEAL_D : DIM, fontWeight: 700 }}>{d.v}</span>
-                    </div>
-                  ))}
-                </div>
-              ),
-            },
-            {
-              title: 'The note itself',
-              grow: 1.2,
-              body: (
-                <>
-                  <div style={{ fontSize: 20, lineHeight: 1.45, color: INK, padding: '12px 14px', borderRadius: 10, background: SOFT }}>“Hairline cracking near bearing plate at Harbor Bridge … south side, approximately 85……”</div>
-                  <Quote style={{ fontSize: 18 }}>recall("Harbor Bridge") → no match</Quote>
-                </>
-              ),
-            },
-          ]}
-        />
-        <div style={{ fontSize: 15, color: DIM, textAlign: 'center' }}>Saved output, cell 81 · updated_at 2026-10-21 08:39:38</div>
-      </div>
+      <Fill gap={12}>
+        <FitBox w={1400} h={440} max={1.05}>
+          <div style={{ position: 'relative', width: 1400, height: 440 }}>
+            <DrawerPart n={1} focusN={focusN} x={0} w={330} delay={0.2} title="Open the logbook">
+              <AgentAvatar size={140} live />
+              <Quote style={{ fontSize: 20 }}>recall("Harbor Bridge")</Quote>
+              <Chip style={{ fontSize: 19 }}>store.search(…, limit=5)</Chip>
+            </DrawerPart>
+            <div style={{ ...at2(340, 180, 70) }}>
+              <Arrow w={64} delay={0.9} />
+            </div>
+            <DrawerPart n={2} focusN={focusN} x={420} w={480} delay={0.7} title="Filed under which name?">
+              {/* the cabinet: two labelled drawers; the one the agent opens is empty, the note sits in the other */}
+              <div style={{ position: 'relative', width: 380, padding: '22px 22px 26px', boxSizing: 'border-box', borderRadius: 10, background: '#8a919c', boxShadow: 'inset 0 6px 0 #aab1ba', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <Drawer label="Harbor Bridge" out delay={1.3}>
+                  <motion.span {...fade(2)} style={{ position: 'absolute', right: 10, bottom: 8, padding: '2px 12px', borderRadius: 999, background: 'rgba(31,42,51,0.85)', fontSize: 20, fontWeight: 700, color: '#fff' }}>empty</motion.span>
+                </Drawer>
+                <Drawer label="bearing plate" lit delay={2.4}>
+                  <motion.span {...fade(2.6)} style={{ position: 'absolute', right: 10, bottom: 8, padding: '2px 12px', borderRadius: 999, background: '#fff', fontSize: 20, fontWeight: 700, color: TEAL_D }}>1 note</motion.span>
+                </Drawer>
+              </div>
+            </DrawerPart>
+            <div style={{ ...at2(910, 180, 70) }}>
+              <Arrow w={64} delay={2.8} />
+            </div>
+            <DrawerPart n={3} focusN={focusN} x={990} w={410} delay={2.8} title="The note itself">
+              <div style={{ position: 'relative', width: '100%', boxSizing: 'border-box', padding: '26px 24px 20px', background: '#fff', borderRadius: 6, boxShadow: '0 6px 16px rgba(0,0,0,0.16)', transform: 'rotate(-1.2deg)', borderTop: `8px solid ${TEAL}` }}>
+                <span style={{ position: 'absolute', top: -14, left: 22, padding: '2px 10px', borderRadius: 6, background: TEAL, color: '#fff', ...mono(16, '#fff'), fontWeight: 700 }}>bearing plate</span>
+                <div style={{ fontSize: 23, lineHeight: 1.45, color: '#1f2a33' }}>“Hairline cracking near bearing plate at Harbor Bridge … south side, approximately 85……”</div>
+              </div>
+              <Quote style={{ fontSize: 19, width: '100%', boxSizing: 'border-box' }}>recall("Harbor Bridge") → no match</Quote>
+            </DrawerPart>
+          </div>
+        </FitBox>
+        <motion.div data-everyday {...fadeUp(3.4)} style={{ flex: 'none', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 20, padding: '10px 20px', borderRadius: 12, background: SOFT }}>
+          <span style={{ fontSize: 23, color: INK, lineHeight: 1.35 }}>
+            Like a letter filed under <b>the street</b> when everyone looks it up by <b>the house</b>: it is in the cabinet, just not where anyone looks.
+          </span>
+          <span style={{ flex: 'none', fontSize: 16, color: DIM }}>saved output, cell 81 · updated_at 2026-10-21 08:39:38</span>
+        </motion.div>
+      </Fill>
     </L2Page>
   );
 }
