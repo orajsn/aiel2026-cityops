@@ -100,7 +100,7 @@ export const LAB_GUIDE: Record<string, GuideBlock[]> = {
     { cell: 68, title: '4.5 Wrap it as a tool', note: 'get_asset_incident_brief: the developer wrote the SQL; the model only names the asset and the focus. It never writes SQL itself.' },
   ],
   // page 2.7 · The agent loop: Section 5.3 to 5.7 (5.8 is page 2.8)
-  '2.7': [
+  '2.7b': [
     {
       cell: 71,
       title: '5.3 Reset',

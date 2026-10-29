@@ -33,6 +33,11 @@ export interface SceneDef {
    * that builds up click by click), instead of fading the panel out and in on every page.
    */
   overlayGroup?: string;
+  /**
+   * Use the camera angle the owner saved for this other page (cameraOverrides.json), when this page has none of its
+   * own: the steps of one panel, or the pages of one chapter, hold the camera where the owner put it.
+   */
+  sameAngleAs?: string;
   card?: HandoffCard;
   recap?: RecapRef;
   recapMode?: boolean;

@@ -76,7 +76,9 @@ export function CameraRig() {
       setSettled(true);
       // a slow push-in once there (not when the owner saved a hand-set angle for this page)
       const push = tw.to.push;
-      if (push && !useCameraStore.getState().overrides[useSceneStore.getState().current().id]) {
+      const here = useSceneStore.getState().current();
+      const ov = useCameraStore.getState().overrides;
+      if (push && !ov[here.id] && !(here.sameAngleAs && ov[here.sameAngleAs])) {
         tween.current = {
           from: { position: pose.position, target: pose.target, durationMs: 0 },
           to: { position: push.position, target: push.target, durationMs: push.durationMs, ease: 'inOut' },

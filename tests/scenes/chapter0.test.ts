@@ -1,4 +1,5 @@
-import { chapter0, lab2Opening } from '../../src/scenes/chapter0';
+import { chapter0 } from '../../src/scenes/chapter0';
+import { chapter1 } from '../../src/scenes/chapter1';
 import { SCENES } from '../../src/scenes/index';
 import { SHOTS } from '../../src/world/shots';
 import { OVERLAYS } from '../../src/overlay/registry';
@@ -10,30 +11,34 @@ test('the Introduction is only the city, then the bridge and its three labs (own
   for (const s of chapter0) expect(s.chapter).toBe(0);
 });
 
-test('the data pages open Lab 2, in their old order, keeping their ids (the saved camera angles are keyed by id)', () => {
-  expect(lab2Opening.map((s) => s.id)).toEqual(['0.3', '0.4', '0.5', '0.6']);
-  for (const s of lab2Opening) expect(s.chapter).toBe(1);
+test('Lab 2 opens on the crack (the deck’s Story), and its old 0.x pages keep their ids (the saved camera angles are keyed by id)', () => {
   const ids = SCENES.map((s) => s.id);
-  expect(ids.slice(ids.indexOf('0.3'), ids.indexOf('0.3') + 5)).toEqual(['0.3', '0.4', '0.5', '0.6', '2.1']);
+  const first = ids.indexOf('0.4');
+  expect(SCENES[first - 1].chapter).not.toBe(1);
+  expect(ids.slice(first, first + 3)).toEqual(['0.4', '0.4a', '0.4b']);
+  for (const id of ['0.3', '0.5', '0.6']) expect(chapter1.find((s) => s.id === id)?.chapter).toBe(1);
 });
 
 test('every shot and overlay referenced by chapter 0 exists', () => {
-  for (const s of [...chapter0, ...lab2Opening]) {
+  for (const s of chapter0) {
     expect(SHOTS[s.shot]).toBeDefined();
     if (s.enterFrom) expect(SHOTS[s.enterFrom]).toBeDefined();
     if (s.overlay) expect(OVERLAYS[s.overlay]).toBeDefined();
   }
 });
 
-test('the database is one page on the sky stage with all four shapes (owner: not split into four steps)', () => {
-  expect(lab2Opening.filter((s) => s.id.startsWith('0.5')).map((s) => s.id)).toEqual(['0.5']);
-  expect(lab2Opening.find((s) => s.id === '0.5')!.shot).toBe('sky');
-  expect(lab2Opening.find((s) => s.id === '0.5')!.world?.sky).toBe('shapes');
-  expect(lab2Opening.find((s) => s.id === '0.6')!.world?.sky).toBe('brain');
+test('the workbench (0.5) is on the sky stage with the database and its four shapes', () => {
+  const bench = chapter1.filter((s) => s.id.startsWith('0.5'));
+  expect(bench.map((s) => s.id)).toEqual(['0.5', '0.5a']);
+  for (const s of bench) {
+    expect(s.shot).toBe('sky');
+    expect(s.world?.sky).toBe('shapes');
+  }
+  expect(chapter1.find((s) => s.id === '0.6')!.world?.sky).toBe('brain');
 });
 
 test('the recap subset is marked', () => {
-  expect([...chapter0, ...lab2Opening].filter((s) => s.recapMode).map((s) => s.id)).toEqual(['0.1', '0.7', '0.5']);
+  expect([...chapter0, ...chapter1].filter((s) => s.recapMode).map((s) => s.id)).toEqual(['0.1', '0.7', '0.5']);
 });
 
 test('SCENES starts with chapter 0, on page zero', () => {
@@ -50,7 +55,7 @@ test('page zero opens on the wide view over Bangkok, so Next flies down into pag
 });
 
 test('0.3 frames the place the document flow lands, clear of the counters panel', () => {
-  const s = lab2Opening.find((x) => x.id === '0.3')!;
+  const s = chapter1.find((x) => x.id === '0.3')!;
   const shot = SHOTS[s.shot];
   const ops = assetPosition('City Operations Control Center');
   const p = projectToScreen(shot.position, shot.target, [ops.x, 1, ops.z]);
@@ -75,12 +80,14 @@ test('pages are numbered 1, 2, 3 inside each part (Introduction, Lab 2, Lab 3), 
   }
   expect(pageNumber('0.0')).toBe(0);
   expect(pageNumber('0.1')).toBe(1);
-  // the running number follows the show order: the bridge is the Introduction's page 3, the data stream opens Lab 2
+  // the running number follows the show order: the bridge is the Introduction's page 3, the crack opens Lab 2
   expect(pageNumber('0.7')).toBe(3);
   expect(pageNumber('0.7c')).toBe(6);
-  expect(pageNumber('0.3')).toBe(1);
-  expect(pageNumber('0.6')).toBe(4);
-  expect(pageNumber('2.1')).toBe(5);
+  expect(pageNumber('0.4')).toBe(1);
+  expect(pageNumber('2.1')).toBe(6);
+  expect(pageNumber('0.3')).toBe(10);
+  expect(pageNumber('0.6')).toBe(12);
+  expect(pageNumber('2.9')).toBe(SCENES.filter((s) => s.chapter === 1).length);
 });
 
 test('0.7 is one panel across four clicks at the bridge: three cards, then each lab opens in turn', () => {

@@ -138,7 +138,8 @@ const L2: Record<string, LabStop> = {
     ],
   },
   // page 7 · The agent loop
-  '2.7': {
+  // §5.1–5.7, run it yourself: on the memories page (2.7b), before the focus pages walk the cells one by one
+  '2.7b': {
     notebook: LAB2,
     where: 'Section 5: Build the agent with LangGraph + Ollama · 5.1 to 5.7',
     from: 69,

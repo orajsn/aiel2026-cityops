@@ -59,7 +59,8 @@ test('on pages with the right-hand panel, the place the page is about sits left 
 
 test('the camera only moves when the story changes place: five places and the sky stage, at most 16 city moves in 38 pages', () => {
   const places = new Set(SCENES.filter((s) => isCity(s.shot)).map((s) => s.shot));
-  expect([...places].sort()).toEqual(['bridge', 'city', 'ops', 'pier2', 'pier2-close', 'pier2-inspect', 'pier3', 'sky', 'sky-model']);
+  // only the owner's places (pier3, the crack's close-up, is free since Lab 2 tells the crack in its panel)
+  for (const p of places) expect(['bridge', 'city', 'ops', 'pier2', 'pier2-close', 'pier2-inspect', 'pier3', 'sky', 'sky-model']).toContain(p);
   let moves = 0;
   SCENES.forEach((s, i) => {
     if (i > 0 && SCENES[i - 1].shot !== s.shot && isCity(s.shot) && isCity(SCENES[i - 1].shot)) moves++;
@@ -72,8 +73,9 @@ test('every page at the Ops Center shows the control room; sky pages name the Op
   const w = (s: (typeof SCENES)[number]) => (s.world ?? {}) as { ops?: boolean; highlight?: string[] };
   expect(SCENES.filter((s) => s.shot === 'ops' && !w(s).ops).map((s) => s.id)).toEqual([]);
   expect(SCENES.filter((s) => s.shot !== 'ops' && w(s).ops).map((s) => s.id)).toEqual([]);
-  // the board pages (0.5, 2.5, 2.6) are the exception: the name would sit under the script bar, and on 0.5 pins rising in the camera's path got in the way
-  expect(SCENES.filter((s) => s.shot === 'sky' && !['0.5', '2.4', '2.5', '2.6'].includes(s.id) && !(w(s).highlight ?? []).includes('City Operations Control Center')).map((s) => s.id)).toEqual([]);
+  // the board pages (0.5, 2.5, 2.6 and their steps) are the exception: the name would sit under the script bar, and on 0.5 pins rising in the camera's path got in the way
+  // Lab 2's workbench, tools and query pages keep their boards (0.5x, 2.5x, 2.6x)
+  expect(SCENES.filter((s) => s.shot === 'sky' && !/^(0\.5|2\.5|2\.6)/.test(s.id) && !(w(s).highlight ?? []).includes('City Operations Control Center')).map((s) => s.id)).toEqual([]);
 });
 
 test('screenPoint is the inverse of projectToScreen', async () => {

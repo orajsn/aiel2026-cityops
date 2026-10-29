@@ -35,8 +35,8 @@ test('every cell to run on every Lab 2 and Lab 3 page has a step in the guide', 
 });
 
 test('5.4’s eight parts each start on a real line of the cell, in order, so a notebook change cannot silently break them', () => {
-  const b = LAB_GUIDE['2.7'].find((x) => x.title.startsWith('5.4'))!;
-  const lines = LAB_STOPS['2.7'].notebook.cells[b.cell].source.split('\n');
+  const b = LAB_GUIDE['2.7b'].find((x) => x.title.startsWith('5.4'))!;
+  const lines = LAB_STOPS['2.7b'].notebook.cells[b.cell].source.split('\n');
   expect(b.parts!.map((p) => p.label[0])).toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']);
   let last = -1;
   for (const p of b.parts!) {
@@ -48,14 +48,14 @@ test('5.4’s eight parts each start on a real line of the cell, in order, so a 
   expect(lines[partLines(lines, b.parts![5]).start]).toMatch(/model_node|Nodes/);
 });
 
-test('page 2.7 steps through 5 blocks and 5.4’s 8 parts: 13 steps, and the clicker walks the same', () => {
-  expect(guideSteps('2.7')).toHaveLength(13);
-  expect(stopStepCount('2.7')).toBe(13);
+test('page 2.7b steps through 5 blocks and 5.4’s 8 parts: 13 steps, and the clicker walks the same', () => {
+  expect(guideSteps('2.7b')).toHaveLength(13);
+  expect(stopStepCount('2.7b')).toBe(13);
   expect(stopStepCount('2.1')).toBe(7); // pages without a guide still step through their cells to run
 });
 
 test('on a block the drawer shows its note under the heading; on a part it highlights that part’s lines', () => {
-  const c = render(<JupyterDrawer sceneId="2.7" />).container;
+  const c = render(<JupyterDrawer sceneId="2.7b" />).container;
   act(() => useDrawerStore.setState({ open: true, focus: 2 })); // 5.4, the block itself
   expect(c.querySelector('[data-guide-note]')?.textContent).toMatch(/eight parts/);
   act(() => useDrawerStore.setState({ focus: 2 + 6 })); // part F
@@ -73,7 +73,7 @@ test('the guide’s own notes name no pier (the notebook’s code is shown as it
 // owner, 28 Oct: walking through the cells should look like running them, output included
 test('a step runs its cell: [*] for a moment, then [n] and its output; 5.4 runs after its last part', () => {
   vi.useFakeTimers();
-  const c = render(<JupyterDrawer sceneId="2.7" />).container;
+  const c = render(<JupyterDrawer sceneId="2.7b" />).container;
   act(() => useDrawerStore.setState({ open: true, focus: 1 })); // 5.3
   expect(c.querySelector('[data-exec="running"]')).not.toBeNull();
   act(() => vi.advanceTimersByTime(1200));
