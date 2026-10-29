@@ -264,9 +264,9 @@ const EDGES = [
   ['Harbor Seawall Section A', 'supports'],
 ];
 export const CASES = [
-  { name: 'Bridge structural triage', asset: 'Harbor Bridge', q: 'What recent issues have been reported on Harbor Bridge?', icon: 'foundation' as IconName },
-  { name: 'Substation cascading outage', asset: 'Substation Gamma', q: 'What evidence points to electrical instability at Substation Gamma?', icon: 'nodes' as IconName },
-  { name: 'Pipeline leak response', asset: 'Pipeline North-7', q: 'What leak or pressure evidence affects Pipeline North-7?', icon: 'clock' as IconName },
+  { name: 'Bridge structural triage', asset: 'Harbor Bridge', q: 'What recent issues have been reported on Harbor Bridge?', key: 'recent issues', icon: 'foundation' as IconName },
+  { name: 'Substation cascading outage', asset: 'Substation Gamma', q: 'What evidence points to electrical instability at Substation Gamma?', key: 'electrical instability', icon: 'nodes' as IconName },
+  { name: 'Pipeline leak response', asset: 'Pipeline North-7', q: 'What leak or pressure evidence affects Pipeline North-7?', key: 'leak or pressure evidence', icon: 'clock' as IconName },
 ];
 
 export function AgentSees(p: L2Props) {

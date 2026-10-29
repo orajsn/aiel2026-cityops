@@ -158,6 +158,8 @@ export interface Case {
   name: string;
   asset: string;
   q: string;
+  /** the words of the question that say what this case is about */
+  key?: string;
 }
 
 const ART: ((p: { on?: boolean; w?: number }) => ReactNode)[] = [BridgeArt, SubstationArt, PipelineArt];
@@ -216,14 +218,23 @@ export function ThreeDrills({ cases, focusN }: { cases: Case[]; focusN: number |
                 <div style={{ fontSize: 28, fontWeight: 700, color: INK }}>{c.name}</div>
                 <div style={{ fontFamily: MONO, fontSize: 21, color: active ? TEAL_D : DIM, marginTop: 4 }}>{c.asset}</div>
               </div>
-              <div style={{ fontSize: 22, color: '#fff', background: 'rgba(31,42,51,0.9)', borderRadius: 14, padding: '12px 16px', lineHeight: 1.35 }}>“{c.q}”</div>
+              <div style={{ fontSize: 22, color: '#fff', background: 'rgba(31,42,51,0.9)', borderRadius: 14, padding: '12px 16px', lineHeight: 1.35 }}>
+                “{c.key && c.q.includes(c.key) ? (
+                  <>
+                    {c.q.slice(0, c.q.indexOf(c.key))}
+                    <b style={{ color: '#7fd3df' }}>{c.key}</b>
+                    {c.q.slice(c.q.indexOf(c.key) + c.key.length)}
+                  </>
+                ) : (
+                  c.q
+                )}”
+              </div>
             </motion.div>
           );
         })}
       </div>
       {/* the dial: one setting picks the case */}
       <motion.div data-switch initial={{ opacity: 0 }} animate={{ opacity: lit(4) ? 1 : 0.35 }} transition={{ delay: 1.6, duration: 0.5 }} style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 26, padding: '6px 0 0', borderTop: '1px solid var(--line)' }}>
-        <Num n={4} on={lit(4)} size={34} />
         <Dial />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <span style={{ fontSize: 24, color: INK, fontWeight: 600 }}>One setting picks the case:</span>
