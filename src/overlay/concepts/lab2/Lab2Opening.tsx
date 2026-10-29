@@ -8,6 +8,7 @@ import {
 } from './parts';
 import { RouteMap } from './RouteMap';
 import { Ladder, WhyLayers } from './WhyArt';
+import { Bench, SiteCheck } from './BenchArt';
 
 /**
  * Lab 2 · the opening chapters of the Harbor Bridge deck: Story (one crack), Why (AI needs your data), and Setup
@@ -234,66 +235,12 @@ export const CHECKS: { n: number; group: string; items: string[] }[] = [
   { n: 8, group: 'Memory library', items: ['langgraph-oracledb installed'] },
 ];
 
-const BENCH: { title: string; icon: ReactNode; lines: string[]; code: string; n: number }[] = [
-  { n: 1, title: 'Oracle AI Database 26ai', icon: <Db size={74} />, lines: ['PRISM data', 'in-database ONNX embedding model'], code: 'Oracle AI Database 26ai Free Release 23.26.2.0.0' },
-  { n: 2, title: 'The language model', icon: <Net w={120} live />, lines: ['a 3B model, chosen for small size', 'a GPU or hosted model is faster'], code: 'Reply: ’READY’' },
-  { n: 3, title: 'Jupyter notebook', icon: <LineIcon name="prompt" size={74} />, lines: ['all settings in one cell', 'active case: Harbor Bridge'], code: 'THREAD_ID = "prism-agent-demo-001"' },
-];
-
 export function Workbench(p: L2Props) {
   const step = p.step ?? 1;
   const focusN = useFocusN(p.focusId);
   return (
     <L2Page testId="l2-bench" {...p}>
-      <Swap k={step}>
-        {step === 1 ? (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
-            <div style={{ fontSize: 23, color: TEAL_D, fontWeight: 600, borderLeft: `5px solid ${TEAL}`, paddingLeft: 14 }}>Before any AI: check the database, the data and the model are ready.</div>
-            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 22, minHeight: 0 }}>
-              {BENCH.map((b, i) => (
-                <motion.div key={b.title} data-bench={b.n} {...fadeUp(0.3 + i * 0.4)} style={{ ...card(focusN === b.n), background: focusN === null || focusN === b.n ? CARD : SOFT, opacity: focusN === null || focusN === b.n ? 1 : 0.45, padding: '22px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }}>
-                  <div style={{ width: 150, height: 150, borderRadius: '50%', background: TINT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{b.icon}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <Num n={b.n} size={34} />
-                    <span style={{ fontSize: 28, fontWeight: 700, color: INK }}>{b.title}</span>
-                  </div>
-                  {b.lines.map((l) => (
-                    <div key={l} style={{ fontSize: 21, color: DIM }}>{l}</div>
-                  ))}
-                  <div style={{ ...mono(16), marginTop: 4 }}>{b.code}</div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '270px minmax(0, 1fr)', gap: 24, minHeight: 0 }}>
-            <motion.div data-tally {...fadeUp(0.2)} style={{ ...card(true), background: TINT, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, textAlign: 'center', padding: 20 }}>
-              <div style={{ fontSize: 84, fontWeight: 700, color: TEAL_D, lineHeight: 1.1 }}>25/25</div>
-              <div style={{ fontSize: 26, fontWeight: 700, color: INK }}>checks OK</div>
-              <div style={{ fontSize: 18, color: DIM, lineHeight: 1.4 }}>tables · views · graph · model · vector index · memory library</div>
-            </motion.div>
-            <div style={{ columnCount: 3, columnGap: 16, minHeight: 0 }}>
-              {CHECKS.map((g, i) => {
-                const on = focusN === null || focusN === g.n;
-                return (
-                  <motion.div key={g.group} data-check-group={g.n} {...fadeUp(0.4 + i * 0.18)} style={{ ...card(focusN === g.n), padding: '10px 14px', opacity: on ? 1 : 0.4, breakInside: 'avoid', marginBottom: 14 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                      <Num n={g.n} size={28} on={on} />
-                      <span style={{ fontSize: 19, fontWeight: 700, color: INK }}>{g.group}</span>
-                    </div>
-                    {g.items.map((it) => (
-                      <div key={it} data-check={it} style={{ display: 'flex', gap: 8, alignItems: 'baseline', fontSize: 16.5, color: INK, lineHeight: 1.5 }}>
-                        <span style={{ ...mono(13, '#fff'), background: TEAL, borderRadius: 4, padding: '0 5px', fontWeight: 700 }}>OK</span>
-                        <span style={{ overflowWrap: 'anywhere', minWidth: 0 }}>{it}</span>
-                      </div>
-                    ))}
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </Swap>
+      <Swap k={step}>{step === 1 ? <Bench focusN={focusN} /> : <SiteCheck groups={CHECKS} focusN={focusN} />}</Swap>
     </L2Page>
   );
 }
