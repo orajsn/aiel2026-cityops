@@ -676,7 +676,7 @@ export function TwoMemories(p: L2Props) {
 /** a locker: a grey door with vents and a handle; `open` swings it away to show what is inside */
 function Locker({ open, at, inside, padlock = false, w }: { open: boolean; at: number; inside?: ReactNode; padlock?: boolean; w?: number }) {
   return (
-    <div data-locker={open ? 'emptied' : 'shut'} style={{ position: 'relative', width: w, flex: 1, minHeight: 0, borderRadius: 10, background: 'rgba(20, 26, 34, 0.78)', perspective: 900 }}>
+    <div data-locker={open ? 'emptied' : 'shut'} style={{ position: 'relative', width: w, flex: 1, minHeight: 0, borderRadius: 10, background: 'rgba(20, 26, 34, 0.78)', overflow: 'hidden' }}>
       {inside && (
         <motion.div {...fade(at + 0.5)} style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 10, textAlign: 'center', color: '#e6e9ef' }}>
           {inside}
@@ -684,8 +684,8 @@ function Locker({ open, at, inside, padlock = false, w }: { open: boolean; at: n
       )}
       <motion.div
         aria-hidden
-        initial={{ rotateY: 0 }}
-        animate={{ rotateY: open ? -112 : 0 }}
+        initial={{ scaleX: 1 }}
+        animate={{ scaleX: open ? 0.1 : 1 }}
         transition={{ delay: at, duration: 1, ease: EASE }}
         style={{ position: 'absolute', inset: 0, transformOrigin: 'left center', borderRadius: 10, background: open ? '#9aa4ae' : '#aab1ba', border: `2px solid ${G_DARK}`, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 0' }}
       >
@@ -720,9 +720,9 @@ export function Wipe(p: L2Props) {
         <motion.div {...fade(0.1)} style={{ fontSize: 24, lineHeight: 1.45, color: INK }}>
           Like clearing out <b>only your own lockers</b> in a shared changing room: find your name tag, empty those, and leave everyone else’s shut.
         </motion.div>
-        <div style={{ flex: '1 0 auto', minHeight: 430, display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(0, 1fr)', columnGap: 40 }}>
+        <div style={{ flex: 1, minHeight: 360, display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(0, 1fr)', columnGap: 40 }}>
           {/* ours: the name tag over three lockers */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
             <motion.div data-step={1} data-on={on(1)} {...fadeUp(0.3)} style={{ alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 14, padding: '10px 16px', borderRadius: 12, border: `2px solid ${TEAL}`, background: TINT, opacity: on(1) ? 1 : 0.4, boxShadow: ring(1), transition: 'opacity 300ms' }}>
               <Num n={1} size={38} on={on(1)} />
               <div>
@@ -730,16 +730,16 @@ export function Wipe(p: L2Props) {
                 <div style={{ ...mono(21) }}>prism_incident_decisions</div>
               </div>
             </motion.div>
-            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '2fr 1fr', columnGap: 18 }}>
+            <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '2fr 1fr', columnGap: 18 }}>
               <div data-step={2} data-on={on(2)} style={{ display: 'flex', flexDirection: 'column', gap: 10, opacity: on(2) ? 1 : 0.4, transition: 'opacity 300ms' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <Num n={2} size={34} on={on(2)} />
                   <span style={{ fontSize: 24, fontWeight: 700, color: INK }}>Logbook pages</span>
                 </div>
-                <div style={{ flex: 1, display: 'flex', gap: 12 }}>
+                <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 12 }}>
                   {['STORE_INCIDENT', 'STORE_VECTORS_INCIDENT'].map((t, i) => (
                     <div key={t} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <Locker open at={1.2 + i * 0.4} inside={<>{count('rows cleared: 1')}</>} />
+                      <Locker open at={1.2 + i * 0.4} inside={<>{count('1 row')}<div style={{ fontSize: 18, color: '#c7ced6' }}>cleared</div></>} />
                       <div style={{ ...mono(18, INK), fontWeight: 700, textAlign: 'center', overflowWrap: 'anywhere' }}>{t}</div>
                     </div>
                   ))}
@@ -759,7 +759,7 @@ export function Wipe(p: L2Props) {
             </motion.div>
           </div>
           {/* the city's: shut and locked */}
-          <motion.div data-untouched {...fadeUp(0.5)} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <motion.div data-untouched {...fadeUp(0.5)} style={{ minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div style={{ padding: '10px 16px', borderRadius: 12, border: '2px dashed var(--line)', display: 'flex', alignItems: 'center', gap: 14 }}>
               <svg width="38" height="38" viewBox="0 0 34 40" aria-hidden style={{ flex: 'none' }}>
                 <path d="M9 18v-6a8 8 0 0 1 16 0v6" fill="none" stroke={G_DARK} strokeWidth="4" />
@@ -770,7 +770,7 @@ export function Wipe(p: L2Props) {
                 <div style={{ fontSize: 22, color: DIM }}>not touched</div>
               </div>
             </div>
-            <div style={{ flex: 1, display: 'flex', gap: 10 }}>
+            <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 10 }}>
               {CITY_RECORDS.map((t) => (
                 <div key={t} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <Locker open={false} at={0} padlock />
