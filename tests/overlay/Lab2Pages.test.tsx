@@ -103,7 +103,7 @@ test('the cast: Mercer reports the crack, Vance asks; the agent is the chief ins
 });
 
 test('a notebook page follows the drawer: the step with the focus step’s number lights up, the others wait', () => {
-  for (const id of ['2.2c', '0.6', '2.3']) {
+  for (const id of ['2.2c', '0.6', '2.3', '2.7c', '2.7d', '2.7e', '2.7f']) {
     const c = renderPage(id);
     const steps = LAB2_FOCUS[id];
     // closed drawer: the whole picture is on

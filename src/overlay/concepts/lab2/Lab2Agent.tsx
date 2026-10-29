@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { EASE } from '../WidePanel';
 import { Fill, FitBox } from '../Fill';
 import { Cog, G_DARK, G_LIGHT, G_MID, KitGlyph, PlugHead, T_SOFT } from './agentArt';
@@ -671,6 +671,18 @@ export function TwoMemories(p: L2Props) {
   );
 }
 
+/** a part that arrives (fade up), then stays faint while the drawer talks about another step */
+const enter = (delay: number, lit: boolean) => ({ initial: { opacity: 0, y: 10 }, animate: { opacity: lit ? 1 : 0.4, y: 0 }, transition: { delay, duration: 0.5, ease: EASE } });
+/** after the build-in, focus changes should answer at once, not wait for the entrance delay */
+function useBuilt(ms = 4500) {
+  const [built, setBuilt] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setBuilt(true), ms);
+    return () => clearTimeout(t);
+  }, [ms]);
+  return built;
+}
+
 /* ---------------- 2.7c · wipe only this lab's notes ---------------- */
 
 /** a locker: a grey door with vents and a handle; `open` swings it away to show what is inside */
@@ -710,6 +722,8 @@ function Locker({ open, at, inside, padlock = false, w }: { open: boolean; at: n
 const CITY_RECORDS = ['PRISM data', 'graph', 'chunks', 'embeddings', 'vector indexes'];
 
 export function Wipe(p: L2Props) {
+  const built = useBuilt();
+  const enterAt = (d: number, lit: boolean) => enter(built ? 0 : d, lit);
   const focusN = useFocusN(p.focusId);
   const on = (n: number) => focusN === null || focusN === n;
   const ring = (n: number) => (focusN === n ? `0 0 0 4px ${TINT2}` : 'none');
@@ -723,7 +737,7 @@ export function Wipe(p: L2Props) {
         <div style={{ flex: 1, minHeight: 360, display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(0, 1fr)', columnGap: 40 }}>
           {/* ours: the name tag over three lockers */}
           <div style={{ minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <motion.div data-step={1} data-on={on(1)} {...fadeUp(0.3)} style={{ alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 14, padding: '10px 16px', borderRadius: 12, border: `2px solid ${TEAL}`, background: TINT, opacity: on(1) ? 1 : 0.4, boxShadow: ring(1), transition: 'opacity 300ms' }}>
+            <motion.div data-step={1} data-on={on(1)} {...enterAt(0.3, on(1))} style={{ alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 14, padding: '10px 16px', borderRadius: 12, border: `2px solid ${TEAL}`, background: TINT, boxShadow: ring(1) }}>
               <Num n={1} size={38} on={on(1)} />
               <div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>This lab’s name tag</div>
@@ -802,6 +816,8 @@ function TableChip({ x, y, w, t }: { x: number; y: number; w: number; t: string 
 }
 
 export function StoreSaver(p: L2Props) {
+  const built = useBuilt();
+  const enterAt = (d: number, lit: boolean) => enter(built ? 0 : d, lit);
   const focusN = useFocusN(p.focusId);
   const on = (n: number) => focusN === null || focusN === n;
   const dim = (n: number) => ({ opacity: on(n) ? 1 : 0.35, transition: 'opacity 300ms' });
@@ -832,7 +848,7 @@ export function StoreSaver(p: L2Props) {
               <ellipse cx={920} cy={70} rx={372} ry={40} fill="rgba(27,138,156,0.22)" stroke="#1b8a9c" strokeWidth={3} />
               <text x={920} y={80} textAnchor="middle" fontSize={26} fontWeight={700} fill="#146f7f" fontFamily={SVG_FONT}>Oracle AI Database</text>
             </motion.g>
-            <motion.g data-step={1} data-on={on(1)} {...fadeUp(0.9)} style={dim(1)}>
+            <motion.g data-step={1} data-on={on(1)} {...enterAt(0.9, on(1))}>
               <rect x={592} y={130} width={666} height={190} rx={16} fill="var(--panel-strong)" stroke={focusN === 1 ? '#1b8a9c' : '#aab1ba'} strokeWidth={2} />
               <text x={620} y={174} fontSize={30} fontWeight={700} fill="var(--ink)" fontFamily={SVG_FONT}>Logbook <tspan fontFamily={SVG_MONO} fontSize={24} fill="#146f7f">OracleStore</tspan></text>
               <text x={620} y={210} fontSize={22} fill="var(--ink-dim)" fontFamily={SVG_FONT}>decisions kept across conversations</text>
@@ -854,7 +870,7 @@ export function StoreSaver(p: L2Props) {
                 <path d="M1110 222C1110 244 1040 238 1040 252" stroke="#1b8a9c" strokeWidth={2.5} strokeDasharray="4 4" fill="none" />
               </motion.g>
             </g>
-            <motion.g data-step={3} data-on={on(3)} {...fadeUp(1.3)} style={dim(3)}>
+            <motion.g data-step={3} data-on={on(3)} {...enterAt(1.3, on(3))}>
               <rect x={592} y={355} width={666} height={180} rx={16} fill="var(--panel-strong)" stroke={focusN === 3 ? '#1b8a9c' : '#aab1ba'} strokeWidth={2} />
               <text x={620} y={398} fontSize={30} fontWeight={700} fill="var(--ink)" fontFamily={SVG_FONT}>Notebook <tspan fontFamily={SVG_MONO} fontSize={24} fill="#146f7f">OracleSaver</tspan></text>
               <text x={620} y={434} fontSize={22} fill="var(--ink-dim)" fontFamily={SVG_FONT}>steps of this conversation, per thread</text>
@@ -887,6 +903,8 @@ function FoamSlot({ name, at }: { name: string; at: number }) {
 }
 
 export function Allowlist(p: L2Props) {
+  const built = useBuilt();
+  const enterAt = (d: number, lit: boolean) => enter(built ? 0 : d, lit);
   const focusN = useFocusN(p.focusId);
   const on = (n: number) => focusN === null || focusN === n;
   const dim = (n: number) => ({ opacity: on(n) ? 1 : 0.4, transition: 'opacity 300ms' });
@@ -925,7 +943,7 @@ export function Allowlist(p: L2Props) {
             </div>
           </motion.div>
           {/* the language model learns only what is in the box */}
-          <motion.div data-step={3} data-on={on(3)} {...fadeUp(2.8)} style={{ ...dim(3), display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }}>
+          <motion.div data-step={3} data-on={on(3)} {...enterAt(2.8, on(3))} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }}>
             <Num n={3} size={38} on={on(3)} />
             <ChiefInspector size={180} />
             <Chip style={{ fontSize: 20 }}>bind_tools(AGENT_TOOLS)</Chip>
@@ -980,6 +998,7 @@ const LAYERS = [
 ];
 
 export function ThreeLayers(p: L2Props) {
+  const built = useBuilt();
   const focusN = useFocusN(p.focusId);
   const on = (n: number) => focusN === null || focusN === n;
   const tilt = [-0.8, 0.6, -0.4];
@@ -1001,7 +1020,7 @@ export function ThreeLayers(p: L2Props) {
                 data-on={on(l.n)}
                 initial={{ opacity: 0, x: 90, rotate: 3 }}
                 animate={{ opacity: on(l.n) ? 1 : 0.45, x: 0, rotate: tilt[i] }}
-                transition={{ delay: 0.5 + i * 0.7, duration: 0.6, ease: EASE }}
+                transition={{ delay: built ? 0 : 0.5 + i * 0.7, duration: 0.6, ease: EASE }}
                 style={{ flex: 1, minHeight: 0, borderRadius: 6, background: 'var(--panel-strong)', boxShadow: '0 4px 12px rgba(0,0,0,0.22)', border: focusN === l.n ? `2.5px solid ${TEAL}` : '1px solid rgba(0,0,0,0.08)', padding: '12px 22px', display: 'flex', alignItems: 'center', gap: 18 }}
               >
                 <Num n={l.n} size={40} on={on(l.n)} />
