@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import type { CSSProperties, ReactNode } from 'react';
 import { WidePanel } from '../WidePanel';
-import { CARD, Clip, Coin, DbIcon, DIM, Flow, LockIcon, Net, RuntimeBar, SOFT, Shield, Spark, SteelPhoto, Switch, TEAL, TEAL_D, GREY, TextIcon, TINT, cap, capTeal, card, fade, fadeUp, mono } from './parts';
+import { CARD, Clip, Coin, DbIcon, DIM, Flow, LockIcon, Net, RuntimeBar, SOFT, Shield, Spark, SteelPhoto, Switch, TEAL, TEAL_D, GREY, TextIcon, TINT, cap, capTeal, card, fade, fadeUp, mono, Fill } from './parts';
 import type { Lab1Props } from './parts';
 
 /**
@@ -129,6 +129,7 @@ export function L1Launch({ kicker, message, notebook }: Lab1Props) {
   ];
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-launch" kickerColor="var(--teal)">
+      <Fill>
       <motion.div data-ids {...fade(0.2)} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 2, marginBottom: 12 }}>
         <span style={cap}>From Hands-on 1 and 2</span>
         {['Project OCID', 'vs_… vector store ID', 'semantic store OCID'].map((t) => (
@@ -212,6 +213,7 @@ export function L1Launch({ kicker, message, notebook }: Lab1Props) {
         <span style={{ fontSize: 24, fontWeight: 700 }}>Seer Construction Intelligence</span>
         <span style={{ fontSize: 16, opacity: 0.9 }}>the same app, the same three stores · port 8080</span>
       </motion.div>
+      </Fill>
     </WidePanel>
   );
 }
@@ -225,66 +227,68 @@ export const CANNOT_PROVE = ['certification', 'material grade', 'acceptance', 's
 export function L1SitePhoto({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-site-photo" kickerColor="var(--teal)">
-      <div style={{ display: 'grid', gridTemplateColumns: '480px 1fr', gap: 28, marginTop: 4 }}>
-        <motion.div {...fadeUp(0.2)}>
+      <Fill max={1.12}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 5fr) minmax(0, 7fr)', gap: 30, marginTop: 6, flex: 1 }}>
+        <motion.div {...fadeUp(0.2)} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
             <span style={cap}>Attached</span>
             <span data-attached style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 6, background: TINT, fontSize: 15, fontWeight: 600, color: 'var(--ink)' }}>
               <Clip /> structural-steel delivery photo
             </span>
           </div>
-          <SteelPhoto w={480} />
-          <div data-question="photo" style={{ fontSize: 18, fontStyle: 'italic', color: DIM, marginTop: 10, lineHeight: 1.4 }}>
+          <SteelPhoto fluid />
+          <div data-question="photo" style={{ fontSize: 20, fontStyle: 'italic', color: DIM, marginTop: 12, lineHeight: 1.4 }}>
             “Describe what you see. Keep observations apart from assumptions.”
           </div>
         </motion.div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <motion.div {...fadeUp(0.6)} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Spark size={36} />
-            <span style={{ fontSize: 21, fontWeight: 700, color: 'var(--ink)' }}>The AI assistant answers in two parts</span>
+            <Spark size={40} />
+            <span style={{ fontSize: 24, fontWeight: 700, color: 'var(--ink)' }}>The AI assistant answers in two parts</span>
           </motion.div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            <motion.div data-observed="list" {...fadeUp(0.9)} style={{ ...card(true), padding: '10px 18px' }}>
-              <div style={{ ...capTeal, fontSize: 12, paddingBottom: 4 }}>Observed · visible in the photo</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, flex: 1 }}>
+            <motion.div data-observed="list" {...fadeUp(0.9)} style={{ ...card(true), padding: '14px 20px', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ ...capTeal, fontSize: 13, paddingBottom: 6 }}>Observed · visible in the photo</div>
               {OBSERVED.map((o, i) => (
-                <motion.div key={o} data-observed={o} {...fadeUp(1.2 + i * 0.3)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderTop: '1px solid var(--line)', fontSize: 18, color: 'var(--ink)' }}>
-                  <span style={{ width: 12, height: 12, borderRadius: '50%', background: TEAL, flex: 'none' }} />
+                <motion.div key={o} data-observed={o} {...fadeUp(1.2 + i * 0.3)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderTop: '1px solid var(--line)', fontSize: 21, color: 'var(--ink)', lineHeight: 1.3 }}>
+                  <span style={{ width: 14, height: 14, borderRadius: '50%', background: TEAL, flex: 'none' }} />
                   {o}
                 </motion.div>
               ))}
             </motion.div>
-            <motion.div data-assumed="list" {...fadeUp(1.6)} style={{ ...card(), padding: '10px 18px' }}>
-              <div style={{ ...cap, fontSize: 12, paddingBottom: 4 }}>Assumed · not shown</div>
+            <motion.div data-assumed="list" {...fadeUp(1.6)} style={{ ...card(), padding: '14px 20px', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ ...cap, fontSize: 13, paddingBottom: 6 }}>Assumed · not shown</div>
               {ASSUMED.map((o, i) => (
-                <motion.div key={o} data-assumed={o} {...fadeUp(1.9 + i * 0.3)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderTop: '1px solid var(--line)', fontSize: 18, color: 'var(--ink)' }}>
-                  <span style={{ width: 12, height: 12, borderRadius: '50%', border: `1.5px solid ${GREY}`, flex: 'none' }} />
+                <motion.div key={o} data-assumed={o} {...fadeUp(1.9 + i * 0.3)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderTop: '1px solid var(--line)', fontSize: 21, color: 'var(--ink)', lineHeight: 1.3 }}>
+                  <span style={{ width: 14, height: 14, borderRadius: '50%', border: `1.5px solid ${GREY}`, flex: 'none' }} />
                   {o}
                 </motion.div>
               ))}
             </motion.div>
           </div>
-          <motion.div data-caution {...fadeUp(2.9)} style={{ borderRadius: 12, border: '2px solid var(--red)', padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ ...cap, fontSize: 13, color: 'var(--red)', width: 120, flex: 'none', lineHeight: 1.35 }}>A photo alone cannot prove</span>
+          <motion.div data-caution {...fadeUp(2.9)} style={{ borderRadius: 12, border: '2px solid var(--red)', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
+            <span style={{ ...cap, fontSize: 14, color: 'var(--red)', width: 130, flex: 'none', lineHeight: 1.35 }}>A photo alone cannot prove</span>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, flex: 1 }}>
               {CANNOT_PROVE.map((c) => (
-                <span key={c} style={{ padding: '4px 10px', borderRadius: 6, background: SOFT, fontSize: 15, fontWeight: 600, color: 'var(--ink)' }}>{c}</span>
+                <span key={c} style={{ padding: '5px 12px', borderRadius: 6, background: SOFT, fontSize: 17, fontWeight: 600, color: 'var(--ink)' }}>{c}</span>
               ))}
             </div>
             <span style={{ color: TEAL, fontSize: 22 }}>→</span>
-            <DbIcon size={30} />
-            <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.25, width: 112 }}>governed data and the engineer</span>
+            <DbIcon size={34} />
+            <span style={{ fontSize: 17, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.25, width: 130 }}>governed data and the engineer</span>
           </motion.div>
         </div>
       </div>
-      <motion.div data-notice {...fadeUp(3.6)} style={{ marginTop: 16, borderRadius: 12, background: TINT, padding: '10px 18px', display: 'flex', alignItems: 'center', gap: 18 }}>
+      <motion.div data-notice {...fadeUp(3.6)} style={{ marginTop: 22, borderRadius: 12, background: TINT, padding: '16px 22px', display: 'flex', alignItems: 'center', gap: 20 }}>
         <span style={capTeal}>Notice</span>
-        <span style={{ fontSize: 18, color: 'var(--ink)' }}>
+        <span style={{ fontSize: 21, color: 'var(--ink)' }}>
           Every request so far, text or photo, shows <b>the same model</b> in the runtime bar.
         </span>
         <span style={{ marginLeft: 'auto' }}>
-          <RuntimeBar model="the multimodal model" routing="disabled" size={14} />
+          <RuntimeBar model="the multimodal model" routing="disabled" size={16} />
         </span>
       </motion.div>
+      </Fill>
     </WidePanel>
   );
 }
@@ -297,19 +301,19 @@ export const REQUESTS = [
   { kind: 'photo', title: 'structural-steel delivery' },
 ] as const;
 
-function Request({ kind, title, coins, delay, h = 100 }: { kind: 'text' | 'photo'; title: string; coins?: number; delay: number; h?: number }) {
+function Request({ kind, title, coins, delay, h = 120 }: { kind: 'text' | 'photo'; title: string; coins?: number; delay: number; h?: number }) {
   const photo = kind === 'photo';
   return (
-    <motion.div data-request={kind} {...fadeUp(delay)} style={{ height: h, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 14, padding: '0 18px', borderRadius: 12, background: photo ? TINT : SOFT, border: `2px solid ${photo ? TEAL : 'transparent'}` }}>
-      {photo ? <SteelPhoto w={86} label={false} /> : <TextIcon />}
+    <motion.div data-request={kind} {...fadeUp(delay)} style={{ height: h, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 16, padding: '0 22px', borderRadius: 12, background: photo ? TINT : SOFT, border: `2px solid ${photo ? TEAL : 'transparent'}` }}>
+      {photo ? <SteelPhoto w={100} label={false} /> : <TextIcon size={44} />}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ ...cap, fontSize: 12 }}>{photo ? 'Photo' : 'Text'}</div>
-        <div style={{ fontSize: 19, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.2 }}>{title}</div>
+        <div style={{ ...cap, fontSize: 13 }}>{photo ? 'Photo' : 'Text'}</div>
+        <div style={{ fontSize: 22, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.2 }}>{title}</div>
       </div>
       {coins !== undefined && (
         <div data-cost={coins} style={{ display: 'flex', gap: 3 }}>
           {Array.from({ length: coins }, (_, i) => (
-            <Coin key={i} delay={delay + 1.6 + i * 0.08} />
+            <Coin key={i} delay={delay + 1.6 + i * 0.08} size={30} />
           ))}
         </div>
       )}
@@ -320,43 +324,45 @@ function Request({ kind, title, coins, delay, h = 100 }: { kind: 'text' | 'photo
 export function L1Baseline({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-baseline" kickerColor="var(--teal)">
-      <div style={{ display: 'grid', gridTemplateColumns: '440px 170px 400px 1fr', alignItems: 'center', columnGap: 10, marginTop: 14 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+      <Fill max={1.06}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 430fr) 140px minmax(0, 380fr) auto', alignItems: 'center', alignContent: 'center', columnGap: 10, marginTop: 6, flex: 1 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
           {REQUESTS.map((r, i) => (
-            <Request key={r.title} kind={r.kind} title={r.title} coins={3} delay={0.3 + i * 0.3} />
+            <Request key={r.title} kind={r.kind} title={r.title} coins={3} delay={0.3 + i * 0.3} h={140} />
           ))}
         </div>
-        <svg data-flow="all-to-one" width="170" height="364" viewBox="0 0 170 364" fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" aria-hidden="true">
-          <path d="M0 50C90 50 80 182 170 182" />
-          <path d="M0 182H170" />
-          <path d="M0 314C90 314 80 182 170 182" />
-          <motion.circle r={5} fill={TEAL} stroke="none" initial={{ cx: 4, cy: 182, opacity: 0 }} animate={{ cx: [4, 164], opacity: [0, 1, 1, 0] }} transition={{ delay: 1.6, duration: 2.4, repeat: Infinity, repeatDelay: 2.6, ease: 'easeInOut' }} />
+        <svg data-flow="all-to-one" width="140" height="492" viewBox="0 0 170 492" preserveAspectRatio="none" fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" aria-hidden="true">
+          <path d="M0 70C90 70 80 246 170 246" />
+          <path d="M0 246H170" />
+          <path d="M0 422C90 422 80 246 170 246" />
+          <motion.circle r={5} fill={TEAL} stroke="none" initial={{ cx: 4, cy: 246, opacity: 0 }} animate={{ cx: [4, 164], opacity: [0, 1, 1, 0] }} transition={{ delay: 1.6, duration: 2.4, repeat: Infinity, repeatDelay: 2.6, ease: 'easeInOut' }} />
         </svg>
-        <motion.div data-model="multimodal" {...fadeUp(1)} style={{ ...card(true), padding: '22px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 10, boxShadow: '0 8px 24px rgba(27,138,156,0.12)' }}>
-          <Net w={220} live who="multimodal" />
-          <div style={{ fontSize: 25, fontWeight: 700, color: 'var(--ink)' }}>the multimodal model</div>
-          <div style={{ fontSize: 15, color: DIM, lineHeight: 1.35 }}>reads text and sees photos: the more capable model, and the costlier one</div>
+        <motion.div data-model="multimodal" {...fadeUp(1)} style={{ ...card(true), padding: '56px 28px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 18, boxShadow: '0 8px 24px rgba(27,138,156,0.12)' }}>
+          <Net w={270} live who="multimodal" />
+          <div style={{ fontSize: 29, fontWeight: 700, color: 'var(--ink)' }}>the multimodal model</div>
+          <div style={{ fontSize: 18, color: DIM, lineHeight: 1.35 }}>reads text and sees photos: the more capable model, and the costlier one</div>
         </motion.div>
-        <motion.div {...fadeUp(2.2)} style={{ paddingLeft: 14 }}>
-          <div style={{ ...cap, fontSize: 12, marginBottom: 8 }}>The runtime bar, each time</div>
-          <div style={{ display: 'grid', gap: 8, justifyItems: 'start' }}>
+        <motion.div {...fadeUp(2.2)} style={{ paddingLeft: 16, maxWidth: 380 }}>
+          <div style={{ ...cap, fontSize: 13, marginBottom: 10 }}>The runtime bar, each time</div>
+          <div style={{ display: 'grid', gap: 10, justifyItems: 'start' }}>
             {[0, 1, 2].map((i) => (
               <motion.div key={i} {...fadeUp(2.4 + i * 0.3)}>
                 <RuntimeBar model="the multimodal model" routing="disabled" size={14} />
               </motion.div>
             ))}
           </div>
-          <div style={{ fontSize: 16, color: DIM, marginTop: 12, lineHeight: 1.45 }}>
+          <div style={{ fontSize: 19, color: DIM, marginTop: 16, lineHeight: 1.45 }}>
             <b style={{ color: 'var(--ink)' }}>Same model, every time.</b> Write it down, with the rough response time: that is the baseline.
           </div>
         </motion.div>
       </div>
-      <motion.div data-question="baseline" {...fadeUp(3.6)} style={{ marginTop: 26, borderRadius: 12, background: TINT, padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 18 }}>
+      <motion.div data-question="baseline" {...fadeUp(3.6)} style={{ marginTop: 26, borderRadius: 12, background: TINT, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 20 }}>
         <span style={capTeal}>The question</span>
-        <span style={{ fontSize: 20, color: 'var(--ink)' }}>
+        <span style={{ fontSize: 24, color: 'var(--ink)' }}>
           Two of these three requests are text only. <b>Do they need a model that can see?</b>
         </span>
       </motion.div>
+      </Fill>
     </WidePanel>
   );
 }
@@ -365,16 +371,16 @@ export function L1Baseline({ kicker, message, notebook }: Lab1Props) {
 
 function ModelCard({ id, name, sub, coins, delay }: { id: string; name: string; sub: string; coins: number; delay: number }) {
   return (
-    <motion.div data-model={id} {...fadeUp(delay)} style={{ ...card(true), padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 16 }}>
-      <Net w={96} who={id} />
+    <motion.div data-model={id} {...fadeUp(delay)} style={{ ...card(true), flex: 1, padding: '18px 22px', display: 'flex', alignItems: 'center', gap: 20 }}>
+      <Net w={120} who={id} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 23, fontWeight: 700, color: 'var(--ink)' }}>{name}</div>
-        <div style={{ fontSize: 15, color: DIM, marginBottom: 8 }}>{sub}</div>
-        <RuntimeBar model={name} routing="enabled" size={14} />
+        <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)' }}>{name}</div>
+        <div style={{ fontSize: 18, color: DIM, marginBottom: 10 }}>{sub}</div>
+        <RuntimeBar model={name} routing="enabled" size={15} />
       </div>
       <div data-cost={coins} style={{ display: 'flex', gap: 3, alignSelf: 'flex-start' }}>
         {Array.from({ length: coins }, (_, i) => (
-          <Coin key={i} delay={delay + 0.6 + i * 0.08} />
+          <Coin key={i} delay={delay + 0.6 + i * 0.08} size={30} />
         ))}
       </div>
     </motion.div>
@@ -384,60 +390,62 @@ function ModelCard({ id, name, sub, coins, delay }: { id: string; name: string; 
 export function L1Routing({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-routing" kickerColor="var(--teal)">
-      <div style={{ display: 'grid', gridTemplateColumns: '340px 100px 190px 100px 1fr', alignItems: 'center', marginTop: 8 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <Fill max={1.1}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 360fr) 100px 200px 100px minmax(0, 600fr)', alignItems: 'center', alignContent: 'center', marginTop: 6, flex: 1 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
           {REQUESTS.map((r, i) => (
-            <Request key={r.title} kind={r.kind} title={r.kind === 'photo' ? 'steel delivery photo' : r.title} delay={0.3 + i * 0.25} h={84} />
+            <Request key={r.title} kind={r.kind} title={r.kind === 'photo' ? 'steel delivery photo' : r.title} delay={0.3 + i * 0.25} h={104} />
           ))}
         </div>
-        <svg width="100" height="284" viewBox="0 0 110 284" preserveAspectRatio="none" fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" aria-hidden="true">
-          <path d="M0 42C60 42 50 142 110 142M0 142H110M0 242C60 242 50 142 110 142" />
+        <svg width="100" height="356" viewBox="0 0 110 356" preserveAspectRatio="none" fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" aria-hidden="true">
+          <path d="M0 52C60 52 50 178 110 178M0 178H110M0 304C60 304 50 178 110 178" />
         </svg>
         <motion.div data-router {...fadeUp(1)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 120, height: 120, transform: 'rotate(45deg)', border: `2.5px solid ${TEAL}`, borderRadius: 8, background: CARD, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ transform: 'rotate(-45deg)', fontSize: 17, fontWeight: 700, color: 'var(--ink)', textAlign: 'center', lineHeight: 1.2 }}>
+          <div style={{ width: 136, height: 136, transform: 'rotate(45deg)', border: `2.5px solid ${TEAL}`, borderRadius: 8, background: CARD, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ transform: 'rotate(-45deg)', fontSize: 20, fontWeight: 700, color: 'var(--ink)', textAlign: 'center', lineHeight: 1.2 }}>
               has an
               <br />
               image?
             </span>
           </div>
-          <span style={{ marginTop: 14, padding: '3px 10px', borderRadius: 6, background: TINT, ...mono(15), fontWeight: 700 }}>response_model</span>
-          <span style={{ fontSize: 14, color: DIM }}>in llm.py</span>
+          <span style={{ marginTop: 20, padding: '4px 12px', borderRadius: 6, background: TINT, ...mono(17), fontWeight: 700 }}>response_model</span>
+          <span style={{ fontSize: 16, color: DIM }}>in llm.py</span>
         </motion.div>
-        <svg width="100" height="320" viewBox="0 0 110 320" preserveAspectRatio="none" fill="none" aria-hidden="true">
-          <path d="M0 160C60 160 50 52 110 52" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" />
-          <path d="M0 160C60 160 50 268 110 268" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" />
-          <text x="62" y="56" fontSize="15" fontWeight="700" fill={TEAL_D} fontFamily="Inter, sans-serif">no</text>
-          <text x="62" y="282" fontSize="15" fontWeight="700" fill={TEAL_D} fontFamily="Inter, sans-serif">yes</text>
-          <motion.circle r={5} fill={TEAL} initial={{ cx: 2, cy: 160, opacity: 0 }} animate={{ cx: [2, 40, 70, 108], cy: [160, 150, 70, 52], opacity: [0, 1, 1, 0] }} transition={{ delay: 2, duration: 2, repeat: Infinity, repeatDelay: 2.6, ease: 'easeInOut' }} />
+        <svg width="100" height="380" viewBox="0 0 110 380" fill="none" aria-hidden="true">
+          <path d="M0 190C60 190 50 92 110 92" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" />
+          <path d="M0 190C60 190 50 288 110 288" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" />
+          <text x="62" y="84" fontSize="17" fontWeight="700" fill={TEAL_D} fontFamily="Inter, sans-serif">no</text>
+          <text x="62" y="314" fontSize="17" fontWeight="700" fill={TEAL_D} fontFamily="Inter, sans-serif">yes</text>
+          <motion.circle r={5} fill={TEAL} initial={{ cx: 2, cy: 190, opacity: 0 }} animate={{ cx: [2, 40, 70, 108], cy: [190, 180, 110, 92], opacity: [0, 1, 1, 0] }} transition={{ delay: 2, duration: 2, repeat: Infinity, repeatDelay: 2.6, ease: 'easeInOut' }} />
         </svg>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, height: 380 }}>
           <ModelCard id="lower-cost" name="the lower-cost model" sub="text-only requests" coins={1} delay={1.6} />
           <ModelCard id="multimodal" name="the multimodal model" sub="requests with an image" coins={3} delay={1.9} />
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 22 }}>
-        <motion.div data-turn-on {...fadeUp(2.8)} style={{ ...card(), border: 'none', padding: '12px 18px', display: 'grid', gridTemplateColumns: '90px 1fr', rowGap: 8, alignItems: 'center' }}>
-          <span style={{ ...cap, fontSize: 12, gridColumn: '1 / 3' }}>Turn it on</span>
-          <b style={{ fontSize: 17, color: 'var(--ink)' }}>Build</b>
-          <span style={{ fontSize: 16, color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            add one line to <span style={mono(14, 'var(--ink)')}>llm.py</span>, set <span style={{ padding: '1px 6px', borderRadius: 4, background: TINT, ...mono(13), fontWeight: 700 }}>…ROUTING_ENABLED=true</span>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginTop: 24 }}>
+        <motion.div data-turn-on {...fadeUp(2.8)} style={{ ...card(), border: 'none', padding: '16px 22px', display: 'grid', gridTemplateColumns: '100px 1fr', rowGap: 10, alignItems: 'center' }}>
+          <span style={{ ...cap, fontSize: 13, gridColumn: '1 / 3' }}>Turn it on</span>
+          <b style={{ fontSize: 19, color: 'var(--ink)' }}>Build</b>
+          <span style={{ fontSize: 18, color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            add one line to <span style={mono(16, 'var(--ink)')}>llm.py</span>, set <span style={{ padding: '1px 6px', borderRadius: 4, background: TINT, ...mono(15), fontWeight: 700 }}>…ROUTING_ENABLED=true</span>
           </span>
-          <b style={{ fontSize: 17, color: 'var(--ink)' }}>Launch</b>
-          <span style={{ fontSize: 16, color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: 10 }}>
-            Runtime configuration › Model routing <Switch on delay={3.4} w={42} />
+          <b style={{ fontSize: 19, color: 'var(--ink)' }}>Launch</b>
+          <span style={{ fontSize: 18, color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: 10 }}>
+            Runtime configuration › Model routing <Switch on delay={3.4} w={46} />
           </span>
         </motion.div>
-        <motion.div data-cost-note {...fadeUp(3.1)} style={{ borderRadius: 12, background: TINT, padding: '12px 18px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+        <motion.div data-cost-note {...fadeUp(3.1)} style={{ borderRadius: 12, background: TINT, padding: '16px 22px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
           <div>
-            <div style={{ ...capTeal, fontSize: 12, marginBottom: 4 }}>The cost, honestly</div>
-            <div style={{ fontSize: 16, color: 'var(--ink)', lineHeight: 1.4 }}>Text requests move to the cheaper model; photos keep the capable one.</div>
+            <div style={{ ...capTeal, fontSize: 13, marginBottom: 6 }}>The cost, honestly</div>
+            <div style={{ fontSize: 19, color: 'var(--ink)', lineHeight: 1.4 }}>Text requests move to the cheaper model; photos keep the capable one.</div>
           </div>
-          <div style={{ borderLeft: '1.5px solid rgba(27,138,156,0.35)', paddingLeft: 16, fontSize: 14, color: DIM, lineHeight: 1.45 }}>
+          <div style={{ borderLeft: '1.5px solid rgba(27,138,156,0.35)', paddingLeft: 18, fontSize: 16, color: DIM, lineHeight: 1.45 }}>
             The runtime bar shows <b style={{ color: 'var(--ink)' }}>which model</b>, not billable tokens. <b style={{ color: 'var(--ink)' }}>Response time is not cost.</b> No saving is claimed without full token counts and current prices.
           </div>
         </motion.div>
       </div>
+      </Fill>
     </WidePanel>
   );
 }
@@ -449,7 +457,7 @@ export const FAIL_CLOSED = ['missing configuration', 'authorization failure', 's
 
 function Lane({ id, children }: { id: string; children: ReactNode }) {
   return (
-    <div data-lane={id} style={{ borderRadius: 14, background: SOFT, padding: '14px 22px', display: 'grid', gridTemplateColumns: '320px 60px 150px 60px 200px 60px 1fr', alignItems: 'center' }}>
+    <div data-lane={id} style={{ height: '100%', boxSizing: 'border-box', borderRadius: 14, background: SOFT, padding: '18px 26px', display: 'grid', gridTemplateColumns: 'minmax(0, 340fr) 60px 160px 60px 210px 60px minmax(0, 400fr)', alignItems: 'center' }}>
       {children}
     </div>
   );
@@ -465,29 +473,30 @@ const dashes = (on: boolean, delay: number) => (
 export function L1Guardrails({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-guardrails" kickerColor="var(--teal)">
-      <div style={{ display: 'grid', gap: 14, marginTop: 4 }}>
+      <Fill max={1.1}>
+      <div style={{ display: 'grid', gridTemplateRows: 'minmax(0, 1fr) minmax(0, 1fr) auto', gap: 18, marginTop: 6, flex: 1 }}>
         <motion.div {...fadeUp(0.2)}>
           <Lane id="allowed">
             <div>
-              <div style={{ ...cap, fontSize: 12 }}>Allowed · Try a prompt</div>
-              <div data-question="allowed" style={{ fontSize: 21, fontWeight: 600, color: 'var(--ink)' }}>Supplier recommendation</div>
+              <div style={{ ...cap, fontSize: 13 }}>Allowed · Try a prompt</div>
+              <div data-question="allowed" style={{ fontSize: 25, fontWeight: 600, color: 'var(--ink)' }}>Supplier recommendation</div>
             </div>
             {dashes(true, 1)}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-              <Shield size={46} />
-              <span style={{ ...mono(14), fontWeight: 600 }}>ApplyGuardrails</span>
+              <Shield size={56} />
+              <span style={{ ...mono(16), fontWeight: 600 }}>ApplyGuardrails</span>
             </div>
             {dashes(true, 1.8)}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-              <Net w={88} live />
-              <span style={{ fontSize: 15, color: DIM }}>the model</span>
+              <Net w={110} live />
+              <span style={{ fontSize: 17, color: DIM }}>the model</span>
             </div>
             {dashes(true, 2.6)}
-            <motion.div data-result="answer" {...fadeUp(1.4)} style={{ ...card(true), padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <Spark size={34} />
+            <motion.div data-result="answer" {...fadeUp(1.4)} style={{ ...card(true), padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
+              <Spark size={40} />
               <div>
-                <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--ink)' }}>Answer from governed data</div>
-                <div style={{ fontSize: 15, color: DIM }}>with its supporting evidence</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink)' }}>Answer from governed data</div>
+                <div style={{ fontSize: 17, color: DIM }}>with its supporting evidence</div>
               </div>
             </motion.div>
           </Lane>
@@ -495,50 +504,50 @@ export function L1Guardrails({ kicker, message, notebook }: Lab1Props) {
         <motion.div {...fadeUp(1)}>
           <Lane id="attack">
             <div>
-              <div style={{ ...cap, fontSize: 12 }}>Attack · Guardrail challenge</div>
-              <div data-question="attack" style={{ fontSize: 17, fontStyle: 'italic', color: 'var(--ink)', lineHeight: 1.35 }}>“{ATTACK}”</div>
+              <div style={{ ...cap, fontSize: 13 }}>Attack · Guardrail challenge</div>
+              <div data-question="attack" style={{ fontSize: 20, fontStyle: 'italic', color: 'var(--ink)', lineHeight: 1.35 }}>“{ATTACK}”</div>
             </div>
             {dashes(true, 1.4)}
             <div data-guard="shield" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-              <Shield mark="x" size={46} />
-              <span style={{ ...mono(14), fontWeight: 600 }}>ApplyGuardrails</span>
+              <Shield mark="x" size={56} />
+              <span style={{ ...mono(16), fontWeight: 600 }}>ApplyGuardrails</span>
             </div>
             {dashes(false, 0)}
             <div data-model-called="false" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-              <Net w={88} dim />
-              <span style={{ fontSize: 15, color: DIM }}>the model · never called</span>
+              <Net w={110} dim />
+              <span style={{ fontSize: 17, color: DIM }}>the model · never called</span>
             </div>
             {dashes(false, 0)}
-            <motion.div data-result="blocked" {...fadeUp(2.2)} style={{ borderRadius: 12, border: '2px solid var(--red)', background: CARD, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <LockIcon size={26} color="var(--red)" />
-              <div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--red)' }}>Blocked by guardrails</div>
-                <div style={{ ...mono(13, DIM), lineHeight: 1.4 }}>promptInjection.score=&lt;score&gt;, blocked=True</div>
-                <div style={{ fontSize: 14, color: DIM }}>no supplier approved</div>
+            <motion.div data-result="blocked" {...fadeUp(2.2)} style={{ borderRadius: 12, border: '2px solid var(--red)', background: CARD, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
+              <LockIcon size={30} color="var(--red)" />
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 23, fontWeight: 700, color: 'var(--red)' }}>Blocked by guardrails</div>
+                <div style={{ ...mono(14, DIM), lineHeight: 1.4 }}>promptInjection.score=&lt;score&gt;, blocked=True</div>
+                <div style={{ fontSize: 16, color: DIM }}>no supplier approved</div>
               </div>
             </motion.div>
           </Lane>
         </motion.div>
-        <motion.div data-fail-closed {...fadeUp(2.8)} style={{ ...card(true), background: TINT, marginTop: 8, padding: '14px 22px', display: 'grid', gridTemplateColumns: '260px 240px 60px auto 1fr', alignItems: 'center', columnGap: 16 }}>
+        <motion.div data-fail-closed {...fadeUp(2.8)} style={{ ...card(true), background: TINT, padding: '20px 26px', display: 'grid', gridTemplateColumns: 'minmax(0, 280fr) minmax(0, 260fr) 60px auto minmax(0, 300fr)', alignItems: 'center', columnGap: 18 }}>
           <div>
-            <div style={{ ...capTeal, fontSize: 12 }}>Fail closed</div>
-            <div style={{ fontSize: 21, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.25 }}>If the check itself cannot run</div>
+            <div style={{ ...capTeal, fontSize: 13 }}>Fail closed</div>
+            <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.25 }}>If the check itself cannot run</div>
           </div>
-          <div style={{ display: 'grid', gap: 6 }}>
+          <div style={{ display: 'grid', gap: 8 }}>
             {FAIL_CLOSED.map((f, i) => (
-              <motion.span key={f} data-failure={f} {...fadeUp(3.2 + i * 0.2)} style={{ padding: '5px 12px', borderRadius: 6, background: CARD, fontSize: 16, fontWeight: 600, color: 'var(--ink)' }}>
+              <motion.span key={f} data-failure={f} {...fadeUp(3.2 + i * 0.2)} style={{ padding: '7px 14px', borderRadius: 6, background: CARD, fontSize: 18, fontWeight: 600, color: 'var(--ink)' }}>
                 {f}
               </motion.span>
             ))}
           </div>
           <Flow w={56} delay={4} />
-          <motion.div data-stops {...fadeUp(4.2)} style={{ borderRadius: 10, background: TEAL, color: '#fff', padding: '10px 18px', display: 'flex', alignItems: 'center', gap: 12, fontSize: 18, fontWeight: 700, lineHeight: 1.2 }}>
-            <LockIcon size={24} />
+          <motion.div data-stops {...fadeUp(4.2)} style={{ borderRadius: 10, background: TEAL, color: '#fff', padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 14, fontSize: 20, fontWeight: 700, lineHeight: 1.25 }}>
+            <LockIcon size={28} />
             the request stops
             <br />
             before the model
           </motion.div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 16, color: DIM }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18, color: DIM }}>
             <svg width="40" height="20" viewBox="0 0 40 20" aria-hidden="true">
               <path d="M2 16Q20 0 38 16" fill="none" stroke="#b7c3cb" strokeWidth={2} strokeDasharray="3 4" />
               <path d="M15 4l10 10M25 4L15 14" stroke={DIM} strokeWidth={2.2} strokeLinecap="round" />
@@ -547,6 +556,7 @@ export function L1Guardrails({ kicker, message, notebook }: Lab1Props) {
           </div>
         </motion.div>
       </div>
+      </Fill>
     </WidePanel>
   );
 }
