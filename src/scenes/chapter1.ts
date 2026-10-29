@@ -161,7 +161,8 @@ const tools: SceneDef[] = [
 const QUERY = { shot: 'sky', world: sky('unified', false), stage: true };
 const query: SceneDef[] = [
   page({ id: '2.6', title: 'Why one query', overlay: 'L2OneQuery', group: 'l2-query', ...QUERY, props: { kicker: K.query, step: 1, message: 'Four systems mean **four copies to keep in sync**.', takeaway: 'Rows, JSON, graph and vectors in four places: **ETL, sync jobs, stale copies**.' } }),
-  page({ id: '2.6a', title: 'One database, four lenses', overlay: 'L2OneQuery', group: 'l2-query', ...QUERY, props: { kicker: K.query, step: 2, message: 'Why **one query**.', takeaway: 'No ETL between systems, no sync jobs, no stale copies: **one consistency boundary**.', terms: [['Four lenses on one record', 'Relational · JSON · SQL/PGQ graph · vector']] } }),
+  // 2.6a plays the old database-in-the-sky sequence with its own small caption, so the 3D board stays in view (owner, 29 Oct)
+  page({ id: '2.6a', title: 'One database, four lenses', overlay: 'UnifiedQuery', ...QUERY, props: { kicker: K.query, message: '**One call, four data models, one transaction.** No ETL, no sync jobs, no stale copies.' } }),
   page({ id: '2.6b', title: 'One brief from one statement', overlay: 'L2Brief', ...QUERY, props: { kicker: K.query, message: 'One brief from **one SQL statement**.', takeaway: 'Relational row, JSON specs, graph neighbours and vector evidence: **one statement, one transaction**.', terms: [['Four lenses', 'Relational · JSON · SQL/PGQ graph · vector']], notebook: `${NB} · cells 63, 65` } }),
   page({ id: '2.6c', title: 'The agent’s main instrument', overlay: 'L2Main', ...QUERY, props: { kicker: K.query, message: 'The query becomes **the agent’s main instrument**.', takeaway: 'The docstring tells the model when to reach for it: **when it needs the whole picture**.', notebook: `${NB} · cell 68`, next: NEXT.graph } }),
 ];
