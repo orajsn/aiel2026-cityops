@@ -602,58 +602,88 @@ export const SOURCES = [
   { src: 'maintenance_logs · critical', d: '0.4801', t: 'Expansion joint at east approach (EJ-1) failed under high tidal gusts;…', claim: 1 },
   { src: 'inspection_findings · high', d: '0.5071', t: 'Complete blockage of multiple scuppers on the west side resulting in d…', claim: 2 },
 ];
+const CLAIMS = [
+  'Expansion joint at east approach (EJ-1) failed under high tidal gusts, resulting in a 400 mm open gap and exposed reinforcement.…',
+  'Complete blockage of multiple scuppers on the west side, causing deck ponding up to 60 mm depth in lane 4 over an approximate 10 m longitudinal ext…',
+];
+/** where things sit in the 1400 × 620 drawing */
+const SRC_Y = (i: number) => 64 + i * 108;
+/** the claims' tops inside the answer page (which starts at y 120) */
+const CLAIM_TOP = [84, 244];
+
+/** a footnote marker: the claim's number in a small teal square */
+function Mark({ n, size = 34 }: { n: number; size?: number }) {
+  return <span style={{ width: size, height: size, flex: 'none', borderRadius: 8, background: TEAL, color: '#fff', fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.55 }}>{n}</span>;
+}
 
 export function Checkable(p: L2Props) {
   const focusN = useFocusN(p.focusId);
   const lit = (n: number) => focusN === null || focusN === n;
+  const dimStyle = (n: number) => ({ opacity: lit(n) ? 1 : 0.35, transition: 'opacity 300ms' });
   return (
     <L2Page testId="l2-check" {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.15fr)', gap: 24, minHeight: 0 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-          <motion.div data-part={1} {...fadeUp(0.2)} style={{ display: 'flex', alignItems: 'center', gap: 12, opacity: lit(1) ? 1 : 0.4 }}>
-            <Num n={1} on={lit(1)} />
-            <div style={{ fontSize: 22, color: '#fff', background: 'rgba(31,42,51,0.92)', borderRadius: 14, padding: '12px 18px' }}>“What recent issues have been reported on Harbor Bridge?”</div>
-          </motion.div>
-          <motion.div data-part={2} {...fadeUp(0.6)} style={{ ...card(true), opacity: lit(2) ? 1 : 0.4, flex: 1, padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <Num n={2} on={lit(2)} />
-              <span style={capTeal}>Answer · saved output</span>
-            </div>
-            {[
-              'Expansion joint at east approach (EJ-1) failed under high tidal gusts, resulting in a 400 mm open gap and exposed reinforcement.…',
-              'Complete blockage of multiple scuppers on the west side, causing deck ponding up to 60 mm depth in lane 4 over an approximate 10 m longitudinal ext…',
-            ].map((t, i) => (
-              <motion.div key={i} data-claim={i + 1} {...fadeUp(1 + i * 0.4)} style={{ display: 'flex', gap: 12, fontSize: 21, lineHeight: 1.4, color: INK }}>
-                <span style={{ width: 30, height: 30, flex: 'none', borderRadius: 8, background: TEAL, color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17 }}>{i + 1}</span>
-                <span>{t}</span>
+      <Fill>
+        <FitBox w={1400} h={640} max={1.06}>
+          <div style={{ position: 'relative', width: 1400, height: 640 }}>
+            {/* 1 · the question, scoped to Harbor Bridge */}
+            <motion.div data-step={1} data-on={lit(1)} {...fadeUp(0.2)} style={{ ...at(0, 0, 640), ...dimStyle(1), display: 'flex', alignItems: 'center', gap: 14 }}>
+              <Num n={1} on={lit(1)} size={44} />
+              <Portrait who="vance" size={80} />
+              <div style={{ fontSize: 23, lineHeight: 1.35, color: '#fff', background: 'rgba(31,42,51,0.92)', borderRadius: 16, padding: '12px 18px' }}>“What recent issues have been reported on Harbor Bridge?”</div>
+            </motion.div>
+            {/* 2 · the answer, as a page with footnote marks */}
+            <motion.div data-step={2} data-on={lit(2)} {...fadeUp(0.7)} style={{ ...at(0, 120, 620), height: 410, ...dimStyle(2), boxSizing: 'border-box', background: '#fff', borderRadius: '6px 40px 6px 6px', boxShadow: '0 4px 16px rgba(0,0,0,0.12)', border: `2px solid ${focusN === 2 ? TEAL : 'var(--line)'}`, padding: '20px 26px', color: '#1f2a33' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Num n={2} on={lit(2)} size={40} />
+                <span style={{ ...capTeal, fontSize: 17 }}>The answer · saved output</span>
+              </div>
+              {CLAIMS.map((t, i) => (
+                <motion.div key={i} data-claim={i + 1} {...fadeUp(1.2 + i * 0.5)} style={{ position: 'absolute', left: 26, right: 26, top: CLAIM_TOP[i], display: 'flex', gap: 14, alignItems: 'flex-start', fontSize: 22, lineHeight: 1.4 }}>
+                  <span style={{ flex: 1 }}>{t}</span>
+                  <Mark n={i + 1} />
+                </motion.div>
+              ))}
+            </motion.div>
+            {/* the everyday picture, under the page */}
+            <motion.div data-everyday {...fadeUp(3.6)} style={{ ...at(0, 548, 640), fontSize: 23, lineHeight: 1.4, color: INK }}>
+              Like <b>footnotes in a report</b>: every claim points to the page it came from.
+            </motion.div>
+            {/* the threads from each footnote mark to its row */}
+            <svg width={1400} height={620} viewBox="0 0 1400 620" aria-hidden style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', pointerEvents: 'none' }}>
+              {[3, 4].map((row, i) => {
+                const y1 = 120 + CLAIM_TOP[i] + 17;
+                const y2 = SRC_Y(row) + 46;
+                return <motion.path key={row} d={`M604 ${y1} C 700 ${y1}, 690 ${y2}, 772 ${y2}`} fill="none" stroke={TEAL} strokeWidth={3} strokeDasharray="6 6" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 3 + i * 0.4, duration: 0.8, ease: EASE }} />;
+              })}
+            </svg>
+            {/* 3 · the five rows it used, as folders */}
+            <motion.div data-step={3} data-on={lit(3)} {...fade(1.6)} style={{ ...at(780, 0, 620), ...dimStyle(3), display: 'flex', alignItems: 'center', gap: 12 }}>
+              <Num n={3} on={lit(3)} size={44} />
+              <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>The sources it used: top-5 rows</span>
+            </motion.div>
+            {SOURCES.map((s, i) => (
+              <motion.div key={i} data-source={i + 1} data-claim-of={s.claim} {...fadeUp(1.8 + i * 0.22)} style={{ ...at(780, SRC_Y(i), 620), height: 92, ...dimStyle(3), boxSizing: 'border-box', display: 'grid', gridTemplateColumns: '64px minmax(0, 1fr) auto', alignItems: 'center', gap: 14, padding: '0 16px', borderRadius: '4px 12px 12px 12px', background: s.claim ? TINT : 'rgba(127,127,127,0.10)', border: s.claim ? `2px solid ${TEAL}` : '2px solid transparent' }}>
+                <Folder size={56} on={!!s.claim} />
+                <div style={{ minWidth: 0 }}>
+                  <div style={mono(17, TEAL_D)}>{s.src}</div>
+                  <div style={{ fontSize: 19, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.t}</div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={mono(18, TEAL_D)}>{s.d}</span>
+                  {s.claim && <Mark n={s.claim} size={30} />}
+                </div>
               </motion.div>
             ))}
-          </motion.div>
-        </div>
-        <motion.div data-part={3} {...fadeUp(1.2)} style={{ ...card(), opacity: lit(3) ? 1 : 0.4, padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Num n={3} on={lit(3)} />
-            <span style={cap}>Sources used: top-5 rows</span>
-          </div>
-          {SOURCES.map((s, i) => (
-            <motion.div key={i} data-source={i + 1} data-claim-of={s.claim} {...fadeUp(1.5 + i * 0.22)} style={{ display: 'grid', gridTemplateColumns: '30px minmax(0, 1fr) auto', gap: 10, alignItems: 'center', padding: '8px 12px', borderRadius: 10, background: s.claim ? TINT : 'rgba(127,127,127,0.10)', border: s.claim ? `2px solid ${TEAL}` : '2px solid transparent' }}>
-              <span style={mono(17, DIM)}>{i + 1}</span>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ ...mono(15, TEAL_D) }}>{s.src}</div>
-                <div style={{ fontSize: 17, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.t}</div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={mono(17, TEAL_D)}>{s.d}</span>
-                {s.claim && <span style={{ fontSize: 16, fontWeight: 700, color: '#fff', background: TEAL, borderRadius: 6, padding: '2px 8px' }}>← claim {s.claim}</span>}
-              </div>
+            <motion.div {...fade(3.8)} style={{ ...at(780, 604, 620), fontSize: 18, color: DIM, whiteSpace: 'nowrap' }}>
+              saved output, cell 36 · cosine distance, smaller is closer
             </motion.div>
-          ))}
-          <div style={{ marginTop: 'auto', fontSize: 17, color: DIM }}>Highlighted rows back up claims 1 and 2.</div>
-        </motion.div>
-      </div>
+          </div>
+        </FitBox>
+      </Fill>
     </L2Page>
   );
 }
+
 
 /* ---------------- 2.4, 2.4a, 2.4b · a question is not a job ---------------- */
 
