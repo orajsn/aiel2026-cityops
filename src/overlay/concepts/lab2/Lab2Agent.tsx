@@ -580,12 +580,6 @@ const MEMS = [
   { key: 'logbook', t: 'Bridge logbook', k: 'long-term · store', s: 'permanent, found by name or by meaning' },
 ] as const;
 
-const LIFE = [
-  { key: 'keep', t: 'What to keep', s: 'decide what is worth writing down' },
-  { key: 'forget', t: 'What to forget, and when', s: 'stale facts must expire' },
-  { key: 'read', t: 'Reading memory', s: '= retrieval: find the right note' },
-] as const;
-
 /** step 1's two memories side by side on the database shelf; on step 2 the whole scene steps back to make room */
 function MemoryShelf({ compact }: { compact: boolean }) {
   return (
@@ -658,62 +652,70 @@ function Logbook() {
   );
 }
 
-/** step 2 · the life of one note: written, ageing, found again */
-function LifeArt({ k }: { k: (typeof LIFE)[number]['key'] }) {
-  return (
-    <svg data-life-art={k} width="150" height="125" viewBox="0 0 120 100" aria-hidden style={{ flex: 'none' }}>
-      {k === 'keep' && (
-        <g>
-          <rect x="14" y="14" width="66" height="78" rx="6" fill="var(--panel-strong)" stroke={G_DARK} strokeWidth="2.5" />
-          <motion.path d="M26 36h42M26 52h42M26 68h26" stroke={TEAL} strokeWidth="4" strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.8, duration: 0.8 }} />
-          <path d="M104 10l8 8-38 38-12 4 4-12z" fill={TEAL} />
-        </g>
-      )}
-      {k === 'forget' && (
-        <g>
-          <rect x="10" y="18" width="62" height="70" rx="6" fill="var(--panel-strong)" stroke={G_DARK} strokeWidth="2.5" />
-          <rect x="10" y="18" width="62" height="18" rx="6" fill={G_DARK} />
-          <path d="M22 50h38M22 64h38M22 78h22" stroke={G_MID} strokeWidth="4" strokeLinecap="round" />
-          <motion.path d="M78 22h30l-15 22 15 22H78l15-22z" fill="none" stroke={TEAL} strokeWidth="3.5" strokeLinejoin="round" initial={{ rotate: 0 }} animate={{ rotate: 180 }} transition={{ delay: 1.8, duration: 1.2, ease: EASE }} style={{ transformOrigin: '93px 44px' }} />
-        </g>
-      )}
-      {k === 'read' && (
-        <g>
-          {[0, 1, 2].map((i) => (
-            <rect key={i} x={10 + i * 8} y={22 + i * 10} width="56" height="60" rx="6" fill={i === 2 ? TINT2 : 'var(--panel-strong)'} stroke={i === 2 ? TEAL : G_MID} strokeWidth="2.5" />
-          ))}
-          <circle cx="86" cy="44" r="18" fill="none" stroke={TEAL} strokeWidth="5" />
-          <path d="M99 57l14 14" stroke={TEAL} strokeWidth="7" strokeLinecap="round" />
-        </g>
-      )}
-    </svg>
+/** 2.7b · the life of one note, as one picture: written into the logbook, gone stale, found again */
+function NoteLife() {
+  const F = 'Inter, sans-serif';
+  const zone = (i: number) => ({ initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.4 + i * 0.9, duration: 0.6, ease: EASE } });
+  const title = (x: number, n: number, t: string, s: string, teal = false) => (
+    <g>
+      <circle cx={x - 150} cy={352} r={20} fill="#1b8a9c" />
+      <text x={x - 150} y={360} textAnchor="middle" fontSize={22} fontWeight={700} fill="#fff" fontFamily={F}>{n}</text>
+      <text x={x - 118} y={361} fontSize={29} fontWeight={700} fill="var(--ink)" fontFamily={F}>{t}</text>
+      <text x={x} y={400} textAnchor="middle" fontSize={24} fontWeight={teal ? 700 : 400} fill={teal ? '#146f7f' : 'var(--ink-dim)'} fontFamily={F}>{s}</text>
+    </g>
   );
-}
-
-function Lifecycle() {
+  const card = (x: number, y: number, w: number, h: number, fill: string, stroke: string) => <rect x={x} y={y} width={w} height={h} rx={8} fill={fill} stroke={stroke} strokeWidth={2.5} />;
   return (
-    <div data-lifecycle style={{ flex: '1 0 auto', display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 18 }}>
-      <motion.div {...fade(0.3)} style={{ fontSize: 24, color: INK, lineHeight: 1.4 }}>
-        A real logbook gets <b>tidied</b>: decide what goes in, cross out what is no longer true, know where to look.
-      </motion.div>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 90px minmax(0, 1fr) 90px minmax(0, 1fr)', alignItems: 'start' }}>
-        {LIFE.map((l, i) => [
-          i > 0 ? (
-            <div key={`a${i}`} style={{ height: 130, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Arrow w={80} delay={0.4 + i * 0.8} />
-            </div>
-          ) : null,
-          <motion.div key={l.key} data-life={i + 1} {...fadeUp(0.6 + i * 0.8)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 8 }}>
-            <div style={{ height: 130, display: 'flex', alignItems: 'center', gap: 12 }}>
-              <Num n={i + 1} size={42} />
-              <LifeArt k={l.key} />
-            </div>
-            <div style={{ fontSize: 27, fontWeight: 700, color: INK }}>{l.t}</div>
-            <div style={{ fontSize: 23, color: i === 1 ? TEAL_D : DIM, fontWeight: i === 1 ? 600 : 400 }}>{l.s}</div>
-          </motion.div>,
-        ])}
-      </div>
-    </div>
+    <FitBox w={1400} h={470} max={1.15}>
+      <svg data-note-life width={1400} height={470} viewBox="0 0 1400 470" style={{ overflow: 'visible' }}>
+        {[0, 480, 960].map((x, i) => (
+          <motion.rect key={x} x={x} y={0} width={440} height={470} rx={20} fill="rgba(127,127,127,0.08)" {...fade(0.2 + i * 0.9)} />
+        ))}
+        <g transform="translate(0 22)">
+        {/* the road the note travels */}
+        <motion.path d="M410 170H510M890 170H990" stroke="#1b8a9c" strokeWidth={3} strokeDasharray="7 7" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 1, duration: 1.6 }} />
+        <path d="M498 160l12 10-12 10M978 160l12 10-12 10" stroke="#1b8a9c" strokeWidth={3} fill="none" />
+        {/* 1 · keep: the logbook open, the note written onto its page */}
+        <motion.g data-life={1} {...zone(0)}>
+          <path d="M40 60l160-14v250l-160 14z" fill="var(--panel-strong)" stroke="#5c6b78" strokeWidth={2.5} />
+          <path d="M360 60l-160-14v250l160 14z" fill="var(--panel-strong)" stroke="#5c6b78" strokeWidth={2.5} />
+          <path d="M200 46v250" stroke="#5c6b78" strokeWidth={3} />
+          {[96, 126, 156].map((y) => <path key={y} d={`M64 ${y}l116-10`} stroke="#aab1ba" strokeWidth={4} strokeLinecap="round" />)}
+          {card(222, 90, 120, 140, 'rgba(27,138,156,0.14)', '#1b8a9c')}
+          <motion.path d="M238 120h88M238 146h88M238 172h60M238 198h76" stroke="#1b8a9c" strokeWidth={5} strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 1, duration: 1.2 }} />
+          <path d="M336 214l46-60 10 8-46 60-14 6z" fill="#146f7f" />
+          {title(200, 1, 'What to keep', 'decide what is worth writing down')}
+        </motion.g>
+        {/* 2 · forget: the calendar moves on, an old note goes grey and is crossed out */}
+        <motion.g data-life={2} {...zone(1)}>
+          {card(560, 50, 180, 200, 'var(--panel-strong)', '#5c6b78')}
+          <rect x={560} y={50} width={180} height={46} rx={8} fill="#5c6b78" />
+          {[0, 1, 2, 3].map((r) => [0, 1, 2, 3].map((c) => <rect key={`${r}${c}`} x={578 + c * 40} y={112 + r * 32} width={26} height={20} rx={3} fill={r * 4 + c < 13 ? '#aab1ba' : 'rgba(27,138,156,0.5)'} />))}
+          <g transform="rotate(-6 820 190)">
+            {card(760, 110, 120, 140, 'rgba(127,127,127,0.12)', '#8a919c')}
+            {[140, 166, 192, 218].map((y) => <path key={y} d={`M776 ${y}h86`} stroke="#aab1ba" strokeWidth={5} strokeLinecap="round" />)}
+            <motion.path d="M772 124L870 238" stroke="#5c6b78" strokeWidth={6} strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 2.3, duration: 0.6 }} />
+          </g>
+          <motion.g initial={{ rotate: 0 }} animate={{ rotate: 180 }} transition={{ delay: 2, duration: 1.2, ease: EASE }} style={{ transformOrigin: '830px 72px' }}>
+            <path d="M808 44h44l-22 28 22 28h-44l22-28z" fill="none" stroke="#1b8a9c" strokeWidth={4} strokeLinejoin="round" />
+          </motion.g>
+          {title(700, 2, 'What to forget, and when', 'stale facts must expire', true)}
+        </motion.g>
+        {/* 3 · read: a stack of notes, the magnifier finds the right one */}
+        <motion.g data-life={3} {...zone(2)}>
+          {[0, 1, 2, 3].map((i) => (
+            <g key={i}>{card(1040 + i * 26, 50 + i * 26, 150, 170, i === 2 ? 'rgba(27,138,156,0.18)' : 'var(--panel-strong)', i === 2 ? '#1b8a9c' : '#8a919c')}</g>
+          ))}
+          {[150, 176, 202].map((y) => <path key={y} d={`M1136 ${y}h100`} stroke="#aab1ba" strokeWidth={5} strokeLinecap="round" />)}
+          <motion.g initial={{ x: 60, y: 40, opacity: 0 }} animate={{ x: 0, y: 0, opacity: 1 }} transition={{ delay: 3, duration: 0.9, ease: EASE }}>
+            <circle cx={1150} cy={150} r={46} fill="rgba(255,255,255,0.35)" stroke="#146f7f" strokeWidth={9} />
+            <path d="M1184 184l40 40" stroke="#146f7f" strokeWidth={14} strokeLinecap="round" />
+          </motion.g>
+          {title(1200, 3, 'Reading memory', '= retrieval: find the right note')}
+        </motion.g>
+        </g>
+      </svg>
+    </FitBox>
   );
 }
 
@@ -721,30 +723,40 @@ export function TwoMemories(p: L2Props) {
   const step = p.step ?? 1;
   return (
     <L2Page testId="l2-memories" {...p}>
-      <Fill>
-        <MemoryShelf compact={step >= 2} />
-        <AnimatePresence>{step >= 2 && <Lifecycle key="life" />}</AnimatePresence>
-        {step < 2 && (
-          <div data-inside style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 40, paddingTop: 16 }}>
-            {[
-              { t: 'Inside the notebook', s: 'the steps of this conversation, per thread', rows: ['checkpoints', 'checkpoint_blobs', 'checkpoint_writes'] },
-              { t: 'Inside the logbook', s: 'the notes, and their index for search by meaning', rows: ['store_incident', 'store_vectors_incident'] },
-            ].map((c, i) => (
-              <motion.div key={c.t} {...fadeUp(2.2 + i * 0.5)} style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '14px 20px', borderRadius: 14, background: SOFT, borderTop: `4px solid ${TEAL}` }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>{c.t}</span>
-                  <span style={{ fontSize: 22, color: DIM }}>{c.s}</span>
-                </div>
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  {c.rows.map((r) => (
-                    <Chip key={r} style={{ fontSize: 20, padding: '6px 12px' }}>{r}</Chip>
-                  ))}
-                </div>
+      <AnimatePresence mode="wait">
+        <motion.div key={step >= 2 ? 'life' : 'shelf'} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease: EASE }} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+          {step >= 2 ? (
+            <Fill gap={10}>
+              <motion.div data-lifecycle {...fade(0.1)} style={{ fontSize: 24, color: INK, lineHeight: 1.4 }}>
+                A real logbook gets <b>tidied</b>: decide what goes in, cross out what is no longer true, know where to look.
               </motion.div>
-            ))}
-          </div>
-        )}
-      </Fill>
+              <NoteLife />
+            </Fill>
+          ) : (
+            <Fill>
+              <MemoryShelf compact={false} />
+              <div data-inside style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 40, paddingTop: 16 }}>
+                {[
+                  { t: 'Inside the notebook', s: 'the steps of this conversation, per thread', rows: ['checkpoints', 'checkpoint_blobs', 'checkpoint_writes'] },
+                  { t: 'Inside the logbook', s: 'the notes, and their index for search by meaning', rows: ['store_incident', 'store_vectors_incident'] },
+                ].map((c, i) => (
+                  <motion.div key={c.t} {...fadeUp(2.2 + i * 0.5)} style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '14px 20px', borderRadius: 14, background: SOFT, borderTop: `4px solid ${TEAL}` }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>{c.t}</span>
+                      <span style={{ fontSize: 22, color: DIM }}>{c.s}</span>
+                    </div>
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
+                      {c.rows.map((r) => (
+                        <Chip key={r} style={{ fontSize: 20, padding: '6px 12px' }}>{r}</Chip>
+                      ))}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </Fill>
+          )}
+        </motion.div>
+      </AnimatePresence>
     </L2Page>
   );
 }
