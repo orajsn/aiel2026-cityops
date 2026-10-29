@@ -2,10 +2,11 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { EASE } from '../WidePanel';
 import { Fill, FitBox } from '../Fill';
+import { AgentAvatar } from './AgentAvatar';
 import { Cog, G_DARK, G_LIGHT, G_MID, KitGlyph, PlugHead, T_SOFT } from './agentArt';
 import { LineIcon, type IconName } from '../icons';
 import {
-  Arrow, ArrowDown, CARD, ChiefInspector, Chip, Db, DIM, INK, L2Page, Net, Num, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
+  Arrow, ArrowDown, CARD, Chip, Db, DIM, INK, L2Page, Net, Num, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
   cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props,
 } from './parts';
 
@@ -73,7 +74,7 @@ function HandsPicture() {
         Like an inspector who says <i>“hand me the crack gauge”</i>: the AI agent names the instrument, <b>the framework picks it up and uses it</b>.
       </motion.div>
       <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'auto 46px auto 46px auto 46px auto', justifyContent: 'space-between', alignItems: 'center', columnGap: 0 }}>
-        <Station delay={0.3} art={<ChiefInspector size={200} />} t="AI Agent" s="asks for a call" />
+        <Station delay={0.3} art={<AgentAvatar size={200} />} t="AI Agent" s="asks for a call" />
         <Arrow w={42} delay={0.8} />
         <motion.div data-slip {...fadeUp(0.9)} style={{ justifySelf: 'center', transform: 'rotate(-1.5deg)', padding: '16px 16px', borderRadius: 10, background: CARD, boxShadow: '0 4px 14px rgba(0,0,0,0.14)', border: '1px solid var(--line)', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ ...cap, fontSize: 15 }}>the request</div>
@@ -108,98 +109,124 @@ function HandsPicture() {
   );
 }
 
-/** step 2 · the procedure: the manual's contents are always in the truck; a chapter opens when the job needs it */
+/** step 2 · the procedure: the cover (name + when to use it) is always in context; the pages come out when needed */
+const SKILL_PAGES = [
+  { t: 'The steps, in order', s: 'recall first · pull the incident brief · more tools only if needed · remember (mandatory) · answer as JSON' },
+  { t: 'The evidence bar', s: 'no speculative tool calls: only when the brief is missing something the agent actually needs' },
+  { t: 'When to escalate', s: 'crack width > 1.0 mm · section loss > 25% · bearing displacement > 15 mm' },
+];
+
 function ProcedurePicture() {
-  const chapter = ['the steps, in order', 'the thresholds', 'scripts', 'references'];
   return (
     <Fill gap={16}>
       <motion.div {...fade(0.1)} style={caption}>
-        Like the inspection manual in the truck: its <b>table of contents is always there</b>; the inspector opens the chapter <b>when the job needs it</b>.
+        Like the inspection manual in the truck: its <b>cover is always there</b>; the inspector opens the pages <b>when the job needs them</b>.
       </motion.div>
-      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 0.8fr) 150px minmax(0, 1.2fr)', alignItems: 'stretch', columnGap: 10 }}>
+      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 0.85fr) 140px minmax(0, 1.25fr)', alignItems: 'stretch', columnGap: 8 }}>
         <motion.div data-closed {...fadeUp(0.3)} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={capTeal}>Always in the context window</div>
           <div style={{ flex: 1, display: 'flex', borderRadius: '6px 14px 14px 6px', overflow: 'hidden', boxShadow: '0 6px 18px rgba(0,0,0,0.16)' }}>
             <div style={{ width: 34, background: TEAL }} />
-            <div style={{ flex: 1, background: TINT2, padding: '22px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12 }}>
+            <div style={{ flex: 1, background: TINT2, padding: '22px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
               <div style={{ fontSize: 30, fontWeight: 700, color: INK, lineHeight: 1.2 }}>Incident triage SOP</div>
-              <div style={body}>its name and <b>when to use it</b>: one short description</div>
+              <div style={body}>
+                <b>When to use it:</b> responding to infrastructure incident reports for the city operations team
+              </div>
               <Chip style={{ alignSelf: 'flex-start', fontSize: 20 }}>INCIDENT_TRIAGE_SKILL</Chip>
             </div>
           </div>
         </motion.div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <Arrow w={100} delay={1.1} />
+          <Arrow w={96} delay={1.1} />
           <motion.div {...fade(1.2)} style={{ fontSize: 22, color: TEAL_D, fontWeight: 600, textAlign: 'center' }}>the job needs it</motion.div>
         </div>
-        <motion.div data-open {...fadeUp(1.4)} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={cap}>Loaded only when needed</div>
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', borderRadius: 10, background: CARD, boxShadow: '0 6px 18px rgba(0,0,0,0.16)', border: '1px solid var(--line)' }}>
-            {[0, 1].map((side) => (
-              <div key={side} style={{ padding: '20px 24px', borderLeft: side ? '2px solid var(--line)' : 'none', display: 'flex', flexDirection: 'column', justifyContent: 'space-around', gap: 10 }}>
-                {chapter.slice(side * 2, side * 2 + 2).map((c, i) => (
-                  <motion.div key={c} data-chapter={c} {...fadeUp(1.8 + (side * 2 + i) * 0.35)} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <div style={{ fontSize: 25, fontWeight: 700, color: INK }}>{c}</div>
-                    <div style={{ height: 6, borderRadius: 3, background: G_LIGHT, width: '90%' }} />
-                    <div style={{ height: 6, borderRadius: 3, background: G_LIGHT, width: '70%' }} />
-                  </motion.div>
-                ))}
-              </div>
+        <div data-open style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <motion.div {...fade(1.3)} style={cap}>Loaded only when needed</motion.div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {SKILL_PAGES.map((pg, i) => (
+              <motion.div key={pg.t} data-chapter={pg.t} initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.6 + i * 0.5, duration: 0.55, ease: EASE }} style={{ flex: 1, borderRadius: 8, background: CARD, boxShadow: '0 4px 12px rgba(0,0,0,0.14)', borderLeft: `6px solid ${TEAL}`, padding: '12px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4 }}>
+                <div style={{ fontSize: 25, fontWeight: 700, color: INK }}>{pg.t}</div>
+                <div style={{ fontSize: 22, color: DIM, lineHeight: 1.35 }}>{pg.s}</div>
+              </motion.div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
       <motion.div {...fade(3.4)} style={{ ...body, padding: '12px 20px', borderRadius: 12, background: TINT }}>
-        Small skills keep the context free for real data: the description is enough to pick the skill, <b>the body arrives only when the task matches</b>.
+        The cover is enough to pick the skill; <b>the pages arrive only when the task matches</b>.
       </motion.div>
     </Fill>
   );
 }
 
-/** step 3 · the standard plug: one socket shape; sources plug in once, any agent can use them */
+/** a USB-C plug seen from the side: cable, the moulded body, the rounded metal tip; `dir` 1 points right */
+function UsbC({ x, y, dir = 1 }: { x: number; y: number; dir?: 1 | -1 }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${dir} 1)`}>
+      <rect x={-52} y={-17} width={46} height={34} rx={9} fill="#1b8a9c" />
+      <rect x={-8} y={-11} width={26} height={22} rx={11} fill="#c7ced6" stroke="#8a919c" strokeWidth={1.5} />
+    </g>
+  );
+}
+
+/** step 3 · the standard plug: MCP as a USB-C hub; every source and every agent uses the same plug shape */
 function PlugPicture() {
   const agents = ['Agent A', 'Agent B'];
   const sources = ['Database', 'Files', 'Tickets'];
   const ay = (i: number) => 170 + i * 150;
-  const sy = (i: number) => 140 + i * 120;
+  const sy = (i: number) => 120 + i * 120;
+  const HUB_L = 420;
+  const HUB_R = 640;
   return (
-    <Fill gap={14}>
+    <Fill gap={12}>
       <motion.div {...fade(0.1)} style={caption}>
-        Like one plug shape for every socket: <b>connect a source once</b>, and any agent can use it.
+        Like a <b>USB-C hub</b>: one plug shape for everything. Plug a source in once, and any agent on the hub can use it.
       </motion.div>
-      <FitBox w={1060} h={450} max={1.1}>
-        <svg data-plug-picture width={1060} height={450} viewBox="0 0 1060 450" style={{ overflow: 'visible' }}>
-          {/* the strip: the one standard socket */}
+      <FitBox w={1060} h={440} max={1.1}>
+        <svg data-plug-picture data-usb-hub width={1060} height={440} viewBox="0 0 1060 440" style={{ overflow: 'visible' }}>
+          {/* the hub, with a USB-C port for each plug */}
           <motion.g {...fade(0.3)}>
-            <rect x="420" y="40" width="210" height="400" rx="20" fill={T_SOFT} stroke="#146f7f" strokeWidth="3" />
-            <rect x="420" y="40" width="210" height="70" rx="20" fill="#146f7f" />
-            <text x="525" y="88" textAnchor="middle" fontSize="36" fontWeight="700" fill="#fff" fontFamily="Inter, sans-serif">MCP</text>
-            <text x="525" y="426" textAnchor="middle" fontSize="22" fill="#146f7f" fontFamily="Inter, sans-serif">one standard plug</text>
-            {[...agents.map((_, i) => ({ x: 432, y: ay(i) })), ...sources.map((_, i) => ({ x: 610, y: sy(i) }))].map((s, i) => (
-              <rect key={i} x={s.x} y={s.y - 16} width="18" height="32" rx="4" fill="#5c6b78" />
+            <rect x={HUB_L} y={40} width={HUB_R - HUB_L} height={380} rx={34} fill="#3d4651" />
+            <rect x={HUB_L + 14} y={54} width={HUB_R - HUB_L - 28} height={70} rx={20} fill="#146f7f" />
+            <text x={530} y={101} textAnchor="middle" fontSize={36} fontWeight={700} fill="#fff" fontFamily="Inter, sans-serif">MCP</text>
+            {/* the one port shape, seen end-on: USB-C */}
+            <rect x={470} y={190} width={120} height={50} rx={25} fill="#11161c" stroke="#c7ced6" strokeWidth={4} />
+            <rect x={492} y={209} width={76} height={12} rx={6} fill="#5c6b78" />
+            <text x={530} y={282} textAnchor="middle" fontSize={24} fontWeight={700} fill="#e6e9ef" fontFamily="Inter, sans-serif">USB-C</text>
+            <text x={530} y={312} textAnchor="middle" fontSize={20} fill="#c7ced6" fontFamily="Inter, sans-serif">one plug shape</text>
+            <text x={530} y={400} textAnchor="middle" fontSize={22} fill="#c7ced6" fontFamily="Inter, sans-serif">the hub</text>
+            {[...agents.map((_, i) => ({ x: HUB_L - 4, y: ay(i) })), ...sources.map((_, i) => ({ x: HUB_R - 10, y: sy(i) + 40 }))].map((s, i) => (
+              <g key={i}>
+                <rect x={s.x} y={s.y - 14} width={14} height={28} rx={7} fill="#11161c" />
+                <rect x={s.x + 5} y={s.y - 7} width={4} height={14} rx={2} fill="#5c6b78" />
+              </g>
             ))}
           </motion.g>
-          {/* the sources, each plugged in once */}
+          {/* the sources plug in once */}
           {sources.map((s, i) => {
-            const y = sy(i);
+            const y = sy(i) + 40;
             return (
               <motion.g key={s} data-source={s} {...fade(0.9 + i * 0.35)}>
-                <motion.path d={`M668 ${y} C720 ${y} 740 ${y} 800 ${y}`} stroke="#5c6b78" strokeWidth="5" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 1 + i * 0.35, duration: 0.6 }} />
-                <PlugHead x={642} y={y} dir={-1} />
-                <rect x="800" y={y - 44} width="230" height="88" rx="14" fill="var(--panel-strong)" stroke="#aab1ba" strokeWidth="2" />
-                <text x="915" y={y + 10} textAnchor="middle" fontSize="28" fontWeight="700" fill="var(--ink)" fontFamily="Inter, sans-serif">{s}</text>
+                <rect x={830} y={y - 44} width={210} height={88} rx={14} fill="var(--panel-strong)" stroke="#aab1ba" strokeWidth={2} />
+                <text x={935} y={y + 10} textAnchor="middle" fontSize={28} fontWeight={700} fill="var(--ink)" fontFamily="Inter, sans-serif">{s}</text>
+                <motion.g initial={{ x: 50 }} animate={{ x: 0 }} transition={{ delay: 1 + i * 0.35, duration: 0.7, ease: EASE }}>
+                  <path d={`M830 ${y}H696`} stroke="#5c6b78" strokeWidth={8} strokeLinecap="round" />
+                  <UsbC x={HUB_R + 6} y={y} dir={-1} />
+                </motion.g>
               </motion.g>
             );
           })}
-          {/* the agents, each plugged in once */}
+          {/* the agents plug in with the same shape */}
           {agents.map((a, i) => {
             const y = ay(i);
             return (
               <motion.g key={a} data-agent={a} {...fade(2.2 + i * 0.4)}>
-                <rect x="20" y={y - 50} width="230" height="100" rx="14" fill="rgba(27, 138, 156, 0.10)" stroke="#1b8a9c" strokeWidth="2.5" />
-                <text x="135" y={y + 10} textAnchor="middle" fontSize="28" fontWeight="700" fill="var(--ink)" fontFamily="Inter, sans-serif">{a}</text>
-                <motion.path d={`M250 ${y} C320 ${y} 340 ${y} 404 ${y}`} stroke="#5c6b78" strokeWidth="5" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 2.3 + i * 0.4, duration: 0.6 }} />
-                <PlugHead x={418} y={y} dir={1} />
+                <rect x={20} y={y - 50} width={220} height={100} rx={14} fill="rgba(27, 138, 156, 0.10)" stroke="#1b8a9c" strokeWidth={2.5} />
+                <text x={130} y={y + 10} textAnchor="middle" fontSize={28} fontWeight={700} fill="var(--ink)" fontFamily="Inter, sans-serif">{a}</text>
+                <motion.g initial={{ x: -50 }} animate={{ x: 0 }} transition={{ delay: 2.3 + i * 0.4, duration: 0.7, ease: EASE }}>
+                  <path d={`M240 ${y}H364`} stroke="#5c6b78" strokeWidth={8} strokeLinecap="round" />
+                  <UsbC x={HUB_L - 6} y={y} dir={1} />
+                </motion.g>
               </motion.g>
             );
           })}
@@ -530,7 +557,7 @@ function MemoryShelf({ compact }: { compact: boolean }) {
           );
         })}
         <motion.div {...fadeUp(0.2)} style={{ gridColumn: 2, gridRow: 1, alignSelf: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <ChiefInspector size={compact ? 90 : 170} />
+          <AgentAvatar size={compact ? 90 : 170} />
           {!compact && <div style={{ fontSize: 22, color: DIM, textAlign: 'center' }}>writes in both</div>}
         </motion.div>
       </div>
@@ -833,7 +860,7 @@ export function StoreSaver(p: L2Props) {
             {/* the agent and the one connection */}
             <motion.g {...fade(0.2)}>
               <g transform="translate(30 170)">
-                <ChiefInspector size={180} />
+                <AgentAvatar size={180} />
               </g>
               <text x={120} y={385} textAnchor="middle" fontSize={28} fontWeight={700} fill="var(--ink)" fontFamily={SVG_FONT}>AI Agent</text>
             </motion.g>
@@ -945,7 +972,7 @@ export function Allowlist(p: L2Props) {
           {/* the language model learns only what is in the box */}
           <motion.div data-step={3} data-on={on(3)} {...enterAt(2.8, on(3))} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }}>
             <Num n={3} size={38} on={on(3)} />
-            <ChiefInspector size={180} />
+            <AgentAvatar size={180} />
             <Chip style={{ fontSize: 20 }}>bind_tools(AGENT_TOOLS)</Chip>
             <div style={{ fontSize: 24, fontWeight: 700, color: INK, lineHeight: 1.3 }}>The model learns only these</div>
             <div style={{ fontSize: 22, color: DIM, lineHeight: 1.35 }}>8 names, their types and their docstrings</div>
@@ -1040,7 +1067,7 @@ export function ThreeLayers(p: L2Props) {
           </div>
           {/* one brief, handed to the agent */}
           <motion.div {...fadeUp(2.9)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, textAlign: 'center' }}>
-            <ChiefInspector size={170} />
+            <AgentAvatar size={170} />
             <div style={{ fontSize: 26, fontWeight: 700, color: INK }}>One brief</div>
             <div style={{ padding: '12px 20px', borderRadius: 12, background: 'rgba(31,42,51,0.92)', ...mono(21, '#fff'), fontWeight: 700 }}>AGENT_SYSTEM</div>
             <div style={{ ...mono(21) }}>2,533 chars</div>
