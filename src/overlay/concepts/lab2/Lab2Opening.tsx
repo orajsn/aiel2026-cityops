@@ -6,6 +6,7 @@ import {
   Arrow, CARD, ChiefInspector, Chip, CrackPlate, Db, DIM, Folder, INK, L2Page, Net, Num, Portrait, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
   cap, capTeal, card, fade, fadeUp, mono, useFocusN, type L2Props,
 } from './parts';
+import { RouteMap } from './RouteMap';
 
 /**
  * Lab 2 · the opening chapters of the Harbor Bridge deck: Story (one crack), Why (AI needs your data), and Setup
@@ -47,7 +48,6 @@ export const ROUTE: { n: number; ch: string; name: string; kinds: ('idea' | 'not
   { n: 11, ch: 'Wrap', name: 'Wrap-up', kinds: ['idea', 'notebook'] },
 ];
 
-const ROUTE_ICON: IconName[] = ['inspect', 'database', 'gear', 'lookup', 'steps', 'branch', 'wrench', 'converge', 'loop', 'lock', 'clipboard'];
 
 function CrackFacts({ compact = false }: { compact?: boolean }) {
   return (
@@ -123,32 +123,8 @@ export function CrackStory(p: L2Props) {
             )}
           </div>
         ) : (
-          <div data-route style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gridTemplateRows: '1fr 1fr', gap: 14, minHeight: 0 }}>
-            {ROUTE.map((r, i) => (
-              <motion.div key={r.n} data-stop={r.ch} {...fadeUp(0.15 + i * 0.12)} style={{ ...card(r.n <= 2), background: r.n <= 2 ? TINT : SOFT, padding: '16px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Num n={r.n} size={36} />
-                  <span style={{ fontSize: 19, fontWeight: 700, color: TEAL_D }}>{r.ch}</span>
-                </div>
-                <div style={{ fontSize: 23, fontWeight: 600, color: INK, lineHeight: 1.25 }}>{r.name}</div>
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <LineIcon name={ROUTE_ICON[r.n - 1]} size={64} color={r.n <= 2 ? TEAL : '#8a97a3'} />
-                </div>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {r.kinds.map((k) => (
-                    <span key={k} style={{ padding: '3px 10px', borderRadius: 999, fontSize: 15, fontWeight: 700, background: k === 'idea' ? TINT2 : 'rgba(31,42,51,0.88)', color: k === 'idea' ? TEAL_D : '#fff' }}>{k}</span>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-            <motion.div {...fade(1.6)} style={{ gridColumn: 6, gridRow: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10, padding: 16, fontSize: 19, color: DIM, lineHeight: 1.4 }}>
-              <span>
-                <b style={{ color: TEAL_D }}>idea</b> first,
-              </span>
-              <span>
-                then the <b style={{ color: INK }}>notebook</b> section that shows it
-              </span>
-            </motion.div>
+          <div data-route style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <RouteMap stops={ROUTE} />
           </div>
         )}
       </Swap>
