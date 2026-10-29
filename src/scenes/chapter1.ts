@@ -1,5 +1,6 @@
 import type { SceneDef } from '../engine/types';
 import type { BeatProps } from '../overlay/concepts/Beat';
+import type { RecapProps } from '../overlay/concepts/Recap';
 
 /**
  * Chapter 1 · RAG to Agents (Lab 2, rag_to_agents_lab.ipynb). Rough pass: one scene per Storyboard row,
@@ -79,21 +80,26 @@ const b18 = beat(1, '2.8', 'A sticky note', 'sky', {
   message: 'A memory, but **a thin one**.',
 }, { pins: 'all', highlight: ['City Operations Control Center'], sky: 'note' });
 
-const b19 = beat(1, '2.9', 'Three questions', 'pier2', {
-  kicker: 'Closing Lab 2',
-  notebook: 'rag_to_agents_lab.ipynb · Section 6 close',
-  // three cards with their icons (owner, 26 Oct: more icons)
-  visual: {
-    kind: 'cards',
-    cols: 3,
-    items: [
-      { title: 'RAG', sub: 'What does the record say?', icon: 'lookup' },
-      { title: 'Workflow', sub: 'Triage predictably.', icon: 'steps' },
-      { title: 'Agent', sub: 'Reason and tell me what to do.', icon: 'branch' },
+// 2.9 · the Lab 2 recap (owner approved Flow29V3, 29 Oct): what we built, then NEXT, the rust (a drawing, not a photo)
+const b19: SceneDef = {
+  id: '2.9',
+  chapter: 1,
+  title: 'Lab 2 recap',
+  shot: 'pier2',
+  world: { bridge: true, markers: true },
+  overlay: 'Lab2Recap',
+  overlayProps: {
+    kicker: 'Lab 2 · What we built',
+    message: 'From a model that guesses to **an agent that decides**.',
+    notebook: 'rag_to_agents_lab.ipynb · Section 6 close',
+    points: [
+      { title: 'Ground the answer', text: 'Give the model the evidence (RAG) and it stops guessing.' },
+      { title: 'Tools and the skill', text: 'The AI agent chooses its tools; the skill keeps it honest.' },
+      { title: 'One query, four shapes', text: 'One SQL statement, one transaction, no copies to sync.' },
     ],
-  },
-  message: 'At three o’clock we give it **a real memory**.',
-}, { bridge: true, markers: true });
+    next: '**Lab 3 · Agent Memory:** the rust is still waiting. The AI agent learns to **remember**, so the next inspector knows what the last one found.',
+  } satisfies RecapProps as unknown as Record<string, unknown>,
+};
 
 export const chapter1: SceneDef[] = [
   b11,

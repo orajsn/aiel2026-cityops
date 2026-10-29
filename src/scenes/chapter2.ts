@@ -9,7 +9,9 @@ import type { DeskCabinetProps, ThreeKindsProps, SharedShelfProps } from '../ove
 import type { MemoryLoopProps } from '../overlay/concepts/MemoryLoop';
 import type { HandsOnProps, ScopeProps } from '../overlay/concepts/HandsOn';
 import type { CopilotTurnProps } from '../overlay/concepts/HandsOn2';
-import type { BothLabsProps, EndingProps, TakeawaysProps, WithWithoutProps } from '../overlay/concepts/Ending';
+import type { BothLabsProps, EndingProps, WithWithoutProps } from '../overlay/concepts/Ending';
+import type { RecapProps } from '../overlay/concepts/Recap';
+import type { AllLabsProps } from '../overlay/concepts/AllLabs';
 import type { Who } from '../world/Person';
 import { beat } from './chapter1';
 // bundled, not in public/: the dev server only serves public files it saw at start-up
@@ -234,23 +236,45 @@ const b216: SceneDef = {
   } satisfies BothLabsProps as unknown as Record<string, unknown>,
 };
 
+// 3.17 · the Lab 3 recap (owner approved Flow317V2, 29 Oct); the quiz moved to 3.18
 const b217: SceneDef = {
   id: '3.17',
   chapter: 2,
-  title: 'Takeaways',
+  title: 'Lab 3 recap',
   shot: 'bridge',
   world: { bridge: true, markers: 'pier2' },
-  overlay: 'Takeaways',
+  overlay: 'Lab3Recap',
   overlayProps: {
-    kicker: 'If you only remember three things',
-    message: 'Three things to **take home**.',
+    kicker: 'Lab 3 · What we built',
+    message: 'An agent that **remembers**, and hands over.',
     points: [
-      { title: 'Memory is the foundation, not a feature', text: 'An agent is only as good as what it can recall.', icon: 'foundation' },
-      { title: 'The context window is a curation problem', text: 'Memory, context and harness engineering solve it.', icon: 'glass' },
-      { title: 'One converged store beats four services', text: 'Vector, SQL, JSON and graph in one database.', icon: 'converge' },
+      { title: 'Memory is the foundation', text: 'Not a feature: the agent is only as good as what it can recall.' },
+      { title: 'Context is curation', text: 'The context window is a curation problem: fill it with what this question needs.' },
+      { title: 'One converged store', text: 'One converged store beats four services kept in sync.' },
     ],
+    next: '**All three labs on one page:** what we built today, from an assistant to an agent that remembers.',
+  } satisfies RecapProps as unknown as Record<string, unknown>,
+};
+
+// 3.18 · takeaways of all three labs, the last page of the show (owner approved Flow318V3, 29 Oct); the quiz is the one red thing
+const b218: SceneDef = {
+  id: '3.18',
+  chapter: 2,
+  title: 'Takeaways · all three labs',
+  shot: 'bridge',
+  world: { bridge: true },
+  overlay: 'AllLabs',
+  overlayProps: {
+    kicker: 'Takeaways · all three labs',
+    message: 'From an assistant, to an agent, to **an agent that remembers**.',
+    steps: [
+      { tag: 'Lab 1 · AI Economics', title: 'An assistant', line: 'the right data, the right model, guardrails', where: 'on the bridge: the repair plan' },
+      { tag: 'Lab 2 · RAG to Agents', title: 'An agent', line: 'decides what to look up across four shapes, says what to do', where: 'on the bridge: the crack' },
+      { tag: 'Lab 3 · Agent Memory', title: 'An agent that remembers', line: 'what Mercer learns on Day 1, Vance knows on Day 2', where: 'on the bridge: the rust' },
+    ],
+    foundation: 'One Oracle AI Database under all three',
     quiz: ['5 minutes', '80% to pass', 'a badge'],
-  } satisfies TakeawaysProps as unknown as Record<string, unknown>,
+  } satisfies AllLabsProps as unknown as Record<string, unknown>,
 };
 
 export const chapter2: SceneDef[] = [
@@ -288,4 +312,5 @@ export const chapter2: SceneDef[] = [
   b215c,
   b216,
   b217,
+  b218,
 ];

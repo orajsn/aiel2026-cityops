@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 import { DoorsAndHall, CopilotTurn, TURN_STEPS } from '../../src/overlay/concepts/HandsOn2';
-import { WithWithout, FailuresSolved, BothLabs, Takeaways } from '../../src/overlay/concepts/Ending';
+import { WithWithout, FailuresSolved, BothLabs, QuizCard } from '../../src/overlay/concepts/Ending';
 import { chapter2 } from '../../src/scenes/chapter2';
 
 test('page 21: Vance bounces off the private room and finds the shared hall', () => {
@@ -24,7 +24,7 @@ test('pages 26 to 29 render their parts', () => {
   expect(w.querySelectorAll('[data-row]')).toHaveLength(4);
   expect(render(<FailuresSolved kicker="k" message="m" />).container.querySelectorAll('[data-solved]')).toHaveLength(4);
   expect(render(<BothLabs rule={['r']} history={['h']} message="m" />).container.querySelectorAll('[data-lab]')).toHaveLength(2);
-  const t = render(<Takeaways kicker="k" message="m" points={[{ title: 'a', text: 'b' }]} quiz={['5 minutes']} />).container;
+  const t = render(<QuizCard quiz={['5 minutes']} />).container;
   expect(t.querySelector('[data-quiz]')).not.toBeNull();
 });
 

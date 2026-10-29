@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import type { CSSProperties } from 'react';
 import { Rich } from '../Rich';
 import { ChatWindow, type ChatItem } from './CopilotChat';
 import { EASE, WidePanel } from './WidePanel';
@@ -151,44 +152,19 @@ export function BothLabs({ rule, history, message }: BothLabsProps) {
   );
 }
 
-/* ---------- page 29 · Takeaways ---------- */
+/* ---------- the quiz (3.18, the last page of the show) ---------- */
 
-export interface TakeawaysProps extends EndingProps {
-  /** each with its icon in place of the number when it has one */
-  points: { title: string; text: string; icon?: IconName }[];
-  quiz: string[];
-}
-
-export function Takeaways({ kicker, message, notebook, points, quiz }: TakeawaysProps) {
+/** the quiz card: the page's one red thing; the QR code comes from the owner */
+export function QuizCard({ quiz, delay = 2.0, style }: { quiz: string[]; delay?: number; style?: CSSProperties }) {
   return (
-    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="takeaways">
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 28, marginTop: 10, alignItems: 'stretch' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {points.map((p, i) => (
-            <motion.div key={p.title} data-takeaway={i + 1} style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '18px 22px', borderRadius: 14, background: TEAL_TINT, border: '2px solid var(--teal)' }} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + i * 0.5, duration: 0.45, ease: EASE }}>
-              {p.icon ? (
-                <LineIcon name={p.icon} size={58} />
-              ) : (
-                <span style={{ flex: 'none', width: 54, height: 54, borderRadius: '50%', background: 'var(--teal)', color: '#ffffff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, fontWeight: 700 }}>{i + 1}</span>
-              )}
-              <span>
-                <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--ink)' }}>{p.title}</div>
-                <div style={{ fontSize: 21, color: 'var(--ink)', marginTop: 4 }}>{p.text}</div>
-              </span>
-            </motion.div>
-          ))}
+    <motion.div data-quiz style={{ padding: 22, borderRadius: 16, border: '3px solid var(--red)', background: 'rgba(199, 70, 52, 0.07)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, boxSizing: 'border-box', ...style }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.5, ease: EASE }}>
+      <div style={{ fontSize: 30, fontWeight: 800, color: 'var(--red)' }}>Quiz</div>
+      <div style={{ width: 180, height: 180, borderRadius: 10, border: '3px dashed var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, color: 'var(--red)', fontWeight: 600 }}>QR code</div>
+      {quiz.map((q) => (
+        <div key={q} style={{ fontSize: 21, color: 'var(--ink)', fontWeight: 600 }}>
+          {q}
         </div>
-        {/* the quiz is the one red thing; the QR code comes from the owner */}
-        <motion.div data-quiz style={{ padding: 22, borderRadius: 16, border: '3px solid var(--red)', background: 'rgba(199, 70, 52, 0.07)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.0, duration: 0.5, ease: EASE }}>
-          <div style={{ fontSize: 30, fontWeight: 800, color: 'var(--red)' }}>Quiz</div>
-          <div style={{ width: 180, height: 180, borderRadius: 10, border: '3px dashed var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, color: 'var(--red)', fontWeight: 600 }}>QR code</div>
-          {quiz.map((q) => (
-            <div key={q} style={{ fontSize: 21, color: 'var(--ink)', fontWeight: 600 }}>
-              {q}
-            </div>
-          ))}
-        </motion.div>
-      </div>
-    </WidePanel>
+      ))}
+    </motion.div>
   );
 }

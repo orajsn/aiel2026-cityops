@@ -28,7 +28,7 @@ export const SCRIPT: Record<string, string> = {
   '2.6': 'One tool runs one SQL statement with three parts: the row and its JSON, the graph edges, and the reports ranked by similarity. It comes back as **one brief** and goes straight into the model. **One call, four data models, one transaction.** No ETL, no sync jobs, no stale copies.',
   '2.7': 'Now the crack report arrives. The agent recalls, pulls the incident brief, writes down what it learned, and answers. **The agent chooses its tools. The procedure keeps it honest.**',
   '2.8': 'At the end it leaves a sticky note: **one row in the database**, keyed to Harbor Bridge, embedded on write. A memory, but **a thin one**.',
-  '2.9': 'Three questions, three patterns. **RAG**: what does the record say. **Workflow**: triage predictably. **Agent**: reason and tell me what to do. And **the rust** is still waiting on the bridge. At three o’clock we give it **a real memory**.',
+  '2.9': 'That is Lab 2: **ground the answer** in evidence, give the agent **tools and a skill**, and fetch all four shapes of data in **one query**. And **the rust** is still waiting on the bridge: in Lab 3 the AI agent learns to remember.',
 
   // Chapter 2 · Agent Memory
   '3.0': 'We are back at Harbor Bridge, because the problem has not gone away: the rust is still there. Two inspectors will look at it on different days. Mercer comes first, Vance comes next. What should Vance know before he starts?',
@@ -64,5 +64,6 @@ export const SCRIPT: Record<string, string> = {
   '3.15b': 'Remember the four failures from the glass? The summary keeps the window from filling up. Only Mercer’s finding comes in. The 25 percent is kept as a fact of its own. And it is fetched again when Vance asks. All four, solved.',
   '3.15c': 'And here is the full memory map. Short-term and long-term memory, the three kinds, and shared memory: most of it you built today with oracleagentmemory, in one database. Tools, workflows and caching are left to your agent framework.',
   '3.16': 'And here both labs meet. This afternoon’s rule says: section loss over 25 percent means an immediate structural review. Today’s history says Mercer measured about 25 percent. This afternoon the agent had the rule. Now it has the history. Together they make the call.',
-  '3.17': 'If you only remember three things: memory is the foundation, not a feature. The context window is a curation problem. And one converged store beats four services. Now scan the code for the quiz: five minutes, 80 percent to pass, and a badge.',
+  '3.17': 'That is Lab 3: memory is **the foundation**, not a feature; the context window is **a curation problem**; and **one converged store** beats four services. Before the quiz, let us look at the whole day.',
+  '3.18': 'Three labs, one bridge. In Lab 1 we built **an assistant**, in Lab 2 it became **an agent**, in Lab 3 it learned to **remember**. Under all three, **one Oracle AI Database**. Now scan the code for the quiz: five minutes, 80 percent to pass, and a badge.',
 };

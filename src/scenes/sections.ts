@@ -25,5 +25,6 @@ export const SECTIONS: Section[] = [
   { chapter: 2, name: 'How memory works', pages: ['3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.3a', '3.3b', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b', '3.6'] },
   { chapter: 2, name: 'Writing and finding memories', pages: ['3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b'] },
   { chapter: 2, name: 'Back on the bridge', pages: ['3.13', '3.14', '3.15', '3.15b', '3.15c', '3.16'] },
-  { chapter: 2, name: 'Takeaways', pages: ['3.17'] },
+  { chapter: 2, name: 'Closing Lab 3', pages: ['3.17'] },
+  { chapter: 2, name: 'Takeaways · all three labs', pages: ['3.18'] },
 ];

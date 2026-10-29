@@ -8,7 +8,7 @@ import { OVERLAYS } from '../../src/overlay/registry';
 
 // one story beat per Storyboard row (doc tab "Storyboard"), in order
 const CH1_BEATS = ['2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7', '2.8', '2.9'];
-const CH2_BEATS = ['3.0', '3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.3a', '3.3b', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b', '3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.14', '3.15', '3.15b', '3.15c', '3.16', '3.17'];
+const CH2_BEATS = ['3.0', '3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.3a', '3.3b', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b', '3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.14', '3.15', '3.15b', '3.15c', '3.16', '3.17', '3.18'];
 
 const beats = (ch: typeof chapter1) => ch.map((s) => s.id);
 
@@ -36,7 +36,7 @@ test('SCENES runs the parts in show order: Introduction, Lab 1 (when in the show
   const order = PARTS.map((c) => SCENES.filter((s) => s.chapter === c).map((s) => s.id)).flat();
   expect(SCENES.map((s) => s.id)).toEqual(order);
   // Introduction 7 (the city, then the bridge's four clicks); Lab 2 opens with the four data pages
-  expect(SCENES.length).toBe(7 + (WITH_LAB1 ? lab1.length : 0) + 4 + 9 + 34);
+  expect(SCENES.length).toBe(7 + (WITH_LAB1 ? lab1.length : 0) + 4 + 9 + 35);
 });
 
 test('no banned names anywhere in the copy', () => {

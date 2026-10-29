@@ -37,12 +37,24 @@ export const lab1: SceneDef[] = [
   atBridge('1.7', 'Does every question need the big model?', 'L1Baseline', { kicker: 'Hands-on 4 · First, the baseline', message: 'Today, **every request** goes to the multimodal model.' }),
   atBridge('1.8', 'Model routing', 'L1Routing', { kicker: 'Hands-on 4 · Model routing', message: 'Text goes to the **lower-cost model**. Photos stay on the multimodal one.' }),
   atBridge('1.9', 'Guardrails', 'L1Guardrails', { kicker: 'Hands-on 5 · Guardrails', message: 'Check every prompt **before** the model sees it.' }),
+  // 1.10 · the Lab 1 recap (owner approved Flow110V2, 29 Oct): what we built, then NEXT, the crack
+  atBridge('1.10', 'Lab 1 recap', 'L1Recap', {
+    kicker: 'Lab 1 · What we built',
+    message: 'An assistant that is **useful, affordable and safe**.',
+    points: [
+      { title: 'One assistant, with sources', text: 'Documents, database and site photos, answered with where each fact came from.' },
+      { title: 'The right model for each question', text: 'Lower-cost for text, multimodal for photos.' },
+      { title: 'Guardrails that fail closed', text: 'When in doubt it refuses; the engineer still approves.' },
+    ],
+    next: '**Lab 2 · RAG to Agents:** the crack. The assistant becomes an **agent**.',
+  }),
 ];
 
 export const LAB1_SECTIONS: Section[] = [
   { chapter: 3, name: 'The repair and its data', pages: ['1.0', '1.1', '1.2', '1.3', '1.3a'] },
   { chapter: 3, name: 'One assistant, step by step', pages: ['1.4', '1.5', '1.6a', '1.6'] },
   { chapter: 3, name: 'The right model, the right rules', pages: ['1.7', '1.8', '1.9'] },
+  { chapter: 3, name: 'Closing Lab 1', pages: ['1.10'] },
 ];
 
 /** what the presenter says on each Lab 1 page (the V2 drafts' captions, in English) */
@@ -59,4 +71,5 @@ export const LAB1_SCRIPT: Record<string, string> = {
   '1.7': 'Before we change anything, we record a baseline. Right now every request, text or photo, goes to the same multimodal model, and the runtime bar says so each time. Note the model and the rough response time. Then ask: do text questions need a model that can see?',
   '1.8': 'Hands-on 4. One check decides the model: does the request carry an image? Text-only goes to the lower-cost model, photos stay on the multimodal one, and the runtime bar shows which answered. Response time is not cost, so we compare models, not claim a saving.',
   '1.9': 'Hands-on 5. Before any prompt reaches the model, OCI ApplyGuardrails checks it for prompt injection. A normal question passes. The attack is blocked, and no supplier is approved. And if the check cannot run at all, the request stops: it fails closed.',
+  '1.10': 'That is Lab 1: one assistant over the documents, the database and the site photos, with its sources; the right model for each question; and guardrails that fail closed, with the engineer still approving. Next, Lab 2 takes the crack, and turns the assistant into an agent.',
 };

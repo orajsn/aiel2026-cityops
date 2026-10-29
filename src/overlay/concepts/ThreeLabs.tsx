@@ -28,7 +28,7 @@ const fromLeft = (delay: number) => ({ initial: { opacity: 0, x: -24 }, animate:
 const OPEN_AT = 0.4;
 
 /* ---------- small drawings, ported from the approved board (FlowCardsV4) ---------- */
-function Doc({ label, w = 74 }: { label: string; w?: number }) {
+export function Doc({ label, w = 74 }: { label: string; w?: number }) {
   return (
     <svg width={w} height={Math.round(w * 1.2)} viewBox="0 0 60 72" aria-hidden="true">
       <path d="M6 2h34l14 14v52a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" fill={PAPER} stroke={TEAL} strokeWidth={2.5} />
@@ -54,7 +54,7 @@ function Drawing({ w = 86 }: { w?: number }) {
   );
 }
 
-function Db({ w = 64, fill = TEAL_FILL }: { w?: number; fill?: string }) {
+export function Db({ w = 64, fill = TEAL_FILL }: { w?: number; fill?: string }) {
   return (
     <svg width={w} height={Math.round(w * 1.1)} viewBox="0 0 60 66" aria-hidden="true">
       <ellipse cx="30" cy="10" rx="25" ry="8" fill={fill} stroke={TEAL} strokeWidth={2.5} />
@@ -64,7 +64,7 @@ function Db({ w = 64, fill = TEAL_FILL }: { w?: number; fill?: string }) {
   );
 }
 
-function SitePhoto({ w = 86 }: { w?: number }) {
+export function SitePhoto({ w = 86 }: { w?: number }) {
   return (
     <svg width={w} height={Math.round(w * 0.78)} viewBox="0 0 90 70" aria-hidden="true">
       <rect x="2" y="2" width="86" height="66" rx="5" fill="#d9dee3" stroke={TEAL} strokeWidth={2.5} />
@@ -110,7 +110,7 @@ function Worker({ label }: { label: string }) {
   );
 }
 
-function Portrait({ who, size = 54 }: { who: 'mercer' | 'vance'; size?: number }) {
+export function Portrait({ who, size = 54 }: { who: 'mercer' | 'vance'; size?: number }) {
   return (
     <img
       data-portrait={who}
@@ -315,18 +315,18 @@ function Big1({ t }: { t: number }) {
 }
 
 /* ---------- Lab 2 · the crack ---------- */
-const TableIcon = () => (
+export const TableIcon = () => (
   <svg width={34} height={30} viewBox="0 0 34 30" aria-hidden="true">
     <rect x="1.5" y="1.5" width="31" height="27" rx="3" fill={PAPER} stroke={TEAL} strokeWidth={2.5} />
     <path d="M1.5 10h31M1.5 19h31M12 1.5v27" stroke={TEAL} strokeWidth={2} />
   </svg>
 );
-const JsonIcon = () => (
+export const JsonIcon = () => (
   <svg width={34} height={30} viewBox="0 0 34 30" aria-hidden="true">
     <text x="17" y="22" textAnchor="middle" fontFamily="JetBrains Mono, monospace" fontSize="18" fontWeight="700" fill={TEAL}>{'{ }'}</text>
   </svg>
 );
-const GraphIcon = () => (
+export const GraphIcon = () => (
   <svg width={34} height={30} viewBox="0 0 34 30" aria-hidden="true">
     <path d="M7 7L27 9M7 7L15 24M27 9L15 24" stroke={TEAL} strokeWidth={2} />
     <circle cx="7" cy="7" r="5" fill={TEAL} />
