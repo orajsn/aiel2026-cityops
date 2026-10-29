@@ -57,8 +57,8 @@ function KitRail({ step }: { step: number }) {
 /** a piece of the flow: a drawing, a bold name, a plain line under it */
 function Station({ art, t, s, delay }: { art: ReactNode; t: ReactNode; s: string; delay: number }) {
   return (
-    <motion.div {...fadeUp(delay)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, textAlign: 'center', minWidth: 0 }}>
-      <div style={{ height: 170, display: 'flex', alignItems: 'center' }}>{art}</div>
+    <motion.div {...fadeUp(delay)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, textAlign: 'center' }}>
+      <div style={{ height: 230, display: 'flex', alignItems: 'center' }}>{art}</div>
       <div style={{ ...big, whiteSpace: 'nowrap' }}>{t}</div>
       <div style={{ fontSize: 22, color: DIM, whiteSpace: 'nowrap' }}>{s}</div>
     </motion.div>
@@ -72,18 +72,18 @@ function HandsPicture() {
       <motion.div {...fade(0.1)} style={caption}>
         Like an inspector who says <i>“hand me the crack gauge”</i>: the AI agent names the instrument, <b>the framework picks it up and uses it</b>.
       </motion.div>
-      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'auto 64px auto 64px auto 64px auto', justifyContent: 'space-between', alignItems: 'center', columnGap: 6 }}>
-        <Station delay={0.3} art={<ChiefInspector size={160} />} t="AI Agent" s="asks for a call" />
-        <Arrow w={64} delay={0.8} />
-        <motion.div data-slip {...fadeUp(0.9)} style={{ justifySelf: 'center', transform: 'rotate(-1.5deg)', padding: '16px 20px', borderRadius: 10, background: CARD, boxShadow: '0 4px 14px rgba(0,0,0,0.14)', border: '1px solid var(--line)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'auto 46px auto 46px auto 46px auto', justifyContent: 'space-between', alignItems: 'center', columnGap: 0 }}>
+        <Station delay={0.3} art={<ChiefInspector size={200} />} t="AI Agent" s="asks for a call" />
+        <Arrow w={42} delay={0.8} />
+        <motion.div data-slip {...fadeUp(0.9)} style={{ justifySelf: 'center', transform: 'rotate(-1.5deg)', padding: '16px 16px', borderRadius: 10, background: CARD, boxShadow: '0 4px 14px rgba(0,0,0,0.14)', border: '1px solid var(--line)', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ ...cap, fontSize: 15 }}>the request</div>
           <div style={{ ...mono(22, INK), fontWeight: 700 }}>get_recent_incidents(</div>
           <div style={{ ...mono(22), paddingLeft: 26 }}>"Harbor Bridge")</div>
         </motion.div>
-        <Arrow w={64} delay={1.4} />
-        <Station delay={1.5} art={<Cog size={150} delay={1.9} />} t="the framework" s="runs it" />
-        <Arrow w={64} delay={2.1} />
-        <Station delay={2.2} art={<Db size={140} />} t="the database" s="rows come back" />
+        <Arrow w={42} delay={1.4} />
+        <Station delay={1.5} art={<Cog size={190} delay={1.9} />} t="the framework" s="runs it" />
+        <Arrow w={42} delay={2.1} />
+        <Station delay={2.2} art={<Db size={180} />} t="the database" s="rows come back" />
       </div>
       <motion.div data-return {...fade(2.8)} style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: 22, color: TEAL_D, fontWeight: 600 }}>
         <span style={{ fontSize: 30 }}>←</span>
@@ -98,7 +98,7 @@ function HandsPicture() {
           { t: 'Action execution', s: 'lab: remember only' },
           { t: 'Context injection', s: 'lab: the SOP' },
         ].map((k, i) => (
-          <motion.div key={k.t} {...fadeUp(3.3 + i * 0.3)} style={{ ...card(), padding: '12px 18px' }}>
+          <motion.div key={k.t} {...fade(3.3 + i * 0.3)} style={{ ...card(), padding: '12px 18px' }}>
             <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>{k.t}</div>
             <div style={{ ...mono(20) }}>{k.s}</div>
           </motion.div>
