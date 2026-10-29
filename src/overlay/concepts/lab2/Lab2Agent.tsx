@@ -236,25 +236,18 @@ export function OneQuery(p: L2Props) {
   );
 }
 
-/* ---------------- 2.6b · §4.2–4.4 one brief from one SQL statement ---------------- */
+/* ---------------- 2.6b, 2.6c, 2.7 · the pictures live in queryArt.tsx ---------------- */
+
+// imported here, beside the three pages that use it, so this file's shared import block stays as it is
+import { BriefBody } from './queryArt';
+
+/* ---------------- 2.6b · one brief from one SQL statement ---------------- */
 
 export function OneBrief(p: L2Props) {
   const focusN = useFocusN(p.focusId);
   return (
     <L2Page testId="l2-brief" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-        <StepRow
-          focusN={focusN}
-          steps={[
-            { title: 'Row + JSON specs', body: <><LineIcon name="profile" size={64} /><div style={{ ...mono(21, INK), fontWeight: 700 }}>Harbor Bridge</div><Chip style={{ alignSelf: 'flex-start' }}>criticality 5</Chip></> },
-            { title: 'Graph neighbours', body: <><LineIcon name="nodes" size={64} /><div style={{ fontSize: 24, fontWeight: 700 }}>5 connected assets</div><Chip style={{ alignSelf: 'flex-start' }}>SQL/PGQ</Chip></> },
-            { title: 'Vector evidence', body: <><LineIcon name="target" size={64} /><div style={{ fontSize: 24, fontWeight: 700 }}>5 evidence chunks</div><Chip style={{ alignSelf: 'flex-start' }}>VECTOR_DISTANCE</Chip></> },
-            { title: 'One JSON brief', grow: 1.3, body: <Quote style={{ fontSize: 20, flex: 1 }}>{'{ "asset": …,\n  "graph_context": […],\n  "ranked_evidence": […] }'}</Quote> },
-          ]}
-        />
-        <motion.div {...fadeUp(2.4)} style={{ alignSelf: 'center', padding: '8px 22px', borderRadius: 999, background: TEAL, color: '#fff', fontSize: 21, fontWeight: 700 }}>one statement · one transaction</motion.div>
-        <div style={{ fontSize: 15, color: DIM, textAlign: 'center' }}>Counts: saved output, cell 65</div>
-      </div>
+      <BriefBody focusN={focusN} />
     </L2Page>
   );
 }
