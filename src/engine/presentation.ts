@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { LAB_STOPS, stopCells } from '../content/labStops';
 import { guideSteps } from '../content/labGuide';
-import { handsOnFor } from '../content/lab1HandsOn';
+import { handsOnTaskCount } from '../content/lab1HandsOn';
 import { useSceneStore } from './store';
 
 /**
@@ -38,8 +38,8 @@ useSceneStore.subscribe((s, prev) => {
 /** how many steps a page's drawer has: its guide's sections and parts (labGuide.ts), else its cells to run, else its Lab 1 hands-on steps */
 export function stopStepCount(id: string): number {
   const stop = LAB_STOPS[id];
-  // Lab 1's Hands-on drawer (lab1HandsOn.ts): one step per numbered step in it
-  if (!stop) return handsOnFor(id)?.steps.length ?? 0;
+  // Lab 1's Hands-on drawer (lab1HandsOn.ts): opens on its overview, then one step per task on the chosen 3A / 3B path
+  if (!stop) return handsOnTaskCount(id);
   return guideSteps(id).length || stopCells(stop).filter((c) => c.run).length;
 }
 
