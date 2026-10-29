@@ -253,89 +253,140 @@ export function Toolkit(p: L2Props) {
   );
 }
 
-/* ---------------- 2.5c · §3.2 the inspector's instruments: tools ---------------- */
+/* ---------------- 2.5c · the inspector's instruments: tools ---------------- */
+
+/** the instrument itself: a closed grey case; through its window, the code inside that the model never reads */
+function InstrumentCase() {
+  return (
+    <svg data-art="instrument" viewBox="0 0 300 330" style={{ width: '100%', height: '100%' }} aria-hidden>
+      <ellipse cx="150" cy="320" rx="130" ry="8" fill="rgba(127,127,127,0.2)" />
+      <rect x="40" y="30" width="80" height="26" rx="8" fill="none" stroke={G_DARK} strokeWidth="8" />
+      <rect x="20" y="50" width="260" height="262" rx="18" fill={G_MID} />
+      <rect x="20" y="50" width="260" height="40" rx="18" fill={G_DARK} />
+      {/* the window onto the code */}
+      <rect x="44" y="110" width="212" height="170" rx="10" fill="rgba(20,26,34,0.85)" />
+      {['SELECT source, dt,', '  severity, text', 'FROM maintenance_logs', 'JOIN inspection_…', 'WHERE a.name = :name', 'ORDER BY dt DESC'].map((t, i) => (
+        <text key={t} x="58" y={138 + i * 25} fontSize="14" fontFamily="JetBrains Mono, monospace" fill="#8a97a3">{t}</text>
+      ))}
+      {/* the string the label hangs from */}
+      <path d="M262 70C290 70 286 120 298 130" stroke={G_DARK} strokeWidth="3" fill="none" />
+    </svg>
+  );
+}
 
 export function Instruments(p: L2Props) {
   const focusN = useFocusN(p.focusId);
-  const lit = (n: number) => focusN === null || focusN === n;
+  const on = (n: number) => focusN === null || focusN === n;
+  const built = useBuilt();
+  const at = (d: number, n: number) => enter(built ? 0 : d, on(n));
+  const row = (n: number, title: string, bodyEl: ReactNode, d: number) => (
+    <motion.div data-step={n} data-on={on(n)} {...at(d, n)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 16, padding: '10px 0', borderTop: n > 1 ? '2px dashed rgba(127,127,127,0.35)' : 'none' }}>
+      <Num n={n} size={40} on={on(n)} />
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>{title}</div>
+        {bodyEl}
+      </div>
+    </motion.div>
+  );
   return (
     <L2Page testId="l2-instruments" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '220px minmax(0, 1fr)', gap: 22, minHeight: 0 }}>
-          <motion.div {...fadeUp(0.1)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, textAlign: 'center' }}>
-            <div style={{ width: 130, height: 130, borderRadius: '50%', background: 'rgba(31,42,51,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="76" height="76" viewBox="0 0 48 48" fill="none" stroke="#fff" strokeWidth="2.6" aria-hidden>
-                <path d="M3 24s8-13 21-13 21 13 21 13-8 13-21 13S3 24 3 24z" />
-                <circle cx="24" cy="24" r="6" />
-              </svg>
+      <Fill gap={14}>
+        <motion.div {...fade(0.1)} style={{ fontSize: 24, lineHeight: 1.45, color: INK }}>
+          Every instrument in the inspector’s case <b>carries a label</b>: what it is called, what it needs, when to reach for it. The AI agent picks by <b>the label alone</b>.
+        </motion.div>
+        <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 0.75fr) minmax(0, 1.7fr) minmax(0, 0.6fr)', columnGap: 10, alignItems: 'stretch' }}>
+          <motion.div {...fade(0.3)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, minHeight: 0 }}>
+            <div style={{ flex: 1, minHeight: 0, width: '100%', display: 'flex', alignItems: 'center' }}>
+              <InstrumentCase />
             </div>
-            <div style={{ fontSize: 22, color: INK, fontWeight: 600 }}>The language model reads only the label</div>
+            <div style={{ fontSize: 22, color: DIM, textAlign: 'center', lineHeight: 1.3 }}>the code inside: the model never reads it</div>
           </motion.div>
-          <StepRow
-            focusN={focusN}
-            arrows={false}
-            steps={[
-              { title: 'Turns a function into a tool', body: <Chip style={{ fontSize: 26, alignSelf: 'flex-start', background: 'rgba(31,42,51,0.92)', color: '#fff' }}>@tool</Chip> },
-              { title: 'Name and inputs', grow: 1.4, body: <Quote style={{ fontSize: 19 }}>get_recent_incidents(asset_name: str, days: int = 180)</Quote> },
-              { title: 'When to use it', grow: 1.4, body: <div style={{ fontSize: 21, lineHeight: 1.45, fontStyle: 'italic', color: INK }}>“…when you need exact recent incident history before recommending action.”</div> },
-            ]}
-          />
+          {/* the label: a big luggage tag */}
+          <motion.div data-tag {...fadeUp(0.6)} style={{ position: 'relative', alignSelf: 'center', background: CARD, borderRadius: '10px 18px 18px 10px', clipPath: 'polygon(46px 0, 100% 0, 100% 100%, 46px 100%, 0 calc(100% - 46px), 0 46px)', boxShadow: '0 6px 18px rgba(0,0,0,0.16)', padding: '14px 26px 14px 82px', display: 'flex', flexDirection: 'column', border: `2px solid ${TEAL}` }}>
+            <span aria-hidden style={{ position: 'absolute', left: 26, top: '50%', width: 22, height: 22, marginTop: -11, borderRadius: '50%', border: `4px solid ${G_DARK}`, background: 'var(--panel)' }} />
+            {row(1, 'Turns a function into a tool', <Chip style={{ fontSize: 24, alignSelf: 'flex-start', background: 'rgba(31,42,51,0.92)', color: '#fff' }}>@tool</Chip>, 0.9)}
+            {row(2, 'Name and inputs', <div style={{ ...mono(21, INK), fontWeight: 700, lineHeight: 1.4 }}>get_recent_incidents(asset_name: str, days: int = 180)</div>, 1.4)}
+            {row(3, 'When to use it', <div style={{ fontSize: 22, lineHeight: 1.4, fontStyle: 'italic', color: INK }}>“Use this when you need exact recent incident history before recommending action.”</div>, 1.9)}
+          </motion.div>
+          <motion.div {...fadeUp(2.4)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, textAlign: 'center' }}>
+            <AgentAvatar size={150} />
+            <div style={{ fontSize: 23, fontWeight: 700, color: INK, lineHeight: 1.3 }}>reads only the label</div>
+            <div style={{ fontSize: 22, color: DIM, lineHeight: 1.3 }}>name, types, docstring</div>
+          </motion.div>
         </div>
-        <motion.div data-allowlist {...fadeUp(1.8)} style={{ ...card(focusN === 4), opacity: lit(4) ? 1 : 0.4, background: TINT, padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <Num n={4} on={lit(4)} size={32} />
-          <span style={capTeal}>Allowlist · AGENT_TOOLS, cell 73 · 8 tools</span>
+        <motion.div data-allowlist data-step={4} data-on={on(4)} {...at(2.8, 4)} style={{ ...card(focusN === 4), background: TINT, padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <Num n={4} on={on(4)} size={36} />
+          <span style={{ fontSize: 22, fontWeight: 700, color: INK }}>The approved case: <span style={{ ...mono(21) }}>AGENT_TOOLS</span>, 8 tools</span>
           {[...DATA_TOOLS, ...MEMORY_TOOLS].map((t) => (
-            <Chip key={t} style={{ fontSize: 17, background: t === 'get_recent_incidents' ? TINT2 : CARD }}>{t}</Chip>
+            <Chip key={t} style={{ fontSize: 18, background: t === 'get_recent_incidents' ? TINT2 : CARD }}>{t}</Chip>
           ))}
         </motion.div>
-      </div>
+      </Fill>
     </L2Page>
   );
 }
 
-/* ---------------- 2.5d · §3.3 the inspection manual: skill / SOP ---------------- */
+/* ---------------- 2.5d · the inspection manual: skill / SOP ---------------- */
 
-const SOP: { n?: number; t: string }[] = [
-  { n: 1, t: '1. Recall this bridge’s memory first' },
-  { n: 2, t: '2. Pull the incident brief' },
-  { t: '3. More tools only if needed' },
-  { n: 3, t: '4. Remember the decision (mandatory)' },
-  { t: '5. Answer as JSON' },
+/** the SOP's five steps (cell 60); `n` is the focus callout the drawer walks */
+const SOP: { n?: number; t: string; s: string }[] = [
+  { n: 1, t: 'Recall this bridge’s memory first', s: 'recall, then recall_similar if nothing is filed' },
+  { n: 2, t: 'Pull the incident brief', s: 'get_asset_incident_brief: one snapshot' },
+  { t: 'More tools only if needed', s: 'never speculatively' },
+  { n: 3, t: 'Remember the decision', s: 'mandatory, before replying' },
+  { t: 'Answer as JSON', s: 'recommendation, rationale, next_steps' },
+];
+
+/** the SOP's escalation thresholds (cell 60), in plain words; the crack rule is the page's one red thing */
+const ESCALATE: { when: string; then: string; red?: boolean }[] = [
+  { when: 'Criticality 5 asset plus critical evidence', then: 'immediate operations review' },
+  { when: 'crack width > 1.0 mm · section loss > 25% · bearing displacement > 15 mm', then: 'IMMEDIATE structural review + propose load restriction', red: true },
+  { when: 'Repeated warnings on one component within 90 days', then: 're-inspect within 30 days' },
+  { when: 'Routine findings', then: 'normal maintenance cadence' },
 ];
 
 export function Manual(p: L2Props) {
   const focusN = useFocusN(p.focusId);
   const lit = (n?: number) => focusN === null || (n !== undefined && focusN === n);
+  const built = useBuilt();
   return (
     <L2Page testId="l2-manual" hasRed {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)', gap: 24, minHeight: 0 }}>
-        <motion.div data-sop {...fadeUp(0.2)} style={{ ...card(true), background: CARD, padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <LineIcon name="book" size={44} />
-            <span style={capTeal}>Inspection manual · SOP, in order</span>
-          </div>
-          {SOP.map((s, i) => (
-            <motion.div key={s.t} data-sop-step={i + 1} {...fadeUp(0.5 + i * 0.3)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 14, padding: '8px 14px', borderRadius: 12, background: s.n && focusN === s.n ? TINT2 : s.n ? TINT : SOFT, opacity: lit(s.n) ? 1 : 0.4, fontSize: 23, fontWeight: s.n ? 700 : 500, color: s.n ? INK : DIM }}>
-              {s.n ? <Num n={s.n} size={34} on={lit(s.n)} /> : <span style={{ width: 34 }} />}
-              {s.t}
-            </motion.div>
-          ))}
+      <Fill gap={10}>
+        <motion.div {...fade(0.1)} style={{ fontSize: 24, lineHeight: 1.4, color: INK }}>
+          The manual open in the truck: <b>the order of checks</b> on one page, <b>when to call it in</b> on the other.
         </motion.div>
-        <motion.div data-escalate {...fadeUp(1.8)} style={{ ...card(focusN === 4), opacity: lit(4) ? 1 : 0.4, padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Num n={4} on={lit(4)} size={34} />
-            <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>When to escalate</span>
+        {/* one open book: two pages and a spine */}
+        <motion.div data-book {...fadeUp(0.2)} style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1.15fr) 18px minmax(0, 1fr)', borderRadius: 12, background: '#7d8791', padding: 10, boxShadow: '0 6px 18px rgba(0,0,0,0.18)' }}>
+          <div data-sop style={{ background: CARD, borderRadius: '8px 2px 2px 8px', padding: '12px 22px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div style={capTeal}>The order of checks · INCIDENT_TRIAGE_SKILL</div>
+            {SOP.map((s, i) => (
+              <motion.div
+                key={s.t}
+                data-sop-step={i + 1}
+                {...(s.n ? { 'data-step': s.n, 'data-on': lit(s.n) } : {})}
+                {...enter(built ? 0 : 0.5 + i * 0.3, lit(s.n))}
+                style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, padding: '0 10px', borderRadius: 8, background: s.n && focusN === s.n ? TINT2 : 'transparent', borderBottom: i < SOP.length - 1 ? '1px solid var(--line)' : 'none' }}
+              >
+                <span style={{ ...mono(24, s.n && lit(s.n) ? TEAL_D : DIM), fontWeight: 700, width: 30, flex: 'none' }}>{i + 1}.</span>
+                <div style={{ minWidth: 0 }}>
+                  <span style={{ fontSize: 23, fontWeight: s.n ? 700 : 500, color: INK }}>{s.t}</span>
+                  <span style={{ fontSize: 22, color: DIM }}> · {s.s}</span>
+                </div>
+              </motion.div>
+            ))}
           </div>
-          {['crack width > 1.0 mm', 'section loss > 25%', 'bearing displacement > 15 mm'].map((t, i) => (
-            <motion.div key={t} {...fadeUp(2.1 + i * 0.25)} style={{ ...mono(22, INK), padding: '10px 16px', borderRadius: 10, background: SOFT, fontWeight: 700 }}>{t}</motion.div>
-          ))}
-          <ArrowDown h={34} />
-          <motion.div data-red {...fadeUp(3)} style={{ padding: '14px 18px', borderRadius: 12, border: `2px solid ${RED}`, fontSize: 23, fontWeight: 700, color: INK, lineHeight: 1.35 }}>
-            IMMEDIATE structural review + propose load restriction
+          <div aria-hidden style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.25), rgba(0,0,0,0.05), rgba(0,0,0,0.25))' }} />
+          <motion.div data-escalate data-step={4} data-on={lit(4)} {...enter(built ? 0 : 1.8, lit(4))} style={{ background: CARD, borderRadius: '2px 8px 8px 2px', padding: '12px 22px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={capTeal}>When to escalate · the operator policy</div>
+            {ESCALATE.map((e, i) => (
+              <motion.div key={e.then} data-rule={i + 1} {...fade(built ? 0 : 2 + i * 0.3)} {...(e.red ? { 'data-red': true } : {})} style={{ flex: e.red ? 1.5 : 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4, padding: '6px 14px', borderRadius: 10, border: e.red ? `2px solid ${RED}` : '1px solid var(--line)' }}>
+                <div style={{ fontSize: 21, color: DIM, lineHeight: 1.3 }}>{e.red ? <span style={{ ...mono(20, INK), fontWeight: 700 }}>{e.when}</span> : e.when}</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: INK, lineHeight: 1.3 }}>→ {e.then}</div>
+              </motion.div>
+            ))}
           </motion.div>
-          <div style={{ marginTop: 'auto', fontSize: 17, color: DIM }}>The lab’s example operator policy, written in plain English inside the prompt</div>
         </motion.div>
-      </div>
+      </Fill>
     </L2Page>
   );
 }
