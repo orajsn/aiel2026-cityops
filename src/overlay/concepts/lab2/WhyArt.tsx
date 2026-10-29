@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import vancePortrait from '../../../assets/portraits/vance.png';
 import { EASE } from '../WidePanel';
 import { Fill } from '../Fill';
-import { CARD, ChiefInspector, DIM, INK, SOFT, TEAL, TEAL_D, TINT, TINT2, cap, capTeal } from './parts';
+import { CARD, ChiefInspector, DIM, INK, SOFT, TEAL, TEAL_D, TINT, TINT2, capTeal } from './parts';
 
 /**
  * 2.0 · Why AI needs your data (owner, 29 Oct: "animation of graphic explaining what no data is, same for all 3

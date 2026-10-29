@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { EASE } from '../WidePanel';
 import { LineIcon, type IconName } from '../icons';
 import {
-  Arrow, CARD, ChiefInspector, Chip, CrackPlate, Db, DIM, Folder, INK, L2Page, Net, Num, Portrait, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
+  Arrow, CARD, ChiefInspector, Chip, CrackPlate, DIM, Folder, INK, L2Page, Net, Portrait, RED, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
   cap, capTeal, card, fade, fadeUp, mono, useFocusN, type L2Props,
 } from './parts';
 import { RouteMap } from './RouteMap';
