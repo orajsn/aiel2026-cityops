@@ -2,10 +2,11 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { EASE } from '../WidePanel';
 import { Fill, FitBox } from '../Fill';
+import { AgentAvatar } from './AgentAvatar';
 import { Cog, G_DARK, G_LIGHT, G_MID, KitGlyph, PlugHead, T_SOFT } from './agentArt';
 import { LineIcon, type IconName } from '../icons';
 import {
-  Arrow, ArrowDown, CARD, ChiefInspector, Chip, Db, DIM, INK, L2Page, Net, Num, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
+  Arrow, ArrowDown, CARD, Chip, Db, DIM, INK, L2Page, Net, Num, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
   cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props,
 } from './parts';
 import { Fill, FitBox } from '../Fill';
@@ -75,7 +76,7 @@ function HandsPicture() {
         Like an inspector who says <i>“hand me the crack gauge”</i>: the AI agent names the instrument, <b>the framework picks it up and uses it</b>.
       </motion.div>
       <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'auto 46px auto 46px auto 46px auto', justifyContent: 'space-between', alignItems: 'center', columnGap: 0 }}>
-        <Station delay={0.3} art={<ChiefInspector size={200} />} t="AI Agent" s="asks for a call" />
+        <Station delay={0.3} art={<AgentAvatar size={200} />} t="AI Agent" s="asks for a call" />
         <Arrow w={42} delay={0.8} />
         <motion.div data-slip {...fadeUp(0.9)} style={{ justifySelf: 'center', transform: 'rotate(-1.5deg)', padding: '16px 16px', borderRadius: 10, background: CARD, boxShadow: '0 4px 14px rgba(0,0,0,0.14)', border: '1px solid var(--line)', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ ...cap, fontSize: 15 }}>the request</div>
@@ -110,98 +111,124 @@ function HandsPicture() {
   );
 }
 
-/** step 2 · the procedure: the manual's contents are always in the truck; a chapter opens when the job needs it */
+/** step 2 · the procedure: the cover (name + when to use it) is always in context; the pages come out when needed */
+const SKILL_PAGES = [
+  { t: 'The steps, in order', s: 'recall first · pull the incident brief · more tools only if needed · remember (mandatory) · answer as JSON' },
+  { t: 'The evidence bar', s: 'no speculative tool calls: only when the brief is missing something the agent actually needs' },
+  { t: 'When to escalate', s: 'crack width > 1.0 mm · section loss > 25% · bearing displacement > 15 mm' },
+];
+
 function ProcedurePicture() {
-  const chapter = ['the steps, in order', 'the thresholds', 'scripts', 'references'];
   return (
     <Fill gap={16}>
       <motion.div {...fade(0.1)} style={caption}>
-        Like the inspection manual in the truck: its <b>table of contents is always there</b>; the inspector opens the chapter <b>when the job needs it</b>.
+        Like the inspection manual in the truck: its <b>cover is always there</b>; the inspector opens the pages <b>when the job needs them</b>.
       </motion.div>
-      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 0.8fr) 150px minmax(0, 1.2fr)', alignItems: 'stretch', columnGap: 10 }}>
+      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 0.85fr) 140px minmax(0, 1.25fr)', alignItems: 'stretch', columnGap: 8 }}>
         <motion.div data-closed {...fadeUp(0.3)} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={capTeal}>Always in the context window</div>
           <div style={{ flex: 1, display: 'flex', borderRadius: '6px 14px 14px 6px', overflow: 'hidden', boxShadow: '0 6px 18px rgba(0,0,0,0.16)' }}>
             <div style={{ width: 34, background: TEAL }} />
-            <div style={{ flex: 1, background: TINT2, padding: '22px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12 }}>
+            <div style={{ flex: 1, background: TINT2, padding: '22px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
               <div style={{ fontSize: 30, fontWeight: 700, color: INK, lineHeight: 1.2 }}>Incident triage SOP</div>
-              <div style={body}>its name and <b>when to use it</b>: one short description</div>
+              <div style={body}>
+                <b>When to use it:</b> responding to infrastructure incident reports for the city operations team
+              </div>
               <Chip style={{ alignSelf: 'flex-start', fontSize: 20 }}>INCIDENT_TRIAGE_SKILL</Chip>
             </div>
           </div>
         </motion.div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <Arrow w={100} delay={1.1} />
+          <Arrow w={96} delay={1.1} />
           <motion.div {...fade(1.2)} style={{ fontSize: 22, color: TEAL_D, fontWeight: 600, textAlign: 'center' }}>the job needs it</motion.div>
         </div>
-        <motion.div data-open {...fadeUp(1.4)} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={cap}>Loaded only when needed</div>
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', borderRadius: 10, background: CARD, boxShadow: '0 6px 18px rgba(0,0,0,0.16)', border: '1px solid var(--line)' }}>
-            {[0, 1].map((side) => (
-              <div key={side} style={{ padding: '20px 24px', borderLeft: side ? '2px solid var(--line)' : 'none', display: 'flex', flexDirection: 'column', justifyContent: 'space-around', gap: 10 }}>
-                {chapter.slice(side * 2, side * 2 + 2).map((c, i) => (
-                  <motion.div key={c} data-chapter={c} {...fadeUp(1.8 + (side * 2 + i) * 0.35)} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <div style={{ fontSize: 25, fontWeight: 700, color: INK }}>{c}</div>
-                    <div style={{ height: 6, borderRadius: 3, background: G_LIGHT, width: '90%' }} />
-                    <div style={{ height: 6, borderRadius: 3, background: G_LIGHT, width: '70%' }} />
-                  </motion.div>
-                ))}
-              </div>
+        <div data-open style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <motion.div {...fade(1.3)} style={cap}>Loaded only when needed</motion.div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {SKILL_PAGES.map((pg, i) => (
+              <motion.div key={pg.t} data-chapter={pg.t} initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.6 + i * 0.5, duration: 0.55, ease: EASE }} style={{ flex: 1, borderRadius: 8, background: CARD, boxShadow: '0 4px 12px rgba(0,0,0,0.14)', borderLeft: `6px solid ${TEAL}`, padding: '12px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4 }}>
+                <div style={{ fontSize: 25, fontWeight: 700, color: INK }}>{pg.t}</div>
+                <div style={{ fontSize: 22, color: DIM, lineHeight: 1.35 }}>{pg.s}</div>
+              </motion.div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
       <motion.div {...fade(3.4)} style={{ ...body, padding: '12px 20px', borderRadius: 12, background: TINT }}>
-        Small skills keep the context free for real data: the description is enough to pick the skill, <b>the body arrives only when the task matches</b>.
+        The cover is enough to pick the skill; <b>the pages arrive only when the task matches</b>.
       </motion.div>
     </Fill>
   );
 }
 
-/** step 3 · the standard plug: one socket shape; sources plug in once, any agent can use them */
+/** a USB-C plug seen from the side: cable, the moulded body, the rounded metal tip; `dir` 1 points right */
+function UsbC({ x, y, dir = 1 }: { x: number; y: number; dir?: 1 | -1 }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${dir} 1)`}>
+      <rect x={-52} y={-17} width={46} height={34} rx={9} fill="#1b8a9c" />
+      <rect x={-8} y={-11} width={26} height={22} rx={11} fill="#c7ced6" stroke="#8a919c" strokeWidth={1.5} />
+    </g>
+  );
+}
+
+/** step 3 · the standard plug: MCP as a USB-C hub; every source and every agent uses the same plug shape */
 function PlugPicture() {
   const agents = ['Agent A', 'Agent B'];
   const sources = ['Database', 'Files', 'Tickets'];
   const ay = (i: number) => 170 + i * 150;
-  const sy = (i: number) => 140 + i * 120;
+  const sy = (i: number) => 120 + i * 120;
+  const HUB_L = 420;
+  const HUB_R = 640;
   return (
-    <Fill gap={14}>
+    <Fill gap={12}>
       <motion.div {...fade(0.1)} style={caption}>
-        Like one plug shape for every socket: <b>connect a source once</b>, and any agent can use it.
+        Like a <b>USB-C hub</b>: one plug shape for everything. Plug a source in once, and any agent on the hub can use it.
       </motion.div>
-      <FitBox w={1060} h={450} max={1.1}>
-        <svg data-plug-picture width={1060} height={450} viewBox="0 0 1060 450" style={{ overflow: 'visible' }}>
-          {/* the strip: the one standard socket */}
+      <FitBox w={1060} h={440} max={1.1}>
+        <svg data-plug-picture data-usb-hub width={1060} height={440} viewBox="0 0 1060 440" style={{ overflow: 'visible' }}>
+          {/* the hub, with a USB-C port for each plug */}
           <motion.g {...fade(0.3)}>
-            <rect x="420" y="40" width="210" height="400" rx="20" fill={T_SOFT} stroke="#146f7f" strokeWidth="3" />
-            <rect x="420" y="40" width="210" height="70" rx="20" fill="#146f7f" />
-            <text x="525" y="88" textAnchor="middle" fontSize="36" fontWeight="700" fill="#fff" fontFamily="Inter, sans-serif">MCP</text>
-            <text x="525" y="426" textAnchor="middle" fontSize="22" fill="#146f7f" fontFamily="Inter, sans-serif">one standard plug</text>
-            {[...agents.map((_, i) => ({ x: 432, y: ay(i) })), ...sources.map((_, i) => ({ x: 610, y: sy(i) }))].map((s, i) => (
-              <rect key={i} x={s.x} y={s.y - 16} width="18" height="32" rx="4" fill="#5c6b78" />
+            <rect x={HUB_L} y={40} width={HUB_R - HUB_L} height={380} rx={34} fill="#3d4651" />
+            <rect x={HUB_L + 14} y={54} width={HUB_R - HUB_L - 28} height={70} rx={20} fill="#146f7f" />
+            <text x={530} y={101} textAnchor="middle" fontSize={36} fontWeight={700} fill="#fff" fontFamily="Inter, sans-serif">MCP</text>
+            {/* the one port shape, seen end-on: USB-C */}
+            <rect x={470} y={190} width={120} height={50} rx={25} fill="#11161c" stroke="#c7ced6" strokeWidth={4} />
+            <rect x={492} y={209} width={76} height={12} rx={6} fill="#5c6b78" />
+            <text x={530} y={282} textAnchor="middle" fontSize={24} fontWeight={700} fill="#e6e9ef" fontFamily="Inter, sans-serif">USB-C</text>
+            <text x={530} y={312} textAnchor="middle" fontSize={20} fill="#c7ced6" fontFamily="Inter, sans-serif">one plug shape</text>
+            <text x={530} y={400} textAnchor="middle" fontSize={22} fill="#c7ced6" fontFamily="Inter, sans-serif">the hub</text>
+            {[...agents.map((_, i) => ({ x: HUB_L - 4, y: ay(i) })), ...sources.map((_, i) => ({ x: HUB_R - 10, y: sy(i) + 40 }))].map((s, i) => (
+              <g key={i}>
+                <rect x={s.x} y={s.y - 14} width={14} height={28} rx={7} fill="#11161c" />
+                <rect x={s.x + 5} y={s.y - 7} width={4} height={14} rx={2} fill="#5c6b78" />
+              </g>
             ))}
           </motion.g>
-          {/* the sources, each plugged in once */}
+          {/* the sources plug in once */}
           {sources.map((s, i) => {
-            const y = sy(i);
+            const y = sy(i) + 40;
             return (
               <motion.g key={s} data-source={s} {...fade(0.9 + i * 0.35)}>
-                <motion.path d={`M668 ${y} C720 ${y} 740 ${y} 800 ${y}`} stroke="#5c6b78" strokeWidth="5" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 1 + i * 0.35, duration: 0.6 }} />
-                <PlugHead x={642} y={y} dir={-1} />
-                <rect x="800" y={y - 44} width="230" height="88" rx="14" fill="var(--panel-strong)" stroke="#aab1ba" strokeWidth="2" />
-                <text x="915" y={y + 10} textAnchor="middle" fontSize="28" fontWeight="700" fill="var(--ink)" fontFamily="Inter, sans-serif">{s}</text>
+                <rect x={830} y={y - 44} width={210} height={88} rx={14} fill="var(--panel-strong)" stroke="#aab1ba" strokeWidth={2} />
+                <text x={935} y={y + 10} textAnchor="middle" fontSize={28} fontWeight={700} fill="var(--ink)" fontFamily="Inter, sans-serif">{s}</text>
+                <motion.g initial={{ x: 50 }} animate={{ x: 0 }} transition={{ delay: 1 + i * 0.35, duration: 0.7, ease: EASE }}>
+                  <path d={`M830 ${y}H696`} stroke="#5c6b78" strokeWidth={8} strokeLinecap="round" />
+                  <UsbC x={HUB_R + 6} y={y} dir={-1} />
+                </motion.g>
               </motion.g>
             );
           })}
-          {/* the agents, each plugged in once */}
+          {/* the agents plug in with the same shape */}
           {agents.map((a, i) => {
             const y = ay(i);
             return (
               <motion.g key={a} data-agent={a} {...fade(2.2 + i * 0.4)}>
-                <rect x="20" y={y - 50} width="230" height="100" rx="14" fill="rgba(27, 138, 156, 0.10)" stroke="#1b8a9c" strokeWidth="2.5" />
-                <text x="135" y={y + 10} textAnchor="middle" fontSize="28" fontWeight="700" fill="var(--ink)" fontFamily="Inter, sans-serif">{a}</text>
-                <motion.path d={`M250 ${y} C320 ${y} 340 ${y} 404 ${y}`} stroke="#5c6b78" strokeWidth="5" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 2.3 + i * 0.4, duration: 0.6 }} />
-                <PlugHead x={418} y={y} dir={1} />
+                <rect x={20} y={y - 50} width={220} height={100} rx={14} fill="rgba(27, 138, 156, 0.10)" stroke="#1b8a9c" strokeWidth={2.5} />
+                <text x={130} y={y + 10} textAnchor="middle" fontSize={28} fontWeight={700} fill="var(--ink)" fontFamily="Inter, sans-serif">{a}</text>
+                <motion.g initial={{ x: -50 }} animate={{ x: 0 }} transition={{ delay: 2.3 + i * 0.4, duration: 0.7, ease: EASE }}>
+                  <path d={`M240 ${y}H364`} stroke="#5c6b78" strokeWidth={8} strokeLinecap="round" />
+                  <UsbC x={HUB_L - 6} y={y} dir={1} />
+                </motion.g>
               </motion.g>
             );
           })}
@@ -228,89 +255,140 @@ export function Toolkit(p: L2Props) {
   );
 }
 
-/* ---------------- 2.5c · §3.2 the inspector's instruments: tools ---------------- */
+/* ---------------- 2.5c · the inspector's instruments: tools ---------------- */
+
+/** the instrument itself: a closed grey case; through its window, the code inside that the model never reads */
+function InstrumentCase() {
+  return (
+    <svg data-art="instrument" viewBox="0 0 300 330" style={{ width: '100%', height: '100%' }} aria-hidden>
+      <ellipse cx="150" cy="320" rx="130" ry="8" fill="rgba(127,127,127,0.2)" />
+      <rect x="40" y="30" width="80" height="26" rx="8" fill="none" stroke={G_DARK} strokeWidth="8" />
+      <rect x="20" y="50" width="260" height="262" rx="18" fill={G_MID} />
+      <rect x="20" y="50" width="260" height="40" rx="18" fill={G_DARK} />
+      {/* the window onto the code */}
+      <rect x="44" y="110" width="212" height="170" rx="10" fill="rgba(20,26,34,0.85)" />
+      {['SELECT source, dt,', '  severity, text', 'FROM maintenance_logs', 'JOIN inspection_…', 'WHERE a.name = :name', 'ORDER BY dt DESC'].map((t, i) => (
+        <text key={t} x="58" y={138 + i * 25} fontSize="14" fontFamily="JetBrains Mono, monospace" fill="#8a97a3">{t}</text>
+      ))}
+      {/* the string the label hangs from */}
+      <path d="M262 70C290 70 286 120 298 130" stroke={G_DARK} strokeWidth="3" fill="none" />
+    </svg>
+  );
+}
 
 export function Instruments(p: L2Props) {
   const focusN = useFocusN(p.focusId);
-  const lit = (n: number) => focusN === null || focusN === n;
+  const on = (n: number) => focusN === null || focusN === n;
+  const built = useBuilt();
+  const at = (d: number, n: number) => enter(built ? 0 : d, on(n));
+  const row = (n: number, title: string, bodyEl: ReactNode, d: number) => (
+    <motion.div data-step={n} data-on={on(n)} {...at(d, n)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 16, padding: '10px 0', borderTop: n > 1 ? '2px dashed rgba(127,127,127,0.35)' : 'none' }}>
+      <Num n={n} size={40} on={on(n)} />
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>{title}</div>
+        {bodyEl}
+      </div>
+    </motion.div>
+  );
   return (
     <L2Page testId="l2-instruments" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '220px minmax(0, 1fr)', gap: 22, minHeight: 0 }}>
-          <motion.div {...fadeUp(0.1)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, textAlign: 'center' }}>
-            <div style={{ width: 130, height: 130, borderRadius: '50%', background: 'rgba(31,42,51,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="76" height="76" viewBox="0 0 48 48" fill="none" stroke="#fff" strokeWidth="2.6" aria-hidden>
-                <path d="M3 24s8-13 21-13 21 13 21 13-8 13-21 13S3 24 3 24z" />
-                <circle cx="24" cy="24" r="6" />
-              </svg>
+      <Fill gap={14}>
+        <motion.div {...fade(0.1)} style={{ fontSize: 24, lineHeight: 1.45, color: INK }}>
+          Every instrument in the inspector’s case <b>carries a label</b>: what it is called, what it needs, when to reach for it. The AI agent picks by <b>the label alone</b>.
+        </motion.div>
+        <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 0.75fr) minmax(0, 1.7fr) minmax(0, 0.6fr)', columnGap: 10, alignItems: 'stretch' }}>
+          <motion.div {...fade(0.3)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, minHeight: 0 }}>
+            <div style={{ flex: 1, minHeight: 0, width: '100%', display: 'flex', alignItems: 'center' }}>
+              <InstrumentCase />
             </div>
-            <div style={{ fontSize: 22, color: INK, fontWeight: 600 }}>The language model reads only the label</div>
+            <div style={{ fontSize: 22, color: DIM, textAlign: 'center', lineHeight: 1.3 }}>the code inside: the model never reads it</div>
           </motion.div>
-          <StepRow
-            focusN={focusN}
-            arrows={false}
-            steps={[
-              { title: 'Turns a function into a tool', body: <Chip style={{ fontSize: 26, alignSelf: 'flex-start', background: 'rgba(31,42,51,0.92)', color: '#fff' }}>@tool</Chip> },
-              { title: 'Name and inputs', grow: 1.4, body: <Quote style={{ fontSize: 19 }}>get_recent_incidents(asset_name: str, days: int = 180)</Quote> },
-              { title: 'When to use it', grow: 1.4, body: <div style={{ fontSize: 21, lineHeight: 1.45, fontStyle: 'italic', color: INK }}>“…when you need exact recent incident history before recommending action.”</div> },
-            ]}
-          />
+          {/* the label: a big luggage tag */}
+          <motion.div data-tag {...fadeUp(0.6)} style={{ position: 'relative', alignSelf: 'center', background: CARD, borderRadius: '10px 18px 18px 10px', clipPath: 'polygon(46px 0, 100% 0, 100% 100%, 46px 100%, 0 calc(100% - 46px), 0 46px)', boxShadow: '0 6px 18px rgba(0,0,0,0.16)', padding: '14px 26px 14px 82px', display: 'flex', flexDirection: 'column', border: `2px solid ${TEAL}` }}>
+            <span aria-hidden style={{ position: 'absolute', left: 26, top: '50%', width: 22, height: 22, marginTop: -11, borderRadius: '50%', border: `4px solid ${G_DARK}`, background: 'var(--panel)' }} />
+            {row(1, 'Turns a function into a tool', <Chip style={{ fontSize: 24, alignSelf: 'flex-start', background: 'rgba(31,42,51,0.92)', color: '#fff' }}>@tool</Chip>, 0.9)}
+            {row(2, 'Name and inputs', <div style={{ ...mono(21, INK), fontWeight: 700, lineHeight: 1.4 }}>get_recent_incidents(asset_name: str, days: int = 180)</div>, 1.4)}
+            {row(3, 'When to use it', <div style={{ fontSize: 22, lineHeight: 1.4, fontStyle: 'italic', color: INK }}>“Use this when you need exact recent incident history before recommending action.”</div>, 1.9)}
+          </motion.div>
+          <motion.div {...fadeUp(2.4)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, textAlign: 'center' }}>
+            <AgentAvatar size={150} />
+            <div style={{ fontSize: 23, fontWeight: 700, color: INK, lineHeight: 1.3 }}>reads only the label</div>
+            <div style={{ fontSize: 22, color: DIM, lineHeight: 1.3 }}>name, types, docstring</div>
+          </motion.div>
         </div>
-        <motion.div data-allowlist {...fadeUp(1.8)} style={{ ...card(focusN === 4), opacity: lit(4) ? 1 : 0.4, background: TINT, padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <Num n={4} on={lit(4)} size={32} />
-          <span style={capTeal}>Allowlist · AGENT_TOOLS, cell 73 · 8 tools</span>
+        <motion.div data-allowlist data-step={4} data-on={on(4)} {...at(2.8, 4)} style={{ ...card(focusN === 4), background: TINT, padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <Num n={4} on={on(4)} size={36} />
+          <span style={{ fontSize: 22, fontWeight: 700, color: INK }}>The approved case: <span style={{ ...mono(21) }}>AGENT_TOOLS</span>, 8 tools</span>
           {[...DATA_TOOLS, ...MEMORY_TOOLS].map((t) => (
-            <Chip key={t} style={{ fontSize: 17, background: t === 'get_recent_incidents' ? TINT2 : CARD }}>{t}</Chip>
+            <Chip key={t} style={{ fontSize: 18, background: t === 'get_recent_incidents' ? TINT2 : CARD }}>{t}</Chip>
           ))}
         </motion.div>
-      </div>
+      </Fill>
     </L2Page>
   );
 }
 
-/* ---------------- 2.5d · §3.3 the inspection manual: skill / SOP ---------------- */
+/* ---------------- 2.5d · the inspection manual: skill / SOP ---------------- */
 
-const SOP: { n?: number; t: string }[] = [
-  { n: 1, t: '1. Recall this bridge’s memory first' },
-  { n: 2, t: '2. Pull the incident brief' },
-  { t: '3. More tools only if needed' },
-  { n: 3, t: '4. Remember the decision (mandatory)' },
-  { t: '5. Answer as JSON' },
+/** the SOP's five steps (cell 60); `n` is the focus callout the drawer walks */
+const SOP: { n?: number; t: string; s: string }[] = [
+  { n: 1, t: 'Recall this bridge’s memory first', s: 'recall, then recall_similar if nothing is filed' },
+  { n: 2, t: 'Pull the incident brief', s: 'get_asset_incident_brief: one snapshot' },
+  { t: 'More tools only if needed', s: 'never speculatively' },
+  { n: 3, t: 'Remember the decision', s: 'mandatory, before replying' },
+  { t: 'Answer as JSON', s: 'recommendation, rationale, next_steps' },
+];
+
+/** the SOP's escalation thresholds (cell 60), in plain words; the crack rule is the page's one red thing */
+const ESCALATE: { when: string; then: string; red?: boolean }[] = [
+  { when: 'Criticality 5 asset plus critical evidence', then: 'immediate operations review' },
+  { when: 'crack width > 1.0 mm · section loss > 25% · bearing displacement > 15 mm', then: 'IMMEDIATE structural review + propose load restriction', red: true },
+  { when: 'Repeated warnings on one component within 90 days', then: 're-inspect within 30 days' },
+  { when: 'Routine findings', then: 'normal maintenance cadence' },
 ];
 
 export function Manual(p: L2Props) {
   const focusN = useFocusN(p.focusId);
   const lit = (n?: number) => focusN === null || (n !== undefined && focusN === n);
+  const built = useBuilt();
   return (
     <L2Page testId="l2-manual" hasRed {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)', gap: 24, minHeight: 0 }}>
-        <motion.div data-sop {...fadeUp(0.2)} style={{ ...card(true), background: CARD, padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <LineIcon name="book" size={44} />
-            <span style={capTeal}>Inspection manual · SOP, in order</span>
-          </div>
-          {SOP.map((s, i) => (
-            <motion.div key={s.t} data-sop-step={i + 1} {...fadeUp(0.5 + i * 0.3)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 14, padding: '8px 14px', borderRadius: 12, background: s.n && focusN === s.n ? TINT2 : s.n ? TINT : SOFT, opacity: lit(s.n) ? 1 : 0.4, fontSize: 23, fontWeight: s.n ? 700 : 500, color: s.n ? INK : DIM }}>
-              {s.n ? <Num n={s.n} size={34} on={lit(s.n)} /> : <span style={{ width: 34 }} />}
-              {s.t}
-            </motion.div>
-          ))}
+      <Fill gap={10}>
+        <motion.div {...fade(0.1)} style={{ fontSize: 24, lineHeight: 1.4, color: INK }}>
+          The manual open in the truck: <b>the order of checks</b> on one page, <b>when to call it in</b> on the other.
         </motion.div>
-        <motion.div data-escalate {...fadeUp(1.8)} style={{ ...card(focusN === 4), opacity: lit(4) ? 1 : 0.4, padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Num n={4} on={lit(4)} size={34} />
-            <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>When to escalate</span>
+        {/* one open book: two pages and a spine */}
+        <motion.div data-book {...fadeUp(0.2)} style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1.15fr) 18px minmax(0, 1fr)', borderRadius: 12, background: '#7d8791', padding: 10, boxShadow: '0 6px 18px rgba(0,0,0,0.18)' }}>
+          <div data-sop style={{ background: CARD, borderRadius: '8px 2px 2px 8px', padding: '12px 22px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div style={capTeal}>The order of checks · INCIDENT_TRIAGE_SKILL</div>
+            {SOP.map((s, i) => (
+              <motion.div
+                key={s.t}
+                data-sop-step={i + 1}
+                {...(s.n ? { 'data-step': s.n, 'data-on': lit(s.n) } : {})}
+                {...enter(built ? 0 : 0.5 + i * 0.3, lit(s.n))}
+                style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, padding: '0 10px', borderRadius: 8, background: s.n && focusN === s.n ? TINT2 : 'transparent', borderBottom: i < SOP.length - 1 ? '1px solid var(--line)' : 'none' }}
+              >
+                <span style={{ ...mono(24, s.n && lit(s.n) ? TEAL_D : DIM), fontWeight: 700, width: 30, flex: 'none' }}>{i + 1}.</span>
+                <div style={{ minWidth: 0 }}>
+                  <span style={{ fontSize: 23, fontWeight: s.n ? 700 : 500, color: INK }}>{s.t}</span>
+                  <span style={{ fontSize: 22, color: DIM }}> · {s.s}</span>
+                </div>
+              </motion.div>
+            ))}
           </div>
-          {['crack width > 1.0 mm', 'section loss > 25%', 'bearing displacement > 15 mm'].map((t, i) => (
-            <motion.div key={t} {...fadeUp(2.1 + i * 0.25)} style={{ ...mono(22, INK), padding: '10px 16px', borderRadius: 10, background: SOFT, fontWeight: 700 }}>{t}</motion.div>
-          ))}
-          <ArrowDown h={34} />
-          <motion.div data-red {...fadeUp(3)} style={{ padding: '14px 18px', borderRadius: 12, border: `2px solid ${RED}`, fontSize: 23, fontWeight: 700, color: INK, lineHeight: 1.35 }}>
-            IMMEDIATE structural review + propose load restriction
+          <div aria-hidden style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.25), rgba(0,0,0,0.05), rgba(0,0,0,0.25))' }} />
+          <motion.div data-escalate data-step={4} data-on={lit(4)} {...enter(built ? 0 : 1.8, lit(4))} style={{ background: CARD, borderRadius: '2px 8px 8px 2px', padding: '12px 22px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={capTeal}>When to escalate · the operator policy</div>
+            {ESCALATE.map((e, i) => (
+              <motion.div key={e.then} data-rule={i + 1} {...fade(built ? 0 : 2 + i * 0.3)} {...(e.red ? { 'data-red': true } : {})} style={{ flex: e.red ? 1.5 : 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4, padding: '6px 14px', borderRadius: 10, border: e.red ? `2px solid ${RED}` : '1px solid var(--line)' }}>
+                <div style={{ fontSize: 21, color: DIM, lineHeight: 1.3 }}>{e.red ? <span style={{ ...mono(20, INK), fontWeight: 700 }}>{e.when}</span> : e.when}</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: INK, lineHeight: 1.3 }}>→ {e.then}</div>
+              </motion.div>
+            ))}
           </motion.div>
-          <div style={{ marginTop: 'auto', fontSize: 17, color: DIM }}>The lab’s example operator policy, written in plain English inside the prompt</div>
         </motion.div>
-      </div>
+      </Fill>
     </L2Page>
   );
 }
@@ -504,12 +582,6 @@ const MEMS = [
   { key: 'logbook', t: 'Bridge logbook', k: 'long-term · store', s: 'permanent, found by name or by meaning' },
 ] as const;
 
-const LIFE = [
-  { key: 'keep', t: 'What to keep', s: 'decide what is worth writing down' },
-  { key: 'forget', t: 'What to forget, and when', s: 'stale facts must expire' },
-  { key: 'read', t: 'Reading memory', s: '= retrieval: find the right note' },
-] as const;
-
 /** step 1's two memories side by side on the database shelf; on step 2 the whole scene steps back to make room */
 function MemoryShelf({ compact }: { compact: boolean }) {
   return (
@@ -532,7 +604,7 @@ function MemoryShelf({ compact }: { compact: boolean }) {
           );
         })}
         <motion.div {...fadeUp(0.2)} style={{ gridColumn: 2, gridRow: 1, alignSelf: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <ChiefInspector size={compact ? 90 : 170} />
+          <AgentAvatar size={compact ? 90 : 170} />
           {!compact && <div style={{ fontSize: 22, color: DIM, textAlign: 'center' }}>writes in both</div>}
         </motion.div>
       </div>
@@ -582,62 +654,70 @@ function Logbook() {
   );
 }
 
-/** step 2 · the life of one note: written, ageing, found again */
-function LifeArt({ k }: { k: (typeof LIFE)[number]['key'] }) {
-  return (
-    <svg data-life-art={k} width="150" height="125" viewBox="0 0 120 100" aria-hidden style={{ flex: 'none' }}>
-      {k === 'keep' && (
-        <g>
-          <rect x="14" y="14" width="66" height="78" rx="6" fill="var(--panel-strong)" stroke={G_DARK} strokeWidth="2.5" />
-          <motion.path d="M26 36h42M26 52h42M26 68h26" stroke={TEAL} strokeWidth="4" strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.8, duration: 0.8 }} />
-          <path d="M104 10l8 8-38 38-12 4 4-12z" fill={TEAL} />
-        </g>
-      )}
-      {k === 'forget' && (
-        <g>
-          <rect x="10" y="18" width="62" height="70" rx="6" fill="var(--panel-strong)" stroke={G_DARK} strokeWidth="2.5" />
-          <rect x="10" y="18" width="62" height="18" rx="6" fill={G_DARK} />
-          <path d="M22 50h38M22 64h38M22 78h22" stroke={G_MID} strokeWidth="4" strokeLinecap="round" />
-          <motion.path d="M78 22h30l-15 22 15 22H78l15-22z" fill="none" stroke={TEAL} strokeWidth="3.5" strokeLinejoin="round" initial={{ rotate: 0 }} animate={{ rotate: 180 }} transition={{ delay: 1.8, duration: 1.2, ease: EASE }} style={{ transformOrigin: '93px 44px' }} />
-        </g>
-      )}
-      {k === 'read' && (
-        <g>
-          {[0, 1, 2].map((i) => (
-            <rect key={i} x={10 + i * 8} y={22 + i * 10} width="56" height="60" rx="6" fill={i === 2 ? TINT2 : 'var(--panel-strong)'} stroke={i === 2 ? TEAL : G_MID} strokeWidth="2.5" />
-          ))}
-          <circle cx="86" cy="44" r="18" fill="none" stroke={TEAL} strokeWidth="5" />
-          <path d="M99 57l14 14" stroke={TEAL} strokeWidth="7" strokeLinecap="round" />
-        </g>
-      )}
-    </svg>
+/** 2.7b · the life of one note, as one picture: written into the logbook, gone stale, found again */
+function NoteLife() {
+  const F = 'Inter, sans-serif';
+  const zone = (i: number) => ({ initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.4 + i * 0.9, duration: 0.6, ease: EASE } });
+  const title = (x: number, n: number, t: string, s: string, teal = false) => (
+    <g>
+      <circle cx={x - 150} cy={352} r={20} fill="#1b8a9c" />
+      <text x={x - 150} y={360} textAnchor="middle" fontSize={22} fontWeight={700} fill="#fff" fontFamily={F}>{n}</text>
+      <text x={x - 118} y={361} fontSize={29} fontWeight={700} fill="var(--ink)" fontFamily={F}>{t}</text>
+      <text x={x} y={400} textAnchor="middle" fontSize={24} fontWeight={teal ? 700 : 400} fill={teal ? '#146f7f' : 'var(--ink-dim)'} fontFamily={F}>{s}</text>
+    </g>
   );
-}
-
-function Lifecycle() {
+  const card = (x: number, y: number, w: number, h: number, fill: string, stroke: string) => <rect x={x} y={y} width={w} height={h} rx={8} fill={fill} stroke={stroke} strokeWidth={2.5} />;
   return (
-    <div data-lifecycle style={{ flex: '1 0 auto', display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 18 }}>
-      <motion.div {...fade(0.3)} style={{ fontSize: 24, color: INK, lineHeight: 1.4 }}>
-        A real logbook gets <b>tidied</b>: decide what goes in, cross out what is no longer true, know where to look.
-      </motion.div>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 90px minmax(0, 1fr) 90px minmax(0, 1fr)', alignItems: 'start' }}>
-        {LIFE.map((l, i) => [
-          i > 0 ? (
-            <div key={`a${i}`} style={{ height: 130, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Arrow w={80} delay={0.4 + i * 0.8} />
-            </div>
-          ) : null,
-          <motion.div key={l.key} data-life={i + 1} {...fadeUp(0.6 + i * 0.8)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 8 }}>
-            <div style={{ height: 130, display: 'flex', alignItems: 'center', gap: 12 }}>
-              <Num n={i + 1} size={42} />
-              <LifeArt k={l.key} />
-            </div>
-            <div style={{ fontSize: 27, fontWeight: 700, color: INK }}>{l.t}</div>
-            <div style={{ fontSize: 23, color: i === 1 ? TEAL_D : DIM, fontWeight: i === 1 ? 600 : 400 }}>{l.s}</div>
-          </motion.div>,
-        ])}
-      </div>
-    </div>
+    <FitBox w={1400} h={470} max={1.15}>
+      <svg data-note-life width={1400} height={470} viewBox="0 0 1400 470" style={{ overflow: 'visible' }}>
+        {[0, 480, 960].map((x, i) => (
+          <motion.rect key={x} x={x} y={0} width={440} height={470} rx={20} fill="rgba(127,127,127,0.08)" {...fade(0.2 + i * 0.9)} />
+        ))}
+        <g transform="translate(0 22)">
+        {/* the road the note travels */}
+        <motion.path d="M410 170H510M890 170H990" stroke="#1b8a9c" strokeWidth={3} strokeDasharray="7 7" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 1, duration: 1.6 }} />
+        <path d="M498 160l12 10-12 10M978 160l12 10-12 10" stroke="#1b8a9c" strokeWidth={3} fill="none" />
+        {/* 1 · keep: the logbook open, the note written onto its page */}
+        <motion.g data-life={1} {...zone(0)}>
+          <path d="M40 60l160-14v250l-160 14z" fill="var(--panel-strong)" stroke="#5c6b78" strokeWidth={2.5} />
+          <path d="M360 60l-160-14v250l160 14z" fill="var(--panel-strong)" stroke="#5c6b78" strokeWidth={2.5} />
+          <path d="M200 46v250" stroke="#5c6b78" strokeWidth={3} />
+          {[96, 126, 156].map((y) => <path key={y} d={`M64 ${y}l116-10`} stroke="#aab1ba" strokeWidth={4} strokeLinecap="round" />)}
+          {card(222, 90, 120, 140, 'rgba(27,138,156,0.14)', '#1b8a9c')}
+          <motion.path d="M238 120h88M238 146h88M238 172h60M238 198h76" stroke="#1b8a9c" strokeWidth={5} strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 1, duration: 1.2 }} />
+          <path d="M336 214l46-60 10 8-46 60-14 6z" fill="#146f7f" />
+          {title(200, 1, 'What to keep', 'decide what is worth writing down')}
+        </motion.g>
+        {/* 2 · forget: the calendar moves on, an old note goes grey and is crossed out */}
+        <motion.g data-life={2} {...zone(1)}>
+          {card(560, 50, 180, 200, 'var(--panel-strong)', '#5c6b78')}
+          <rect x={560} y={50} width={180} height={46} rx={8} fill="#5c6b78" />
+          {[0, 1, 2, 3].map((r) => [0, 1, 2, 3].map((c) => <rect key={`${r}${c}`} x={578 + c * 40} y={112 + r * 32} width={26} height={20} rx={3} fill={r * 4 + c < 13 ? '#aab1ba' : 'rgba(27,138,156,0.5)'} />))}
+          <g transform="rotate(-6 820 190)">
+            {card(760, 110, 120, 140, 'rgba(127,127,127,0.12)', '#8a919c')}
+            {[140, 166, 192, 218].map((y) => <path key={y} d={`M776 ${y}h86`} stroke="#aab1ba" strokeWidth={5} strokeLinecap="round" />)}
+            <motion.path d="M772 124L870 238" stroke="#5c6b78" strokeWidth={6} strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 2.3, duration: 0.6 }} />
+          </g>
+          <motion.g initial={{ rotate: 0 }} animate={{ rotate: 180 }} transition={{ delay: 2, duration: 1.2, ease: EASE }} style={{ transformOrigin: '830px 72px' }}>
+            <path d="M808 44h44l-22 28 22 28h-44l22-28z" fill="none" stroke="#1b8a9c" strokeWidth={4} strokeLinejoin="round" />
+          </motion.g>
+          {title(700, 2, 'What to forget, and when', 'stale facts must expire', true)}
+        </motion.g>
+        {/* 3 · read: a stack of notes, the magnifier finds the right one */}
+        <motion.g data-life={3} {...zone(2)}>
+          {[0, 1, 2, 3].map((i) => (
+            <g key={i}>{card(1040 + i * 26, 50 + i * 26, 150, 170, i === 2 ? 'rgba(27,138,156,0.18)' : 'var(--panel-strong)', i === 2 ? '#1b8a9c' : '#8a919c')}</g>
+          ))}
+          {[150, 176, 202].map((y) => <path key={y} d={`M1136 ${y}h100`} stroke="#aab1ba" strokeWidth={5} strokeLinecap="round" />)}
+          <motion.g initial={{ x: 60, y: 40, opacity: 0 }} animate={{ x: 0, y: 0, opacity: 1 }} transition={{ delay: 3, duration: 0.9, ease: EASE }}>
+            <circle cx={1150} cy={150} r={46} fill="rgba(255,255,255,0.35)" stroke="#146f7f" strokeWidth={9} />
+            <path d="M1184 184l40 40" stroke="#146f7f" strokeWidth={14} strokeLinecap="round" />
+          </motion.g>
+          {title(1200, 3, 'Reading memory', '= retrieval: find the right note')}
+        </motion.g>
+        </g>
+      </svg>
+    </FitBox>
   );
 }
 
@@ -645,30 +725,40 @@ export function TwoMemories(p: L2Props) {
   const step = p.step ?? 1;
   return (
     <L2Page testId="l2-memories" {...p}>
-      <Fill>
-        <MemoryShelf compact={step >= 2} />
-        <AnimatePresence>{step >= 2 && <Lifecycle key="life" />}</AnimatePresence>
-        {step < 2 && (
-          <div data-inside style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 40, paddingTop: 16 }}>
-            {[
-              { t: 'Inside the notebook', s: 'the steps of this conversation, per thread', rows: ['checkpoints', 'checkpoint_blobs', 'checkpoint_writes'] },
-              { t: 'Inside the logbook', s: 'the notes, and their index for search by meaning', rows: ['store_incident', 'store_vectors_incident'] },
-            ].map((c, i) => (
-              <motion.div key={c.t} {...fadeUp(2.2 + i * 0.5)} style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '14px 20px', borderRadius: 14, background: SOFT, borderTop: `4px solid ${TEAL}` }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>{c.t}</span>
-                  <span style={{ fontSize: 22, color: DIM }}>{c.s}</span>
-                </div>
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  {c.rows.map((r) => (
-                    <Chip key={r} style={{ fontSize: 20, padding: '6px 12px' }}>{r}</Chip>
-                  ))}
-                </div>
+      <AnimatePresence mode="wait">
+        <motion.div key={step >= 2 ? 'life' : 'shelf'} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease: EASE }} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+          {step >= 2 ? (
+            <Fill gap={10}>
+              <motion.div data-lifecycle {...fade(0.1)} style={{ fontSize: 24, color: INK, lineHeight: 1.4 }}>
+                A real logbook gets <b>tidied</b>: decide what goes in, cross out what is no longer true, know where to look.
               </motion.div>
-            ))}
-          </div>
-        )}
-      </Fill>
+              <NoteLife />
+            </Fill>
+          ) : (
+            <Fill>
+              <MemoryShelf compact={false} />
+              <div data-inside style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 40, paddingTop: 16 }}>
+                {[
+                  { t: 'Inside the notebook', s: 'the steps of this conversation, per thread', rows: ['checkpoints', 'checkpoint_blobs', 'checkpoint_writes'] },
+                  { t: 'Inside the logbook', s: 'the notes, and their index for search by meaning', rows: ['store_incident', 'store_vectors_incident'] },
+                ].map((c, i) => (
+                  <motion.div key={c.t} {...fadeUp(2.2 + i * 0.5)} style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '14px 20px', borderRadius: 14, background: SOFT, borderTop: `4px solid ${TEAL}` }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>{c.t}</span>
+                      <span style={{ fontSize: 22, color: DIM }}>{c.s}</span>
+                    </div>
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
+                      {c.rows.map((r) => (
+                        <Chip key={r} style={{ fontSize: 20, padding: '6px 12px' }}>{r}</Chip>
+                      ))}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </Fill>
+          )}
+        </motion.div>
+      </AnimatePresence>
     </L2Page>
   );
 }
@@ -723,79 +813,87 @@ function Locker({ open, at, inside, padlock = false, w }: { open: boolean; at: n
 
 const CITY_RECORDS = ['PRISM data', 'graph', 'chunks', 'embeddings', 'vector indexes'];
 
+/** a lock, drawn */
+function Padlock({ size = 38 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 34 40" aria-hidden style={{ flex: 'none' }}>
+      <path d="M9 18v-6a8 8 0 0 1 16 0v6" fill="none" stroke={G_DARK} strokeWidth="4" />
+      <rect x="4" y="17" width="26" height="20" rx="4" fill={G_DARK} />
+    </svg>
+  );
+}
+
+/**
+ * One grid for the whole changing room (owner, 29 Oct: "why its not align"): this lab's three lockers and the city's
+ * five share the same rows, so the header boxes, the sub-headings, the locker tops and the labels line up.
+ */
 export function Wipe(p: L2Props) {
-  const built = useBuilt();
-  const enterAt = (d: number, lit: boolean) => enter(built ? 0 : d, lit);
   const focusN = useFocusN(p.focusId);
+  const built = useBuilt();
   const on = (n: number) => focusN === null || focusN === n;
-  const ring = (n: number) => (focusN === n ? `0 0 0 4px ${TINT2}` : 'none');
+  const fadeOn = (n: number) => ({ opacity: on(n) ? 1 : 0.4, transition: 'opacity 300ms' });
   const count = (t: ReactNode) => <div style={{ ...mono(21, '#fff'), fontWeight: 700, lineHeight: 1.3 }}>{t}</div>;
+  const ours = [
+    { t: 'STORE_INCIDENT', n: 2, at: 1.2, inside: <>{count('1 row')}<div style={{ fontSize: 18, color: '#c7ced6' }}>cleared</div></> },
+    { t: 'STORE_VECTORS_INCIDENT', n: 2, at: 1.6, inside: <>{count('1 row')}<div style={{ fontSize: 18, color: '#c7ced6' }}>cleared</div></> },
+    { t: 'CHECKPOINTS · BLOBS · WRITES', n: 3, at: 2.2, inside: <>{count('9 · 9 · 17')}<div style={{ fontSize: 18, color: '#c7ced6' }}>rows cleared</div></> },
+  ];
+  const box = { display: 'flex', alignItems: 'center', gap: 14, padding: '10px 16px', borderRadius: 12 } as const;
+  const sub = { display: 'flex', alignItems: 'center', gap: 10, fontSize: 24, fontWeight: 700, color: INK } as const;
+  const label = { fontSize: 18, textAlign: 'center' as const, lineHeight: 1.25, alignSelf: 'start' };
   return (
     <L2Page testId="l2-wipe" {...p}>
-      <Fill gap={16}>
+      <Fill gap={14}>
         <motion.div {...fade(0.1)} style={{ fontSize: 24, lineHeight: 1.45, color: INK }}>
           Like clearing out <b>only your own lockers</b> in a shared changing room: find your name tag, empty those, and leave everyone else’s shut.
         </motion.div>
-        <div style={{ flex: 1, minHeight: 360, display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(0, 1fr)', columnGap: 40 }}>
-          {/* ours: the name tag over three lockers */}
-          <div style={{ minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <motion.div data-step={1} data-on={on(1)} {...enterAt(0.3, on(1))} style={{ alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 14, padding: '10px 16px', borderRadius: 12, border: `2px solid ${TEAL}`, background: TINT, boxShadow: ring(1) }}>
-              <Num n={1} size={38} on={on(1)} />
-              <div>
-                <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>This lab’s name tag</div>
-                <div style={{ ...mono(21) }}>prism_incident_decisions</div>
-              </div>
-            </motion.div>
-            <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '2fr 1fr', columnGap: 18 }}>
-              <div data-step={2} data-on={on(2)} style={{ display: 'flex', flexDirection: 'column', gap: 10, opacity: on(2) ? 1 : 0.4, transition: 'opacity 300ms' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Num n={2} size={34} on={on(2)} />
-                  <span style={{ fontSize: 24, fontWeight: 700, color: INK }}>Logbook pages</span>
-                </div>
-                <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 12 }}>
-                  {['STORE_INCIDENT', 'STORE_VECTORS_INCIDENT'].map((t, i) => (
-                    <div key={t} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <Locker open at={1.2 + i * 0.4} inside={<>{count('1 row')}<div style={{ fontSize: 18, color: '#c7ced6' }}>cleared</div></>} />
-                      <div style={{ ...mono(18, INK), fontWeight: 700, textAlign: 'center', overflowWrap: 'anywhere' }}>{t}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div data-step={3} data-on={on(3)} style={{ display: 'flex', flexDirection: 'column', gap: 10, opacity: on(3) ? 1 : 0.4, transition: 'opacity 300ms' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Num n={3} size={34} on={on(3)} />
-                  <span style={{ fontSize: 24, fontWeight: 700, color: INK }}>This visit</span>
-                </div>
-                <Locker open at={2.2} inside={<>{count('9 · 9 · 17')}<div style={{ fontSize: 18, color: '#c7ced6' }}>rows cleared</div></>} />
-                <div style={{ ...mono(18, INK), fontWeight: 700, textAlign: 'center' }}>CHECKPOINTS · BLOBS · WRITES</div>
-              </div>
+        <div data-lockers style={{ flex: 1, minHeight: 360, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1.35fr)) 30px repeat(5, minmax(0, 1fr))', gridTemplateRows: '76px 44px minmax(0, 1fr) 50px auto', columnGap: 12, rowGap: 10 }}>
+          {/* row 1: the two header boxes, the same height */}
+          <motion.div data-step={1} data-on={on(1)} {...enter(built ? 0 : 0.3, on(1))} style={{ ...box, gridColumn: '1 / 4', border: `2px solid ${TEAL}`, background: TINT, boxShadow: focusN === 1 ? `0 0 0 4px ${TINT2}` : 'none' }}>
+            <Num n={1} size={38} on={on(1)} />
+            <div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>This lab’s name tag</div>
+              <div style={{ ...mono(21) }}>prism_incident_decisions</div>
             </div>
-            <motion.div {...fade(2.8)} style={{ alignSelf: 'flex-start' }}>
-              <Chip style={{ fontSize: 19 }}>thread_id = prism-agent-demo-001</Chip>
-            </motion.div>
-          </div>
-          {/* the city's: shut and locked */}
-          <motion.div data-untouched {...fadeUp(0.5)} style={{ minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ padding: '10px 16px', borderRadius: 12, border: '2px dashed var(--line)', display: 'flex', alignItems: 'center', gap: 14 }}>
-              <svg width="38" height="38" viewBox="0 0 34 40" aria-hidden style={{ flex: 'none' }}>
-                <path d="M9 18v-6a8 8 0 0 1 16 0v6" fill="none" stroke={G_DARK} strokeWidth="4" />
-                <rect x="4" y="17" width="26" height="20" rx="4" fill={G_DARK} />
-              </svg>
-              <div>
-                <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>The city records</div>
-                <div style={{ fontSize: 22, color: DIM }}>not touched</div>
-              </div>
-            </div>
-            <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 10 }}>
-              {CITY_RECORDS.map((t) => (
-                <div key={t} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <Locker open={false} at={0} padlock />
-                  <div style={{ fontSize: 19, color: INK, textAlign: 'center', lineHeight: 1.2, minHeight: 46 }}>{t}</div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 18, color: DIM, textAlign: 'right' }}>Row counts: saved output, cell 71</div>
           </motion.div>
+          <motion.div data-untouched {...fade(0.5)} style={{ ...box, gridColumn: '5 / 10', border: '2px dashed var(--line)' }}>
+            <Padlock />
+            <div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>The city records</div>
+              <div style={{ fontSize: 22, color: DIM }}>not touched</div>
+            </div>
+          </motion.div>
+          {/* row 2: the sub-headings */}
+          <div data-step={2} data-on={on(2)} style={{ ...sub, ...fadeOn(2), gridColumn: '1 / 3' }}>
+            <Num n={2} size={34} on={on(2)} /> Logbook pages
+          </div>
+          <div data-step={3} data-on={on(3)} style={{ ...sub, ...fadeOn(3), gridColumn: '3 / 4' }}>
+            <Num n={3} size={34} on={on(3)} /> This visit
+          </div>
+          <div style={{ ...sub, gridColumn: '5 / 10', fontWeight: 500, color: DIM, fontSize: 22 }}>five lockers, padlocked</div>
+          {/* row 3: the lockers, tops on one line */}
+          {ours.map((o, i) => (
+            <div key={o.t} style={{ gridColumn: i + 1, gridRow: 3, display: 'flex', minHeight: 0, ...fadeOn(o.n) }}>
+              <Locker open at={o.at} inside={o.inside} />
+            </div>
+          ))}
+          {CITY_RECORDS.map((t, i) => (
+            <div key={t} style={{ gridColumn: i + 5, gridRow: 3, display: 'flex', minHeight: 0 }}>
+              <Locker open={false} at={0} padlock />
+            </div>
+          ))}
+          {/* row 4: the labels, on one baseline */}
+          {ours.map((o, i) => (
+            <div key={o.t} style={{ ...label, ...mono(18, INK), fontWeight: 700, gridColumn: i + 1, gridRow: 4, ...fadeOn(o.n) }}>{o.t.replace(/_(?=[A-Z]+$)/, '_\u200b')}</div>
+          ))}
+          {CITY_RECORDS.map((t, i) => (
+            <div key={t} style={{ ...label, fontSize: 19, color: INK, gridColumn: i + 5, gridRow: 4 }}>{t}</div>
+          ))}
+          {/* row 5: the thread, and where the counts come from */}
+          <motion.div {...fade(2.8)} style={{ gridColumn: '1 / 4', gridRow: 5 }}>
+            <Chip style={{ fontSize: 19 }}>thread_id = prism-agent-demo-001</Chip>
+          </motion.div>
+          <div style={{ gridColumn: '5 / 10', gridRow: 5, fontSize: 18, color: DIM, textAlign: 'right', alignSelf: 'center' }}>Row counts: saved output, cell 71</div>
         </div>
       </Fill>
     </L2Page>
@@ -835,7 +933,7 @@ export function StoreSaver(p: L2Props) {
             {/* the agent and the one connection */}
             <motion.g {...fade(0.2)}>
               <g transform="translate(30 170)">
-                <ChiefInspector size={180} />
+                <AgentAvatar size={180} />
               </g>
               <text x={120} y={385} textAnchor="middle" fontSize={28} fontWeight={700} fill="var(--ink)" fontFamily={SVG_FONT}>AI Agent</text>
             </motion.g>
@@ -947,7 +1045,7 @@ export function Allowlist(p: L2Props) {
           {/* the language model learns only what is in the box */}
           <motion.div data-step={3} data-on={on(3)} {...enterAt(2.8, on(3))} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }}>
             <Num n={3} size={38} on={on(3)} />
-            <ChiefInspector size={180} />
+            <AgentAvatar size={180} />
             <Chip style={{ fontSize: 20 }}>bind_tools(AGENT_TOOLS)</Chip>
             <div style={{ fontSize: 24, fontWeight: 700, color: INK, lineHeight: 1.3 }}>The model learns only these</div>
             <div style={{ fontSize: 22, color: DIM, lineHeight: 1.35 }}>8 names, their types and their docstrings</div>
@@ -1042,7 +1140,7 @@ export function ThreeLayers(p: L2Props) {
           </div>
           {/* one brief, handed to the agent */}
           <motion.div {...fadeUp(2.9)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, textAlign: 'center' }}>
-            <ChiefInspector size={170} />
+            <AgentAvatar size={170} />
             <div style={{ fontSize: 26, fontWeight: 700, color: INK }}>One brief</div>
             <div style={{ padding: '12px 20px', borderRadius: 12, background: 'rgba(31,42,51,0.92)', ...mono(21, '#fff'), fontWeight: 700 }}>AGENT_SYSTEM</div>
             <div style={{ ...mono(21) }}>2,533 chars</div>
