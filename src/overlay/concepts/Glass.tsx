@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { EASE, WidePanel } from './WidePanel';
 import { LineIcon, type IconName } from './icons';
+import { Fill, FitBox } from './Fill';
 import vancePortrait from '../../assets/portraits/vance.png';
 
 export interface GlassProps {
@@ -45,11 +46,11 @@ export function Glass({ kicker, message, step, notebook }: GlassProps) {
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="glass" step={step}>
       <AnimatePresence mode="wait">
         {step === 1 ? (
-          <motion.div key="fill" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+          <motion.div key="fill" exit={{ opacity: 0 }} transition={{ duration: 0.3 }} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             <GlassFill />
           </motion.div>
         ) : (
-          <motion.div key="wrong" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+          <motion.div key="wrong" exit={{ opacity: 0 }} transition={{ duration: 0.3 }} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             <FourGlasses />
           </motion.div>
         )}
@@ -60,8 +61,8 @@ export function Glass({ kicker, message, step, notebook }: GlassProps) {
 
 /* ---------- step 1 ---------- */
 
-const LAYER_H = 60;
-const GLASS_W = 440;
+const LAYER_H = 82;
+const GLASS_W = 480;
 const GLASS_TOP = 22;
 const GLASS_H = GLASS_TOP + LAYER_H * GLASS_LAYERS.length + 6;
 const SLANT = 0.17; // each side leans in by this share of the width at the bottom
@@ -112,8 +113,9 @@ function GlassFill() {
   const clip = `polygon(0 0, 100% 0, ${100 - SLANT * 100}% 100%, ${SLANT * 100}% 100%)`;
   const outline = `M0 ${GLASS_TOP} L${GLASS_W * SLANT} ${GLASS_H} L${GLASS_W * (1 - SLANT)} ${GLASS_H} L${GLASS_W} ${GLASS_TOP}`;
   return (
-    <div>
-      <div style={{ position: 'relative', width: 1400, height: GLASS_H + 24, margin: '8px auto 0' }}>
+    <Fill>
+      <FitBox w={1400} h={GLASS_H + 24} max={1.1}>
+      <div style={{ position: 'relative', width: 1400, height: GLASS_H + 24 }}>
         {/* the glass */}
         <div data-glass="fill" style={{ position: 'absolute', left: 0, top: 0, width: GLASS_W, height: GLASS_H }}>
           <div style={{ position: 'absolute', left: 0, right: 0, top: GLASS_TOP, bottom: 0, clipPath: clip, display: 'flex', flexDirection: 'column-reverse' }}>
@@ -124,9 +126,9 @@ function GlassFill() {
                 initial={{ opacity: 0, y: -60 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + i * 0.32, duration: 0.6, ease: EASE }}
-                style={{ height: LAYER_H, boxSizing: 'border-box', borderTop: i === GLASS_LAYERS.length - 1 ? 'none' : '5px solid var(--panel-strong)', background: `rgba(27, 138, 156, ${i % 2 ? 0.3 : 0.16})`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 24, fontWeight: 600, color: 'var(--ink)', ...(i === 0 ? { paddingBottom: 6 } : {}) }}
+                style={{ height: LAYER_H, boxSizing: 'border-box', borderTop: i === GLASS_LAYERS.length - 1 ? 'none' : '5px solid var(--panel-strong)', background: `rgba(27, 138, 156, ${i % 2 ? 0.3 : 0.16})`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 27, fontWeight: 600, color: 'var(--ink)', ...(i === 0 ? { paddingBottom: 6 } : {}) }}
               >
-                {name === 'Vance’s question' && <img data-portrait="vance" src={vancePortrait} alt="" width={46} height={46} style={{ borderRadius: '50%', border: '2px solid var(--teal)', objectFit: 'cover' }} />}
+                {name === 'Vance’s question' && <img data-portrait="vance" src={vancePortrait} alt="" width={54} height={54} style={{ borderRadius: '50%', border: '2px solid var(--teal)', objectFit: 'cover' }} />}
                 {name}
               </motion.div>
             ))}
@@ -136,13 +138,13 @@ function GlassFill() {
             <line x1={0} y1={GLASS_TOP} x2={GLASS_W} y2={GLASS_TOP} stroke="var(--ink-dim)" strokeWidth={2.5} strokeDasharray="9 7" />
           </svg>
         </div>
-        <motion.div data-rim="full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.2, duration: 0.5 }} style={{ position: 'absolute', left: GLASS_W + 24, top: GLASS_TOP - 14, fontSize: 19, fontWeight: 600, color: 'var(--ink-dim)' }}>
+        <motion.div data-rim="full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.2, duration: 0.5 }} style={{ position: 'absolute', left: GLASS_W + 24, top: GLASS_TOP - 16, fontSize: 22, fontWeight: 600, color: 'var(--ink-dim)' }}>
           full line: no more fits
         </motion.div>
 
         {/* the one arrow, and the model */}
-        <motion.div data-arrow="sees" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5, duration: 0.5 }} style={{ position: 'absolute', left: 480, top: 190, width: 290, textAlign: 'center' }}>
-          <div style={{ fontSize: 23, fontWeight: 700, color: 'var(--teal)', lineHeight: 1.25, marginBottom: 6 }}>
+        <motion.div data-arrow="sees" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5, duration: 0.5 }} style={{ position: 'absolute', left: 515, top: 236, width: 290, textAlign: 'center' }}>
+          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--teal)', lineHeight: 1.25, marginBottom: 6 }}>
             it sees this,
             <br />
             and nothing else
@@ -151,14 +153,14 @@ function GlassFill() {
             <motion.path d="M4 18h278M266 4l16 14-16 14" fill="none" stroke="var(--teal)" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 2.6, duration: 0.7, ease: EASE }} />
           </svg>
         </motion.div>
-        <motion.div data-model="language-model" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 3, duration: 0.6 }} style={{ position: 'absolute', left: 790, top: 90, width: 260, textAlign: 'center' }}>
+        <motion.div data-model="language-model" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 3, duration: 0.6 }} style={{ position: 'absolute', left: 815, top: 130, width: 260, textAlign: 'center' }}>
           <NeuralDrawing />
-          <div style={{ fontSize: 23, fontWeight: 600, color: 'var(--ink)', marginTop: 4 }}>the language model</div>
+          <div style={{ fontSize: 26, fontWeight: 600, color: 'var(--ink)', marginTop: 4 }}>the language model</div>
         </motion.div>
 
         {/* outside the glass */}
-        <div data-outside="glass" style={{ position: 'absolute', left: 1090, top: 70, width: 310 }}>
-          <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '0.14em', color: 'var(--ink-dim)', marginBottom: 12 }}>OUTSIDE THE GLASS</div>
+        <div data-outside="glass" style={{ position: 'absolute', left: 1090, top: 96, width: 310 }}>
+          <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '0.14em', color: 'var(--ink-dim)', marginBottom: 16 }}>OUTSIDE THE GLASS</div>
           {OUTSIDE.map((o, i) => (
             <motion.div
               key={o}
@@ -166,27 +168,28 @@ function GlassFill() {
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 3.1 + i * 0.25, duration: 0.5, ease: EASE }}
-              style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', marginBottom: 12, border: `2px dashed ${GREY_LINE}`, borderRadius: 8, background: 'rgba(138, 145, 156, 0.1)', color: 'var(--ink-dim)' }}
+              style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '18px 18px', marginBottom: 16, border: `2px dashed ${GREY_LINE}`, borderRadius: 8, background: 'rgba(138, 145, 156, 0.1)', color: 'var(--ink-dim)' }}
             >
               <EyeIcon off />
               <div>
-                <div style={{ fontSize: 22 }}>{o}</div>
-                <div style={{ fontSize: 16, fontWeight: 600 }}>not seen</div>
+                <div style={{ fontSize: 24 }}>{o}</div>
+                <div style={{ fontSize: 18, fontWeight: 600 }}>not seen</div>
               </div>
             </motion.div>
           ))}
         </div>
       </div>
+      </FitBox>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 18, marginTop: 28 }}>
+      <div style={{ flex: 'none', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, marginTop: 24 }}>
         {GLASS_FACTS.map((f, i) => (
-          <motion.div key={f} data-fact={f} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.8 + i * 0.25, duration: 0.5, ease: EASE }} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '14px 22px', borderRadius: 10, background: 'rgba(127, 127, 127, 0.1)', fontSize: 23, fontWeight: 600, color: 'var(--ink)' }}>
+          <motion.div key={f} data-fact={f} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.8 + i * 0.25, duration: 0.5, ease: EASE }} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '20px 24px', borderRadius: 12, background: 'rgba(127, 127, 127, 0.1)', fontSize: 24, fontWeight: 600, color: 'var(--ink)' }}>
             {i === 0 ? <LineIcon name="glass" size={40} /> : i === 1 ? <EyeIcon /> : <PourIcon />}
             {f}
           </motion.div>
         ))}
       </div>
-    </div>
+    </Fill>
   );
 }
 
@@ -208,7 +211,7 @@ const TUMBLER = 'M22 40L44 228Q100 238 156 228L178 40';
 
 function MiniGlass({ word, t0, children }: { word: string; t0: number; children: (t0: number) => ReactNode }) {
   return (
-    <svg data-glass={word} width={200} height={270} viewBox="0 0 200 270" style={{ overflow: 'visible' }} aria-hidden="true">
+    <svg data-glass={word} width={290} height={392} viewBox="0 0 200 270" style={{ overflow: 'visible', width: '100%', maxWidth: 290, height: 'auto' }} aria-hidden="true">
       {children(t0)}
       <path d={TUMBLER} fill="none" stroke={GREY_LINE} strokeWidth={3} strokeLinejoin="round" />
       <line x1={14} y1={40} x2={186} y2={40} stroke={GREY_LINE} strokeWidth={3} strokeLinecap="round" />
@@ -344,23 +347,23 @@ const DRAW = [VolumeGlass, RelevanceGlass, AccuracyGlass, TimingGlass];
 
 function FourGlasses() {
   return (
-    <div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, marginTop: 4, paddingTop: 12 }}>
+    <Fill>
+      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, alignContent: 'center', paddingTop: 12 }}>
         {WRONG.map((w, i) => (
           <motion.div key={w.word} data-problem={w.word} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 + i * 0.1, duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <MiniGlass word={w.word} t0={START + i * SLOT}>
               {DRAW[i]}
             </MiniGlass>
             {/* the same icon comes back when the problem is solved (Ending.tsx, 3.15b) */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 30, fontWeight: 700, color: 'var(--ink)', marginTop: 10 }}>
-              <LineIcon name={CURATION[i].icon} size={34} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 33, fontWeight: 700, color: 'var(--ink)', marginTop: 14 }}>
+              <LineIcon name={CURATION[i].icon} size={40} />
               {w.word}
             </div>
-            <div style={{ fontSize: 20, lineHeight: 1.35, color: 'var(--ink-dim)', marginTop: 6, maxWidth: 300 }}>{w.text}</div>
+            <div style={{ fontSize: 23, lineHeight: 1.4, color: 'var(--ink-dim)', marginTop: 8, maxWidth: 320 }}>{w.text}</div>
           </motion.div>
         ))}
       </div>
-      <div data-legend="glass" style={{ display: 'flex', gap: 40, marginTop: 20, fontSize: 18, color: 'var(--ink-dim)' }}>
+      <div data-legend="glass" style={{ flex: 'none', display: 'flex', gap: 48, marginTop: 20, fontSize: 21, color: 'var(--ink-dim)' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <i style={{ width: 24, height: 18, borderRadius: 3, background: GREY_FILL, border: `1.5px solid ${GREY_LINE}` }} /> grey = noise and old turns
         </span>
@@ -368,6 +371,6 @@ function FourGlasses() {
           <i style={{ width: 24, height: 18, borderRadius: 3, background: TEAL_FILL, border: '2px solid var(--teal)' }} /> teal = what Vance needs
         </span>
       </div>
-    </div>
+    </Fill>
   );
 }

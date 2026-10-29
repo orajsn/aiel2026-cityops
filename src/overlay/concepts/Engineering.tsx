@@ -6,6 +6,7 @@ import vancePortrait from '../../assets/portraits/vance.png';
 import { CURATION } from './Glass';
 import { LineIcon } from './icons';
 import { EASE, WidePanel } from './WidePanel';
+import { Fill } from './Fill';
 
 export type Which = 'memory' | 'context' | 'harness';
 
@@ -20,7 +21,7 @@ const GREY = 'var(--ink-dim)';
 const MONO = 'JetBrains Mono, monospace';
 const TEAL_TINT = 'rgba(27, 138, 156, 0.12)';
 
-const label = { fontSize: 15, fontWeight: 700, letterSpacing: 2.4, color: GREY, textTransform: 'uppercase' as const, marginBottom: 14 };
+const label = { fontSize: 17, fontWeight: 700, letterSpacing: 2.4, color: GREY, textTransform: 'uppercase' as const, marginBottom: 18 };
 
 /** step timing: 1, 2, 3 arrive about a second apart, the ticks follow */
 const stepAt = (i: number) => 0.5 + i * 0.9;
@@ -62,7 +63,7 @@ function Portrait({ src, alt, size = 84 }: { src: string; alt: string; size?: nu
 }
 
 function Chip({ text }: { text: string }) {
-  return <span style={{ fontFamily: MONO, fontSize: 16, padding: '4px 12px', borderRadius: 7, border: '1.5px solid var(--teal)', background: TEAL_TINT, color: 'var(--ink)' }}>{text}</span>;
+  return <span style={{ display: 'inline-block', lineHeight: 1.35, fontFamily: MONO, fontSize: 18, padding: '5px 12px', borderRadius: 7, border: '1.5px solid var(--teal)', background: TEAL_TINT, color: 'var(--ink)' }}>{text}</span>;
 }
 
 function Arrow({ delay = 0, w = 70 }: { delay?: number; w?: number }) {
@@ -281,33 +282,33 @@ const EVERYDAY: Record<Which, { art: ReactNode; caption: string }> = {
 /** a numbered step: its number sits in the rail, with a dot travelling down the connector to the next */
 function Step({ n, last, children }: { n: number; last?: boolean; children: ReactNode }) {
   return (
-    <motion.div data-step={n} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: stepAt(n - 1), duration: 0.5, ease: EASE }} style={{ display: 'grid', gridTemplateColumns: '46px 1fr', columnGap: 18, position: 'relative' }}>
+    <motion.div data-step={n} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: stepAt(n - 1), duration: 0.5, ease: EASE }} style={{ flex: last ? 'none' : '1 0 auto', display: 'grid', gridTemplateColumns: '50px 1fr', columnGap: 20, position: 'relative' }}>
       <div style={{ position: 'relative' }}>
-        <span style={{ width: 46, height: 46, borderRadius: '50%', background: 'var(--teal)', color: '#fff', fontWeight: 700, fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{n}</span>
+        <span style={{ width: 50, height: 50, borderRadius: '50%', background: 'var(--teal)', color: '#fff', fontWeight: 700, fontSize: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{n}</span>
         {!last && (
           <>
-            <span style={{ position: 'absolute', left: 22, top: 50, bottom: -14, borderLeft: '2.5px dotted var(--teal)' }} />
-            <motion.span data-connector-dot style={{ position: 'absolute', left: 17, width: 12, height: 12, borderRadius: '50%', background: 'var(--teal)' }} initial={{ top: 50, opacity: 0 }} animate={{ top: [50, 110], opacity: [0, 1, 1, 0] }} transition={{ delay: stepAt(n - 1) + 0.5, duration: 0.9, ease: EASE }} />
+            <span style={{ position: 'absolute', left: 24, top: 56, bottom: 6, borderLeft: '2.5px dotted var(--teal)' }} />
+            <motion.span data-connector-dot style={{ position: 'absolute', left: 19, width: 12, height: 12, borderRadius: '50%', background: 'var(--teal)' }} initial={{ top: '0%', opacity: 0 }} animate={{ top: ['0%', '90%'], opacity: [0, 1, 1, 0] }} transition={{ delay: stepAt(n - 1) + 0.5, duration: 0.9, ease: EASE }} />
           </>
         )}
       </div>
-      <div style={{ paddingBottom: last ? 0 : 14 }}>{children}</div>
+      <div style={{ paddingBottom: last ? 0 : 24 }}>{children}</div>
     </motion.div>
   );
 }
 
-const stepTitle = { fontSize: 23, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.3, marginBottom: 8 } as const;
-const bubble = { fontSize: 19, fontStyle: 'italic', padding: '10px 18px', borderRadius: 14, background: 'rgba(127, 127, 127, 0.14)', color: 'var(--ink)' } as const;
+const stepTitle = { fontSize: 26, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.3, marginBottom: 12 } as const;
+const bubble = { fontSize: 22, fontStyle: 'italic', padding: '12px 20px', borderRadius: 14, background: 'rgba(127, 127, 127, 0.14)', color: 'var(--ink)' } as const;
 
 function MemorySteps() {
   return (
-    <div>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
       <Step n={1}>
         <div style={stepTitle}>Mercer finishes her Day 1 turn.</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Portrait src={mercerPortrait} alt="Mercer" size={78} />
+          <Portrait src={mercerPortrait} alt="Mercer" size={96} />
           <div style={bubble}>“…about 25% section loss at the bearing plate edges.”</div>
-          <MiniGlass w={44} layers={1} />
+          <MiniGlass w={52} layers={1} />
         </div>
       </Step>
       <Step n={2}>
@@ -315,9 +316,9 @@ function MemorySteps() {
           We file the turn in <span style={{ color: 'var(--teal)' }}>Oracle AI Database</span> as separate records.
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <MiniGlass w={42} layers={1} />
+          <MiniGlass w={50} layers={1} />
           <Arrow delay={stepAt(1) + 0.5} w={64} />
-          <Cylinder w={48} />
+          <Cylinder w={56} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginLeft: 10 }}>
             {['conversation', 'fact: ~25% section loss', 'guideline: remove loose corrosion before coating'].map((t, i) => (
               <motion.div key={t} data-record={t.split(':')[0]} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: stepAt(1) + 0.8 + i * 0.2, duration: 0.4, ease: EASE }}>
@@ -330,10 +331,10 @@ function MemorySteps() {
       <Step n={3} last>
         <div style={stepTitle}>The glass empties for the next turn. Nothing is lost.</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <MiniGlass w={56} layers={0} />
+          <MiniGlass w={64} layers={0} />
           <Arrow delay={stepAt(2) + 0.5} w={64} />
-          <Cylinder w={56} />
-          <div style={{ fontSize: 21, fontWeight: 700, color: 'var(--teal)', lineHeight: 1.35, marginLeft: 12 }}>The 25% is its own record,<br />so a summary can’t drop it.</div>
+          <Cylinder w={64} />
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--teal)', lineHeight: 1.35, marginLeft: 12 }}>The 25% is its own record,<br />so a summary can’t drop it.</div>
         </div>
       </Step>
     </div>
@@ -342,18 +343,18 @@ function MemorySteps() {
 
 function ContextSteps() {
   return (
-    <div>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
       <Step n={1}>
         <div style={stepTitle}>Vance asks a question.</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Portrait src={vancePortrait} alt="Vance" size={78} />
+          <Portrait src={vancePortrait} alt="Vance" size={96} />
           <div style={bubble}>“What happened at this pier?”</div>
         </div>
       </Step>
       <Step n={2}>
         <div style={stepTitle}>Search the store and keep only what matches.</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Cylinder w={56} />
+          <Cylinder w={64} />
           <Arrow delay={stepAt(1) + 0.5} w={60} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {['Mercer’s finding', 'her guideline'].map((t, i) => (
@@ -362,14 +363,14 @@ function ContextSteps() {
               </motion.div>
             ))}
           </div>
-          <span style={{ fontSize: 19, color: GREY, marginLeft: 14, maxWidth: 150, lineHeight: 1.3 }}>the rest stays in the store</span>
+          <span style={{ fontSize: 22, color: GREY, marginLeft: 16, maxWidth: 170, lineHeight: 1.3 }}>the rest stays in the store</span>
         </div>
       </Step>
       <Step n={3} last>
         <div style={stepTitle}>Old chat turns become a one-line summary. The glass is poured fresh.</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <MiniGlass w={64} layers={4} />
-          <div style={{ fontSize: 19, lineHeight: 1.45 }}>
+          <MiniGlass w={76} layers={4} />
+          <div style={{ fontSize: 22, lineHeight: 1.45 }}>
             <div style={{ color: 'var(--ink)' }}>Vance’s question</div>
             <div style={{ color: GREY }}>summary of old turns</div>
             <div style={{ color: 'var(--teal)', fontWeight: 700 }}>her guideline</div>
@@ -413,17 +414,17 @@ function HarnessLoop() {
     };
   }, []);
   return (
-    <div data-harness-loop>
+    <div data-harness-loop style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
       <div style={{ fontSize: 20, lineHeight: 1.4, color: GREY }}>
         The <b style={{ color: 'var(--ink)' }}>harness</b> is the loop code your agent already runs in: LangGraph, Claude Agent SDK, OpenAI Agents SDK, or your own Python.
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '10px 0 10px' }}>
-        <span data-turn={turn} style={{ fontSize: 21, fontWeight: 700, color: 'var(--ink)', marginRight: 6, minWidth: 110 }}>turn 1 → {turn}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 9, margin: '10px 0 12px' }}>
+        <span data-turn={turn} style={{ fontSize: 23, fontWeight: 700, color: 'var(--ink)', marginRight: 6, minWidth: 110 }}>turn 1 → {turn}</span>
         {Array.from({ length: 15 }).map((_, i) => (
           <span key={i} data-turn-dot={i + 1} style={{ width: i === 0 || i === 14 ? 24 : 12, height: i === 0 || i === 14 ? 24 : 12, borderRadius: '50%', background: i < turn ? 'var(--teal)' : 'rgba(27, 138, 156, 0.22)', transition: 'background 0.2s' }} />
         ))}
       </div>
-      <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1fr 70px 1fr', gridTemplateRows: 'auto 64px auto' }}>
+      <div style={{ flex: '1 0 auto', position: 'relative', display: 'grid', gridTemplateColumns: '1fr 80px 1fr', gridTemplateRows: 'minmax(min-content, 1fr) 54px minmax(min-content, 1fr)' }}>
         {STATIONS.map((s, i) => {
           const [r, c] = CELL[i].split(' / ').map(Number);
           const on = lit === i;
@@ -435,13 +436,13 @@ function HarnessLoop() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0, boxShadow: on ? '0 0 0 3px rgba(27, 138, 156, 0.35)' : '0 0 0 0px rgba(27, 138, 156, 0)' }}
               transition={{ opacity: { delay: 0.3 + i * 0.2, duration: 0.5 }, y: { delay: 0.3 + i * 0.2, duration: 0.5, ease: EASE }, boxShadow: { duration: 0.5, ease: EASE } }}
-              style={{ gridRow: r, gridColumn: c, border: '2px solid var(--teal)', borderRadius: 12, padding: '10px 16px', background: on ? TEAL_TINT : 'transparent' }}
+              style={{ gridRow: r, gridColumn: c, display: 'flex', flexDirection: 'column', justifyContent: 'center', border: '2px solid var(--teal)', borderRadius: 12, padding: '10px 18px', background: on ? TEAL_TINT : 'transparent' }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 24, fontWeight: 700, color: 'var(--ink)' }}>
-                <span style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--teal)', color: '#fff', fontSize: 19, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{s.n}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 27, fontWeight: 700, color: 'var(--ink)' }}>
+                <span style={{ width: 38, height: 38, borderRadius: '50%', background: 'var(--teal)', color: '#fff', fontSize: 21, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{s.n}</span>
                 {s.name}
               </div>
-              <div style={{ fontSize: 17, lineHeight: 1.3, color: 'var(--ink)', marginTop: 4 }}>{s.text}</div>
+              <div style={{ fontSize: 19, lineHeight: 1.3, color: 'var(--ink)', marginTop: 4 }}>{s.text}</div>
             </motion.div>
           );
         })}
@@ -452,12 +453,12 @@ function HarnessLoop() {
           </div>
         ))}
         <div style={{ gridRow: 2, gridColumn: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <MiniGlass w={46} layers={3} />
+          <MiniGlass w={54} layers={3} />
         </div>
       </div>
-      <div style={{ textAlign: 'center', marginTop: 2 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 8 }}>
         <Cylinder w={44} />
-        <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--teal)' }}>Oracle AI Database</div>
+        <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--teal)' }}>Oracle AI Database</div>
       </div>
       <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--teal)', marginTop: 10 }}>Nobody has to remember to look. The loop does it every time.</div>
     </div>
@@ -470,26 +471,26 @@ function Problems({ which }: { which: Which }) {
   const fixes = FIXES[which];
   let k = 0;
   return (
-    <div>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
       {CURATION.map((c) => {
         const how = fixes[c.word];
         const delay = how ? TICKS_AT + k++ * 0.4 : TICKS_AT;
         return how ? (
-          <motion.div key={c.word} data-fix={c.word} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay, duration: 0.5, ease: EASE }} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', marginBottom: 12, borderRadius: 12, border: '2px solid var(--teal)', background: TEAL_TINT }}>
-            <Tick />
+          <motion.div key={c.word} data-fix={c.word} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay, duration: 0.5, ease: EASE }} style={{ flex: '1 0 auto', display: 'flex', alignItems: 'center', gap: 16, padding: '10px 18px', borderRadius: 12, border: '2px solid var(--teal)', background: TEAL_TINT }}>
+            <Tick size={38} />
             <div>
-              <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--ink)' }}>{c.word}</div>
-              <div style={{ fontSize: 19, color: 'var(--teal)', fontWeight: 500, lineHeight: 1.25 }}>{how}</div>
+              <div style={{ fontSize: 27, fontWeight: 700, color: 'var(--ink)' }}>{c.word}</div>
+              <div style={{ fontSize: 21, color: 'var(--teal)', fontWeight: 500, lineHeight: 1.25 }}>{how}</div>
             </div>
           </motion.div>
         ) : (
-          <div key={c.word} data-unfixed={c.word} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', marginBottom: 12, borderRadius: 12, border: '2px dashed var(--line)', opacity: 0.6 }}>
-            <span style={{ width: 34, height: 34, borderRadius: '50%', border: '2px solid var(--line)', flex: 'none' }} />
-            <div style={{ fontSize: 24, fontWeight: 700, color: GREY }}>{c.word}</div>
+          <div key={c.word} data-unfixed={c.word} style={{ flex: '1 0 auto', display: 'flex', alignItems: 'center', gap: 16, padding: '10px 18px', borderRadius: 12, border: '2px dashed var(--line)', opacity: 0.6 }}>
+            <span style={{ width: 38, height: 38, borderRadius: '50%', border: '2px solid var(--line)', flex: 'none' }} />
+            <div style={{ fontSize: 27, fontWeight: 700, color: GREY }}>{c.word}</div>
           </div>
         );
       })}
-      <div style={{ fontSize: 16, color: GREY, marginTop: 4 }}>the four problems in the glass</div>
+      <div style={{ fontSize: 18, color: GREY }}>the four problems in the glass</div>
     </div>
   );
 }
@@ -511,23 +512,28 @@ export function Discipline({ kicker, message, which, notebook }: DisciplineProps
   const e = EVERYDAY[which];
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="discipline">
-      <div data-which={which} style={{ display: 'grid', gridTemplateColumns: '340px 1fr 270px', gap: 0, marginTop: 10, borderTop: '1px solid var(--line)', paddingTop: 16 }}>
-        <div style={{ paddingRight: 24, borderRight: '1px solid var(--line)' }}>
+      <Fill>
+      <div data-which={which} style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '410px 1fr 300px', gap: 0, marginTop: 10, borderTop: '1px solid var(--line)', paddingTop: 20 }}>
+        <div style={{ paddingRight: 26, borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column' }}>
           <div style={label}>In everyday life</div>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 0.6 }}>{e.art}</motion.div>
-          <div data-caption style={{ fontSize: 20, lineHeight: 1.45, color: 'var(--ink)', marginTop: 14 }}>{e.caption}</div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            {/* the drawings are laid out at 320 px wide: shown larger, the column has the room */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 0.6 }} style={{ zoom: 1.2 }}>{e.art}</motion.div>
+            <div data-caption style={{ fontSize: 23, lineHeight: 1.45, color: 'var(--ink)', marginTop: 18 }}>{e.caption}</div>
+          </div>
         </div>
-        <div style={{ padding: '0 28px', borderRight: '1px solid var(--line)' }}>
+        <div style={{ padding: '0 30px', borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column' }}>
           <div style={label}>At Harbor Bridge</div>
           {which === 'memory' && <MemorySteps />}
           {which === 'context' && <ContextSteps />}
           {which === 'harness' && <HarnessLoop />}
         </div>
-        <div style={{ paddingLeft: 24 }}>
+        <div style={{ paddingLeft: 26, display: 'flex', flexDirection: 'column' }}>
           <div style={label}>Problems it fixes</div>
           <Problems which={which} />
         </div>
       </div>
+      </Fill>
     </WidePanel>
   );
 }
@@ -557,26 +563,27 @@ export function WhoFixesWhat({ kicker, message, notebook }: WhoFixesWhatProps) {
   let k = 0;
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="who-fixes-what">
-      <div data-grid style={{ display: 'grid', gridTemplateColumns: '300px repeat(3, 1fr)', columnGap: 12, rowGap: 12, marginTop: 16, alignItems: 'stretch' }}>
+      <Fill>
+      <div data-grid style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '320px repeat(3, 1fr)', gridTemplateRows: 'auto repeat(4, minmax(96px, 1fr))', columnGap: 14, rowGap: 14, marginTop: 16, alignItems: 'stretch' }}>
         <div />
         {DISCIPLINES.map((d, i) => (
-          <motion.div key={d.key} data-column={d.name} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.15, duration: 0.5, ease: EASE }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontSize: 30, fontWeight: 700, color: 'var(--ink)' }}>
-            <LineIcon name={d.icon} size={40} />
+          <motion.div key={d.key} data-column={d.name} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.15, duration: 0.5, ease: EASE }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 33, fontWeight: 700, color: 'var(--ink)', paddingBottom: 6 }}>
+            <LineIcon name={d.icon} size={46} />
             {d.n} {d.name}
           </motion.div>
         ))}
         {ROWS.flatMap((r) => [
           <div key={r.word} data-row={r.word} style={{ alignSelf: 'center' }}>
-            <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--ink)' }}>{r.shown}</div>
-            <div style={{ fontSize: 19, color: GREY }}>{r.sub}</div>
+            <div style={{ fontSize: 31, fontWeight: 700, color: 'var(--ink)' }}>{r.shown}</div>
+            <div style={{ fontSize: 22, color: GREY, marginTop: 2 }}>{r.sub}</div>
           </div>,
           ...DISCIPLINES.map((d) => {
             const how = FIXES[d.key][r.word];
-            if (!how) return <div key={d.key + r.word} data-empty-cell={`${d.name}>${r.word}`} style={{ minHeight: 84, borderRadius: 10, background: 'rgba(127, 127, 127, 0.12)' }} />;
+            if (!how) return <div key={d.key + r.word} data-empty-cell={`${d.name}>${r.word}`} style={{ borderRadius: 12, background: 'rgba(127, 127, 127, 0.12)' }} />;
             const delay = 1 + k++ * 0.3;
             return (
-              <motion.div key={d.key + r.word} data-cell={`${d.name}>${r.word}`} initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay, duration: 0.5, ease: EASE }} style={{ minHeight: 84, borderRadius: 10, background: 'var(--teal)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontSize: 23, fontWeight: 600, padding: '0 12px', textAlign: 'center' }}>
-                <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="#fff" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" style={{ flex: 'none' }}>
+              <motion.div key={d.key + r.word} data-cell={`${d.name}>${r.word}`} initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay, duration: 0.5, ease: EASE }} style={{ borderRadius: 12, background: 'var(--teal)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontSize: 26, fontWeight: 600, padding: '0 14px', textAlign: 'center' }}>
+                <svg width="26" height="26" viewBox="0 0 20 20" fill="none" stroke="#fff" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" style={{ flex: 'none' }}>
                   <path d="M4 10.5l4 4 8-9" />
                 </svg>
                 {how}
@@ -585,6 +592,7 @@ export function WhoFixesWhat({ kicker, message, notebook }: WhoFixesWhatProps) {
           }),
         ])}
       </div>
+      </Fill>
     </WidePanel>
   );
 }

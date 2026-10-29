@@ -51,7 +51,8 @@ export function MemoryMap({ kicker, message, step, notebook }: MemoryMapProps) {
 
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="memory-map" step={step}>
-        <svg viewBox="0 0 1400 600" width="100%" style={{ display: 'block', overflow: 'visible', fontFamily: 'inherit' }} role="img" aria-label="Classification of agent memory">
+        {/* the map fills the body, as large as its shape allows, centred */}
+        <svg viewBox="0 0 1400 600" width="100%" height="100%" style={{ flex: 1, minHeight: 360, display: 'block', overflow: 'visible', fontFamily: 'inherit' }} role="img" aria-label="Classification of agent memory">
           <defs>
             <marker id="mm-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M2 1L8 5L2 9" fill="none" stroke={LINE} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />

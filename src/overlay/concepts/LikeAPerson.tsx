@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import type { CSSProperties, ReactNode } from 'react';
 import { EASE, WidePanel } from './WidePanel';
 import { LineIcon, type IconName } from './icons';
+import { Fill } from './Fill';
 import mercerPortrait from '../../assets/portraits/mercer.png';
 
 export interface LikeAPersonProps {
@@ -46,13 +47,13 @@ const part = (on: boolean, row: number) => ({
 });
 
 const PersonIcon = () => (
-  <svg width={44} height={44} viewBox="0 0 48 48" fill="none" stroke={GREY} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg width={56} height={56} viewBox="0 0 48 48" fill="none" stroke={GREY} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <circle cx="24" cy="14" r="8" />
     <path d="M8 43c0-9 7-15 16-15s16 6 16 15" />
   </svg>
 );
 const AgentIcon = () => (
-  <svg width={44} height={44} viewBox="0 0 48 48" fill="none" stroke="var(--teal)" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg width={56} height={56} viewBox="0 0 48 48" fill="none" stroke="var(--teal)" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M24 4v6" />
     <rect x="9" y="10" width="30" height="26" rx="6" />
     <circle cx="18" cy="23" r="3" />
@@ -66,15 +67,16 @@ const cell = (col: number, row: number): CSSProperties => ({
   gridRow: row + 2,
   display: 'flex',
   alignItems: 'center',
-  gap: 16,
-  padding: '14px 18px',
+  gap: 20,
+  padding: '18px 24px',
   background: ROW_FILL[row],
   borderTop: BORDER,
   borderLeft: BORDER,
-  fontSize: 24,
+  fontSize: 28,
+  lineHeight: 1.3,
   fontWeight: 500,
   color: 'var(--ink)',
-  minHeight: 118,
+  minHeight: 130,
   boxSizing: 'border-box',
 });
 
@@ -89,41 +91,43 @@ export function LikeAPerson({ kicker, message, focus }: LikeAPersonProps) {
     { label: <b>The agent</b>, icon: <AgentIcon /> },
     {
       label: (
-        <span style={{ display: 'flex', flexDirection: 'column', fontSize: 18, color: 'var(--ink-dim)', fontWeight: 600 }}>
+        <span style={{ display: 'flex', flexDirection: 'column', fontSize: 21, color: 'var(--ink-dim)', fontWeight: 600 }}>
           At<span className="mono" style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--ink)' }}>Harbor Bridge</span>
         </span>
       ),
-      icon: <img data-portrait="mercer" src={mercerPortrait} alt="" width={52} height={52} style={{ borderRadius: '50%', border: '2px solid var(--teal)', objectFit: 'cover' }} />,
+      icon: <img data-portrait="mercer" src={mercerPortrait} alt="" width={68} height={68} style={{ borderRadius: '50%', border: '3px solid var(--teal)', objectFit: 'cover' }} />,
     },
   ];
   return (
     <WidePanel kicker={kicker} message={message} testId="like-a-person">
-      <div data-table="kinds" style={{ display: 'grid', gridTemplateColumns: '260px repeat(3, minmax(0, 1fr))', gridTemplateRows: 'auto repeat(3, 1fr)', border: '2px solid var(--teal)', borderRadius: 4, overflow: 'hidden', marginTop: 8 }}>
-        <div style={{ gridColumn: 1, gridRow: 1, background: 'rgba(27, 138, 156, 0.85)', color: '#fff', padding: '16px 20px', fontSize: 16, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', display: 'flex', alignItems: 'center' }}>Same idea, three places</div>
+      <Fill>
+      <div data-table="kinds" style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '290px repeat(3, minmax(0, 1fr))', gridTemplateRows: 'auto repeat(3, 1fr)', border: '2px solid var(--teal)', borderRadius: 4, overflow: 'hidden', marginTop: 8 }}>
+        <div style={{ gridColumn: 1, gridRow: 1, background: 'rgba(27, 138, 156, 0.85)', color: '#fff', padding: '20px 24px', fontSize: 18, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', display: 'flex', alignItems: 'center' }}>Same idea, three places</div>
         {rowHeads.map((r, row) => (
-          <motion.div key={row} data-row={['person', 'agent', 'bridge'][row]} {...at(row)} style={{ gridColumn: 1, gridRow: row + 2, display: 'flex', alignItems: 'center', gap: 16, padding: '14px 20px', background: LABEL_FILL[row], borderTop: BORDER, fontSize: 24, color: 'var(--ink)' }}>
+          <motion.div key={row} data-row={['person', 'agent', 'bridge'][row]} {...at(row)} style={{ gridColumn: 1, gridRow: row + 2, display: 'flex', alignItems: 'center', gap: 18, padding: '18px 24px', background: LABEL_FILL[row], borderTop: BORDER, fontSize: 29, color: 'var(--ink)' }}>
             {r.icon}
             {r.label}
           </motion.div>
         ))}
         {KINDS.map((k, col) => (
           <div key={k.kind} data-kind={k.kind} data-on={focus === undefined || focus === col} style={{ display: 'contents' }}>
-            <motion.div {...part(focus === undefined || focus === col, 0)} style={{ gridColumn: col + 2, gridRow: 1, display: 'flex', alignItems: 'center', gap: 16, padding: '12px 18px', background: 'var(--teal)', color: '#fff', borderLeft: '1px solid rgba(255,255,255,0.3)' }}>
-              <LineIcon name={k.icon} size={48} color="#fff" />
+            <motion.div {...part(focus === undefined || focus === col, 0)} style={{ gridColumn: col + 2, gridRow: 1, display: 'flex', alignItems: 'center', gap: 18, padding: '18px 24px', background: 'var(--teal)', color: '#fff', borderLeft: '1px solid rgba(255,255,255,0.3)' }}>
+              <LineIcon name={k.icon} size={56} color="#fff" />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: 30, fontWeight: 700 }}>{k.kind}</span>
-                <span style={{ fontSize: 18, opacity: 0.9 }}>{k.what}</span>
+                <span style={{ fontSize: 34, fontWeight: 700 }}>{k.kind}</span>
+                <span style={{ fontSize: 21, opacity: 0.9 }}>{k.what}</span>
               </div>
             </motion.div>
             {[k.person, k.agent, k.lab].map((ex, row) => (
               <motion.div key={row} data-cell={['person', 'agent', 'bridge'][row]} {...part(focus === undefined || focus === col, row + 1)} style={cell(col, row)}>
-                <LineIcon name={ex.icon} size={44} color={row === 0 ? GREY : 'var(--teal)'} />
+                <LineIcon name={ex.icon} size={52} color={row === 0 ? GREY : 'var(--teal)'} />
                 <span>{ex.text}</span>
               </motion.div>
             ))}
           </div>
         ))}
       </div>
+      </Fill>
     </WidePanel>
   );
 }
