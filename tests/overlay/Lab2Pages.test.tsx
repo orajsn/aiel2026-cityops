@@ -24,7 +24,7 @@ const redRoots = (c: HTMLElement) => {
 beforeEach(() => useDrawerStore.getState().reset());
 
 test('every Lab 2 page renders its panel, headline, takeaway (chapter ends only) and (when it has them) glossary chip and next band', () => {
-  expect(PAGES.length).toBe(58);
+  expect(PAGES.length).toBe(57);
   for (const s of PAGES) {
     const c = renderPage(s.id);
     const p = s.overlayProps as { takeaway?: string; terms?: unknown[]; next?: string; step?: number };

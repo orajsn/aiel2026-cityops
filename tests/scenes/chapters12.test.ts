@@ -84,7 +84,8 @@ test('Lab 2: the jump menu has the deck’s chapters in order, and one panel per
 });
 
 test('Lab 2: every page has a takeaway, each chapter ends on a "Next in the notebook" band (but the recap)', () => {
-  for (const s of chapter1.filter((x) => x.id !== '2.9')) expect((s.overlayProps as { takeaway?: string }).takeaway?.length, s.id).toBeGreaterThan(20);
+  // 2.6a is the sky stage's own small caption (UnifiedQuery), not a Lab 2 panel
+  for (const s of chapter1.filter((x) => x.id !== '2.9' && x.id !== '2.6a')) expect((s.overlayProps as { takeaway?: string }).takeaway?.length, s.id).toBeGreaterThan(20);
   for (const c of LAB2_CHAPTERS.slice(0, -1)) {
     const last = c.pages[c.pages.length - 1];
     expect((last.overlayProps as { next?: string }).next, last.id).toMatch(/^\S/);
