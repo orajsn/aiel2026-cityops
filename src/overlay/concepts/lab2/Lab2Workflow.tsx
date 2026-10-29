@@ -7,7 +7,7 @@ import { Triage } from './everyday';
 import { Fill, FitBox } from '../Fill';
 import { InfoDesk, Junction, Recipe, Taxi, Tram, WorkOrder } from './workflowArt';
 import {
-  Arrow, ArrowDown, CARD, ChiefInspector, Chip, DIM, INK, L2Page, Net, Num, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
+  Arrow, ArrowDown, CARD, ChiefInspector, Chip, DIM, INK, L2Page, Net, Num, Portrait, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
   cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props,
 } from './parts';
 
@@ -28,90 +28,139 @@ function Swap({ k, children }: { k: string | number; children: ReactNode }) {
 /* ---------------- 2.4c, 2.4d · who holds the pen, the anatomy of a workflow ---------------- */
 
 const PENS = [
-  { name: 'RAG', who: 'the application', sub: 'one lookup, one answer', icon: 'lookup' as IconName },
-  { name: 'Workflow', who: 'the code', sub: '', icon: 'steps' as IconName, ticks: ['Path fixed in advance', 'LLM only inside steps', 'Human sign-off (design option)', 'Replayable'] },
-  { name: 'Agent', who: 'the model', sub: 'flexible, less predictable', icon: 'branch' as IconName },
+  { name: 'RAG', like: 'an information desk', who: 'the application', sub: 'one lookup, one answer', art: <InfoDesk /> },
+  { name: 'Workflow', like: 'a tram on its rails', who: 'the code', sub: '', art: <Tram />, ticks: ['Path fixed in advance', 'LLM only inside steps', 'Human sign-off (design option)', 'Replayable'] },
+  { name: 'Agent', like: 'a taxi in the city', who: 'the model', sub: 'flexible, less predictable', art: <Taxi /> },
 ];
+const PEN_AT = [0.3, 1.1, 1.9];
 
-const SUCCESS = [
+/** 2.4c · three ways to get somewhere: a desk, a tram, a taxi; the workflow's tram in the middle, its four promises after */
+function WhoChooses() {
+  return (
+    <Fill>
+      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr)', gap: 22, marginTop: 4 }}>
+        {PENS.map((c, i) => {
+          const mid = i === 1;
+          return (
+            <motion.div key={c.name} data-pen={c.name} {...fadeUp(PEN_AT[i])} style={{ ...card(mid), background: mid ? TINT : SOFT, padding: '18px 22px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <div style={{ fontSize: 34, fontWeight: 700, color: INK }}>{c.name}</div>
+              <div style={{ fontSize: 22, color: DIM }}>is like {c.like}</div>
+              <div style={{ flex: '1 1 0', minHeight: 150, width: '100%', margin: '10px 0', position: 'relative' }}>
+                <div style={{ position: 'absolute', inset: 0 }}>{c.art}</div>
+              </div>
+              <div style={{ fontSize: 21, color: DIM }}>The next step is picked by</div>
+              <div style={{ fontSize: 30, fontWeight: 700, color: mid ? TEAL_D : INK }}>{c.who}</div>
+              {c.sub && <div style={{ fontSize: 22, color: DIM, marginTop: 4 }}>{c.sub}</div>}
+              {c.ticks && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10, textAlign: 'left' }}>
+                  {c.ticks.map((t, k) => (
+                    <motion.div key={t} {...fadeUp(2.8 + k * 0.3)} style={{ fontSize: 22, color: INK, lineHeight: 1.3 }}>
+                      <span style={{ color: TEAL, fontWeight: 700 }}>✓</span> {t}
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          );
+        })}
+      </div>
+    </Fill>
+  );
+}
+
+/* 2.4d · the anatomy as a rail map: the success line on top, the failure tracks branching off at Evaluate */
+const LINE = [
   { t: '1. Receive task', s: 'the crack report comes in' },
-  { t: '2. Plan approach', s: 'the steps are written in code' },
+  { t: '2. Plan approach', s: 'steps written in code' },
   { t: '3. Execute tools', s: 'retrieve, call the model' },
-  { t: '4. Evaluate', s: 'is the result good enough?' },
+  { t: '4. Evaluate', s: 'good enough?' },
   { t: '5a. Format result', s: 'the report goes out ✓' },
 ];
-const FAILURE = [
-  { t: '5b. Human review', s: 'low confidence' },
-  { t: '6b. Human resolves', s: 'override or correct ✓' },
-  { t: '5c. Replan', s: 'the LLM adjusts' },
-  { t: 'Max retries', s: 'abort' },
-];
+const NODE_X = [270, 518, 766, 1014, 1262];
+const NODE_W = 236;
+const LINE_AT = (i: number) => 0.4 + i * 0.4;
+const BRANCH_AT = 2.6;
+
+function Node({ x, y, t, s, delay, solid = true, end = false, attr }: { x: number; y: number; t: string; s: string; delay: number; solid?: boolean; end?: boolean; attr: Record<string, string> }) {
+  return (
+    <motion.div {...attr} {...fadeUp(delay)} style={{ position: 'absolute', left: x - NODE_W / 2, top: y, width: NODE_W, height: 128, boxSizing: 'border-box', borderRadius: 14, padding: '10px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: end ? TEAL : solid ? 'var(--panel-strong)' : 'var(--panel-strong)', border: `2px ${solid ? 'solid' : 'dashed'} ${solid ? TEAL : 'rgba(127,127,127,0.6)'}`, color: end ? '#fff' : INK }}>
+      <div style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.2 }}>{t}</div>
+      <div style={{ fontSize: 20, opacity: end ? 0.92 : 0.75, marginTop: 4 }}>{s}</div>
+    </motion.div>
+  );
+}
+
+function Anatomy() {
+  const grey = 'rgba(127,127,127,0.7)';
+  const draw = (delay: number) => ({ initial: { pathLength: 0 }, animate: { pathLength: 1 }, transition: { delay, duration: 0.6, ease: EASE } });
+  return (
+    <Fill>
+      <FitBox w={1400} h={660} max={1.15}>
+        {/* the tracks */}
+        <svg width={1400} height={660} viewBox="0 0 1400 660" style={{ position: 'absolute', left: 0, top: 0 }} aria-hidden fill="none" strokeLinecap="round" strokeLinejoin="round">
+          {/* sleepers and rail of the success line */}
+          {Array.from({ length: 62 }, (_, i) => (
+            <motion.rect key={i} x={150 + i * 19} y={105} width={6} height={30} rx={1} fill="rgba(127,127,127,0.25)" stroke="none" {...fade(0.3 + i * 0.03)} />
+          ))}
+          <motion.path d="M150 120 H1390" stroke="var(--teal)" strokeWidth={5} {...draw(0.3)} />
+          {/* the failure tracks branch off at Evaluate */}
+          <motion.path d="M1014 184 V576" stroke={grey} strokeWidth={3.5} strokeDasharray="8 8" {...draw(BRANCH_AT)} />
+          <motion.path d="M1014 300 H890 M1014 438 H890 M1014 576 H890" stroke={grey} strokeWidth={3.5} strokeDasharray="8 8" {...draw(BRANCH_AT + 0.4)} />
+          {/* replan loops back to Plan */}
+          <motion.path d="M648 300 H518 V190" stroke={grey} strokeWidth={3.5} strokeDasharray="8 8" {...draw(BRANCH_AT + 0.9)} />
+          <motion.path d="M508 204 L518 188 L528 204" stroke={grey} strokeWidth={3.5} {...fade(BRANCH_AT + 1.4)} />
+          {/* review resolves, retries give up */}
+          <motion.path d="M648 438 H642 M648 576 H642" stroke={grey} strokeWidth={3.5} {...fade(BRANCH_AT + 1.2)} />
+          {[[894, 300], [894, 438], [894, 576], [646, 438], [646, 576]].map(([x, y]) => (
+            <motion.path key={`${x}${y}`} d={`M${x + 10} ${y - 9} L${x - 2} ${y} L${x + 10} ${y + 9}`} stroke={grey} strokeWidth={3.5} {...fade(BRANCH_AT + 1)} />
+          ))}
+        </svg>
+        <motion.div {...fade(0.2)} style={{ position: 'absolute', left: 152, top: 14, ...capTeal, fontSize: 17 }}>
+          Success path · the lab implements this
+        </motion.div>
+        {/* Mercer sends the report in */}
+        <motion.div {...fadeUp(0.2)} style={{ position: 'absolute', left: 0, top: 60, width: 130, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+          <Portrait who="mercer" size={92} />
+          <span style={{ fontSize: 22, fontWeight: 700, color: INK }}>Mercer</span>
+        </motion.div>
+        {LINE.map((n, i) => (
+          <Node key={n.t} attr={{ 'data-success': String(i + 1) }} x={NODE_X[i]} y={56} t={n.t} s={n.s} delay={LINE_AT(i)} end={i === 4} />
+        ))}
+        {/* Vance reads it */}
+        <motion.div {...fadeUp(LINE_AT(5))} style={{ position: 'absolute', left: NODE_X[4] - 110, top: 190, width: 220, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+          <ArrowDown h={26} />
+          <Portrait who="vance" size={72} />
+          <span style={{ fontSize: 22, fontWeight: 700, color: INK }}>Vance reads it</span>
+        </motion.div>
+        <motion.div {...fade(BRANCH_AT)} style={{ position: 'absolute', left: 20, top: 250, width: 360 }}>
+          <div style={{ ...cap, fontSize: 17 }}>Failure path</div>
+          <div style={{ fontSize: 22, color: DIM, marginTop: 6, lineHeight: 1.35 }}>designed, not built in the lab</div>
+        </motion.div>
+        <Node attr={{ 'data-failure': '5c. Replan' }} x={766} y={236} t="5c. Replan" s="the LLM adjusts" delay={BRANCH_AT + 0.6} solid={false} />
+        <Node attr={{ 'data-failure': '5b. Human review' }} x={766} y={374} t="5b. Human review" s="low confidence" delay={BRANCH_AT + 0.8} solid={false} />
+        <Node attr={{ 'data-failure': '6b. Human resolves' }} x={518} y={374} t="6b. Human resolves" s="override or correct ✓" delay={BRANCH_AT + 1.2} solid={false} />
+        <Node attr={{ 'data-failure': 'Max retries' }} x={766} y={512} t="Max retries" s="the limit is reached" delay={BRANCH_AT + 1.0} solid={false} />
+        <Node attr={{ 'data-failure': 'Abort' }} x={518} y={512} t="Abort" s="the run stops" delay={BRANCH_AT + 1.4} solid={false} />
+        {/* the everyday picture */}
+        <motion.div {...fade(BRANCH_AT + 1.8)} style={{ position: 'absolute', left: 1070, top: 366, width: 330, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ ...cap, fontSize: 17 }}>In everyday life</div>
+          <div style={{ height: 112 }}>
+            <Junction />
+          </div>
+          <div style={{ fontSize: 22, color: INK, lineHeight: 1.4 }}>
+            A rail junction: <b>every track out</b> is laid before the first train runs.
+          </div>
+        </motion.div>
+      </FitBox>
+    </Fill>
+  );
+}
 
 export function WhoPicks(p: L2Props) {
   const step = p.step ?? 1;
   return (
     <L2Page testId="l2-pen" {...p}>
-      <Swap k={step}>
-        {step === 1 ? (
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr)', gap: 22, minHeight: 0 }}>
-            {PENS.map((c, i) => (
-              <motion.div key={c.name} data-pen={c.name} {...fadeUp(0.2 + i * 0.4)} style={{ ...card(i === 1), background: i === 1 ? TINT : SOFT, padding: '22px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, textAlign: 'center' }}>
-                <div style={cap}>Who holds the pen?</div>
-                <LineIcon name={c.icon} size={72} color={i === 1 ? TEAL : '#8a97a3'} />
-                <div style={{ fontSize: 34, fontWeight: 700, color: INK }}>{c.name}</div>
-                <div style={{ fontSize: 21, color: DIM }}>picks the next step:</div>
-                <div style={{ fontSize: 28, fontWeight: 700, color: TEAL_D }}>{c.who}</div>
-                {c.sub && <div style={{ fontSize: 21, color: DIM }}>{c.sub}</div>}
-                {c.ticks && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start', marginTop: 4 }}>
-                    {c.ticks.map((t, k) => (
-                      <motion.div key={t} {...fadeUp(1.4 + k * 0.3)} style={{ fontSize: 22, color: INK }}>
-                        <span style={{ color: TEAL, fontWeight: 700 }}>✓</span> {t}
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18, minHeight: 0 }}>
-            <div style={capTeal}>Success path · the lab implements this</div>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'stretch', gap: 6 }}>
-              {SUCCESS.map((s, i) => [
-                i > 0 ? (
-                  <div key={`a${i}`} style={{ display: 'flex', alignItems: 'center' }}>
-                    <Arrow w={42} delay={0.3 + i * 0.35} />
-                  </div>
-                ) : null,
-                <motion.div key={s.t} data-success={i + 1} {...fadeUp(0.2 + i * 0.35)} style={{ flex: 1, ...card(true), background: i === 4 ? TEAL : CARD, color: i === 4 ? '#fff' : INK, padding: '16px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <div style={{ fontSize: 25, fontWeight: 700 }}>{s.t}</div>
-                  <div style={{ fontSize: 20, opacity: 0.85, marginTop: 6 }}>{s.s}</div>
-                </motion.div>,
-              ])}
-            </div>
-            <div style={{ ...cap, marginTop: 10 }}>Failure path · designed, not built in the lab</div>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'stretch', gap: 6 }}>
-              <motion.div {...fadeUp(2.2)} style={{ flex: 1, ...card(), padding: '16px 16px', borderStyle: 'dashed', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div style={{ fontSize: 25, fontWeight: 700, color: INK }}>4. Evaluate</div>
-                <div style={{ fontSize: 20, color: DIM, marginTop: 6 }}>the result looks weak</div>
-              </motion.div>
-              {FAILURE.map((s, i) => [
-                <div key={`a${i}`} style={{ display: 'flex', alignItems: 'center' }}>
-                  <Arrow w={42} delay={2.4 + i * 0.3} color="#8a97a3" />
-                </div>,
-                <motion.div key={s.t} data-failure={s.t} {...fadeUp(2.5 + i * 0.3)} style={{ flex: 1, ...card(), padding: '16px 16px', borderStyle: 'dashed', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <div style={{ fontSize: 25, fontWeight: 700, color: INK }}>{s.t}</div>
-                  <div style={{ fontSize: 20, color: DIM, marginTop: 6 }}>{s.s}</div>
-                </motion.div>,
-              ])}
-            </div>
-            <motion.div {...fade(3.8)} style={{ alignSelf: 'center', fontSize: 22, color: INK, padding: '10px 22px', borderRadius: 999, background: TINT }}>
-              Every exit is planned: <b>success · review · replan · abort</b>. The code makes the routing decisions.
-            </motion.div>
-          </div>
-        )}
-      </Swap>
+      <Swap k={step}>{step === 1 ? <WhoChooses /> : <Anatomy />}</Swap>
     </L2Page>
   );
 }
