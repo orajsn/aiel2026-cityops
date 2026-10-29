@@ -1,6 +1,8 @@
 import { AnimatePresence, motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { EASE } from '../WidePanel';
+import { Fill, FitBox } from '../Fill';
+import { Cog, G_LIGHT, KitGlyph, PlugHead, T_SOFT } from './agentArt';
 import { LineIcon, type IconName } from '../icons';
 import {
   Arrow, ArrowDown, CARD, ChiefInspector, Chip, Db, DIM, INK, L2Page, Net, Num, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
@@ -17,79 +19,208 @@ import {
 export const DATA_TOOLS = ['get_asset_overview', 'get_recent_incidents', 'get_connected_assets', 'search_incidents_semantic', 'get_asset_incident_brief'];
 export const MEMORY_TOOLS = ['remember', 'recall', 'recall_similar'];
 
-function Pane({ on, n, title, sub, icon, children, delay }: { on: boolean; n: number; title: string; sub: string; icon: IconName; children: ReactNode; delay: number }) {
+/** the inspector's kit, filling one click at a time: what each piece is, in plain words */
+const KIT: { kind: 'tools' | 'skills' | 'mcp'; t: string; s: string }[] = [
+  { kind: 'tools', t: 'Tools', s: 'the hands' },
+  { kind: 'skills', t: 'Skills', s: 'the procedure' },
+  { kind: 'mcp', t: 'MCP', s: 'the standard plug' },
+];
+
+const big = { fontSize: 26, fontWeight: 700, color: INK, lineHeight: 1.25 } as const;
+const body = { fontSize: 22, color: INK, lineHeight: 1.4 } as const;
+const caption = { fontSize: 24, lineHeight: 1.45, color: INK } as const;
+
+/** the left rail: the kit so far; done pieces ticked, the current one lit, the next ones waiting dashed */
+function KitRail({ step }: { step: number }) {
   return (
-    <motion.div data-pane={title} {...reveal(on, delay)} style={{ ...card(true), background: CARD, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <Num n={n} size={36} />
-        <LineIcon name={icon} size={48} />
-        <div>
-          <div style={{ fontSize: 30, fontWeight: 700, color: INK }}>{title}</div>
-          <div style={{ fontSize: 19, color: DIM }}>{sub}</div>
-        </div>
-      </div>
-      {children}
+    <div data-kit-rail style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingRight: 26, borderRight: '1px solid var(--line)' }}>
+      <div style={{ ...cap, fontSize: 17 }}>The inspector’s kit</div>
+      {KIT.map((k, i) => {
+        const now = step === i + 1;
+        const done = step > i + 1;
+        const waiting = step < i + 1;
+        return (
+          <div key={k.kind} data-kit-slot={k.kind} data-now={now || undefined} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 16, padding: '12px 16px', borderRadius: 14, border: `2px ${waiting ? 'dashed' : 'solid'} ${waiting ? 'var(--line)' : TEAL}`, background: now ? TINT2 : done ? TINT : 'transparent', opacity: waiting ? 0.45 : 1, transition: 'all 400ms' }}>
+            <KitGlyph kind={k.kind} size={60} on={!waiting} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 27, fontWeight: 700, color: INK }}>{k.t}</div>
+              <div style={{ fontSize: 22, color: waiting ? DIM : TEAL_D }}>{k.s}</div>
+            </div>
+            {done && <Num n="✓" size={32} />}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** a piece of the flow: a drawing, a bold name, a plain line under it */
+function Station({ art, t, s, delay }: { art: ReactNode; t: ReactNode; s: string; delay: number }) {
+  return (
+    <motion.div {...fadeUp(delay)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, textAlign: 'center', minWidth: 0 }}>
+      <div style={{ height: 170, display: 'flex', alignItems: 'center' }}>{art}</div>
+      <div style={{ ...big, whiteSpace: 'nowrap' }}>{t}</div>
+      <div style={{ fontSize: 22, color: DIM, whiteSpace: 'nowrap' }}>{s}</div>
     </motion.div>
   );
 }
 
+/** step 1 · the hands: the agent names the instrument, the framework picks it up and uses it */
+function HandsPicture() {
+  return (
+    <Fill gap={12}>
+      <motion.div {...fade(0.1)} style={caption}>
+        Like an inspector who says <i>“hand me the crack gauge”</i>: the AI agent names the instrument, <b>the framework picks it up and uses it</b>.
+      </motion.div>
+      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'auto 64px auto 64px auto 64px auto', justifyContent: 'space-between', alignItems: 'center', columnGap: 6 }}>
+        <Station delay={0.3} art={<ChiefInspector size={160} />} t="AI Agent" s="asks for a call" />
+        <Arrow w={64} delay={0.8} />
+        <motion.div data-slip {...fadeUp(0.9)} style={{ justifySelf: 'center', transform: 'rotate(-1.5deg)', padding: '16px 20px', borderRadius: 10, background: CARD, boxShadow: '0 4px 14px rgba(0,0,0,0.14)', border: '1px solid var(--line)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ ...cap, fontSize: 15 }}>the request</div>
+          <div style={{ ...mono(22, INK), fontWeight: 700 }}>get_recent_incidents(</div>
+          <div style={{ ...mono(22), paddingLeft: 26 }}>"Harbor Bridge")</div>
+        </motion.div>
+        <Arrow w={64} delay={1.4} />
+        <Station delay={1.5} art={<Cog size={150} delay={1.9} />} t="the framework" s="runs it" />
+        <Arrow w={64} delay={2.1} />
+        <Station delay={2.2} art={<Db size={140} />} t="the database" s="rows come back" />
+      </div>
+      <motion.div data-return {...fade(2.8)} style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: 22, color: TEAL_D, fontWeight: 600 }}>
+        <span style={{ fontSize: 30 }}>←</span>
+        <span style={{ flex: 1, borderTop: `2.5px dashed ${TEAL}` }} />
+        <span>the result goes back to the language model, which decides what to do next</span>
+        <span style={{ flex: 1, borderTop: `2.5px dashed ${TEAL}` }} />
+      </motion.div>
+      <div data-what-a-tool-is style={{ display: 'grid', gridTemplateColumns: 'auto repeat(3, minmax(0, 1fr))', gap: 14, alignItems: 'stretch' }}>
+        <motion.div {...fade(3.2)} style={{ ...big, alignSelf: 'center' }}>What a tool is</motion.div>
+        {[
+          { t: 'Data retrieval', s: 'lab: 7 tools' },
+          { t: 'Action execution', s: 'lab: remember only' },
+          { t: 'Context injection', s: 'lab: the SOP' },
+        ].map((k, i) => (
+          <motion.div key={k.t} {...fadeUp(3.3 + i * 0.3)} style={{ ...card(), padding: '12px 18px' }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>{k.t}</div>
+            <div style={{ ...mono(20) }}>{k.s}</div>
+          </motion.div>
+        ))}
+      </div>
+    </Fill>
+  );
+}
+
+/** step 2 · the procedure: the manual's contents are always in the truck; a chapter opens when the job needs it */
+function ProcedurePicture() {
+  const chapter = ['the steps, in order', 'the thresholds', 'scripts', 'references'];
+  return (
+    <Fill gap={16}>
+      <motion.div {...fade(0.1)} style={caption}>
+        Like the inspection manual in the truck: its <b>table of contents is always there</b>; the inspector opens the chapter <b>when the job needs it</b>.
+      </motion.div>
+      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 0.8fr) 150px minmax(0, 1.2fr)', alignItems: 'stretch', columnGap: 10 }}>
+        <motion.div data-closed {...fadeUp(0.3)} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={capTeal}>Always in the context window</div>
+          <div style={{ flex: 1, display: 'flex', borderRadius: '6px 14px 14px 6px', overflow: 'hidden', boxShadow: '0 6px 18px rgba(0,0,0,0.16)' }}>
+            <div style={{ width: 34, background: TEAL }} />
+            <div style={{ flex: 1, background: TINT2, padding: '22px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12 }}>
+              <div style={{ fontSize: 30, fontWeight: 700, color: INK, lineHeight: 1.2 }}>Incident triage SOP</div>
+              <div style={body}>its name and <b>when to use it</b>: one short description</div>
+              <Chip style={{ alignSelf: 'flex-start', fontSize: 20 }}>INCIDENT_TRIAGE_SKILL</Chip>
+            </div>
+          </div>
+        </motion.div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <Arrow w={100} delay={1.1} />
+          <motion.div {...fade(1.2)} style={{ fontSize: 22, color: TEAL_D, fontWeight: 600, textAlign: 'center' }}>the job needs it</motion.div>
+        </div>
+        <motion.div data-open {...fadeUp(1.4)} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={cap}>Loaded only when needed</div>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', borderRadius: 10, background: CARD, boxShadow: '0 6px 18px rgba(0,0,0,0.16)', border: '1px solid var(--line)' }}>
+            {[0, 1].map((side) => (
+              <div key={side} style={{ padding: '20px 24px', borderLeft: side ? '2px solid var(--line)' : 'none', display: 'flex', flexDirection: 'column', justifyContent: 'space-around', gap: 10 }}>
+                {chapter.slice(side * 2, side * 2 + 2).map((c, i) => (
+                  <motion.div key={c} data-chapter={c} {...fadeUp(1.8 + (side * 2 + i) * 0.35)} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ fontSize: 25, fontWeight: 700, color: INK }}>{c}</div>
+                    <div style={{ height: 6, borderRadius: 3, background: G_LIGHT, width: '90%' }} />
+                    <div style={{ height: 6, borderRadius: 3, background: G_LIGHT, width: '70%' }} />
+                  </motion.div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+      <motion.div {...fade(3.4)} style={{ ...body, padding: '12px 20px', borderRadius: 12, background: TINT }}>
+        Small skills keep the context free for real data: the description is enough to pick the skill, <b>the body arrives only when the task matches</b>.
+      </motion.div>
+    </Fill>
+  );
+}
+
+/** step 3 · the standard plug: one socket shape; sources plug in once, any agent can use them */
+function PlugPicture() {
+  const agents = ['Agent A', 'Agent B'];
+  const sources = ['Database', 'Files', 'Tickets'];
+  const ay = (i: number) => 170 + i * 150;
+  const sy = (i: number) => 140 + i * 120;
+  return (
+    <Fill gap={14}>
+      <motion.div {...fade(0.1)} style={caption}>
+        Like one plug shape for every socket: <b>connect a source once</b>, and any agent can use it.
+      </motion.div>
+      <FitBox w={1060} h={450} max={1.1}>
+        <svg data-plug-picture width={1060} height={450} viewBox="0 0 1060 450" style={{ overflow: 'visible' }}>
+          {/* the strip: the one standard socket */}
+          <motion.g {...fade(0.3)}>
+            <rect x="420" y="40" width="210" height="400" rx="20" fill={T_SOFT} stroke="#146f7f" strokeWidth="3" />
+            <rect x="420" y="40" width="210" height="70" rx="20" fill="#146f7f" />
+            <text x="525" y="88" textAnchor="middle" fontSize="36" fontWeight="700" fill="#fff" fontFamily="Inter, sans-serif">MCP</text>
+            <text x="525" y="426" textAnchor="middle" fontSize="22" fill="#146f7f" fontFamily="Inter, sans-serif">one standard plug</text>
+            {[...agents.map((_, i) => ({ x: 432, y: ay(i) })), ...sources.map((_, i) => ({ x: 610, y: sy(i) }))].map((s, i) => (
+              <rect key={i} x={s.x} y={s.y - 16} width="18" height="32" rx="4" fill="#5c6b78" />
+            ))}
+          </motion.g>
+          {/* the sources, each plugged in once */}
+          {sources.map((s, i) => {
+            const y = sy(i);
+            return (
+              <motion.g key={s} data-source={s} {...fade(0.9 + i * 0.35)}>
+                <motion.path d={`M668 ${y} C720 ${y} 740 ${y} 800 ${y}`} stroke="#5c6b78" strokeWidth="5" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 1 + i * 0.35, duration: 0.6 }} />
+                <PlugHead x={642} y={y} dir={-1} />
+                <rect x="800" y={y - 44} width="230" height="88" rx="14" fill="var(--panel-strong)" stroke="#aab1ba" strokeWidth="2" />
+                <text x="915" y={y + 10} textAnchor="middle" fontSize="28" fontWeight="700" fill="var(--ink)" fontFamily="Inter, sans-serif">{s}</text>
+              </motion.g>
+            );
+          })}
+          {/* the agents, each plugged in once */}
+          {agents.map((a, i) => {
+            const y = ay(i);
+            return (
+              <motion.g key={a} data-agent={a} {...fade(2.2 + i * 0.4)}>
+                <rect x="20" y={y - 50} width="230" height="100" rx="14" fill="rgba(27, 138, 156, 0.10)" stroke="#1b8a9c" strokeWidth="2.5" />
+                <text x="135" y={y + 10} textAnchor="middle" fontSize="28" fontWeight="700" fill="var(--ink)" fontFamily="Inter, sans-serif">{a}</text>
+                <motion.path d={`M250 ${y} C320 ${y} 340 ${y} 404 ${y}`} stroke="#5c6b78" strokeWidth="5" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 2.3 + i * 0.4, duration: 0.6 }} />
+                <PlugHead x={418} y={y} dir={1} />
+              </motion.g>
+            );
+          })}
+        </svg>
+      </FitBox>
+      <motion.div {...fade(3.2)} style={{ ...body, color: DIM }}>A design option, shown as a concept: in this lab the tools are plain Python functions.</motion.div>
+    </Fill>
+  );
+}
+
 export function Toolkit(p: L2Props) {
-  const step = p.step ?? 1;
+  const step = Math.min(3, Math.max(1, p.step ?? 1));
   return (
     <L2Page testId="l2-toolkit" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, minHeight: 0 }}>
-          <Pane on n={1} title="Tools" sub="the hands" icon="wrench" delay={0.2}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {['get_asset', 'search_incidents', 'remember'].map((t) => (
-                <Chip key={t} style={{ alignSelf: 'flex-start', fontSize: 19 }}>{t}</Chip>
-              ))}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 19, color: INK, marginTop: 'auto' }}>
-              <span>The LLM asks for a call</span>
-              <Arrow w={36} delay={1} />
-              <span>the framework runs it</span>
-            </div>
-            <div style={{ fontSize: 18, color: DIM }}>callable functions that act, not just think</div>
-          </Pane>
-          <Pane on={upTo(step, 2)} n={2} title="Skills" sub="the procedure" icon="clipboard" delay={0.2}>
-            <div style={{ borderRadius: 12, border: `2px solid ${TEAL}`, padding: '10px 14px', background: TINT }}>
-              <div style={{ ...cap, fontSize: 13, color: TEAL_D }}>context window</div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: INK, marginTop: 4 }}>
-                Incident triage SOP <span style={{ fontWeight: 400, color: DIM }}>· when to use it</span>
-              </div>
-            </div>
-            <ArrowDown h={28} />
-            <div style={{ borderRadius: 12, border: '2px dashed rgba(127,127,127,0.5)', padding: '10px 14px' }}>
-              <div style={{ fontSize: 19, color: INK }}>steps · thresholds</div>
-              <div style={{ fontSize: 19, color: INK }}>scripts · references</div>
-              <div style={{ ...cap, fontSize: 13, marginTop: 4 }}>loaded when needed</div>
-            </div>
-            <div style={{ fontSize: 18, color: DIM, marginTop: 'auto' }}>only the description sits in context; the body loads when needed</div>
-          </Pane>
-          <Pane on={upTo(step, 3)} n={3} title="MCP" sub="the standard plug" icon="converge" delay={0.2}>
-            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 60px minmax(0, 1fr)', alignItems: 'center', gap: 6 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {['Agent A', 'Agent B'].map((a) => (
-                  <div key={a} style={{ padding: '8px 12px', borderRadius: 10, background: TINT, fontSize: 19, fontWeight: 600, color: INK }}>{a}</div>
-                ))}
-              </div>
-              <div style={{ height: 70, borderRadius: 10, background: TEAL, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>MCP</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {['Database', 'Files', 'Tickets'].map((a) => (
-                  <div key={a} style={{ padding: '6px 12px', borderRadius: 10, background: SOFT, fontSize: 18, color: INK }}>{a}</div>
-                ))}
-              </div>
-            </div>
-            <div style={{ fontSize: 18, color: DIM }}>connect once, use from any agent (concept only)</div>
-          </Pane>
-        </div>
-        <motion.div data-what-a-tool-is {...reveal(upTo(step, 3), 1)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, flexWrap: 'wrap', fontSize: 20, color: INK }}>
-          <b>What a tool is:</b>
-          <Chip>data retrieval · lab: 7 tools</Chip>
-          <Chip>action execution · lab: remember only</Chip>
-          <Chip>context injection · lab: the SOP</Chip>
-        </motion.div>
+      <div data-picture-row style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '300px minmax(0, 1fr)', columnGap: 28 }}>
+        <KitRail step={step} />
+        <AnimatePresence mode="wait">
+          <motion.div key={step} data-kit-step={step} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease: EASE }} style={{ minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            {step === 1 ? <HandsPicture /> : step === 2 ? <ProcedurePicture /> : <PlugPicture />}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </L2Page>
   );
