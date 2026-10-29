@@ -872,29 +872,69 @@ export function StoreSaver(p: L2Props) {
   );
 }
 
-/* ---------------- 2.7e · §5.4 bind the allowlist ---------------- */
+/* ---------------- 2.7e · bind the allowlist ---------------- */
+
+/** one instrument dropping into its own cut-out in the foam */
+function FoamSlot({ name, at }: { name: string; at: number }) {
+  return (
+    <div data-slot={name} style={{ flex: 1, minHeight: 54, borderRadius: 999, background: 'rgba(0, 0, 0, 0.38)', boxShadow: 'inset 0 3px 6px rgba(0,0,0,0.45)', padding: 5, display: 'flex' }}>
+      <motion.div initial={{ opacity: 0, y: -26 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: at, duration: 0.55, ease: EASE }} style={{ flex: 1, borderRadius: 999, background: '#d9eef1', display: 'flex', alignItems: 'center', gap: 12, padding: '0 18px' }}>
+        <span style={{ width: 16, height: 16, borderRadius: '50%', background: TEAL, flex: 'none' }} />
+        <span style={{ ...mono(20, '#0f5562'), fontWeight: 700, whiteSpace: 'nowrap' }}>{name}</span>
+      </motion.div>
+    </div>
+  );
+}
 
 export function Allowlist(p: L2Props) {
   const focusN = useFocusN(p.focusId);
+  const on = (n: number) => focusN === null || focusN === n;
+  const dim = (n: number) => ({ opacity: on(n) ? 1 : 0.4, transition: 'opacity 300ms' });
+  const head = (n: number, t: string) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: '#fff', fontSize: 24, fontWeight: 700 }}>
+      <Num n={n} size={36} on={on(n)} /> {t}
+    </div>
+  );
   return (
     <L2Page testId="l2-allowlist" {...p}>
-      <StepRow
-        focusN={focusN}
-        steps={[
-          { title: 'The allowlist', grow: 1.3, body: <><div style={cap}>5 data tools</div>{DATA_TOOLS.map((t) => <Chip key={t} style={{ alignSelf: 'flex-start', fontSize: 18 }}>{t}</Chip>)}</> },
-          { title: 'Three memory tools', body: <><div style={cap}>3 memory tools</div>{MEMORY_TOOLS.map((t) => <Chip key={t} style={{ alignSelf: 'flex-start', fontSize: 18 }}>{t}</Chip>)}</> },
-          {
-            title: 'The model learns only these',
-            body: (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }}>
-                <ChiefInspector size={120} />
-                <div style={{ fontSize: 21, color: INK }}>sees 8 names, types, docstrings</div>
-                <span data-no-ninth style={{ padding: '6px 16px', borderRadius: 999, border: '2px dashed #8a97a3', fontSize: 20, fontWeight: 700, color: DIM }}>no 9th tool</span>
+      <Fill gap={14}>
+        <motion.div {...fade(0.1)} style={{ fontSize: 24, lineHeight: 1.45, color: INK }}>
+          Like a toolbox with a <b>foam insert</b>: each approved instrument has its own cut-out, and <b>no space for a ninth</b>.
+        </motion.div>
+        <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 2.3fr) minmax(0, 1fr)', columnGap: 34 }}>
+          {/* the open toolbox: lid with its label, then the foam tray */}
+          <motion.div data-toolbox {...fadeUp(0.2)} style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ height: 66, borderRadius: '18px 18px 4px 4px', background: G_DARK, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18 }}>
+              <span style={{ padding: '6px 18px', borderRadius: 8, background: '#e9edf1', ...mono(22, INK), fontWeight: 700 }}>AGENT_TOOLS</span>
+              <span style={{ fontSize: 22, color: '#e6e9ef', fontWeight: 600 }}>8 tools, cell 73</span>
+            </div>
+            <div style={{ height: 10, background: '#46525e' }} />
+            <div style={{ flex: 1, minHeight: 0, borderRadius: '4px 4px 18px 18px', background: '#3d4651', padding: '20px 24px', display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(0, 1fr)', columnGap: 26 }}>
+              <div data-step={1} data-on={on(1)} style={{ ...dim(1), display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {head(1, '5 data tools')}
+                {DATA_TOOLS.map((t, i) => <FoamSlot key={t} name={t} at={0.7 + i * 0.25} />)}
               </div>
-            ),
-          },
-        ]}
-      />
+              <div data-step={2} data-on={on(2)} style={{ ...dim(2), display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {head(2, '3 memory tools')}
+                {MEMORY_TOOLS.map((t, i) => <FoamSlot key={t} name={t} at={2 + i * 0.25} />)}
+                {/* the foam is solid where a ninth would go */}
+                <div style={{ flex: 2.2, borderRadius: 18, background: 'rgba(255,255,255,0.04)', border: '2px dashed rgba(255,255,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: 22, color: '#aab1ba', padding: 10 }}>
+                  solid foam: no cut-out left
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          {/* the language model learns only what is in the box */}
+          <motion.div data-step={3} data-on={on(3)} {...fadeUp(2.8)} style={{ ...dim(3), display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }}>
+            <Num n={3} size={38} on={on(3)} />
+            <ChiefInspector size={180} />
+            <Chip style={{ fontSize: 20 }}>bind_tools(AGENT_TOOLS)</Chip>
+            <div style={{ fontSize: 24, fontWeight: 700, color: INK, lineHeight: 1.3 }}>The model learns only these</div>
+            <div style={{ fontSize: 22, color: DIM, lineHeight: 1.35 }}>8 names, their types and their docstrings</div>
+            <span data-no-ninth style={{ padding: '8px 18px', borderRadius: 999, border: '2px dashed #8a97a3', fontSize: 22, fontWeight: 700, color: DIM }}>no 9th tool</span>
+          </motion.div>
+        </div>
+      </Fill>
     </L2Page>
   );
 }
