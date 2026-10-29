@@ -52,7 +52,7 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
           </div>
           <div style={{ ...cap, color: '#aab4bf', fontSize: 12, marginTop: 4 }}>Try a prompt</div>
           {TRY_A_PROMPT.map((t) => (
-            <span key={t} style={{ alignSelf: 'flex-start', border: '1px solid rgba(255,255,255,0.4)', borderRadius: 6, padding: '3px 8px', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}>{t}</span>
+            <span key={t} style={{ alignSelf: 'flex-start', border: '1px solid rgba(255,255,255,0.4)', borderRadius: 6, padding: '3px 7px', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>{t}</span>
           ))}
           <div style={{ marginTop: 'auto', fontSize: 13, color: '#aab4bf' }}>scoped to one project code</div>
         </motion.div>
@@ -101,7 +101,7 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
                 <Chip style={{ background: '#1f2a33', color: '#fff' }}>file_search</Chip>
                 finds passages in the specification
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '10px 0', fontSize: 13, color: DIM }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, margin: '10px 0', fontSize: 15, color: DIM }}>
                 <div style={{ display: 'grid', gap: 3 }}>
                   {[0, 1, 2, 3].map((i) => (
                     <span key={i} style={{ width: 44, height: 7, borderRadius: 2, border: `1.5px solid ${TEAL}`, background: TINT }} />
