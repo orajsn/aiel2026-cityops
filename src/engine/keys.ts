@@ -1,5 +1,5 @@
 import type { SceneStore } from './store';
-import { presentNext, presentPrev, usePresentationStore } from './presentation';
+import { focusNext, focusPrev, pagePrev, presentNext, presentPrev, usePresentationStore } from './presentation';
 
 export interface KeyHandlers {
   jump(): void;
@@ -39,12 +39,13 @@ export function bindKeys(store: SceneStore, handlers: KeyHandlers): () => void {
       case 'ArrowRight':
       case 'PageDown':
       case ' ':
-        store.getState().next();
+        // a Lab 2 focus page walks its notebook steps first (lab2Focus.ts)
+        if (!focusNext()) store.getState().next();
         e.preventDefault();
         break;
       case 'ArrowLeft':
       case 'PageUp':
-        store.getState().prev();
+        if (!focusPrev()) pagePrev(store);
         e.preventDefault();
         break;
       case 'j':

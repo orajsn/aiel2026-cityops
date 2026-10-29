@@ -3,11 +3,13 @@ import { LAB_STOPS, stopCells } from '../../src/content/labStops';
 import { LAB_GUIDE, guideSteps } from '../../src/content/labGuide';
 import { JupyterDrawer } from '../../src/overlay/jupyter/JupyterDrawer';
 import { useDrawerStore } from '../../src/engine/presentation';
+import { LAB2_FOCUS } from '../../src/content/lab2Focus';
 
 // owner, 28 Oct ("check all"): on every page, the step bar's numbers are the cells' own numbers
 beforeEach(() => useDrawerStore.getState().reset());
 
-for (const id of Object.keys(LAB_STOPS)) {
+// a Lab 2 page with a notebook focus shows the whole notebook and its focus steps instead (FocusDrawer.test.tsx)
+for (const id of Object.keys(LAB_STOPS).filter((id) => !LAB2_FOCUS[id]?.length)) {
   test(`page ${id}: each chip shows the number of the cell it lands on, and the bar agrees with "Run N cells"`, () => {
     const stop = LAB_STOPS[id];
     const runs = stopCells(stop).filter((c) => c.run);

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { LAB_STOPS, stopCells } from '../content/labStops';
 import { guideSteps } from '../content/labGuide';
 import { handsOnTaskCount } from '../content/lab1HandsOn';
+import { LAB2_FOCUS } from '../content/lab2Focus';
 import { useSceneStore } from './store';
 
 /**
@@ -21,13 +22,23 @@ export interface DrawerState {
   reset(): void;
 }
 
+/**
+ * Back from the page after a Lab 2 focus page lands on its last step, drawer open (resumeFocus). Every reset on that
+ * page (the page change itself, the drawers mounting once the camera arrives) keeps it, until the next click.
+ */
+let resume: { id: string; focus: number } | null = null;
+
 export const useDrawerStore = create<DrawerState>((set) => ({
   open: false,
   focus: 0,
   done: false,
-  setOpen: (open) => set({ open }),
-  setFocus: (focus) => set({ focus }),
-  reset: () => set({ open: false, focus: 0, done: false }),
+  setOpen: (open) => ((resume = null), set({ open })),
+  setFocus: (focus) => ((resume = null), set({ focus })),
+  reset: () => {
+    if (resume && resume.id === useSceneStore.getState().current()?.id) return set({ open: true, focus: resume.focus, done: false });
+    resume = null;
+    set({ open: false, focus: 0, done: false });
+  },
 }));
 
 // every page starts with its drawer closed, however it was reached (clicker, jump menu, address)
@@ -37,6 +48,7 @@ useSceneStore.subscribe((s, prev) => {
 
 /** how many steps a page's drawer has: its guide's sections and parts (labGuide.ts), else its cells to run, else its Lab 1 hands-on steps */
 export function stopStepCount(id: string): number {
+  if (focusStepCount(id)) return focusStepCount(id);
   const stop = LAB_STOPS[id];
   // Lab 1's Hands-on drawer (lab1HandsOn.ts): opens on its overview, then one step per task on the chosen 3A / 3B path
   if (!stop) return handsOnTaskCount(id);
@@ -49,7 +61,65 @@ function runsHere(): number {
   return settled ? stopStepCount(useSceneStore.getState().current().id) : 0;
 }
 
+/* ---------- Lab 2's notebook focus (src/content/lab2Focus.ts): the same line for every Next and Back ---------- */
+
+/** how many focus steps a page has (0: none, the page behaves as before) */
+export const focusStepCount = (id: string): number => LAB2_FOCUS[id]?.length ?? 0;
+
+/** the focus page on screen now, once its camera has arrived */
+function focusHere(): number {
+  const s = useSceneStore.getState();
+  return s.settled ? focusStepCount(s.current().id) : 0;
+}
+
+/**
+ * Next on a focus page (any Next: arrow, Page Down, clicker, the on-screen buttons): open the drawer on step 1 (or
+ * where it was closed by hand), then each step, then close it and go to the next page. False when the page has no focus.
+ */
+export function focusNext(): boolean {
+  const steps = focusHere();
+  if (!steps) return false;
+  resume = null;
+  const d = useDrawerStore.getState();
+  if (!d.open) useDrawerStore.setState({ open: true, focus: Math.min(steps, Math.max(1, d.focus)), done: false });
+  else if (d.focus < steps) useDrawerStore.setState({ focus: d.focus + 1 });
+  else {
+    useDrawerStore.setState({ open: false, done: true });
+    useSceneStore.getState().next();
+  }
+  return true;
+}
+
+/** Back on a focus page: the steps in reverse, then close the drawer. False once it is closed: the page before, as usual. */
+export function focusPrev(): boolean {
+  const steps = focusHere();
+  if (!steps) return false;
+  const d = useDrawerStore.getState();
+  if (!d.open) return false;
+  resume = null;
+  if (d.focus > 1) useDrawerStore.setState({ focus: d.focus - 1 });
+  else useDrawerStore.setState({ open: false, focus: 0, done: false });
+  return true;
+}
+
+/** after a move to the page before: a focus page opens where Next left it, on its last step */
+export function resumeFocus() {
+  const id = useSceneStore.getState().current().id;
+  const steps = focusStepCount(id);
+  if (!steps) return;
+  resume = { id, focus: steps };
+  useDrawerStore.setState({ open: true, focus: steps, done: false });
+}
+
+/** the page before (Back once the page's drawer is closed), resuming a focus page at its end */
+export function pagePrev(store: { getState(): { index: number; prev(): void } } = useSceneStore) {
+  const before = store.getState().index;
+  store.getState().prev();
+  if (store.getState().index !== before) resumeFocus();
+}
+
 export function presentNext() {
+  if (focusNext()) return;
   const runs = runsHere();
   const d = useDrawerStore.getState();
   if (runs && !d.done) {
@@ -61,6 +131,8 @@ export function presentNext() {
 }
 
 export function presentPrev() {
+  if (focusPrev()) return;
+  if (focusHere()) return pagePrev();
   const runs = runsHere();
   const d = useDrawerStore.getState();
   if (runs) {
@@ -68,7 +140,7 @@ export function presentPrev() {
     if (d.open && d.focus > 0) return d.setFocus(d.focus - 1);
     if (d.open) return d.setOpen(false);
   }
-  useSceneStore.getState().prev();
+  pagePrev();
 }
 
 const KEY = 'cityops.presentation';

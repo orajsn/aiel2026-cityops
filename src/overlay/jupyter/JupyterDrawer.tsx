@@ -4,6 +4,8 @@ import { LAB_STOPS, stopCells, todoLines, type StopCell } from '../../content/la
 import { NotebookMarkdown, PythonCode } from './NotebookMarkdown';
 import { useDrawerStore } from '../../engine/presentation';
 import { guideSteps, partLines, type GuideStep } from '../../content/labGuide';
+import { LAB2_FOCUS } from '../../content/lab2Focus';
+import { FocusDrawer } from './FocusDrawer';
 
 /** cells longer than this show their first lines and fold the rest */
 const FOLD_AT = 16;
@@ -25,6 +27,11 @@ const BADGE: Record<string, string> = { run: 'run', todo: 'fill in, then run', c
  * highlighted and their note pinned at the top.
  */
 export function JupyterDrawer({ sceneId }: { sceneId: string }) {
+  // a Lab 2 page with a notebook focus (lab2Focus.ts) shows the whole notebook and walks its steps; every other page as before
+  return LAB2_FOCUS[sceneId]?.length ? <FocusDrawer sceneId={sceneId} /> : <StopDrawer sceneId={sceneId} />;
+}
+
+function StopDrawer({ sceneId }: { sceneId: string }) {
   const stop = LAB_STOPS[sceneId];
   const open = useDrawerStore((s) => s.open);
   const focus = useDrawerStore((s) => s.focus);

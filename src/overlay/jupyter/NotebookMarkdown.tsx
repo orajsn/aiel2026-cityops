@@ -10,6 +10,23 @@ function inline(text: string): ReactNode[] {
   });
 }
 
+export type LinePiece = { text: string; kind: string };
+
+/** the coloured tokens of a cell, one array per line (a token that spans lines is split at the line ends) */
+export function codeLines(source: string): LinePiece[][] {
+  const lines: LinePiece[][] = [[]];
+  for (const t of highlightPython(source)) {
+    t.text.split('\n').forEach((part, j) => {
+      if (j > 0) lines.push([]);
+      if (part) lines[lines.length - 1].push({ text: part, kind: t.kind });
+    });
+  }
+  return lines;
+}
+
+/** one line's pieces, coloured as JupyterLab colours them */
+export const linePieces = (line: LinePiece[]) => line.map((p, j) => (p.kind === 'plain' ? p.text : <span key={j} className={`py-${p.kind}`}>{p.text}</span>));
+
 /** `marked` tints whole lines (the TODO lines people type into); tokens are split at line ends for that */
 /** `marked` lines are lit: a TODO's lines, or (tone 'guide') the part of the cell a guide step is about */
 export function PythonCode({ source, marked, tone = 'todo' }: { source: string; marked?: Set<number>; tone?: 'todo' | 'guide' }) {
@@ -17,13 +34,7 @@ export function PythonCode({ source, marked, tone = 'todo' }: { source: string; 
   if (!marked?.size) {
     return <pre className="jd__code">{tokens.map((t, i) => (t.kind === 'plain' ? t.text : <span key={i} className={`py-${t.kind}`}>{t.text}</span>))}</pre>;
   }
-  const lines: { text: string; kind: string }[][] = [[]];
-  for (const t of tokens) {
-    t.text.split('\n').forEach((part, j) => {
-      if (j > 0) lines.push([]);
-      if (part) lines[lines.length - 1].push({ text: part, kind: t.kind });
-    });
-  }
+  const lines = codeLines(source);
   return (
     <pre className="jd__code">
       {lines.map((line, i) => (

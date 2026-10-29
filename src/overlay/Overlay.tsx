@@ -14,7 +14,7 @@ import { useTrafficStore } from '../engine/traffic';
 import { Rich } from './Rich';
 import { SettingsPanel } from './SettingsPanel';
 import { pageNumber } from '../scenes';
-import { useDrawerStore, usePresentationStore } from '../engine/presentation';
+import { focusNext, focusPrev, pagePrev, useDrawerStore, usePresentationStore } from '../engine/presentation';
 import { FRAME, useGraphicsStore } from '../engine/graphics';
 
 // named for the event's agenda (owner): the intro, then Lab 2 and Lab 3; pages are numbered the same way (0.x, 2.x, 3.x)
@@ -172,10 +172,10 @@ export function Overlay() {
           ▦
         </button>
         {/* CAM and Traffic live in Settings › Tools (owner, 27 Oct) */}
-        <button type="button" className="stepper__btn" aria-label="Back" disabled={index === 0} onClick={() => useSceneStore.getState().prev()}>
+        <button type="button" className="stepper__btn" aria-label="Back" disabled={index === 0} onClick={() => focusPrev() || pagePrev()}>
           ‹
         </button>
-        <button type="button" className="stepper__btn" aria-label="Next" disabled={index >= total - 1} onClick={() => useSceneStore.getState().next()}>
+        <button type="button" className="stepper__btn" aria-label="Next" disabled={index >= total - 1} onClick={() => focusNext() || useSceneStore.getState().next()}>
           ›
         </button>
       </nav>

@@ -685,6 +685,38 @@ body.is-idle, body.is-idle * { cursor: none !important; }
 .jd__out--ran { margin-top: 6px; padding: 8px 12px; border-left: 3px solid #1a7f37; background: #f6fbf7; animation: jd-out-in 0.35s ease-out; }
 @keyframes jd-out-in { from { opacity: 0; transform: translateY(-4px); } }
 
+/* Lab 2's notebook focus (FocusDrawer.tsx, lab2Focus.ts): the whole notebook; the step on screen is a teal band with a
+   numbered callout and its label above, its "Here:" note below; earlier steps fade to a faint band and a small number;
+   the rest of that cell steps back. Teal only: Oracle Red stays the show's one warm colour. */
+.jd__sect { font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--teal); }
+.jd__brief--focus { gap: 8px; padding: 12px 22px; }
+.jd__brief--focus .jd__steps { gap: 10px; }
+.jd__step.is-past { background: rgba(27, 138, 156, 0.12); }
+.jd__now { margin-left: 8px; font-size: 19px; font-weight: 700; color: #1f2a33; }
+.jd__back { margin-left: auto; border: 2px solid var(--teal); border-radius: 8px; padding: 7px 16px; background: #fff; color: var(--teal); font-weight: 700; font-size: 16px; cursor: pointer; }
+.jd__back + .jd__next { margin-left: 0; }
+.jd__code--focus { padding: 10px 12px 10px 0; }
+.jd__fl { display: flex; align-items: flex-start; transition: opacity 0.4s ease, background-color 0.4s ease; }
+.jd__gut { flex: none; width: 46px; display: flex; justify-content: center; align-items: flex-start; }
+.jd__lt { flex: 1; min-width: 0; padding-left: 10px; border-left: 3px solid transparent; }
+.jd__code--focus.has-now .jd__fl:not(.is-now):not(.jd__fl--label):not(.jd__fl--here) { opacity: 0.5; filter: grayscale(1); }
+.jd__fl.is-now { background: rgba(27, 138, 156, 0.17); animation: jd-band-in 0.5s ease-out; }
+.jd__fl.is-now .jd__lt { border-left-color: var(--teal); font-weight: 600; color: #0f1d24; }
+/* the lit lines read as one dark band, as the storyboard has them: no JupyterLab string red in the one place everyone looks */
+.jd__fl.is-now .jd__lt span { color: #0f1d24; }
+.jd__fl.is-past { background: rgba(27, 138, 156, 0.06); }
+.jd__fl.is-past .jd__lt { border-left-color: rgba(27, 138, 156, 0.35); }
+@keyframes jd-band-in { from { background-color: rgba(27, 138, 156, 0); } }
+.jd__callout { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--teal); color: #fff; font: 700 17px/1 var(--font-body); font-style: normal; box-shadow: 0 0 0 4px rgba(27, 138, 156, 0.2); }
+.jd__callout--past { width: 21px; height: 21px; margin-top: 1px; font-size: 12px; background: #fff; color: var(--teal); border: 1.5px solid rgba(27, 138, 156, 0.55); box-shadow: none; }
+.jd__fl--label { align-items: center; padding: 8px 0 6px; animation: jd-out-in 0.35s ease-out; }
+.jd__label { padding-left: 10px; font: 700 18px/1.3 var(--font-body); color: var(--teal); }
+.jd__fl--here { padding: 6px 0 4px; animation: jd-out-in 0.35s ease-out; }
+.jd__here { padding-left: 13px; font: 400 16px/1.4 var(--font-body); color: #1f2a33; }
+.jd__here b { color: var(--teal); }
+.jd__out--saved { margin-top: 6px; padding: 8px 12px; border-left: 3px solid var(--teal); background: rgba(27, 138, 156, 0.06); animation: jd-out-in 0.35s ease-out; }
+.jd__out--saved .jd__out-label { order: -1; margin-left: 0; color: var(--teal); font-weight: 700; }
+
 /* Settings › Text size: slider + percent box */
 .settings__text { display: flex; align-items: center; gap: 12px; }
 .settings__text input[type='range'] { flex: 1; accent-color: var(--teal); }

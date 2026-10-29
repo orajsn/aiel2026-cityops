@@ -76,7 +76,7 @@ test('every code cell of both notebooks is in a stop', () => {
 test('the drawer never shows a word the screen must not show', () => {
   for (const id of Object.keys(LAB_STOPS)) {
     const { container, getByRole, unmount } = render(<JupyterDrawer sceneId={id} />);
-    fireEvent.click(getByRole('button', { name: /run in jupyter/i }));
+    fireEvent.click(getByRole('button', { name: /(run|open) in jupyter/i }));
     expect(container.textContent, id).not.toMatch(/Kirkland|\bMEA\b|\bMWA\b|\bBMA\b|fictional/);
     unmount();
   }
@@ -99,7 +99,7 @@ test('TODO cells: only the lines people type into are marked, not the ready-made
 test('Lab 3 page 15: a closed tab first; opening it shows the notebook cells with the run order', () => {
   const { container, getByRole } = render(<JupyterDrawer sceneId="3.6" />);
   expect(container.querySelector('.jd__panel')).toBeNull();
-  fireEvent.click(getByRole('button', { name: /run in jupyter/i }));
+  fireEvent.click(getByRole('button', { name: /(run|open) in jupyter/i }));
   expect(container.querySelector('.jd__file')?.textContent).toContain('notebook_student_ollama.ipynb');
   const badges = [...container.querySelectorAll('[data-run]')].map((e) => e.getAttribute('data-run'));
   expect(badges).toEqual(['1', '2', '3', '4', '5', '6', '7']);
@@ -109,7 +109,7 @@ test('Lab 3 page 15: a closed tab first; opening it shows the notebook cells wit
 
 test('Lab 2 page 4: the optional section says it is optional', () => {
   const { container, getByRole } = render(<JupyterDrawer sceneId="2.4" />);
-  fireEvent.click(getByRole('button', { name: /run in jupyter/i }));
+  fireEvent.click(getByRole('button', { name: /(run|open) in jupyter/i }));
   expect(container.querySelector('.jd__file')?.textContent).toContain('rag_to_agents_lab.ipynb');
   expect(container.querySelector('.jd__todo-line')?.textContent).toMatch(/optional/i);
 });
