@@ -8,7 +8,7 @@ import {
 } from './parts';
 
 /**
- * Lab 2 · §3 Tools (tools, skills, MCP), §4 Query (one query, four lenses) and §5 Agent (build the agent): the deck's
+ * Lab 2 · Tools (tools, skills, MCP), Query (one query, four lenses) and Agent (build the agent): the deck's
  * chapters 7 to 9. The agent is the chief inspector; its tools are its instruments; the skill is its manual.
  */
 
@@ -273,7 +273,7 @@ export function MainInstrument(p: L2Props) {
             { title: 'Name and inputs', grow: 1.3, body: <Quote style={{ fontSize: 19 }}>get_asset_incident_brief(asset_name, focus, k=5)</Quote> },
             { title: 'When to prefer it', grow: 1.2, body: <div style={{ fontSize: 21, lineHeight: 1.45, fontStyle: 'italic' }}>“Prefer this when you need a holistic picture before recommending action.”</div> },
             {
-              title: 'Calls the §4.3 query',
+              title: 'Calls the one-brief query',
               grow: 1.1,
               body: (
                 <>

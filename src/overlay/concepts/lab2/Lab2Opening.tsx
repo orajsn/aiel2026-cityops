@@ -8,7 +8,7 @@ import {
 } from './parts';
 
 /**
- * Lab 2 · the opening chapters of the Harbor Bridge deck: Story (one crack), Why (AI needs your data), and §0 Setup
+ * Lab 2 · the opening chapters of the Harbor Bridge deck: Story (one crack), Why (AI needs your data), and Setup
  * (the workbench, what the agent can see, is the model awake?). Mercer reports the crack, Vance asks what to do.
  */
 
@@ -26,25 +26,25 @@ function Swap({ k, children }: { k: string | number; children: ReactNode }) {
 /* ---------------- Story · one crack (0.4, 0.4a, 0.4b) ---------------- */
 
 const EVIDENCE: { label: string; icon: IconName; where: string }[] = [
-  { label: 'Asset record', icon: 'profile', where: '§0.8' },
-  { label: 'Specifications', icon: 'prompt', where: '§0.8' },
-  { label: 'Connected assets', icon: 'nodes', where: '§4.2' },
-  { label: 'History', icon: 'log', where: '§3.2' },
-  { label: 'Memory', icon: 'book', where: '§5.2' },
+  { label: 'Asset record', icon: 'profile', where: '' },
+  { label: 'Specifications', icon: 'prompt', where: '' },
+  { label: 'Connected assets', icon: 'nodes', where: '' },
+  { label: 'History', icon: 'log', where: '' },
+  { label: 'Memory', icon: 'book', where: '' },
 ];
 
 export const ROUTE: { n: number; ch: string; name: string; kinds: ('idea' | 'notebook')[] }[] = [
   { n: 1, ch: 'Story', name: 'One crack', kinds: ['idea'] },
   { n: 2, ch: 'Why', name: 'Why AI needs your data', kinds: ['idea'] },
-  { n: 3, ch: '§0 Setup', name: 'The workbench', kinds: ['notebook'] },
-  { n: 4, ch: '§1 RAG', name: 'The filing cabinet', kinds: ['idea', 'notebook'] },
-  { n: 5, ch: '§2 Workflow', name: 'The fixed checklist', kinds: ['idea', 'notebook'] },
+  { n: 3, ch: 'Setup', name: 'The workbench', kinds: ['notebook'] },
+  { n: 4, ch: 'RAG', name: 'The filing cabinet', kinds: ['idea', 'notebook'] },
+  { n: 5, ch: 'Workflow', name: 'The fixed checklist', kinds: ['idea', 'notebook'] },
   { n: 6, ch: 'Agent', name: 'The chief inspector', kinds: ['idea'] },
-  { n: 7, ch: '§3 Tools', name: 'Tools, skills, MCP', kinds: ['idea', 'notebook'] },
-  { n: 8, ch: '§4 Query', name: 'One query, four lenses', kinds: ['notebook'] },
-  { n: 9, ch: '§5 Agent', name: 'Build the agent', kinds: ['idea', 'notebook'] },
+  { n: 7, ch: 'Tools', name: 'Tools, skills, MCP', kinds: ['idea', 'notebook'] },
+  { n: 8, ch: 'Query', name: 'One query, four lenses', kinds: ['notebook'] },
+  { n: 9, ch: 'Agent', name: 'Build the agent', kinds: ['idea', 'notebook'] },
   { n: 10, ch: 'Trust', name: 'Security and observability', kinds: ['idea', 'notebook'] },
-  { n: 11, ch: '§6 Wrap', name: 'Wrap-up', kinds: ['idea', 'notebook'] },
+  { n: 11, ch: 'Wrap', name: 'Wrap-up', kinds: ['idea', 'notebook'] },
 ];
 
 const ROUTE_ICON: IconName[] = ['inspect', 'database', 'gear', 'lookup', 'steps', 'branch', 'wrench', 'converge', 'loop', 'lock', 'clipboard'];
@@ -109,7 +109,7 @@ export function CrackStory(p: L2Props) {
                     <motion.div key={e.label} data-kind={e.label} {...fadeUp(0.6 + i * 0.25)} style={{ ...card(true), padding: '20px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, textAlign: 'center' }}>
                       <LineIcon name={e.icon} size={72} />
                       <div style={{ fontSize: 21, fontWeight: 700, color: INK, overflowWrap: 'anywhere' }}>{e.label}</div>
-                      <Chip>{e.where}</Chip>
+                      
                     </motion.div>
                   ))}
                 </div>
@@ -322,8 +322,8 @@ export const CHECKS: { n: number; group: string; items: string[] }[] = [
 
 const BENCH: { title: string; icon: ReactNode; lines: string[]; code: string; n: number }[] = [
   { n: 1, title: 'Oracle AI Database 26ai', icon: <Db size={74} />, lines: ['PRISM data', 'in-database ONNX embedding model'], code: 'Oracle AI Database 26ai Free Release 23.26.2.0.0' },
-  { n: 2, title: 'The language model', icon: <Net w={120} live />, lines: ['a 3B model, chosen for small size', 'a GPU or hosted model is faster'], code: 'Reply: ’READY’ (§0.10)' },
-  { n: 3, title: 'Jupyter notebook', icon: <LineIcon name="prompt" size={74} />, lines: ['all settings in one cell, §0.4', 'active case: Harbor Bridge'], code: 'THREAD_ID = "prism-agent-demo-001"' },
+  { n: 2, title: 'The language model', icon: <Net w={120} live />, lines: ['a 3B model, chosen for small size', 'a GPU or hosted model is faster'], code: 'Reply: ’READY’' },
+  { n: 3, title: 'Jupyter notebook', icon: <LineIcon name="prompt" size={74} />, lines: ['all settings in one cell', 'active case: Harbor Bridge'], code: 'THREAD_ID = "prism-agent-demo-001"' },
 ];
 
 export function Workbench(p: L2Props) {

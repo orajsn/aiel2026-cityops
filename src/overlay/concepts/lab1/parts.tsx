@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { useLayoutEffect, useRef } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { EASE } from '../WidePanel';
 
@@ -26,6 +27,70 @@ export interface Lab1Props {
 
 export const fadeUp = (delay: number) => ({ initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.5, ease: EASE } });
 export const fade = (delay: number) => ({ initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { delay, duration: 0.5, ease: EASE } });
+
+/**
+ * Fills the panel's body with a page's content (owner, 29 Oct: use the whole stage, as if the caption were off;
+ * grow the content, do not just add space): the content is laid out at a width of W / k and scaled by k, the
+ * largest k (up to `max`) at which it still fits the height, so type, cards and pictures all grow together and
+ * the page keeps its proportions. The content box is at least the full height, so rows with flex: 1 take what
+ * is left. With a large Settings › Text size it shrinks to `min` and then scrolls rather than clips.
+ */
+export function Fill({ children, max = 1.25, min = 0.8, refit, style }: { children: ReactNode; max?: number; min?: number; /** fit again when this changes (a page whose content changes between clicks) */ refit?: unknown; style?: CSSProperties }) {
+  const outer = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const o = outer.current;
+    const i = inner.current;
+    if (!o || !i) return;
+    let last = '';
+    const fit = () => {
+      const W = o.clientWidth;
+      const H = o.clientHeight;
+      if (!W || !H) return;
+      const key = `${W}x${H}`;
+      i.style.minHeight = '0px';
+      const over = (k: number) => {
+        i.style.width = `${W / k}px`;
+        return i.offsetHeight * k > H + 0.5 || i.scrollWidth > i.clientWidth + 2;
+      };
+      let lo = min;
+      let hi = max;
+      if (!over(hi)) lo = hi;
+      else if (over(lo)) hi = lo;
+      else for (let n = 0; n < 10; n++) {
+        const m = (lo + hi) / 2;
+        if (over(m)) hi = m;
+        else lo = m;
+      }
+      const k = Math.floor(lo * 1000) / 1000;
+      const scrolls = over(k);
+      i.style.width = `${W / k}px`;
+      i.style.minHeight = `${H / k}px`;
+      i.style.transform = `scale(${k})`;
+      i.dataset.fit = String(k);
+      o.style.overflowY = scrolls ? 'auto' : 'hidden';
+      last = key;
+    };
+    fit();
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(() => {
+      if (`${o.clientWidth}x${o.clientHeight}` !== last) fit();
+    });
+    ro?.observe(o);
+    let alive = true;
+    document.fonts?.ready.then(() => alive && fit());
+    return () => {
+      alive = false;
+      ro?.disconnect();
+    };
+  }, [max, min, refit]);
+  return (
+    <div ref={outer} data-fill style={{ position: 'relative', flex: 1, minHeight: 0, overflowX: 'hidden', overflowY: 'hidden' }}>
+      <div ref={inner} style={{ position: 'absolute', left: 0, top: 0, width: '100%', transformOrigin: '0 0', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', ...style }}>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 /** the small uppercase label over a block */
 export const cap: CSSProperties = { fontSize: 13, fontWeight: 700, letterSpacing: 2, color: DIM, textTransform: 'uppercase' };
@@ -220,9 +285,9 @@ export function LockIcon({ size = 26, color = '#fff' }: { size?: number; color?:
 }
 
 /** the synthetic structural-steel delivery photo: I-beams stacked on timber, a project placard beside the stack */
-export function SteelPhoto({ w = 300, label = true }: { w?: number; label?: boolean }) {
+export function SteelPhoto({ w = 300, label = true, fluid = false }: { w?: number; label?: boolean; /** as wide as its box */ fluid?: boolean }) {
   return (
-    <svg data-photo="steel-delivery" width={w} height={w * 0.66} viewBox="0 0 420 278" aria-hidden="true" style={{ display: 'block', borderRadius: 10, flex: 'none' }}>
+    <svg data-photo="steel-delivery" width={fluid ? '100%' : w} height={fluid ? undefined : w * 0.66} viewBox="0 0 420 278" aria-hidden="true" style={{ display: 'block', borderRadius: 10, flex: 'none', ...(fluid ? { height: 'auto', aspectRatio: '420 / 278' } : null) }}>
       <rect width="420" height="278" fill="#d3dae0" />
       <rect y="200" width="420" height="78" fill="#b9c3bf" />
       <g fill="#6d7884">
@@ -249,9 +314,9 @@ export function SteelPhoto({ w = 300, label = true }: { w?: number; label?: bool
 }
 
 /** Harbor Bridge from the side: deck, three piers, the city behind, the river under it */
-export function BridgeSide({ w = 300, children }: { w?: number; children?: ReactNode }) {
+export function BridgeSide({ w = 300, fluid = false, children }: { w?: number; /** as wide as its box */ fluid?: boolean; children?: ReactNode }) {
   return (
-    <svg data-bridge width={w} height={w * 0.62} viewBox="0 0 700 434" aria-hidden="true" style={{ display: 'block', flex: 'none' }}>
+    <svg data-bridge width={fluid ? '100%' : w} height={fluid ? undefined : w * 0.62} viewBox="0 0 700 434" aria-hidden="true" style={{ display: 'block', flex: 'none', ...(fluid ? { height: 'auto', aspectRatio: '700 / 434' } : null) }}>
       <rect width="700" height="434" fill="rgba(138,151,163,0.12)" />
       <g fill="rgba(138,151,163,0.28)">
         {[[0, 100, 30], [36, 50, 22], [74, 110, 26], [102, 74, 24], [176, 92, 38], [244, 66, 34], [282, 40, 22], [312, 100, 26], [378, 88, 46], [430, 56, 22], [458, 90, 42], [548, 84, 40], [594, 30, 30], [664, 30, 36]].map(([x, h, wd], i) => (

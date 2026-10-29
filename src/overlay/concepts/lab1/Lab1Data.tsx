@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import type { CSSProperties, ReactNode } from 'react';
 import { WidePanel } from '../WidePanel';
-import { Avatar, CARD, Clip, Chip, DbIcon, DIM, Flow, FlowDown, GREY, HandsOn, MONO, PdfIcon, SOFT, Shield, Spark, SteelPhoto, Switch, TEAL, TEAL_D, TINT, cap, capTeal, card, fade, fadeUp, mono } from './parts';
+import { Avatar, CARD, Clip, Chip, DbIcon, DIM, Flow, FlowDown, GREY, HandsOn, MONO, PdfIcon, SOFT, Shield, Spark, SteelPhoto, Switch, TEAL, TEAL_D, TINT, cap, capTeal, card, fade, fadeUp, mono, Fill } from './parts';
 import type { Lab1Props } from './parts';
 
 /**
@@ -37,24 +37,25 @@ function Box({ title, ho, children, style, ...rest }: { title: ReactNode; ho: nu
 export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-assistant" kickerColor="var(--teal)">
-      <div style={{ display: 'grid', gridTemplateColumns: '228px 34px 1fr 34px 212px', alignItems: 'stretch', columnGap: 4, marginTop: 4, height: 540 }}>
+      <Fill max={1.12}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 270fr) 34px minmax(0, 880fr) 34px minmax(0, 236fr)', alignItems: 'stretch', columnGap: 4, marginTop: 4, flex: 1 }}>
         {/* the app */}
         <motion.div data-app {...fadeUp(0.2)} style={{ borderRadius: 12, background: '#1f2a33', color: '#e6e9ef', padding: '14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ ...cap, color: '#aab4bf', fontSize: 12 }}>The app</span>
+            <span style={{ ...cap, color: '#aab4bf', fontSize: 15 }}>The app</span>
             <HandsOn n={3} solid />
           </div>
-          <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.2 }}>Seer Construction Intelligence</div>
-          <div style={{ background: '#fff', color: '#1f2a33', borderRadius: 8, padding: '8px 10px', fontSize: 16 }}>“Which supplier is ready?”</div>
-          <div style={{ background: '#fff', color: '#1f2a33', borderRadius: 8, padding: '6px 10px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ fontSize: 22, fontWeight: 700, lineHeight: 1.2 }}>Seer Construction Intelligence</div>
+          <div style={{ background: '#fff', color: '#1f2a33', borderRadius: 8, padding: '8px 10px', fontSize: 18 }}>“Which supplier is ready?”</div>
+          <div style={{ background: '#fff', color: '#1f2a33', borderRadius: 8, padding: '6px 10px', fontSize: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
             <SteelPhoto w={42} label={false} />
             or attach a delivery photo
           </div>
-          <div style={{ ...cap, color: '#aab4bf', fontSize: 12, marginTop: 4 }}>Try a prompt</div>
+          <div style={{ ...cap, color: '#aab4bf', fontSize: 15, marginTop: 4 }}>Try a prompt</div>
           {TRY_A_PROMPT.map((t) => (
-            <span key={t} style={{ alignSelf: 'flex-start', border: '1px solid rgba(255,255,255,0.4)', borderRadius: 6, padding: '3px 7px', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>{t}</span>
+            <span key={t} style={{ alignSelf: 'flex-start', border: '1px solid rgba(255,255,255,0.4)', borderRadius: 6, padding: '3px 7px', fontSize: 15, fontWeight: 600, whiteSpace: 'nowrap' }}>{t}</span>
           ))}
-          <div style={{ marginTop: 'auto', fontSize: 13, color: '#aab4bf' }}>scoped to one project code</div>
+          <div style={{ marginTop: 'auto', fontSize: 16, color: '#aab4bf' }}>scoped to one project code</div>
         </motion.div>
 
         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -64,15 +65,15 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
         {/* OCI Enterprise AI */}
         <motion.div data-oci {...fadeUp(0.5)} style={{ ...card(true), background: TINT, padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span style={{ fontSize: 21, fontWeight: 700, color: TEAL_D }}>OCI Enterprise AI</span>
-            <span style={{ fontSize: 14, color: DIM }}>one project holds the stores and settings · the Responses API runs each request</span>
+            <span style={{ fontSize: 23, fontWeight: 700, color: TEAL_D }}>OCI Enterprise AI</span>
+            <span style={{ fontSize: 17, color: DIM }}>one project holds the stores and settings · the Responses API runs each request</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <Box data-step="check" title={<><Num n={1} /> Check the request</>} ho={5}>
               <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <Shield size={50} />
-                <div style={{ fontSize: 15, color: 'var(--ink)', lineHeight: 1.35 }}>
-                  <div style={mono(15)}>ApplyGuardrails</div>
+                <Shield size={60} />
+                <div style={{ fontSize: 18, color: 'var(--ink)', lineHeight: 1.35 }}>
+                  <div style={mono(18)}>ApplyGuardrails</div>
                   checks every request for prompt injection <b>before</b> the model is called
                 </div>
               </div>
@@ -83,12 +84,12 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
                 ['image', 'the multimodal model', true],
               ].map(([k, m, solid]) => (
                 <div key={String(k)} data-route={String(k)} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                  <span style={{ width: 64, padding: '3px 0', textAlign: 'center', borderRadius: 6, background: SOFT, fontSize: 15, fontWeight: 600, color: 'var(--ink)' }}>{String(k)}</span>
+                  <span style={{ width: 64, padding: '3px 0', textAlign: 'center', borderRadius: 6, background: SOFT, fontSize: 18, fontWeight: 600, color: 'var(--ink)' }}>{String(k)}</span>
                   <Flow w={30} delay={1.6} />
-                  <span style={{ padding: '3px 10px', borderRadius: 6, border: `2px solid ${TEAL}`, background: solid ? TEAL : CARD, color: solid ? '#fff' : TEAL_D, fontSize: 15, fontWeight: 700 }}>{String(m)}</span>
+                  <span style={{ padding: '3px 10px', borderRadius: 6, border: `2px solid ${TEAL}`, background: solid ? TEAL : CARD, color: solid ? '#fff' : TEAL_D, fontSize: 18, fontWeight: 700 }}>{String(m)}</span>
                 </div>
               ))}
-              <div style={{ fontSize: 13, color: DIM }}>the runtime bar shows which model answered</div>
+              <div style={{ fontSize: 16, color: DIM }}>the runtime bar shows which model answered</div>
             </Box>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -97,44 +98,44 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, flex: 1 }}>
             <Box data-store="vector" title="Vector store" ho={1} style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--ink)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 17, color: 'var(--ink)' }}>
                 <Chip style={{ background: '#1f2a33', color: '#fff' }}>file_search</Chip>
                 finds passages in the specification
               </div>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, margin: '10px 0', fontSize: 15, color: DIM }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, margin: '10px 0', fontSize: 18, color: DIM }}>
                 <div style={{ display: 'grid', gap: 3 }}>
                   {[0, 1, 2, 3].map((i) => (
-                    <span key={i} style={{ width: 44, height: 7, borderRadius: 2, border: `1.5px solid ${TEAL}`, background: TINT }} />
+                    <span key={i} style={{ width: 64, height: 10, borderRadius: 2, border: `1.5px solid ${TEAL}`, background: TINT }} />
                   ))}
                 </div>
                 split into chunks →
-                <svg width="46" height="28" viewBox="0 0 46 28" aria-hidden="true">
+                <svg width="69" height="42" viewBox="0 0 46 28" aria-hidden="true">
                   {[0, 1, 2, 3, 4, 5, 6].map((i) => (
                     <circle key={i} cx={6 + (i % 4) * 11} cy={i < 4 ? 6 : 20} r={4} fill={TEAL} />
                   ))}
                 </svg>
                 embeddings, searched by meaning
               </div>
-              <div style={{ marginTop: 'auto', borderRadius: 8, background: SOFT, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--ink)' }}>
-                <PdfIcon size={24} />
+              <div style={{ marginTop: 'auto', borderRadius: 8, background: SOFT, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 17, color: 'var(--ink)' }}>
+                <PdfIcon size={30} />
                 <b>Object Storage bucket</b>
                 <Flow w={26} delay={2.4} />
                 <span style={{ color: DIM }}>data sync connector</span>
               </div>
             </Box>
             <Box data-store="semantic" title="Semantic store" ho={2} style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--ink)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 17, color: 'var(--ink)' }}>
                 <Chip style={{ background: '#1f2a33', color: '#fff' }}>NL2SQL</Chip>
                 turns the question into SQL, checked for project scope
               </div>
-              <div style={{ margin: '8px 0 4px', borderRadius: 6, background: '#1f2a33', color: '#e6e9ef', padding: '6px 10px', fontFamily: MONO, fontSize: 13, lineHeight: 1.5 }}>
+              <div style={{ margin: '8px 0 4px', borderRadius: 6, background: '#1f2a33', color: '#e6e9ef', padding: '6px 10px', fontFamily: MONO, fontSize: 16, lineHeight: 1.5 }}>
                 SELECT … FROM <span style={{ color: '#7fd3e0' }}>governed views</span>
                 <br />
                 WHERE project = <span style={{ color: '#7fd3e0' }}>&lt;one project&gt;</span>
               </div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: TEAL_D }}>✓ SQL checked: it cannot reach other projects</div>
-              <div style={{ marginTop: 'auto', borderRadius: 8, background: SOFT, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--ink)' }}>
-                <DbIcon size={22} />
+              <div style={{ fontSize: 17, fontWeight: 600, color: TEAL_D }}>✓ SQL checked: it cannot reach other projects</div>
+              <div style={{ marginTop: 'auto', borderRadius: 8, background: SOFT, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 17, color: 'var(--ink)' }}>
+                <DbIcon size={28} />
                 <b>Autonomous AI Database</b>
                 <Flow w={26} delay={2.6} />
                 <span style={{ color: DIM }}>ADB MCP Server</span>
@@ -150,23 +151,24 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
         {/* the answer */}
         <motion.div data-answer {...fadeUp(3)} style={{ ...card(true), background: TINT, padding: '14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={capTeal}>The answer</div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 17, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.2 }}>
-            <PdfIcon size={28} />
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 19, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.2 }}>
+            <PdfIcon size={34} />
             cites the specification
           </div>
-          <div style={{ fontSize: 14, color: DIM }}>governed supplier fields:</div>
-          <div style={{ background: CARD, borderRadius: 6, padding: '6px 10px', ...mono(13, 'var(--ink)'), lineHeight: 1.7 }}>
+          <div style={{ fontSize: 17, color: DIM }}>governed supplier fields:</div>
+          <div style={{ background: CARD, borderRadius: 6, padding: '6px 10px', ...mono(16, 'var(--ink)'), lineHeight: 1.7 }}>
             {SUPPLIER_FIELDS.slice(1).map((f) => (
               <div key={f}>{f}</div>
             ))}
           </div>
-          <div style={{ fontSize: 14, color: DIM, lineHeight: 1.35 }}>for a photo: what it sees, kept apart from what it assumes</div>
-          <div data-engineer style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, fontSize: 17, fontWeight: 700, color: 'var(--ink)' }}>
-            <Avatar who="engineer" size={44} />
+          <div style={{ fontSize: 17, color: DIM, lineHeight: 1.35 }}>for a photo: what it sees, kept apart from what it assumes</div>
+          <div data-engineer style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, fontSize: 19, fontWeight: 700, color: 'var(--ink)' }}>
+            <Avatar who="engineer" size={54} />
             the engineer decides
           </div>
         </motion.div>
       </div>
+      </Fill>
     </WidePanel>
   );
 }
@@ -185,6 +187,7 @@ const tag = (bold = false): CSSProperties => ({ padding: '4px 10px', borderRadiu
 export function L1App({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-app" kickerColor="var(--teal)">
+      <Fill>
       <motion.div data-window="app" {...fadeUp(0.2)} style={{ marginTop: 4, borderRadius: 12, border: '2px solid var(--line)', overflow: 'hidden', background: CARD }}>
         {/* the browser bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px', background: 'rgba(138,151,163,0.18)' }}>
@@ -286,6 +289,7 @@ export function L1App({ kicker, message, notebook }: Lab1Props) {
           </div>
         </div>
       </motion.div>
+      </Fill>
     </WidePanel>
   );
 }
@@ -314,6 +318,7 @@ function Bucket() {
 export function L1Specs({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-specs" kickerColor="var(--teal)">
+      <Fill>
       <div style={{ display: 'grid', gridTemplateColumns: '232px 120px 1fr', alignItems: 'stretch', columnGap: 8, marginTop: 4 }}>
         <motion.div data-source="object-storage" {...fadeUp(0.2)} style={{ ...card(), borderColor: 'rgba(27,138,156,0.35)', padding: '14px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 6 }}>
           <Bucket />
@@ -419,6 +424,7 @@ export function L1Specs({ kicker, message, notebook }: Lab1Props) {
           </motion.span>
         ))}
       </div>
+      </Fill>
     </WidePanel>
   );
 }
@@ -438,32 +444,40 @@ function TableIcon() {
 
 const STEP: CSSProperties = { ...card(), borderColor: 'rgba(27,138,156,0.35)', background: CARD, padding: '14px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 6 };
 
+/** what a supplier recommendation looks like: generic labels, the real values come from the lab's governed views */
+const SAMPLE_ROWS: string[][] = [
+  ['Supplier A', 'recommended', 'high', 'low', 'certified for this repair, delivered on time on similar work'],
+  ['Supplier B', 'conditional', 'medium', 'medium', 'certification renewal pending'],
+  ['Supplier C', 'not recommended', 'low', 'high', 'two late deliveries on past orders'],
+];
+
 export function L1Suppliers({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-suppliers" kickerColor="var(--teal)">
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 1fr 30px 1fr 30px 1fr 30px 1fr', alignItems: 'stretch', columnGap: 4, marginTop: 4, height: 290 }}>
-        <motion.div data-question="supplier" {...fadeUp(0.2)} style={{ ...card(), border: 'none', padding: '14px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6 }}>
-          <Avatar who="project manager" size={56} />
-          <div style={{ fontSize: 14, fontWeight: 600, color: DIM }}>the project manager</div>
-          <div style={{ ...cap, fontSize: 11 }}>Try a prompt › Supplier recommendation</div>
-          <div style={{ fontSize: 18, fontStyle: 'italic', color: 'var(--ink)', lineHeight: 1.3 }}>“Which suppliers do you recommend for this project?”</div>
+      <Fill>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 1fr 30px 1fr 30px 1fr 30px 1fr', alignItems: 'stretch', columnGap: 4, marginTop: 4, flex: 1, minHeight: 290 }}>
+        <motion.div data-question="supplier" {...fadeUp(0.2)} style={{ ...card(), border: 'none', padding: '18px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>
+          <Avatar who="project manager" size={76} />
+          <div style={{ fontSize: 17, fontWeight: 600, color: DIM }}>the project manager</div>
+          <div style={{ ...cap, fontSize: 13 }}>Try a prompt › Supplier recommendation</div>
+          <div style={{ fontSize: 23, fontStyle: 'italic', color: 'var(--ink)', lineHeight: 1.3 }}>“Which suppliers do you recommend for this project?”</div>
         </motion.div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Flow w={28} delay={0.8} head={false} />
         </div>
         <motion.div data-step="semantic" {...fadeUp(0.6)} style={{ ...STEP, justifyContent: 'center' }}>
-          <TableIcon />
-          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>Semantic store</div>
-          <Chip style={{ fontSize: 12 }}>seer-construction-semantic</Chip>
-          <div style={{ fontSize: 14, color: DIM, lineHeight: 1.35 }}>knows what each governed view and column means (semantic enrichment)</div>
+          <div style={{ transform: 'scale(1.5)', margin: '10px 0' }}><TableIcon /></div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)' }}>Semantic store</div>
+          <Chip style={{ fontSize: 15 }}>seer-construction-semantic</Chip>
+          <div style={{ fontSize: 18, color: DIM, lineHeight: 1.4 }}>knows what each governed view and column means (semantic enrichment)</div>
         </motion.div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Flow w={28} delay={1.4} head={false} />
         </div>
         <motion.div data-step="nl2sql" {...fadeUp(1)} style={{ ...STEP, justifyContent: 'center' }}>
-          <div style={{ ...mono(20), fontWeight: 700 }}>NL2SQL</div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>Question → SQL</div>
-          <div style={{ alignSelf: 'stretch', textAlign: 'left', borderRadius: 6, background: SOFT, padding: '6px 10px', ...mono(13, 'var(--ink)'), lineHeight: 1.6 }}>
+          <div style={{ ...mono(28), fontWeight: 700 }}>NL2SQL</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)' }}>Question → SQL</div>
+          <div style={{ alignSelf: 'stretch', textAlign: 'left', borderRadius: 6, background: SOFT, padding: '10px 14px', ...mono(17, 'var(--ink)'), lineHeight: 1.7 }}>
             SELECT …<br />
             FROM …<br />
             WHERE <b style={{ color: TEAL_D }}>this project</b>
@@ -473,10 +487,10 @@ export function L1Suppliers({ kicker, message, notebook }: Lab1Props) {
           <Flow w={28} delay={2} head={false} />
         </div>
         <motion.div data-step="sql-check" {...fadeUp(1.4)} style={{ ...STEP, borderColor: TEAL, justifyContent: 'center' }}>
-          <Shield size={44} />
-          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>SQL check</div>
-          <div style={{ fontSize: 14, color: DIM, lineHeight: 1.35 }}>the app checks the SQL stays inside this one project</div>
-          <motion.div data-blocked {...fadeUp(2.4)} style={{ alignSelf: 'stretch', borderRadius: 6, border: '1.5px solid var(--red)', color: 'var(--red)', padding: '4px 8px', fontSize: 13, fontWeight: 700, lineHeight: 1.25 }}>
+          <Shield size={64} />
+          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)' }}>SQL check</div>
+          <div style={{ fontSize: 18, color: DIM, lineHeight: 1.4 }}>the app checks the SQL stays inside this one project</div>
+          <motion.div data-blocked {...fadeUp(2.4)} style={{ alignSelf: 'stretch', borderRadius: 6, border: '1.5px solid var(--red)', color: 'var(--red)', padding: '6px 10px', fontSize: 16, fontWeight: 700, lineHeight: 1.25 }}>
             × SQL that widens to other projects
           </motion.div>
         </motion.div>
@@ -484,10 +498,10 @@ export function L1Suppliers({ kicker, message, notebook }: Lab1Props) {
           <Flow w={28} delay={2.6} head={false} />
         </div>
         <motion.div data-step="mcp" {...fadeUp(1.8)} style={{ ...STEP, justifyContent: 'center' }}>
-          <DbIcon size={46} />
-          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>ADB MCP Server</div>
-          <div style={{ fontSize: 14, color: DIM, lineHeight: 1.35 }}>runs it on the Autonomous AI Database, schema</div>
-          <span style={{ ...mono(12), fontWeight: 700 }}>CONSTRUCTION_ENGINEERING</span>
+          <DbIcon size={66} />
+          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)' }}>ADB MCP Server</div>
+          <div style={{ fontSize: 18, color: DIM, lineHeight: 1.4 }}>runs it on the Autonomous AI Database, schema</div>
+          <span style={{ ...mono(15), fontWeight: 700 }}>CONSTRUCTION_ENGINEERING</span>
         </motion.div>
       </div>
 
@@ -496,22 +510,29 @@ export function L1Suppliers({ kicker, message, notebook }: Lab1Props) {
         <motion.path d="M1290 0v16H140v18" fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 3, duration: 1.2 }} />
       </svg>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 330px', gap: 18 }}>
-        <motion.div data-answer {...fadeUp(3.6)} style={{ ...card(true), padding: '12px 22px' }}>
-          <div style={{ ...capTeal, marginBottom: 8 }}>The answer · from governed data, with its evidence</div>
+        <motion.div data-answer {...fadeUp(3.6)} style={{ ...card(true), padding: '18px 26px' }}>
+          <div style={{ ...capTeal, marginBottom: 12, fontSize: 15 }}>The answer · from governed data, with its evidence <span style={{ color: DIM, fontWeight: 500, letterSpacing: 0, textTransform: 'none' }}>· sample answer, the shape of the real output</span></div>
           <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.4fr 0.8fr 0.8fr 2.2fr', columnGap: 28, rowGap: 14 }}>
             {SUPPLIER_FIELDS.map((f) => (
-              <span key={f} data-field={f} style={mono(15, TEAL_D)}>
+              <span key={f} data-field={f} style={mono(17, TEAL_D)}>
                 {f}
               </span>
             ))}
-            {[0, 1, 2].flatMap((r) => SUPPLIER_FIELDS.map((f, c) => <motion.span key={`${r}${f}`} {...fade(4 + r * 0.25)} style={{ display: 'block', height: 14, borderRadius: 7, background: 'rgba(138,151,163,0.3)', width: ['65%', '70%', '45%', '50%', '90%'][c] }} />))}
+            {SAMPLE_ROWS.flatMap((row, r) =>
+              row.map((v, c) => (
+                <motion.span key={`${r}-${c}`} data-sample-cell {...fade(4 + r * 0.3)} style={{ fontSize: 18, color: 'var(--ink)', fontWeight: c === 0 ? 700 : 500, lineHeight: 1.3 }}>
+                  {c === 1 ? <Chip style={{ fontSize: 15 }}>{v}</Chip> : v}
+                </motion.span>
+              )),
+            )}
           </div>
         </motion.div>
         <motion.div {...fadeUp(4.4)} style={{ ...card(), border: 'none', padding: '16px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--ink)', marginBottom: 6 }}>Only what the data says</div>
-          <div style={{ fontSize: 15, color: DIM, lineHeight: 1.45 }}>No approval the database does not hold. Values come from the views, not from the model.</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--ink)', marginBottom: 8 }}>Only what the data says</div>
+          <div style={{ fontSize: 19, color: DIM, lineHeight: 1.45 }}>No approval the database does not hold. Values come from the views, not from the model.</div>
         </motion.div>
       </div>
+      </Fill>
     </WidePanel>
   );
 }

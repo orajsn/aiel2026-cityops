@@ -4,7 +4,7 @@ import { LineIcon, type IconName } from '../icons';
 import { CARD, Chip, DIM, INK, L2Page, Num, RED, SOFT, TEAL, TEAL_D, TINT, cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props } from './parts';
 
 /**
- * Lab 2 · Trust (security and observability) and §6 Wrap: the deck's chapters 10 and 11, in the Ops Center's
+ * Lab 2 · Trust (security and observability) and Wrap: the deck's chapters 10 and 11, in the Ops Center's
  * control room, where the city watches its systems.
  */
 

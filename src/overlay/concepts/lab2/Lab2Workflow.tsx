@@ -8,7 +8,7 @@ import {
 } from './parts';
 
 /**
- * Lab 2 · §2 Workflow, the fixed checklist, and the Agent chapter, the chief inspector (the deck's chapters 5 and 6).
+ * Lab 2 · Workflow, the fixed checklist, and the Agent chapter, the chief inspector (the deck's chapters 5 and 6).
  */
 
 function Swap({ k, children }: { k: string | number; children: ReactNode }) {
