@@ -239,7 +239,7 @@ export function OneQuery(p: L2Props) {
 /* ---------------- 2.6b, 2.6c, 2.7 · the pictures live in queryArt.tsx ---------------- */
 
 // imported here, beside the three pages that use it, so this file's shared import block stays as it is
-import { BriefBody } from './queryArt';
+import { BriefBody, MainBody } from './queryArt';
 
 /* ---------------- 2.6b · one brief from one SQL statement ---------------- */
 
@@ -252,38 +252,13 @@ export function OneBrief(p: L2Props) {
   );
 }
 
-/* ---------------- 2.6c · §4.5 the query becomes the agent's main instrument ---------------- */
+/* ---------------- 2.6c · the query becomes the agent's main instrument ---------------- */
 
 export function MainInstrument(p: L2Props) {
   const focusN = useFocusN(p.focusId);
   return (
     <L2Page testId="l2-main" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-        <StepRow
-          focusN={focusN}
-          steps={[
-            { title: 'Make it a tool', grow: 0.8, body: <Chip style={{ fontSize: 26, alignSelf: 'flex-start', background: 'rgba(31,42,51,0.92)', color: '#fff' }}>@tool</Chip> },
-            { title: 'Name and inputs', grow: 1.3, body: <Quote style={{ fontSize: 19 }}>get_asset_incident_brief(asset_name, focus, k=5)</Quote> },
-            { title: 'When to prefer it', grow: 1.2, body: <div style={{ fontSize: 21, lineHeight: 1.45, fontStyle: 'italic' }}>“Prefer this when you need a holistic picture before recommending action.”</div> },
-            {
-              title: 'Calls the one-brief query',
-              grow: 1.1,
-              body: (
-                <>
-                  {['relational + JSON', 'graph', 'vector'].map((x) => (
-                    <Chip key={x} style={{ alignSelf: 'flex-start', fontSize: 18 }}>{x}</Chip>
-                  ))}
-                  <ArrowDown h={26} />
-                  <div style={{ fontSize: 22, fontWeight: 700, color: TEAL_D }}>one JSON brief</div>
-                </>
-              ),
-            },
-          ]}
-        />
-        <motion.div {...fadeUp(2.6)} style={{ alignSelf: 'center', padding: '10px 24px', borderRadius: 999, background: TINT, fontSize: 22, color: INK }}>
-          The model fills three arguments. <b>It never sees or writes the SQL.</b>
-        </motion.div>
-      </div>
+      <MainBody focusN={focusN} />
     </L2Page>
   );
 }
