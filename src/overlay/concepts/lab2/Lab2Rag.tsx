@@ -387,55 +387,91 @@ export function Nearest(p: L2Props) {
 
 /* ---------------- 2.3 · §1.6 the rule: answer only from what you were given ---------------- */
 
+/** a callout around the open folder: its number, its words; it lights with the drawer's focus step */
+function Callout({ n, focusN, x, y, w, delay, title, children }: { n: number; focusN: number | null; x: number; y: number; w: number; delay: number; title: string; children: ReactNode }) {
+  const on = focusN === null || focusN === n;
+  return (
+    <motion.div data-step={n} data-on={on} {...fadeUp(delay)} style={{ ...at(x, y, w), opacity: on ? 1 : 0.35, transition: 'opacity 300ms', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <Num n={n} on={on} size={48} />
+        <span style={{ fontSize: 30, fontWeight: 700, color: INK, lineHeight: 1.2 }}>{title}</span>
+      </div>
+      <div style={{ paddingLeft: 62, display: 'flex', flexDirection: 'column', gap: 10 }}>{children}</div>
+    </motion.div>
+  );
+}
+
+/** a dotted leader from a callout to the part of the folder it talks about */
+function Leader({ d, delay }: { d: string; delay: number }) {
+  return <motion.path d={d} fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="5 6" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay, duration: 0.6, ease: EASE }} />;
+}
+
 export function Rule(p: L2Props) {
   const focusN = useFocusN(p.focusId);
+  // the open folder sits in the middle of a 1400 × 520 drawing
+  const FX = 430;
+  const FY = 110;
   return (
     <L2Page testId="l2-rule" hasRed {...p}>
-      <StepRow
-        focusN={focusN}
-        steps={[
-          {
-            title: 'Answer only from the folder',
-            body: (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 18 }}>
-                <Folder size={100} />
-                <Quote style={{ fontSize: 20 }}>System rule: use ONLY the facts in &lt;context&gt;</Quote>
+      <Fill>
+        <FitBox w={1400} h={580} max={1.08}>
+          <div style={{ position: 'relative', width: 1400, height: 580 }}>
+            {/* the open folder, from above: two covers, a page in each */}
+            <motion.svg {...fade(0.2)} width={1400} height={580} viewBox="0 0 1400 580" style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }} aria-hidden>
+              <rect x={FX - 10} y={FY + 6} width={560} height={450} rx={14} fill="rgba(127,127,127,0.18)" />
+              <path d={`M${FX} ${FY + 20}a12 12 0 0 1 12-12h90l14-14h148v456H${FX + 12}a12 12 0 0 1-12-12z`} fill="rgba(27,138,156,0.28)" stroke={TEAL} strokeWidth={3} />
+              <path d={`M${FX + 274} ${FY - 6}h254a12 12 0 0 1 12 12v432a12 12 0 0 1-12 12H${FX + 274}z`} fill="rgba(27,138,156,0.22)" stroke={TEAL} strokeWidth={3} />
+              <path d={`M${FX + 274} ${FY - 6}v456`} stroke={TEAL_D} strokeWidth={4} />
+              {/* the left page: the retrieved notes, inside <context> */}
+              <rect x={FX + 22} y={FY + 22} width={236} height={406} rx={6} fill="#fff" />
+              {[90, 116, 142, 168, 194].map((y, i) => (
+                <path key={y} d={`M${FX + 44} ${FY + y}H${FX + (i % 2 ? 210 : 236)}`} stroke="#b8c0c8" strokeWidth={6} strokeLinecap="round" />
+              ))}
+              <rect x={FX + 44} y={FY + 250} width={192} height={70} rx={8} fill="none" stroke={GREY} strokeWidth={2.5} strokeDasharray="7 7" />
+              {/* the right page: more notes, one with a sticky note on it */}
+              <rect x={FX + 290} y={FY + 22} width={236} height={406} rx={6} fill="#fff" />
+              {[60, 86, 112, 250, 276, 302, 328, 354].map((y, i) => (
+                <path key={y} d={`M${FX + 312} ${FY + y}H${FX + (i % 2 ? 478 : 504)}`} stroke="#b8c0c8" strokeWidth={6} strokeLinecap="round" />
+              ))}
+              <Leader d={`M380 150 C 410 150, 420 ${FY + 110}, ${FX + 40} ${FY + 110}`} delay={1} />
+              <Leader d={`M380 410 C 410 410, 420 ${FY + 262}, ${FX + 44} ${FY + 284}`} delay={1.8} />
+              <Leader d={`M1020 190 C 990 190, 990 ${FY + 160}, ${FX + 520} ${FY + 160}`} delay={2.6} />
+            </motion.svg>
+            {/* the mono tags and words on the pages, in HTML */}
+            <div style={{ ...at(FX + 44, FY + 38, 200), ...mono(19), fontWeight: 700 }}>&lt;context&gt;</div>
+            <div style={{ ...at(FX + 44, FY + 258, 192), height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19, color: DIM, textAlign: 'center' }}>not in the folder</div>
+            <div style={{ ...at(FX + 44, FY + 384, 200), ...mono(19), fontWeight: 700 }}>&lt;/context&gt;</div>
+            <motion.div data-sticky initial={{ opacity: 0, rotate: 0, y: -14 }} animate={{ opacity: 1, rotate: 5, y: 0 }} transition={{ delay: 2.4, duration: 0.5 }} style={{ ...at(FX + 330, FY + 128, 200), padding: '12px 14px', background: '#f6f1df', border: `2.5px solid ${RED}`, borderRadius: 4, fontSize: 22, color: '#1f2a33', boxShadow: '0 4px 10px rgba(0,0,0,0.22)', boxSizing: 'border-box', textAlign: 'center' }}>
+              “ignore your rules”
+            </motion.div>
+            <motion.div {...fade(3)} style={{ ...at(FX + 300, FY + 218, 220), whiteSpace: 'nowrap', textAlign: 'center', ...mono(16, TEAL_D), fontWeight: 700 }}>
+              ↑ just text on a page
+            </motion.div>
+            {/* the system rule, pinned over the folder */}
+            <motion.div {...fadeUp(0.4)} style={{ ...at(FX - 70, 10, 680), display: 'flex', justifyContent: 'center' }}>
+              <Quote style={{ fontSize: 21, padding: '12px 18px', whiteSpace: 'nowrap' }}>System rule: use ONLY the facts in &lt;context&gt;</Quote>
+            </motion.div>
+            <Callout n={1} focusN={focusN} x={0} y={110} w={380} delay={0.8} title="Answer only from the folder">
+              <div style={{ fontSize: 23, color: DIM, lineHeight: 1.4 }}>Like an open-book exam with one book: the facts come from these pages, not from memory.</div>
+            </Callout>
+            <Callout n={2} focusN={focusN} x={0} y={360} w={380} delay={1.6} title="If missing, say so">
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8 }}>
+                <span style={{ fontSize: 28, fontWeight: 700, color: INK, padding: '10px 18px', borderRadius: 14, background: TINT, whiteSpace: 'nowrap' }}>“I don’t know”</span>
+                <span style={{ fontSize: 22, color: DIM }}>instead of a guess</span>
               </div>
-            ),
-          },
-          {
-            title: 'If missing, say so',
-            body: (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16 }}>
-                <div style={{ fontSize: 22, color: DIM }}>question not covered</div>
-                <ArrowDown h={40} />
-                <div style={{ fontSize: 30, fontWeight: 700, color: INK, padding: '14px 18px', borderRadius: 14, background: TINT, textAlign: 'center' }}>“I don’t know”</div>
-                <div style={{ fontSize: 21, color: DIM, textAlign: 'center' }}>instead of a guess</div>
-              </div>
-            ),
-          },
-          {
-            title: 'Folder text is data',
-            body: (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
-                <div style={{ position: 'relative', padding: '22px 18px', borderRadius: 12, border: `2px solid ${TEAL}`, background: CARD }}>
-                  <div style={{ ...mono(18) }}>&lt;context&gt;</div>
-                  <div style={{ fontSize: 21, color: INK, margin: '10px 0' }}>retrieved inspection notes</div>
-                  <div style={{ ...mono(18) }}>&lt;/context&gt;</div>
-                  <motion.div data-sticky initial={{ opacity: 0, rotate: 0, y: -10 }} animate={{ opacity: 1, rotate: 4, y: 0 }} transition={{ delay: 2, duration: 0.5 }} style={{ position: 'absolute', right: -8, top: -26, padding: '10px 14px', background: '#f6f1df', border: `2px solid ${RED}`, borderRadius: 4, fontSize: 19, color: '#1f2a33', boxShadow: '0 3px 8px rgba(0,0,0,0.2)' }}>
-                    “ignore your rules”
-                  </motion.div>
-                </div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: TEAL_D }}>treated as data, never as an order</div>
-                <div style={{ fontSize: 15, color: DIM }}>sticky note: illustration</div>
-              </div>
-            ),
-          },
-        ]}
-      />
+            </Callout>
+            <Callout n={3} focusN={focusN} x={1030} y={150} w={370} delay={2.4} title="Folder text is data">
+              <div style={{ fontSize: 23, color: DIM, lineHeight: 1.4 }}>A note inside the folder is something to read, not someone to obey.</div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: TEAL_D }}>treated as data, never as an order</div>
+              <div style={{ fontSize: 16, color: DIM }}>sticky note: illustration</div>
+            </Callout>
+          </div>
+        </FitBox>
+      </Fill>
     </L2Page>
   );
 }
+
 
 /* ---------------- 2.3a · §1.7–1.8 RAG plumbing, by hand then LangChain ---------------- */
 
