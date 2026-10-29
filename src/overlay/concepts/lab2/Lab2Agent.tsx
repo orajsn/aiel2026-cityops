@@ -447,130 +447,40 @@ export function OneQuery(p: L2Props) {
   );
 }
 
-/* ---------------- 2.6b · §4.2–4.4 one brief from one SQL statement ---------------- */
+/* ---------------- 2.6b, 2.6c, 2.7 · the pictures live in queryArt.tsx ---------------- */
+
+// imported here, beside the three pages that use it, so this file's shared import block stays as it is
+import { BriefBody, GraphBody, MainBody } from './queryArt';
+
+/* ---------------- 2.6b · one brief from one SQL statement ---------------- */
 
 export function OneBrief(p: L2Props) {
   const focusN = useFocusN(p.focusId);
   return (
     <L2Page testId="l2-brief" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-        <StepRow
-          focusN={focusN}
-          steps={[
-            { title: 'Row + JSON specs', body: <><LineIcon name="profile" size={64} /><div style={{ ...mono(21, INK), fontWeight: 700 }}>Harbor Bridge</div><Chip style={{ alignSelf: 'flex-start' }}>criticality 5</Chip></> },
-            { title: 'Graph neighbours', body: <><LineIcon name="nodes" size={64} /><div style={{ fontSize: 24, fontWeight: 700 }}>5 connected assets</div><Chip style={{ alignSelf: 'flex-start' }}>SQL/PGQ</Chip></> },
-            { title: 'Vector evidence', body: <><LineIcon name="target" size={64} /><div style={{ fontSize: 24, fontWeight: 700 }}>5 evidence chunks</div><Chip style={{ alignSelf: 'flex-start' }}>VECTOR_DISTANCE</Chip></> },
-            { title: 'One JSON brief', grow: 1.3, body: <Quote style={{ fontSize: 20, flex: 1 }}>{'{ "asset": …,\n  "graph_context": […],\n  "ranked_evidence": […] }'}</Quote> },
-          ]}
-        />
-        <motion.div {...fadeUp(2.4)} style={{ alignSelf: 'center', padding: '8px 22px', borderRadius: 999, background: TEAL, color: '#fff', fontSize: 21, fontWeight: 700 }}>one statement · one transaction</motion.div>
-        <div style={{ fontSize: 15, color: DIM, textAlign: 'center' }}>Counts: saved output, cell 65</div>
-      </div>
+      <BriefBody focusN={focusN} />
     </L2Page>
   );
 }
 
-/* ---------------- 2.6c · §4.5 the query becomes the agent's main instrument ---------------- */
+/* ---------------- 2.6c · the query becomes the agent's main instrument ---------------- */
 
 export function MainInstrument(p: L2Props) {
   const focusN = useFocusN(p.focusId);
   return (
     <L2Page testId="l2-main" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-        <StepRow
-          focusN={focusN}
-          steps={[
-            { title: 'Make it a tool', grow: 0.8, body: <Chip style={{ fontSize: 26, alignSelf: 'flex-start', background: 'rgba(31,42,51,0.92)', color: '#fff' }}>@tool</Chip> },
-            { title: 'Name and inputs', grow: 1.3, body: <Quote style={{ fontSize: 19 }}>get_asset_incident_brief(asset_name, focus, k=5)</Quote> },
-            { title: 'When to prefer it', grow: 1.2, body: <div style={{ fontSize: 21, lineHeight: 1.45, fontStyle: 'italic' }}>“Prefer this when you need a holistic picture before recommending action.”</div> },
-            {
-              title: 'Calls the one-brief query',
-              grow: 1.1,
-              body: (
-                <>
-                  {['relational + JSON', 'graph', 'vector'].map((x) => (
-                    <Chip key={x} style={{ alignSelf: 'flex-start', fontSize: 18 }}>{x}</Chip>
-                  ))}
-                  <ArrowDown h={26} />
-                  <div style={{ fontSize: 22, fontWeight: 700, color: TEAL_D }}>one JSON brief</div>
-                </>
-              ),
-            },
-          ]}
-        />
-        <motion.div {...fadeUp(2.6)} style={{ alignSelf: 'center', padding: '10px 24px', borderRadius: 999, background: TINT, fontSize: 22, color: INK }}>
-          The model fills three arguments. <b>It never sees or writes the SQL.</b>
-        </motion.div>
-      </div>
+      <MainBody focusN={focusN} />
     </L2Page>
   );
 }
 
-/* ---------------- 2.7 · §5.1 the agent is a state graph ---------------- */
-
-function GNode({ n, title, sub, on, x, y, w = 200 }: { n?: number; title: string; sub?: string; on: boolean; x: number; y: number; w?: number }) {
-  return (
-    <div data-node={title} style={{ position: 'absolute', left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)', width: w, padding: '12px 14px', borderRadius: 14, ...card(!!n), background: n ? CARD : 'rgba(31,42,51,0.92)', color: n ? INK : '#fff', opacity: on ? 1 : 0.4, display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', transition: 'opacity 300ms' }}>
-      {n && <Num n={n} size={32} on={on} />}
-      <div style={{ textAlign: n ? 'left' : 'center' }}>
-        <div style={{ fontSize: 24, fontWeight: 700, fontFamily: n ? undefined : 'JetBrains Mono, monospace' }}>{title}</div>
-        {sub && <div style={{ fontSize: 17, color: DIM }}>{sub}</div>}
-      </div>
-    </div>
-  );
-}
+/* ---------------- 2.7 · the agent is a state graph ---------------- */
 
 export function StateGraph(p: L2Props) {
   const focusN = useFocusN(p.focusId);
-  const lit = (n: number) => focusN === null || focusN === n;
   return (
     <L2Page testId="l2-graph" {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: 24, minHeight: 0 }}>
-        <motion.div data-graph {...fade(0.2)} style={{ position: 'relative', ...card(), minHeight: 0 }}>
-          <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
-            <g fill="none" stroke="#1b8a9c" strokeWidth="0.5" strokeDasharray="1.4 1.4" vectorEffect="non-scaling-stroke">
-              <path d="M19 16L40 21" />
-              <path d="M50 28V46" />
-              <path d="M44 57L30 74" />
-              <path d="M57 57L76 72" />
-              <path d="M76 72V83" />
-            </g>
-          </svg>
-          <motion.svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
-            {/* the loop: tools back to model, a light walking it at a slow pace */}
-            <path id="l2-back" d="M14 82C4 82 4 30 36 24" fill="none" stroke="#1b8a9c" strokeWidth="2.2" vectorEffect="non-scaling-stroke" />
-          </motion.svg>
-          <GNode title="START" on x={12} y={14} w={130} />
-          <GNode n={1} title="model" sub="think" on={lit(1)} x={50} y={22} />
-          <GNode n={3} title="tool?" sub="did it ask for one?" on={lit(3)} x={50} y={52} w={230} />
-          <GNode n={2} title="tools" sub="act" on={lit(2)} x={24} y={80} />
-          <div data-node="enforce" style={{ position: 'absolute', left: '78%', top: '64%', transform: 'translate(-50%, -50%)', fontSize: 16, color: DIM, textAlign: 'center', width: 170 }}>enforce step: remember called?</div>
-          <GNode title="END" on x={78} y={88} w={120} />
-          <div style={{ position: 'absolute', left: '36%', top: '64%', fontSize: 18, fontWeight: 700, color: TEAL_D }}>yes</div>
-          <div style={{ position: 'absolute', left: '62%', top: '60%', fontSize: 18, fontWeight: 700, color: DIM }}>no</div>
-          <div data-back style={{ position: 'absolute', left: '2%', top: '46%', display: 'flex', alignItems: 'center', gap: 6, opacity: lit(4) ? 1 : 0.4 }}>
-            <Num n={4} size={30} on={lit(4)} />
-            <span style={{ fontSize: 17, color: TEAL_D, fontWeight: 700 }}>back to think</span>
-          </div>
-        </motion.div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, justifyContent: 'center' }}>
-          {[
-            { n: 1, t: 'model', s: 'the language model reads everything so far and thinks' },
-            { n: 2, t: 'tools', s: 'the framework runs the tool it asked for' },
-            { n: 3, t: 'tool?', s: 'one question: did the model ask for a tool?' },
-            { n: 4, t: 'loop', s: 'yes: run it and go back to the model; no: finish' },
-          ].map((x, i) => (
-            <motion.div key={x.n} {...fadeUp(0.6 + i * 0.35)} style={{ display: 'flex', alignItems: 'center', gap: 14, ...card(focusN === x.n), padding: '12px 16px', opacity: lit(x.n) ? 1 : 0.4 }}>
-              <Num n={x.n} size={34} on={lit(x.n)} />
-              <div>
-                <div style={{ ...mono(20, INK), fontWeight: 700 }}>{x.t}</div>
-                <div style={{ fontSize: 19, color: DIM }}>{x.s}</div>
-              </div>
-            </motion.div>
-          ))}
-          <div style={{ fontSize: 15, color: DIM }}>Illustration of cell 73. The enforce step is in the graph too.</div>
-        </div>
-      </div>
+      <GraphBody focusN={focusN} />
     </L2Page>
   );
 }
