@@ -176,53 +176,98 @@ export const STATIONS = [
 ];
 const TOTAL = STATIONS.reduce((a, s) => a + s.ms, 0);
 
+const BY = ['the language model', 'the database', 'the language model', 'plain Python'];
+const ST_X = [180, 520, 860, 1200];
+/** the crack report's ride, about nine seconds: it waits under each station in proportion to that station's time */
+const RIDE = (() => {
+  const dwell = [0.7, 0.9, 3.6, 0.3];
+  const move = 0.5;
+  const xs: number[] = [30];
+  const ts: number[] = [0];
+  let t = 0;
+  ST_X.forEach((x, i) => {
+    t += move;
+    xs.push(x, x);
+    ts.push(t, t + dwell[i]);
+    t += dwell[i];
+  });
+  t += move;
+  xs.push(1370);
+  ts.push(t);
+  return { xs, op: xs.map((_, i) => (i === 0 || i === xs.length - 1 ? 0 : 1)), times: ts.map((v) => v / t), dur: t };
+})();
+
+/**
+ * 2.4e · the conveyor belt is the picture (owner, 29 Oct: "you dont say what section spent time what"): four
+ * stations over a moving belt, the crack report waiting longest under the drafter; each station's own time in big
+ * type under it, then one bar that splits the 32 seconds between them.
+ */
 export function Conveyor(p: L2Props) {
+  const label = { ...cap, fontSize: 17, letterSpacing: '0.14em' };
   return (
     <L2Page testId="l2-conveyor" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18, minHeight: 0 }}>
-        <div style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-          {/* the crack report rides the belt */}
-          <motion.div data-rider initial={{ x: 0, opacity: 0 }} animate={{ x: ['0%', '0%', '82%'], opacity: [0, 1, 1] }} transition={{ duration: 6, times: [0, 0.1, 1], ease: 'easeInOut', repeat: Infinity, repeatDelay: 2 }} style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 999, background: 'rgba(31,42,51,0.92)', color: '#fff', fontSize: 19, marginBottom: 12 }}>
-            <LineIcon name="clipboard" size={26} color="#fff" /> crack 0.12 mm rides the belt →
-          </motion.div>
-          <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 50px minmax(0, 1fr) 50px minmax(0, 1fr) 50px minmax(0, 1fr)', alignItems: 'stretch' }}>
-            {STATIONS.map((s, i) => [
-              i > 0 ? (
-                <div key={`a${i}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Arrow w={44} delay={0.4 + i * 0.4} />
-                </div>
-              ) : null,
-              <motion.div key={s.name} data-station={s.name} {...fadeUp(0.2 + i * 0.4)} style={{ ...card(s.name === 'Drafter'), background: s.name === 'Drafter' ? TINT : SOFT, padding: '18px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <Num n={i + 1} size={34} />
-                  <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>{s.name}</span>
-                </div>
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <LineIcon name={s.icon} size={84} color={s.name === 'Drafter' ? TEAL : '#8a97a3'} />
-                </div>
-                <div style={{ fontSize: 22, color: INK, lineHeight: 1.35 }}>{s.out}</div>
-                <Chip dim={s.name !== 'Drafter'} style={{ alignSelf: 'flex-start', fontSize: 17 }}>{s.tok}</Chip>
-              </motion.div>,
-            ])}
-          </div>
-          {/* the belt */}
-          <div style={{ height: 10, borderRadius: 5, marginTop: 14, background: 'repeating-linear-gradient(90deg, rgba(127,127,127,0.35) 0 18px, rgba(127,127,127,0.15) 18px 30px)' }} />
-        </div>
-        <motion.div data-timing {...fadeUp(2)} style={{ ...card(), padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <span style={cap}>Where the 32 seconds go</span>
-            <span style={{ fontSize: 15, color: DIM }}>saved output, cell 50 · one CPU run</span>
-          </div>
-          <div style={{ display: 'flex', height: 46, borderRadius: 8, overflow: 'hidden', gap: 3 }}>
-            {STATIONS.filter((s) => s.ms > 0).map((s, i) => (
-              <motion.div key={s.name} data-ms={s.ms} initial={{ flexGrow: 0.001 }} animate={{ flexGrow: s.ms / TOTAL }} transition={{ delay: 2.3 + i * 0.3, duration: 0.9, ease: EASE }} style={{ flexBasis: 0, background: s.name === 'Drafter' ? TEAL : 'rgba(27,138,156,0.35)', color: s.name === 'Drafter' ? '#fff' : INK, display: 'flex', alignItems: 'center', justifyContent: 'center', ...mono(18, s.name === 'Drafter' ? '#fff' : INK), fontWeight: 700, whiteSpace: 'nowrap', minWidth: 120 }}>
-                {s.ms.toLocaleString('en-US')} ms
-              </motion.div>
+      <Fill>
+        <FitBox w={1400} h={600} max={1.15}>
+          {/* the belt: rollers under a moving tread */}
+          <svg width={1400} height={60} viewBox="0 0 1400 60" style={{ position: 'absolute', left: 0, top: 222 }} aria-hidden>
+            <rect x="20" y="8" width="1360" height="22" rx="11" fill="rgba(127,127,127,0.18)" stroke="rgba(127,127,127,0.5)" strokeWidth="2" />
+            <motion.path d="M30 19 H1370" stroke="rgba(127,127,127,0.55)" strokeWidth="4" strokeDasharray="14 18" initial={{ strokeDashoffset: 0 }} animate={{ strokeDashoffset: -320 }} transition={{ duration: 10, ease: 'linear', repeat: Infinity }} />
+            {Array.from({ length: 23 }, (_, i) => (
+              <circle key={i} cx={40 + i * 60} cy="44" r="9" fill="none" stroke="rgba(127,127,127,0.55)" strokeWidth="3" />
             ))}
-          </div>
-          <div style={{ fontSize: 19, color: DIM }}>The drafter writes one token at a time: it takes about 25 of the 32 seconds.</div>
-        </motion.div>
-      </div>
+          </svg>
+          {/* the four stations */}
+          {STATIONS.map((s, i) => {
+            const draft = s.name === 'Drafter';
+            return (
+              <motion.div key={s.name} data-station={s.name} {...fadeUp(0.2 + i * 0.35)} style={{ position: 'absolute', left: ST_X[i] - 150, top: 0, width: 300, height: 176, boxSizing: 'border-box', ...card(draft), background: draft ? TINT : 'var(--panel-strong)', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Num n={i + 1} size={36} />
+                  <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>{s.name}</span>
+                  <span style={{ marginLeft: 'auto' }}>
+                    <LineIcon name={s.icon} size={44} color={draft ? TEAL : '#8a97a3'} />
+                  </span>
+                </div>
+                <div style={{ fontSize: 20, color: TEAL_D }}>{BY[i]}</div>
+                <div style={{ fontSize: 22, color: INK, lineHeight: 1.3 }}>→ {s.out}</div>
+              </motion.div>
+            );
+          })}
+          {/* the station's arm down to the belt */}
+          {ST_X.map((x, i) => (
+            <motion.div key={x} {...fade(0.4 + i * 0.35)} style={{ position: 'absolute', left: x - 3, top: 176, width: 6, height: 40, background: 'rgba(127,127,127,0.45)', borderRadius: 3 }} />
+          ))}
+          {/* the crack report rides the belt and waits under each station */}
+          <motion.div data-rider initial={{ x: RIDE.xs[0], opacity: 0 }} animate={{ x: RIDE.xs, opacity: RIDE.op }} transition={{ delay: 1.6, duration: RIDE.dur, times: RIDE.times, ease: 'easeInOut', repeat: Infinity, repeatDelay: 1.5 }} style={{ position: 'absolute', left: -40, top: 190, width: 80, height: 36, borderRadius: 6, background: 'rgba(31,42,51,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <LineIcon name="clipboard" size={28} color="#fff" />
+          </motion.div>
+          {/* each station's own time, in big type */}
+          {STATIONS.map((s, i) => (
+            <motion.div key={s.name} data-ms={s.ms} {...fadeUp(1.8 + i * 0.35)} style={{ position: 'absolute', left: ST_X[i] - 150, top: 290, width: 300, textAlign: 'center' }}>
+              <div style={{ ...mono(40, s.name === 'Drafter' ? TEAL_D : INK), fontWeight: 700 }}>{s.ms.toLocaleString('en-US')} ms</div>
+              <div style={{ fontSize: 21, color: DIM, marginTop: 2 }}>{s.ms === 0 ? 'plain Python, under 1 ms' : `${(s.ms / 1000).toFixed(1)} s · ${s.tok}`}</div>
+            </motion.div>
+          ))}
+          {/* one bar: where the 32 seconds go */}
+          <motion.div data-timing {...fadeUp(3.4)} style={{ position: 'absolute', left: 0, top: 410, width: 1400, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+              <span style={label}>Where the 32 seconds go</span>
+              <span style={{ fontSize: 17, color: DIM }}>saved output, cell 50 · one CPU run</span>
+            </div>
+            <div style={{ display: 'flex', height: 58, gap: 4 }}>
+              {STATIONS.filter((s) => s.ms > 0).map((s, i) => (
+                <motion.div key={s.name} initial={{ flexGrow: 0.001 }} animate={{ flexGrow: s.ms / TOTAL }} transition={{ delay: 3.7 + i * 0.4, duration: 0.9, ease: EASE }} style={{ flexBasis: 0, minWidth: 270, borderRadius: 8, background: s.name === 'Drafter' ? TEAL : 'rgba(27,138,156,0.30)', display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px', whiteSpace: 'nowrap', overflow: 'hidden', color: s.name === 'Drafter' ? '#fff' : INK }}>
+                  <span style={{ width: 32, height: 32, borderRadius: '50%', flex: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, background: s.name === 'Drafter' ? '#fff' : TEAL, color: s.name === 'Drafter' ? TEAL_D : '#fff' }}>{i + 1}</span>
+                  <span style={{ fontSize: 22, fontWeight: 700 }}>{s.name}: {(s.ms / 1000).toFixed(1)} s</span>
+                </motion.div>
+              ))}
+            </div>
+            <motion.div {...fade(5.2)} style={{ fontSize: 24, color: INK, lineHeight: 1.4 }}>
+              <b style={{ color: TEAL_D }}>Drafting takes about 25 of the 32 seconds</b>: the language model writes its plan one token at a time (234 out). Formatting is plain Python and takes under 1 ms.
+            </motion.div>
+          </motion.div>
+        </FitBox>
+      </Fill>
     </L2Page>
   );
 }
