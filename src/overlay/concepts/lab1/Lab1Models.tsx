@@ -105,6 +105,9 @@ export const SITE_PHOTO_FOLLOW = 'What is the repair history at this location?';
 export const SITE_PHOTO_CAUTION = 'A photo alone cannot diagnose the cause, assess the load capacity or approve reopening the bridge. The responsible engineer must check.';
 export const SITE_PHOTO_NOTE = 'Every request still goes to the same model. The next exercise changes that.';
 
+/** the repair history the assistant prints for that spot (sample entries, oldest first) */
+const HISTORY = ['Patch repair of spalled concrete at this spot', 'Cracks sealed, surface coated', 'Last inspection: rust staining noted, repair recommended'];
+
 export function L1SitePhoto({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-site-photo">
@@ -157,12 +160,14 @@ export function L1SitePhoto({ kicker, message, notebook }: Lab1Props) {
               <LineIcon name="database" size={28} />
               FROM THE DATABASE
             </div>
-            {[0.82, 0.64, 0.74].map((w, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0' }}>
-                <i style={{ width: 14, height: 14, borderRadius: '50%', background: 'var(--teal)', flex: 'none' }} />
-                <motion.i initial={{ width: 0 }} animate={{ width: `${w * 100}%` }} transition={{ delay: 3.4 + i * 0.2, duration: 0.6, ease: EASE }} style={{ height: 14, borderRadius: 7, background: GREY_FILL, display: 'block' }} />
-              </div>
+            {/* a sample history (owner, 29 Oct: print an answer, not a skeleton); no dates or names invented */}
+            {HISTORY.map((h, i) => (
+              <motion.div key={h} data-history-item={h} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 3.4 + i * 0.2, duration: 0.5, ease: EASE }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '5px 0', fontSize: 19, color: 'var(--ink)' }}>
+                <i style={{ width: 12, height: 12, borderRadius: '50%', background: 'var(--teal)', flex: 'none' }} />
+                {h}
+              </motion.div>
             ))}
+            <div style={{ fontSize: 13, color: 'var(--ink-dim)', marginTop: 4 }}>sample answer</div>
           </motion.div>
         </Window>
       </div>

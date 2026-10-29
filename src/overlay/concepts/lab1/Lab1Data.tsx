@@ -351,6 +351,27 @@ export interface L1ContractorsProps {
 }
 
 /** 1.5 · The project manager asks the database: tables, the Semantic Store that knows what they mean, NL2SQL, ADB MCP Server, a placeholder answer table. */
+/** the answer the assistant prints for the project manager (sample rows: names and items stay generic) */
+const ANSWER: { head: string; col: string; rows: [string, string, boolean, string][] }[] = [
+  {
+    head: 'Contractor',
+    col: 'Qualified for this repair',
+    rows: [
+      ['Contractor A', '✓ qualified', true, 'concrete repair certified, similar bridge work'],
+      ['Contractor B', '✗ not yet', false, 'certification expired'],
+    ],
+  },
+  {
+    head: 'Material',
+    col: 'Delivery status',
+    rows: [
+      ['Repair mortar', 'delivered', true, ''],
+      ['Bonding agent', 'in transit', false, ''],
+      ['Corrosion inhibitor', 'not shipped yet', false, ''],
+    ],
+  },
+];
+
 export function L1Contractors({ kicker, message, notebook }: L1ContractorsProps) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-contractors">
@@ -395,14 +416,25 @@ export function L1Contractors({ kicker, message, notebook }: L1ContractorsProps)
         <Arrow w={50} delay={3.4} />
         <motion.div data-answer="table" {...rise(3.4)} style={{ borderRadius: 14, border: '2px solid var(--teal)', background: TEAL_TINT, padding: '12px 16px' }}>
           <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: 2, color: GREY, textTransform: 'uppercase', marginBottom: 8 }}>The answer</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px', fontSize: 17, fontWeight: 700, color: 'var(--ink)' }}>
-            <span>Contractor</span>
-            <span>Delivery status</span>
-            {[0, 1].flatMap((r) => [
-              <motion.span key={`a${r}`} data-bar initial={{ width: 0 }} animate={{ width: r ? 80 : 110 }} transition={{ delay: 3.8 + r * 0.2, duration: 0.5, ease: EASE }} style={{ height: 12, borderRadius: 6, background: G_MID, opacity: 0.7, alignSelf: 'center' }} />,
-              <motion.span key={`b${r}`} data-bar initial={{ width: 0 }} animate={{ width: r ? 70 : 90 }} transition={{ delay: 3.9 + r * 0.2, duration: 0.5, ease: EASE }} style={{ height: 12, borderRadius: 6, background: 'var(--teal)', opacity: 0.7, alignSelf: 'center' }} />,
-            ])}
-          </div>
+          {/* a sample answer (owner, 29 Oct: print an answer, not a skeleton); no real company names, prices or dates */}
+          {ANSWER.map((group, g) => (
+            <div key={group.head} style={{ marginTop: g ? 10 : 0 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', fontSize: 15, fontWeight: 700, color: 'var(--ink-dim)', borderBottom: '1px solid var(--line)', paddingBottom: 3 }}>
+                <span>{group.head}</span>
+                <span>{group.col}</span>
+              </div>
+              {group.rows.map(([name, status, ok, why], r) => (
+                <motion.div key={name} data-row={name} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 3.8 + (g * 2 + r) * 0.18, duration: 0.45, ease: EASE }} style={{ display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: 10, padding: '5px 0', borderBottom: '1px solid var(--line)' }}>
+                  <span style={{ fontSize: 18, color: 'var(--ink)' }}>
+                    <b>{name}</b>
+                    {why && <span style={{ fontSize: 15, color: 'var(--ink-dim)' }}> · {why}</span>}
+                  </span>
+                  <span style={{ fontSize: 15, fontWeight: 700, padding: '3px 10px', borderRadius: 999, color: ok ? '#fff' : 'var(--ink)', background: ok ? 'var(--teal)' : 'rgba(127,127,127,0.18)' }}>{status}</span>
+                </motion.div>
+              ))}
+            </div>
+          ))}
+          <div style={{ marginTop: 6, fontSize: 13, color: 'var(--ink-dim)' }}>sample answer</div>
         </motion.div>
       </div>
     </WidePanel>

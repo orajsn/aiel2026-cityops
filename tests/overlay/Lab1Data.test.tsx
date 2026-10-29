@@ -27,13 +27,15 @@ test('L1Specs: the engineer’s question, three steps, three sourced parts, the 
   noRed(c);
 });
 
-test('L1Contractors: tables, Semantic Store, NL2SQL, ADB MCP Server, placeholder answer, no invented specifics', () => {
+test('L1Contractors: tables, Semantic Store, NL2SQL, ADB MCP Server, a printed sample answer, no invented specifics', () => {
   const c = render(<L1Contractors kicker="k" message="m" />).container;
   expect(c.textContent).toContain('Which contractor is qualified for this repair, and what is the delivery status of the materials we need?');
   expect(attrs(c, 'data-table')).toEqual(['Contractors', 'Certifications', 'Purchase orders']);
   for (const w of ['Autonomous Database', 'Semantic Store', 'NL2SQL', 'ADB MCP Server', 'SELECT', 'JOIN certifications'])
     expect(c.textContent).toContain(w);
-  expect(c.querySelectorAll('[data-answer="table"] [data-bar]')).toHaveLength(4);
+  // owner, 29 Oct: an actual answer, not a skeleton: which contractor qualifies, and each material's delivery status
+  expect([...c.querySelectorAll('[data-answer="table"] [data-row]')].map((r) => r.getAttribute('data-row'))).toEqual(['Contractor A', 'Contractor B', 'Repair mortar', 'Bonding agent', 'Corrosion inhibitor']);
+  expect(c.querySelector('[data-answer="table"]')?.textContent).toContain('✓ qualified');
   expect(attrs(c, 'data-tag')).toEqual(['Hands-on 2 · Semantic Store + NL2SQL']);
   expect(c.textContent).not.toMatch(/\$|\d{4}|Kirkland|fictional/);
   noRed(c);
