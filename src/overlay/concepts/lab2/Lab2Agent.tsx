@@ -811,79 +811,87 @@ function Locker({ open, at, inside, padlock = false, w }: { open: boolean; at: n
 
 const CITY_RECORDS = ['PRISM data', 'graph', 'chunks', 'embeddings', 'vector indexes'];
 
+/** a lock, drawn */
+function Padlock({ size = 38 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 34 40" aria-hidden style={{ flex: 'none' }}>
+      <path d="M9 18v-6a8 8 0 0 1 16 0v6" fill="none" stroke={G_DARK} strokeWidth="4" />
+      <rect x="4" y="17" width="26" height="20" rx="4" fill={G_DARK} />
+    </svg>
+  );
+}
+
+/**
+ * One grid for the whole changing room (owner, 29 Oct: "why its not align"): this lab's three lockers and the city's
+ * five share the same rows, so the header boxes, the sub-headings, the locker tops and the labels line up.
+ */
 export function Wipe(p: L2Props) {
-  const built = useBuilt();
-  const enterAt = (d: number, lit: boolean) => enter(built ? 0 : d, lit);
   const focusN = useFocusN(p.focusId);
+  const built = useBuilt();
   const on = (n: number) => focusN === null || focusN === n;
-  const ring = (n: number) => (focusN === n ? `0 0 0 4px ${TINT2}` : 'none');
+  const fadeOn = (n: number) => ({ opacity: on(n) ? 1 : 0.4, transition: 'opacity 300ms' });
   const count = (t: ReactNode) => <div style={{ ...mono(21, '#fff'), fontWeight: 700, lineHeight: 1.3 }}>{t}</div>;
+  const ours = [
+    { t: 'STORE_INCIDENT', n: 2, at: 1.2, inside: <>{count('1 row')}<div style={{ fontSize: 18, color: '#c7ced6' }}>cleared</div></> },
+    { t: 'STORE_VECTORS_INCIDENT', n: 2, at: 1.6, inside: <>{count('1 row')}<div style={{ fontSize: 18, color: '#c7ced6' }}>cleared</div></> },
+    { t: 'CHECKPOINTS · BLOBS · WRITES', n: 3, at: 2.2, inside: <>{count('9 · 9 · 17')}<div style={{ fontSize: 18, color: '#c7ced6' }}>rows cleared</div></> },
+  ];
+  const box = { display: 'flex', alignItems: 'center', gap: 14, padding: '10px 16px', borderRadius: 12 } as const;
+  const sub = { display: 'flex', alignItems: 'center', gap: 10, fontSize: 24, fontWeight: 700, color: INK } as const;
+  const label = { fontSize: 18, textAlign: 'center' as const, lineHeight: 1.25, alignSelf: 'start' };
   return (
     <L2Page testId="l2-wipe" {...p}>
-      <Fill gap={16}>
+      <Fill gap={14}>
         <motion.div {...fade(0.1)} style={{ fontSize: 24, lineHeight: 1.45, color: INK }}>
           Like clearing out <b>only your own lockers</b> in a shared changing room: find your name tag, empty those, and leave everyone else’s shut.
         </motion.div>
-        <div style={{ flex: 1, minHeight: 360, display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(0, 1fr)', columnGap: 40 }}>
-          {/* ours: the name tag over three lockers */}
-          <div style={{ minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <motion.div data-step={1} data-on={on(1)} {...enterAt(0.3, on(1))} style={{ alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 14, padding: '10px 16px', borderRadius: 12, border: `2px solid ${TEAL}`, background: TINT, boxShadow: ring(1) }}>
-              <Num n={1} size={38} on={on(1)} />
-              <div>
-                <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>This lab’s name tag</div>
-                <div style={{ ...mono(21) }}>prism_incident_decisions</div>
-              </div>
-            </motion.div>
-            <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '2fr 1fr', columnGap: 18 }}>
-              <div data-step={2} data-on={on(2)} style={{ display: 'flex', flexDirection: 'column', gap: 10, opacity: on(2) ? 1 : 0.4, transition: 'opacity 300ms' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Num n={2} size={34} on={on(2)} />
-                  <span style={{ fontSize: 24, fontWeight: 700, color: INK }}>Logbook pages</span>
-                </div>
-                <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 12 }}>
-                  {['STORE_INCIDENT', 'STORE_VECTORS_INCIDENT'].map((t, i) => (
-                    <div key={t} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <Locker open at={1.2 + i * 0.4} inside={<>{count('1 row')}<div style={{ fontSize: 18, color: '#c7ced6' }}>cleared</div></>} />
-                      <div style={{ ...mono(18, INK), fontWeight: 700, textAlign: 'center', overflowWrap: 'anywhere' }}>{t}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div data-step={3} data-on={on(3)} style={{ display: 'flex', flexDirection: 'column', gap: 10, opacity: on(3) ? 1 : 0.4, transition: 'opacity 300ms' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Num n={3} size={34} on={on(3)} />
-                  <span style={{ fontSize: 24, fontWeight: 700, color: INK }}>This visit</span>
-                </div>
-                <Locker open at={2.2} inside={<>{count('9 · 9 · 17')}<div style={{ fontSize: 18, color: '#c7ced6' }}>rows cleared</div></>} />
-                <div style={{ ...mono(18, INK), fontWeight: 700, textAlign: 'center' }}>CHECKPOINTS · BLOBS · WRITES</div>
-              </div>
+        <div data-lockers style={{ flex: 1, minHeight: 360, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1.35fr)) 30px repeat(5, minmax(0, 1fr))', gridTemplateRows: '76px 44px minmax(0, 1fr) 50px auto', columnGap: 12, rowGap: 10 }}>
+          {/* row 1: the two header boxes, the same height */}
+          <motion.div data-step={1} data-on={on(1)} {...enter(built ? 0 : 0.3, on(1))} style={{ ...box, gridColumn: '1 / 4', border: `2px solid ${TEAL}`, background: TINT, boxShadow: focusN === 1 ? `0 0 0 4px ${TINT2}` : 'none' }}>
+            <Num n={1} size={38} on={on(1)} />
+            <div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>This lab’s name tag</div>
+              <div style={{ ...mono(21) }}>prism_incident_decisions</div>
             </div>
-            <motion.div {...fade(2.8)} style={{ alignSelf: 'flex-start' }}>
-              <Chip style={{ fontSize: 19 }}>thread_id = prism-agent-demo-001</Chip>
-            </motion.div>
-          </div>
-          {/* the city's: shut and locked */}
-          <motion.div data-untouched {...fadeUp(0.5)} style={{ minHeight: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ padding: '10px 16px', borderRadius: 12, border: '2px dashed var(--line)', display: 'flex', alignItems: 'center', gap: 14 }}>
-              <svg width="38" height="38" viewBox="0 0 34 40" aria-hidden style={{ flex: 'none' }}>
-                <path d="M9 18v-6a8 8 0 0 1 16 0v6" fill="none" stroke={G_DARK} strokeWidth="4" />
-                <rect x="4" y="17" width="26" height="20" rx="4" fill={G_DARK} />
-              </svg>
-              <div>
-                <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>The city records</div>
-                <div style={{ fontSize: 22, color: DIM }}>not touched</div>
-              </div>
-            </div>
-            <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 10 }}>
-              {CITY_RECORDS.map((t) => (
-                <div key={t} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <Locker open={false} at={0} padlock />
-                  <div style={{ fontSize: 19, color: INK, textAlign: 'center', lineHeight: 1.2, minHeight: 46 }}>{t}</div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 18, color: DIM, textAlign: 'right' }}>Row counts: saved output, cell 71</div>
           </motion.div>
+          <motion.div data-untouched {...fade(0.5)} style={{ ...box, gridColumn: '5 / 10', border: '2px dashed var(--line)' }}>
+            <Padlock />
+            <div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: INK }}>The city records</div>
+              <div style={{ fontSize: 22, color: DIM }}>not touched</div>
+            </div>
+          </motion.div>
+          {/* row 2: the sub-headings */}
+          <div data-step={2} data-on={on(2)} style={{ ...sub, ...fadeOn(2), gridColumn: '1 / 3' }}>
+            <Num n={2} size={34} on={on(2)} /> Logbook pages
+          </div>
+          <div data-step={3} data-on={on(3)} style={{ ...sub, ...fadeOn(3), gridColumn: '3 / 4' }}>
+            <Num n={3} size={34} on={on(3)} /> This visit
+          </div>
+          <div style={{ ...sub, gridColumn: '5 / 10', fontWeight: 500, color: DIM, fontSize: 22 }}>five lockers, padlocked</div>
+          {/* row 3: the lockers, tops on one line */}
+          {ours.map((o, i) => (
+            <div key={o.t} style={{ gridColumn: i + 1, gridRow: 3, display: 'flex', minHeight: 0, ...fadeOn(o.n) }}>
+              <Locker open at={o.at} inside={o.inside} />
+            </div>
+          ))}
+          {CITY_RECORDS.map((t, i) => (
+            <div key={t} style={{ gridColumn: i + 5, gridRow: 3, display: 'flex', minHeight: 0 }}>
+              <Locker open={false} at={0} padlock />
+            </div>
+          ))}
+          {/* row 4: the labels, on one baseline */}
+          {ours.map((o, i) => (
+            <div key={o.t} style={{ ...label, ...mono(18, INK), fontWeight: 700, gridColumn: i + 1, gridRow: 4, ...fadeOn(o.n) }}>{o.t.replace(/_(?=[A-Z]+$)/, '_\u200b')}</div>
+          ))}
+          {CITY_RECORDS.map((t, i) => (
+            <div key={t} style={{ ...label, fontSize: 19, color: INK, gridColumn: i + 5, gridRow: 4 }}>{t}</div>
+          ))}
+          {/* row 5: the thread, and where the counts come from */}
+          <motion.div {...fade(2.8)} style={{ gridColumn: '1 / 4', gridRow: 5 }}>
+            <Chip style={{ fontSize: 19 }}>thread_id = prism-agent-demo-001</Chip>
+          </motion.div>
+          <div style={{ gridColumn: '5 / 10', gridRow: 5, fontSize: 18, color: DIM, textAlign: 'right', alignSelf: 'center' }}>Row counts: saved output, cell 71</div>
         </div>
       </Fill>
     </L2Page>
