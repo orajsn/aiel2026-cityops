@@ -2,6 +2,8 @@ import { AnimatePresence, motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { EASE } from '../WidePanel';
 import { LineIcon, type IconName } from '../icons';
+import { Story, stepAt } from './Story';
+import { Triage } from './everyday';
 import {
   Arrow, ArrowDown, CARD, ChiefInspector, Chip, DIM, INK, L2Page, Net, Num, Quote, RED, SOFT, Saved, StepRow, TEAL, TEAL_D, TINT, TINT2,
   cap, capTeal, card, fade, fadeUp, mono, reveal, upTo, useFocusN, type L2Props,
@@ -177,53 +179,55 @@ export function Conveyor(p: L2Props) {
 /* ---------------- 2.4f · §2.3 station one: rate the severity ---------------- */
 
 export function Station1(p: L2Props) {
-  const focusN = useFocusN(p.focusId);
+  const focusN = useFocusN(p.focusId) ?? 0;
   return (
     <L2Page testId="l2-station1" {...p}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-        <motion.div {...fadeUp(0.1)} style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: 21, color: INK }}>
-          <span style={cap}>Incident report</span>
-          <span style={{ padding: '6px 14px', borderRadius: 10, background: 'rgba(31,42,51,0.92)', color: '#fff' }}>Crack near the bearing plate · 0.12 mm × 85 mm</span>
-        </motion.div>
-        <StepRow
-          focusN={focusN}
-          steps={[
-            {
-              title: 'Only three ratings exist',
-              body: (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12 }}>
-                  {['routine', 'warning', 'critical'].map((r) => (
-                    <div key={r} data-rating={r} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px', borderRadius: 12, ...mono(22, r === 'warning' ? '#fff' : INK), background: r === 'warning' ? TEAL : 'rgba(127,127,127,0.12)', fontWeight: 700 }}>
-                      {r}
-                      {r === 'warning' && <span>✓</span>}
-                    </div>
-                  ))}
-                </div>
-              ),
-            },
-            {
-              title: 'Plus one short reason',
-              body: (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12 }}>
-                  <Chip style={{ alignSelf: 'flex-start' }}>reason:</Chip>
-                  <div style={{ fontSize: 23, lineHeight: 1.4, color: INK, padding: '14px 18px', borderRadius: 12, background: TINT }}>“Hairline crack detected at weld seam, requiring further inspection”</div>
-                </div>
-              ),
-            },
-            {
-              title: 'Model told: JSON only',
-              body: (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14 }}>
-                  <Quote style={{ fontSize: 20 }}>{'{"severity": …, "reason": …}'}</Quote>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 22, fontWeight: 700, color: TEAL_D }}>Pydantic: shape ✓</div>
-                  <div style={{ fontSize: 20, color: DIM }}>checks the shape, not whether the rating is right</div>
-                </div>
-              ),
-            },
-          ]}
-        />
-        <Saved label="Saved output, cell 50">Severity. warning: Hairline crack detected at weld seam, requiring further inspection</Saved>
-      </div>
+      <Story
+        focusN={focusN}
+        everyday={{ art: <Triage />, caption: <>A triage nurse has <b>three tags</b>. Every patient gets exactly one, and a short note on the card.</> }}
+        steps={[
+          {
+            title: 'The incident report comes in.',
+            body: (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <LineIcon name="clipboard" size={46} />
+                <span style={{ padding: '8px 16px', borderRadius: 10, background: 'rgba(31,42,51,0.92)', color: '#fff', fontSize: 21 }}>Crack near the bearing plate · 0.12 mm × 85 mm</span>
+              </div>
+            ),
+          },
+          {
+            title: <>The model may pick <span style={{ color: TEAL }}>only one of three ratings</span>.</>,
+            body: (
+              <div style={{ display: 'flex', gap: 12 }}>
+                {['routine', 'warning', 'critical'].map((r, i) => (
+                  <motion.span key={r} data-rating={r} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: stepAt(1) + 0.3 + i * 0.15, duration: 0.4, ease: EASE }} style={{ padding: '10px 20px', borderRadius: 10, ...mono(22, r === 'warning' ? '#fff' : INK), fontWeight: 700, background: r === 'warning' ? TEAL : 'rgba(127,127,127,0.14)' }}>
+                    {r}
+                    {r === 'warning' && ' ✓'}
+                  </motion.span>
+                ))}
+              </div>
+            ),
+          },
+          {
+            title: 'Plus one short reason, in a fixed shape.',
+            body: (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <Quote style={{ fontSize: 19 }}>{'{"severity": "warning", "reason": "Hairline crack detected at weld seam, requiring further inspection"}'}</Quote>
+                <span style={{ fontSize: 17, color: DIM }}>saved output, cell 50</span>
+              </div>
+            ),
+          },
+        ]}
+        side={{
+          label: 'What the code enforces',
+          items: [
+            { title: 'Three ratings only', sub: 'routine · warning · critical' },
+            { title: 'One short reason', sub: 'a sentence, not an essay' },
+            { title: 'The shape is checked', sub: 'Pydantic: the shape, not the truth' },
+          ],
+          foot: 'station one of four',
+        }}
+      />
     </L2Page>
   );
 }
