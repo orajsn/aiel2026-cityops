@@ -4,6 +4,7 @@ import { EASE } from '../WidePanel';
 import { LineIcon, type IconName } from '../icons';
 import { Story, stepAt } from './Story';
 import { Triage } from './everyday';
+import { AgentAvatar } from './AgentAvatar';
 import { Fill, FitBox } from '../Fill';
 import { Junction, Library, Recipe, Taxi, Train, WorkOrder } from './workflowArt';
 import {
@@ -544,85 +545,124 @@ export function Order(p: L2Props) {
 
 const CHECKLIST = ['Check the bearing plate', 'Measure the crack', 'Log the reading'];
 const LOOP = [
-  { n: 1, t: 'Look', s: 'read the situation' },
-  { n: 2, t: 'Pick a tool', s: 'from its toolbox' },
-  { n: 3, t: 'Read the result', s: 'check what came back' },
-  { n: 4, t: 'Decide again', s: 'done, or next step?' },
+  { n: 1, t: 'Look', s: 'read the situation', x: 350, y: 64 },
+  { n: 2, t: 'Pick a tool', s: 'from its toolbox', x: 585, y: 290 },
+  { n: 3, t: 'Read the result', s: 'check what came back', x: 350, y: 516 },
+  { n: 4, t: 'Decide again', s: 'done, or next step?', x: 115, y: 290 },
 ];
 const DOES = ['Plans and reasons', 'Picks its tools', 'Remembers across sessions', 'Adapts to what it finds'];
+const LOOP_AT = (i: number) => 0.5 + i * 0.6;
 
+function ChiefTick() {
+  return (
+    <svg width={34} height={34} viewBox="0 0 34 34" aria-hidden style={{ flex: 'none' }}>
+      <circle cx="17" cy="17" r="16" fill="var(--teal)" />
+      <path d="M9.5 17.5l5 5 10-11" stroke="#fff" strokeWidth={3.2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/**
+ * 2.4i, 2.4j, 2.4k · built across three clicks, as Lab 3's desk and filing cabinet are: the fixed checklist on the
+ * left meets a failure it has no step for (the page's one red thing); the AI agent arrives in the middle; next its
+ * loop of four is drawn around it, a light running the circle; last the list of what it does lights up on the right
+ * and it signs the recommendation.
+ */
 export function Chief(p: L2Props) {
   const step = p.step ?? 1;
+  const label = { ...cap, fontSize: 17, letterSpacing: '0.14em', marginBottom: 14 };
   return (
     <L2Page testId="l2-chief" hasRed={step === 1} {...p}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '360px minmax(0, 1fr)', gap: 26, minHeight: 0 }}>
-        {/* the fixed checklist, with no step for the new failure */}
-        <motion.div data-checklist {...fadeUp(0.2)} style={{ ...card(), padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <LineIcon name="clipboard" size={44} color="#8a97a3" />
-            <div>
-              <div style={{ fontSize: 25, fontWeight: 700, color: INK }}>Fixed checklist</div>
-              <div style={{ fontSize: 18, color: DIM }}>steps decided in advance</div>
-            </div>
-          </div>
-          {CHECKLIST.map((c, i) => (
-            <motion.div key={c} {...fadeUp(0.5 + i * 0.3)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, background: CARD, border: '1.5px solid var(--line)', fontSize: 20, color: INK }}>
-              <Num n={i + 1} size={30} on={false} />
-              <span style={{ flex: 1 }}>{c}</span>
-              <span style={{ color: TEAL, fontWeight: 700 }}>✓</span>
+      <Fill>
+        <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: step === 3 ? '330px minmax(0, 1fr) 380px' : '400px minmax(0, 1fr)', columnGap: 30, marginTop: 4 }}>
+          {/* the fixed checklist, and the failure it has no step for */}
+          <div data-checklist style={{ display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--line)', paddingRight: 26 }}>
+            <div style={label}>In everyday life</div>
+            <motion.div {...fadeUp(0.2)} style={{ ...card(), background: 'var(--panel-strong)', padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <LineIcon name="clipboard" size={42} color="#8a97a3" />
+                <span style={{ fontSize: 26, fontWeight: 700, color: INK }}>Fixed checklist</span>
+              </div>
+              {CHECKLIST.map((c, i) => (
+                <motion.div key={c} {...fadeUp(0.4 + i * 0.25)} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 22, color: INK }}>
+                  <Num n={i + 1} size={30} on={false} />
+                  <span style={{ flex: 1 }}>{c}</span>
+                  <span style={{ color: TEAL, fontWeight: 700 }}>✓</span>
+                </motion.div>
+              ))}
             </motion.div>
-          ))}
-          <motion.div data-new-failure {...fadeUp(1.6)} style={{ marginTop: 'auto', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, textAlign: 'center', borderRadius: 12, border: `2px dashed ${step === 1 ? RED : '#8a97a3'}`, padding: 14 }}>
-            <LineIcon name="inspect" size={44} color={step === 1 ? RED : '#8a97a3'} />
-            <div style={{ fontSize: 22, fontWeight: 700, color: step === 1 ? RED : INK }}>New failure: no step for it</div>
-            <div style={{ fontSize: 18, color: DIM }}>cannot grow new branches by itself</div>
-          </motion.div>
-        </motion.div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18, minHeight: 0 }}>
-          {/* the chief inspector */}
-          <motion.div data-chief {...fadeUp(0.8)} style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
-            <ChiefInspector size={step === 1 ? 190 : 120} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ fontSize: 32, fontWeight: 700, color: INK }}>Chief inspector</div>
-              <span style={{ alignSelf: 'flex-start', padding: '4px 14px', borderRadius: 999, background: TINT2, ...mono(18), fontWeight: 700 }}>AI AGENT · Harbor Bridge</span>
-              <div style={{ fontSize: 23, color: '#fff', background: 'rgba(31,42,51,0.92)', borderRadius: 14, padding: '10px 18px' }}>“I decide the next step myself.”</div>
-            </div>
-          </motion.div>
-          {/* the loop it runs */}
-          <motion.div data-loop {...reveal(upTo(step, 2), 0.2)} style={{ ...card(true), background: TINT, padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={capTeal}>The loop it runs, again and again</div>
-            <div style={{ display: 'flex', alignItems: 'stretch', gap: 6 }}>
-              {LOOP.map((l, i) => [
-                i > 0 ? (
-                  <div key={`a${i}`} style={{ display: 'flex', alignItems: 'center' }}>
-                    <Arrow w={40} delay={0.6 + i * 0.5} loop={upTo(step, 2) && i === 3} />
-                  </div>
-                ) : null,
-                <motion.div key={l.t} data-loop-step={l.n} {...reveal(upTo(step, 2), 0.4 + i * 0.5)} style={{ flex: 1, ...card(), background: CARD, padding: '12px 14px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <Num n={l.n} size={30} />
-                    <span style={{ fontSize: 22, fontWeight: 700, color: INK }}>{l.t}</span>
-                  </div>
-                  <div style={{ fontSize: 18, color: DIM, marginTop: 4 }}>{l.s}</div>
-                </motion.div>,
-              ])}
-              <div style={{ display: 'flex', alignItems: 'center', fontSize: 30, color: TEAL }}>↺</div>
-            </div>
-          </motion.div>
-          {/* what it does, and the signed recommendation */}
-          <motion.div data-does {...reveal(upTo(step, 3), 0.2)} style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) 300px', gap: 12, alignItems: 'stretch' }}>
-            {DOES.map((d, i) => (
-              <motion.div key={d} {...reveal(upTo(step, 3), 0.3 + i * 0.25)} style={{ gridColumn: (i % 2) + 1, ...card(), padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10, fontSize: 21, fontWeight: 600, color: INK }}>
-                <span style={{ color: TEAL, fontWeight: 700 }}>✓</span> {d}
+            <ArrowDown h={30} />
+            <motion.div data-new-failure {...fadeUp(1.4)} style={{ flex: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, textAlign: 'center', borderRadius: 14, border: `2.5px dashed ${step === 1 ? RED : '#8a97a3'}`, padding: 14 }}>
+              <LineIcon name="inspect" size={48} color={step === 1 ? RED : '#8a97a3'} />
+              <div style={{ fontSize: 24, fontWeight: 700, color: step === 1 ? RED : INK }}>A new failure: no step for it</div>
+              <div style={{ fontSize: 21, color: DIM, lineHeight: 1.35 }}>The list cannot grow a new branch by itself.</div>
+            </motion.div>
+            {step === 1 && (
+              <motion.div {...fade(2)} style={{ flex: 1, display: 'flex', alignItems: 'center', fontSize: 23, color: INK, lineHeight: 1.45, marginTop: 14 }}>
+                <span>
+                  A checklist is great for the known jobs. When something new turns up, <b>someone has to decide</b> what to do next.
+                </span>
               </motion.div>
-            ))}
-            <motion.div data-signed {...reveal(upTo(step, 3), 1.4)} style={{ gridColumn: 3, gridRow: '1 / 3', ...card(true), background: CARD, padding: '14px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>
-              <div style={{ fontSize: 21, color: INK }}>Ready → <b>recommendation</b></div>
-              <div style={{ borderTop: '1.5px solid var(--line)', paddingTop: 8, ...mono(17), fontWeight: 700 }}>SIGNED · Chief inspector</div>
-            </motion.div>
-          </motion.div>
+            )}
+          </div>
+          {/* the AI agent, and the loop it runs around itself */}
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <div style={label}>{step === 1 ? 'At Harbor Bridge: the chief inspector' : 'The loop it runs, again and again'}</div>
+            <FitBox w={700} h={590} max={1.1}>
+              <svg width={700} height={590} viewBox="0 0 700 590" style={{ position: 'absolute', inset: 0 }} aria-hidden>
+                <motion.circle cx={350} cy={290} r={226} fill="none" stroke="var(--teal)" strokeWidth={3} strokeDasharray="6 10" initial={{ opacity: 0 }} animate={{ opacity: step >= 2 ? 0.8 : 0.25 }} transition={{ delay: step >= 2 ? 0.2 : 1.6, duration: 0.6 }} />
+                {step >= 2 && (
+                  <motion.g style={{ originX: '350px', originY: '290px' }} initial={{ rotate: 0, opacity: 0 }} animate={{ rotate: 360, opacity: 1 }} transition={{ rotate: { delay: LOOP_AT(4), duration: 8, ease: 'linear', repeat: Infinity }, opacity: { delay: LOOP_AT(4), duration: 0.4 } }}>
+                    <circle cx={350 + 226 * Math.SQRT1_2} cy={290 - 226 * Math.SQRT1_2} r={10} fill="var(--teal)" />
+                  </motion.g>
+                )}
+              </svg>
+              {/* the agent in the middle */}
+              <motion.div data-chief {...fadeUp(step === 1 ? 1.8 : 0.1)} style={{ position: 'absolute', left: step === 1 ? 160 : 230, top: step === 1 ? 70 : 160, width: step === 1 ? 380 : 240, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, textAlign: 'center', transition: 'top 0.5s' }}>
+                <AgentAvatar size={step === 1 ? 210 : 130} live={step >= 2} />
+                <div style={{ fontSize: step === 1 ? 30 : 24, fontWeight: 700, color: INK }}>Chief inspector</div>
+                <span style={{ padding: '4px 14px', borderRadius: 999, background: TINT2, ...mono(step === 1 ? 18 : 15), fontWeight: 700 }}>{step === 1 ? 'AI AGENT · Harbor Bridge' : 'AI AGENT'}</span>
+                {step === 1 && (
+                  <motion.div {...fadeUp(2.5)} style={{ fontSize: 24, color: '#fff', background: 'rgba(31,42,51,0.92)', borderRadius: 14, padding: '10px 18px', marginTop: 6 }}>
+                    “I decide the next step myself.”
+                  </motion.div>
+                )}
+              </motion.div>
+              {/* the loop of four */}
+              {step >= 2 &&
+                LOOP.map((l, i) => (
+                  <motion.div key={l.t} data-loop-step={l.n} {...fadeUp(LOOP_AT(i))} style={{ position: 'absolute', left: l.x - 112, top: l.y - 54, width: 224, height: 108, boxSizing: 'border-box', borderRadius: 14, border: '2px solid var(--teal)', background: 'var(--panel-strong)', padding: '10px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Num n={l.n} size={30} />
+                      <span style={{ fontSize: 23, fontWeight: 700, color: INK, lineHeight: 1.15 }}>{l.t}</span>
+                    </div>
+                    <div style={{ fontSize: 19, color: DIM }}>{l.s}</div>
+                  </motion.div>
+                ))}
+            </FitBox>
+          </div>
+          {/* what it does, then the signed recommendation */}
+          {step === 3 && (
+            <div data-does style={{ display: 'flex', flexDirection: 'column', gap: 12, borderLeft: '1px solid var(--line)', paddingLeft: 26 }}>
+              <div style={{ ...label, marginBottom: 2 }}>What it does</div>
+              {DOES.map((d, i) => (
+                <motion.div key={d} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4 + i * 0.4, duration: 0.5, ease: EASE }} style={{ flex: '1 0 auto', display: 'flex', alignItems: 'center', gap: 14, padding: '8px 16px', borderRadius: 12, border: '2px solid var(--teal)', background: TINT, fontSize: 23, fontWeight: 700, color: INK }}>
+                  <ChiefTick /> {d}
+                </motion.div>
+              ))}
+              <motion.div data-signed {...fadeUp(2.2)} style={{ ...card(true), background: CARD, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                <AgentAvatar size={64} />
+                <div>
+                  <div style={{ fontSize: 23, color: INK }}>
+                    Ready → <b>the recommendation</b>
+                  </div>
+                  <div style={{ ...mono(18), fontWeight: 700, marginTop: 4 }}>SIGNED · AI Agent</div>
+                </div>
+              </motion.div>
+            </div>
+          )}
         </div>
-      </div>
+      </Fill>
     </L2Page>
   );
 }
