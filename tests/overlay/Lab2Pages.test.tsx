@@ -57,7 +57,7 @@ test('no pier numbers, no model name, no "Ollama", never "copilot", "Kirkland" o
   for (const s of PAGES) {
     const c = renderPage(s.id);
     // the notebook's own code is shown verbatim on a notebook page (it names OLLAMA_MODEL)
-    c.querySelectorAll('[data-code]').forEach((e) => e.remove());
+    c.querySelectorAll('[data-code], [data-code-out]').forEach((e) => e.remove());
     const t = c.textContent ?? '';
     expect(t, s.id).not.toMatch(/\bpier\s*\d/i);
     expect(t, s.id).not.toMatch(/llama|ollama/i);

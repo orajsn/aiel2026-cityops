@@ -165,8 +165,8 @@ export interface Case {
 const ART: ((p: { on?: boolean; w?: number }) => ReactNode)[] = [BridgeArt, SubstationArt, PipelineArt];
 const DIAL_AT = 2.0;
 
-function Dial() {
-  // the pointer sweeps over the three positions and settles on the first
+/** the pointer sweeps over the three positions and settles on the first; once a case is being talked about it points at that case */
+function Dial({ at, sweep }: { at: number; sweep: boolean }) {
   const angles = [-50, 0, 50];
   return (
     <svg width={190} height={150} viewBox="0 0 190 150" aria-hidden style={{ display: 'block', flex: 'none' }}>
@@ -175,15 +175,15 @@ function Dial() {
         const r = (a - 90) * (Math.PI / 180);
         return (
           <g key={a}>
-            <circle cx={95 + Math.cos(r) * 86} cy={120 + Math.sin(r) * 86} r={14} fill={i === 0 ? T : CARD} stroke={i === 0 ? T : G} strokeWidth={2.6} />
-            <text x={95 + Math.cos(r) * 86} y={126 + Math.sin(r) * 86} textAnchor="middle" fontSize="16" fontWeight="700" fill={i === 0 ? '#fff' : G} fontFamily="Inter, sans-serif">
+            <circle cx={95 + Math.cos(r) * 86} cy={120 + Math.sin(r) * 86} r={14} fill={i === at ? T : CARD} stroke={i === at ? T : G} strokeWidth={2.6} />
+            <text x={95 + Math.cos(r) * 86} y={126 + Math.sin(r) * 86} textAnchor="middle" fontSize="16" fontWeight="700" fill={i === at ? '#fff' : G} fontFamily="Inter, sans-serif">
               {i + 1}
             </text>
           </g>
         );
       })}
       <g transform="translate(95 120)">
-        <motion.path d="M0 0V-68" stroke={T} strokeWidth={7} strokeLinecap="round" initial={{ rotate: 50 }} animate={{ rotate: [50, 0, -50] }} transition={{ delay: DIAL_AT, duration: 1.4, times: [0, 0.45, 1], ease: 'easeInOut' }} style={{ originX: 0.5, originY: 1 }} />
+        <motion.path d="M0 0V-68" stroke={T} strokeWidth={7} strokeLinecap="round" initial={{ rotate: 50 }} animate={{ rotate: sweep ? [50, 0, -50] : angles[at] }} transition={sweep ? { delay: DIAL_AT, duration: 1.4, times: [0, 0.45, 1], ease: 'easeInOut' } : { duration: 0.45, ease: 'easeInOut' }} style={{ originX: 0.5, originY: 1 }} />
       </g>
       <circle cx={95} cy={120} r={20} fill={TEAL} />
       <circle cx={95} cy={120} r={7} fill="#fff" />
@@ -193,7 +193,9 @@ function Dial() {
 
 export function ThreeDrills({ cases, focusN }: { cases: Case[]; focusN: number | null }) {
   const lit = (n: number) => focusN === null || focusN === n;
-  const chosen = DIAL_AT + 1.4;
+  // the case in use follows the one being talked about; the dial and the setting under it follow too
+  const at = focusN !== null && focusN >= 1 && focusN <= 3 ? focusN - 1 : 0;
+  const chosen = focusN === null ? DIAL_AT + 1.4 : 0.1;
   return (
     <Fill gap={14}>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1, duration: 0.5 }} style={{ flex: 'none', fontSize: 24, color: DIM, lineHeight: 1.35 }}>
@@ -202,7 +204,7 @@ export function ThreeDrills({ cases, focusN }: { cases: Case[]; focusN: number |
       <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 22 }}>
         {cases.map((c, i) => {
           const Art = ART[i];
-          const active = i === 0;
+          const active = i === at;
           return (
             <motion.div key={c.name} data-case={c.asset} data-active={active} initial={{ opacity: 0, y: 12 }} animate={{ opacity: lit(i + 1) ? 1 : 0.35, y: 0 }} transition={{ delay: 0.3 + i * 0.45, duration: 0.5, ease: EASE }} style={{ borderRadius: 16, border: `${active ? 3 : 2}px solid ${active ? TEAL : 'var(--line)'}`, background: active ? CARD : SOFT, padding: '18px 22px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', gap: 12, textAlign: 'center', position: 'relative' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -235,10 +237,10 @@ export function ThreeDrills({ cases, focusN }: { cases: Case[]; focusN: number |
       </div>
       {/* the dial: one setting picks the case */}
       <motion.div data-switch initial={{ opacity: 0 }} animate={{ opacity: lit(4) ? 1 : 0.35 }} transition={{ delay: 1.6, duration: 0.5 }} style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 26, padding: '6px 0 0', borderTop: '1px solid var(--line)' }}>
-        <Dial />
+        <Dial at={at} sweep={focusN === null} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <span style={{ fontSize: 24, color: INK, fontWeight: 600 }}>One setting picks the case:</span>
-          <Chip style={{ fontSize: 22, alignSelf: 'flex-start' }}>ACTIVE_SCENARIO = SCENARIOS[0]</Chip>
+          <Chip style={{ fontSize: 22, alignSelf: 'flex-start' }}>ACTIVE_SCENARIO = SCENARIOS[{at}]</Chip>
           <span style={{ fontSize: 20, color: DIM }}>the same code runs any of the three</span>
         </div>
       </motion.div>

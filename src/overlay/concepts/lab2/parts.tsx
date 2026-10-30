@@ -53,6 +53,8 @@ export interface L2Props {
   notebook?: string;
   /** the scene id, so a notebook page can follow the drawer's focus steps (LAB2_FOCUS) */
   focusId?: string;
+  /** the footer's height in px, the same on every page of a group of clicks, so the picture above never moves or rescales (chapter1.ts sets it) */
+  footerH?: number;
 }
 
 /** a mono chip on a teal tint (a table, a function, a value the notebook prints) */
@@ -61,10 +63,10 @@ export function Chip({ children, style, dim = false }: { children: ReactNode; st
 }
 
 /** the footer of every Lab 2 page: takeaway on the left, the glossary chip on the right, the next band under both */
-function Footer({ takeaway, terms, next }: Pick<L2Props, 'takeaway' | 'terms' | 'next'>) {
-  if (!takeaway && !terms?.length && !next) return null;
+function Footer({ takeaway, terms, next, footerH }: Pick<L2Props, 'takeaway' | 'terms' | 'next' | 'footerH'>) {
+  if (!takeaway && !terms?.length && !next) return footerH ? <div data-footer-space style={{ flex: 'none', height: footerH }} /> : null;
   return (
-    <div data-footer style={{ flex: 'none', display: 'flex', flexDirection: 'column', gap: 10, marginTop: 14 }}>
+    <div data-footer style={{ flex: 'none', display: 'flex', flexDirection: 'column', gap: 10, marginTop: 14, boxSizing: 'border-box', minHeight: footerH ? footerH - 14 : undefined }}>
       <div style={{ display: 'grid', gridTemplateColumns: terms?.length ? 'minmax(0, 1fr) minmax(0, 0.95fr)' : 'minmax(0, 1fr)', gap: 18, alignItems: 'stretch' }}>
         <AnimatePresence mode="popLayout">
           {takeaway && (
@@ -90,7 +92,7 @@ function Footer({ takeaway, terms, next }: Pick<L2Props, 'takeaway' | 'terms' | 
         </AnimatePresence>
       </div>
       {next && (
-        <motion.div data-next {...fade(3.8)} style={{ alignSelf: 'flex-end', display: 'flex', alignItems: 'center', gap: 12, padding: '8px 18px', borderRadius: 999, background: TEAL, color: '#fff', fontSize: 19, fontWeight: 600 }}>
+        <motion.div data-next {...fade(3.8)} style={{ alignSelf: 'flex-end', marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 12, padding: '8px 18px', borderRadius: 999, background: TEAL, color: '#fff', fontSize: 19, fontWeight: 600 }}>
           <span style={{ opacity: 0.85, fontWeight: 500 }}>Next in the notebook</span>
           <span aria-hidden>→</span>
           <span>{next}</span>
@@ -111,7 +113,7 @@ export function L2Page({ testId, hasRed = false, children, ...p }: L2Props & { t
         {children}
       </div>
       {/* a takeaway only where the chapter ends, on the page with the Next band (owner, 29 Oct: not on every page) */}
-      <Footer takeaway={p.next ? p.takeaway : undefined} terms={p.terms} next={p.next} />
+      <Footer takeaway={p.next ? p.takeaway : undefined} terms={p.terms} next={p.next} footerH={p.footerH} />
     </WidePanel>
   );
 }

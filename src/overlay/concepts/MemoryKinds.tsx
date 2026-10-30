@@ -97,7 +97,7 @@ function Table({ width, children, label, top }: { width: number; children: React
           flexDirection: 'column',
           borderRadius: '14px 14px 4px 4px',
           background: WOOD.top,
-          padding: '20px 22px 22px',
+          padding: '14px 22px 16px',
           boxShadow: `inset 0 2px 0 rgba(255,255,255,0.18)`,
           overflow: 'hidden',
         }}
@@ -139,7 +139,7 @@ function Desk() {
           </span>
         }
       >
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'auto auto', gap: '36px 30px', alignContent: 'space-evenly', padding: '10px 18px' }}>
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'auto auto', gap: '18px 30px', alignContent: 'space-evenly', padding: '6px 18px' }}>
           {cards.map((c, i) => (
             <motion.div
               key={c.text}
@@ -148,7 +148,7 @@ function Desk() {
               // the sweep passes left to right: each card goes as it reaches it, off the table's right edge
               animate={wiped ? { opacity: 0, x: 1200 - (i % 2) * 560, y: 30 + i * 6, rotate: tilt[i] * 14 } : { opacity: 1, x: 0, y: 0, rotate: tilt[i] }}
               transition={wiped ? { delay: 0.15 + (i % 2) * 0.28 + Math.floor(i / 2) * 0.06, duration: 0.85, ease: [0.5, 0, 0.75, 0] } : { delay: 0.3 + i * 0.35, duration: 0.6, ease: EASE }}
-              style={{ ...CARD, padding: '20px 26px', minHeight: 150 }}
+              style={{ ...CARD, padding: '14px 26px', minHeight: 130 }}
             >
               <div style={{ fontSize: 18, fontWeight: 700, color: c.who === 'mercer' ? 'var(--ink-dim)' : 'var(--teal)', marginBottom: 8 }}>{c.who === 'mercer' ? 'Mercer' : 'AI Agent'}</div>
               <div style={{ fontSize: 27, lineHeight: 1.35, color: 'var(--ink)' }}>{c.text}</div>

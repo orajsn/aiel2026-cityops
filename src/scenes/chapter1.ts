@@ -170,7 +170,7 @@ const query: SceneDef[] = [
 /* ---------------- Agent · build the agent ---------------- */
 const BUILD = { shot: 'sky', world: sky('brain') };
 const build: SceneDef[] = [
-  page({ id: '2.7', title: 'The agent is a state graph', overlay: 'L2Notebook', ...BUILD, props: { kicker: K.build, message: 'The agent is **a state graph**.', takeaway: 'Yes: run the tool and loop back to the model. No: finish. **That cycle is the whole agent.**', terms: [['The inspector’s loop', 'LangGraph StateGraph: model ⇄ tools']], notebook: `${NB} · · cell 73` } }),
+  page({ id: '2.7', title: 'The agent is a state graph', overlay: 'L2Notebook', ...BUILD, props: { kicker: K.build, message: 'The agent is **a state graph**.', takeaway: 'Yes: run the tool and loop back to the model. No: finish. **That cycle is the whole agent.**', terms: [['The inspector’s loop', 'LangGraph StateGraph: model ⇄ tools']], notebook: `${NB} · cell 73` } }),
   page({ id: '2.7a', title: 'Two memories', overlay: 'L2Memories', group: 'l2-memories', ...BUILD, props: { kicker: K.build, step: 1, message: 'Two memories, **one database**.', takeaway: 'One notebook for this visit, **one permanent logbook** with an index, both on one database.', terms: [['Visit notebook', 'Short-term memory · checkpointer'], ['Bridge logbook', 'Long-term memory · store']] } }),
   page({ id: '2.7b', title: 'Memory needs a lifecycle', overlay: 'L2Memories', group: 'l2-memories', ...BUILD, props: { kicker: K.build, step: 2, message: 'Memory needs **a lifecycle**.', takeaway: 'Without a lifecycle, an agent will happily act on **stale facts**.', terms: [['Visit notebook', 'Short-term memory · checkpointer'], ['Bridge logbook', 'Long-term memory · store']], next: NEXT.wipe } }),
   page({ id: '2.7c', title: 'Wipe only this lab’s notes', overlay: 'L2Notebook', ...BUILD, props: { kicker: K.build, message: 'Wipe **only this lab’s** notes.', takeaway: 'Clear this visit’s notebook and this lab’s logbook pages. **The city records are not touched.**', notebook: `${NB} · cell 71` } }),
@@ -234,3 +234,24 @@ export const LAB2_CHAPTERS: { name: string; pages: SceneDef[] }[] = [
 ];
 
 export const chapter1: SceneDef[] = LAB2_CHAPTERS.flatMap((c) => c.pages);
+
+/**
+ * The pages of one group (the clicks of one picture) keep one footer height: the picture above never moves or rescales
+ * between clicks (owner, 30 Oct: 2.4, 2.4a and 2.4b). The height is the tallest footer in the group.
+ */
+const footerHeight = (p: L2Props): number => {
+  const row = Math.max(p.next && p.takeaway ? 104 : 0, p.terms?.length ? 46 + p.terms.length * 34 : 0);
+  return row + (p.next ? 50 : 0) + (row || p.next ? 14 : 0);
+};
+const byGroup = new Map<string, SceneDef[]>();
+for (const s of chapter1) if (s.overlayGroup) byGroup.set(s.overlayGroup, [...(byGroup.get(s.overlayGroup) ?? []), s]);
+for (const pages of byGroup.values()) {
+  const props = pages.map((s) => s.overlayProps as unknown as L2Props);
+  // a click without a glossary chip borrows the group's, so the footer is never an empty strip on one click and full on the next
+  const terms = props.find((p) => p.terms?.length)?.terms;
+  if (terms) for (const p of props) if (!p.terms?.length) p.terms = terms;
+  // reserve one height only when every click has a footer; a group with none on some click keeps the picture's full height
+  if (pages.length < 2 || props.some((p) => !p.terms?.length && !(p.next && p.takeaway))) continue;
+  const h = Math.max(...props.map(footerHeight));
+  for (const p of props) p.footerH = h;
+}
