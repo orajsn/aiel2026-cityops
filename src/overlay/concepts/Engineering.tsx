@@ -298,8 +298,8 @@ function Step({ n, last, children }: { n: number; last?: boolean; children: Reac
   );
 }
 
-const stepTitle = { fontSize: 23, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.3, marginBottom: 12 } as const;
-const bubble = { fontSize: 20, fontStyle: 'italic', padding: '12px 20px', borderRadius: 14, background: 'rgba(127, 127, 127, 0.14)', color: 'var(--ink)' } as const;
+const stepTitle = { fontSize: 26, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.3, marginBottom: 12 } as const;
+const bubble = { fontSize: 22, fontStyle: 'italic', padding: '12px 20px', borderRadius: 14, background: 'rgba(127, 127, 127, 0.14)', color: 'var(--ink)' } as const;
 
 function MemorySteps() {
   return (
@@ -335,7 +335,7 @@ function MemorySteps() {
           <MiniGlass w={64} layers={0} />
           <Arrow delay={stepAt(2) + 0.5} w={64} />
           <Cylinder w={64} />
-          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--teal)', lineHeight: 1.3, marginLeft: 8 }}>The 25% is its own record,<br />so a summary can’t drop it.</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--teal)', lineHeight: 1.35, marginLeft: 12 }}>The 25% is its own record,<br />so a summary can’t drop it.</div>
         </div>
       </Step>
     </div>
@@ -526,8 +526,8 @@ export function Discipline({ kicker, message, which, notebook }: DisciplineProps
   const e = EVERYDAY[which];
   return (
     <WidePanel wide kicker={kicker} message={message} notebook={notebook} testId="discipline">
-      <Fill>
-      <div data-which={which} style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 4fr) minmax(0, 3fr) minmax(0, 3fr)', gap: 0, marginTop: 10, borderTop: '1px solid var(--line)', paddingTop: 20 }}>
+      <Fill style={{ overflowY: 'hidden' }}>
+      <div data-which={which} style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 25fr) minmax(0, 45fr) minmax(0, 30fr)', gap: 0, marginTop: 4, borderTop: '1px solid var(--line)', paddingTop: 14 }}>
         <div style={{ paddingRight: 26, borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column' }}>
           <div style={label}>In everyday life</div>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
