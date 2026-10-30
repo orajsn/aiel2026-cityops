@@ -228,8 +228,12 @@ export function WhatProves({ kinds }: { kinds: string[] }) {
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly' }}>
             {kinds.map((k, i) => (
               <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1.5px dashed rgba(127,127,127,0.3)', padding: '6px 0' }}>
-                <span style={{ width: 28, height: 28, borderRadius: 6, border: `2px solid ${G}`, flex: 'none', position: 'relative' }}>
-                  <motion.svg initial={{ opacity: 0, scale: 0.4 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: landAt(i), duration: 0.3 }} width={28} height={28} viewBox="0 0 28 28" style={{ position: 'absolute', left: -2, top: -2 }} aria-hidden>
+                {/* the empty box and the tick share one 28 px square, so the tick lands exactly on the box */}
+                <span style={{ width: 28, height: 28, flex: 'none', position: 'relative' }}>
+                  <svg width={28} height={28} viewBox="0 0 28 28" style={{ position: 'absolute', inset: 0 }} aria-hidden>
+                    <rect x="1" y="1" width="26" height="26" rx="6" fill="none" stroke={G} strokeWidth={2} />
+                  </svg>
+                  <motion.svg initial={{ opacity: 0, scale: 0.4 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: landAt(i), duration: 0.3 }} width={28} height={28} viewBox="0 0 28 28" style={{ position: 'absolute', inset: 0 }} aria-hidden>
                     <rect x="0" y="0" width="28" height="28" rx="6" fill={T} />
                     <path d="M7 14.5l5 5 9-10" stroke="#fff" strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" />
                   </motion.svg>
