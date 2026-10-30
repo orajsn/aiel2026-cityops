@@ -1133,9 +1133,9 @@ export function FirstRun(p: L2Props) {
             </motion.div>
           ) : (
             <motion.div key="trace" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease: EASE }} style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)', gap: 18 }}>
-              <div data-part={4} style={{ ...card(focusN === 4), opacity: lit(4) ? 1 : 0.4, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div data-part={2} style={{ ...card(focusN === 2), opacity: lit(2) ? 1 : 0.4, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Num n={4} on={lit(4)} size={30} />
+                  <Num n={2} on={lit(2)} size={30} />
                   <span style={cap}>Trace · cumulative ms · cell 79 · ● call ○ result</span>
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-around' }}>
@@ -1157,9 +1157,9 @@ export function FirstRun(p: L2Props) {
                   </div>
                 </div>
               </div>
-              <div data-part={5} style={{ ...card(focusN === 5), opacity: lit(5) ? 1 : 0.4, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div data-part={3} style={{ ...card(focusN === 3), opacity: lit(3) ? 1 : 0.4, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Num n={5} on={lit(5)} size={30} />
+                  <Num n={3} on={lit(3)} size={30} />
                   <span style={cap}>Quality checks</span>
                 </div>
                 {CHECKS_RUN.map((c, i) => (

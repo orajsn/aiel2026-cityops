@@ -176,13 +176,16 @@ export const LAB2_FOCUS: Record<string, FocusStep[]> = {
     { cell: 75, lines: [[7, 11]], n: 3, label: 'The report form', note: 'the procedure, the rule, the report form' },
     { cell: 75, lines: [[14, 14]], n: 3, label: 'AGENT_SYSTEM assembled', output: true },
   ],
-  // §5.6 · the first run (cell 77), §5.7 · the answer, the trace and the checks (cell 79)
-  '2.7h': [
+  // §5.6 · the first run (cell 77), §5.7 · the answer (cell 79): page 2.7g shows the run, the rule and the stored note
+  '2.7g': [
     { cell: 77, lines: [[125, 127]], n: 1, label: 'Run the agent on the crack report', output: true },
     { cell: 75, lines: [[10, 11]], n: 2, label: 'remember comes before the final answer', note: 'remember must be called before the final answer' },
     { cell: 79, lines: [[1, 1]], n: 3, label: 'The answer', output: true },
-    { cell: 79, lines: [[2, 3]], n: 4, label: 'The trace' },
-    { cell: 79, lines: [[4, 5]], n: 5, label: 'The quality checks', output: true },
+  ],
+  // page 2.7h, the same run seen two ways: the trace (2) and the quality checks (3)
+  '2.7h': [
+    { cell: 79, lines: [[2, 3]], n: 2, label: 'The trace' },
+    { cell: 79, lines: [[4, 5]], n: 3, label: 'The quality checks', output: true },
   ],
   // §5.8 · the key you save under decides what you find (cell 81)
   '2.8': [
