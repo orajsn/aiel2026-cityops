@@ -194,7 +194,7 @@ const b215 = atRust('3.15', 'With and without memory', 'WithWithout', {
 } satisfies WithWithoutProps);
 const b215b = atRust('3.15b', 'The four failures, solved', 'FailuresSolved', { kicker: 'Back to the glass', message: 'The four failures from the glass, **solved**.' } satisfies EndingProps);
 // 3.15c · the full memory map, moved from the start of the lab (owner, 28 Oct): after the hands-on its layers mean something (notebook cell 90)
-const b215c = atRust('3.15c', 'What you built', 'MemoryMap', { kicker: 'Kinds of memory', step: 5, message: 'The full memory map: **what you actually built** today.', notebook: `${NB} · Memory types - what you actually built` } satisfies MemoryMapProps);
+const b215c = atRust('3.15c', 'What you built', 'MemoryMap', { kicker: 'Kinds of memory', step: 5, built: true, message: 'The full memory map: **what you actually built** today.', notebook: `${NB} · Memory types - what you actually built` } satisfies MemoryMapProps);
 
 const b216 = atRust('3.16', 'Where both labs meet', 'LabsMeet', { kicker: 'Where both labs meet', step: 1, message: 'This afternoon the agent had **the rule**. Now it has **the history**.' }, 'meet');
 const b216a = atRust('3.16a', 'Together they make the call', 'LabsMeet', { kicker: 'Where both labs meet', step: 2, message: 'Together they **make the call**.' }, 'meet');
@@ -231,11 +231,11 @@ const b218: SceneDef = {
     kicker: 'Takeaways · all three labs',
     message: 'From an assistant, to an agent, to **an agent that remembers**.',
     steps: [
-      { tag: 'Lab 1 · AI Economics', title: 'An assistant', line: 'the right data, the right model, guardrails', where: 'on the bridge: the repair plan' },
-      { tag: 'Lab 2 · RAG to Agents', title: 'An agent', line: 'decides what to look up across four shapes, says what to do', where: 'on the bridge: the crack' },
-      { tag: 'Lab 3 · Agent Memory', title: 'An agent that remembers', line: 'what Mercer learns on Day 1, Vance knows on Day 2', where: 'on the bridge: the rust' },
+      { tag: 'Lab 1 · AI Economics', title: 'An assistant', line: '**the right data**, **the right model** (model routing), **guardrails**', where: 'on the bridge: the repair plan' },
+      { tag: 'Lab 2 · RAG to Agents', title: 'An agent', line: '**decides what to look up** across four shapes, and says what to do', where: 'on the bridge: the crack' },
+      { tag: 'Lab 3 · Agent Memory', title: 'An agent that remembers', line: '**how to make an agent remember**: what Mercer learns on Day 1, Vance knows on Day\u00a02', where: 'on the bridge: the rust' },
     ],
-    foundation: 'One Oracle AI Database under all three',
+    foundation: 'One Oracle AI Database, ready for AI workloads, under all three',
     quiz: ['5 minutes', '80% to pass', 'a badge'],
   } satisfies AllLabsProps as unknown as Record<string, unknown>,
 };

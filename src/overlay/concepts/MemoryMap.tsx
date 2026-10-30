@@ -9,6 +9,8 @@ export interface MemoryMapProps {
   /** how far the map is built, 1 to 5, the same order as the Lab 3 deck's slides 19 to 23 */
   step: 1 | 2 | 3 | 4 | 5;
   notebook?: string;
+  /** 3.15c: the finished map as what the lab built; what the agent framework keeps stays grey and dashed, with a key under it */
+  built?: boolean;
 }
 
 /** short-term memory is grey (it does not last), long-term and shared memory teal (it is kept) */
@@ -23,7 +25,10 @@ const LINE = '#8a919c';
  * 5 coordination and shared memory. The pages share one panel (overlayGroup), so each click only adds
  * its part; whatever is already there stays still.
  */
-export function MemoryMap({ kicker, message, step, notebook }: MemoryMapProps) {
+/** the parts the notebook leaves to the agent framework (its own closing line: tools, workflows and caching) */
+const FRAMEWORK = ['Semantic cache', 'Workflow', 'Toolbox'];
+
+export function MemoryMap({ kicker, message, step, notebook, built = false }: MemoryMapProps) {
   // a part from an earlier click shows at once (when the map is opened mid-way), the new part draws in
   const t = (s: number, order: number) => (s < step ? 0 : 0.3 + order * 0.16);
   // every part gets its own key from its place in the source (the same on every click), so React keeps it
@@ -50,7 +55,7 @@ export function MemoryMap({ kicker, message, step, notebook }: MemoryMapProps) {
     ) : null;
 
   return (
-    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="memory-map" step={step}>
+    <WidePanel wide={built} kicker={kicker} message={message} notebook={notebook} testId="memory-map" step={step}>
         {/* the map fills the body, as large as its shape allows, centred */}
         <svg viewBox="0 0 1400 600" width="100%" height="100%" style={{ flex: 1, minHeight: 360, display: 'block', overflow: 'visible', fontFamily: 'inherit' }} role="img" aria-label="Classification of agent memory">
           <defs>
@@ -78,7 +83,7 @@ export function MemoryMap({ kicker, message, step, notebook }: MemoryMapProps) {
           {P(1, 0, <Box x={20} y={262} w={170} h={70} fill="var(--teal)" stroke="var(--teal)" lines={['Agent memory']} size={22} ink="#ffffff" />)}
           {P(1, 1, <Box x={250} y={40} w={250} h={70} {...GREY} lines={['Short-term', 'memory (STM)']} size={22} bold />)}
           {P(1, 2, <Box x={560} y={30} w={250} h={44} {...GREY} lines={['Working memory']} size={19} />)}
-          {P(1, 2, <Box x={560} y={86} w={250} h={44} {...GREY} lines={['Semantic cache']} size={19} />)}
+          {P(1, 2, <Box x={560} y={86} w={250} h={44} {...GREY} lines={['Semantic cache']} size={19} off={built} />)}
           {P(1, 4, <Layer x={880} y={8} h={128} name="Runtime layer" color={GREY.stroke} items={['LLM context window', 'Session memory']} first={44} gap={44} itemH={36} tone={GREY} />)}
 
           {/* click 2: long-term memory */}
@@ -90,7 +95,7 @@ export function MemoryMap({ kicker, message, step, notebook }: MemoryMapProps) {
           {P(3, 2, <Box x={560} y={358} w={250} h={70} {...TEAL} lines={['Semantic']} size={20} note="Harbor Bridge and the right pier" />)}
 
           {/* click 4: the layers they live in */}
-          {P(4, 0, <Layer x={880} y={148} h={116} name="Execution layer" color={TEAL.stroke} items={['Workflow', 'Toolbox']} first={36} gap={40} itemH={34} tone={TEAL} />)}
+          {P(4, 0, <Layer x={880} y={148} h={116} name="Execution layer" color={TEAL.stroke} items={['Workflow', 'Toolbox']} first={36} gap={40} itemH={34} tone={TEAL} off={built ? FRAMEWORK : []} />)}
           {P(4, 1, <Layer x={880} y={276} h={156} name="Experience layer" color={TEAL.stroke} items={['Tool logs', 'Conversations', 'Summaries']} first={36} gap={40} itemH={34} tone={TEAL} />)}
           {P(4, 2, <Layer x={880} y={444} h={150} name="Knowledge layer" color={TEAL.stroke} items={['Knowledge base', 'Entity memory', 'Persona memory']} first={36} gap={40} itemH={34} tone={TEAL} />)}
 
@@ -98,18 +103,29 @@ export function MemoryMap({ kicker, message, step, notebook }: MemoryMapProps) {
           {P(5, 0, <Box x={250} y={480} w={250} h={70} {...TEAL} lines={['Coordination']} size={22} bold />)}
           {P(5, 1, <Box x={560} y={490} w={250} h={50} {...TEAL} lines={['Shared memory']} size={20} />)}
         </svg>
-
+        {built && (
+          <div data-key style={{ flex: 'none', display: 'flex', gap: 48, justifyContent: 'center', alignItems: 'center', fontSize: 24, color: 'var(--ink)', paddingBottom: 6 }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ width: 44, height: 26, borderRadius: 7, background: TEAL.fill, border: `2px solid ${TEAL.stroke}` }} />
+              built today with <b className="mono" style={{ fontSize: 22 }}>oracleagentmemory</b>, in one database
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ width: 44, height: 26, borderRadius: 7, border: `2px dashed ${GREY.stroke}` }} />
+              left to your agent framework
+            </span>
+          </div>
+        )}
     </WidePanel>
   );
 }
 
-function Box({ x, y, w, h, fill, stroke, lines, size, bold = false, ink = 'var(--ink)', note }: { x: number; y: number; w: number; h: number; fill: string; stroke: string; lines: string[]; size: number; bold?: boolean; ink?: string; note?: string }) {
+function Box({ x, y, w, h, fill, stroke, lines, size, bold = false, ink = 'var(--ink)', note, off = false }: { x: number; y: number; w: number; h: number; fill: string; stroke: string; lines: string[]; size: number; bold?: boolean; ink?: string; note?: string; off?: boolean }) {
   const lh = size * 1.18;
   const block = lines.length * lh + (note ? 22 : 0);
   const top = y + (h - block) / 2 + size * 0.86;
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} rx={12} fill={fill} stroke={stroke} strokeWidth={2} />
+      <rect x={x} y={y} width={w} height={h} rx={12} fill={off ? 'none' : fill} stroke={stroke} strokeWidth={2} strokeDasharray={off ? '7 5' : undefined} />
       {lines.map((l, i) => (
         <text key={i} x={x + w / 2} y={top + i * lh} textAnchor="middle" fontSize={size} fontWeight={bold ? 700 : 600} fill={ink}>
           {l}
@@ -124,7 +140,7 @@ function Box({ x, y, w, h, fill, stroke, lines, size, bold = false, ink = 'var(-
   );
 }
 
-function Layer({ x, y, h, name, color, items, first, gap, itemH, tone }: { x: number; y: number; h: number; name: string; color: string; items: string[]; first: number; gap: number; itemH: number; tone: { fill: string; stroke: string } }) {
+function Layer({ x, y, h, name, color, items, first, gap, itemH, tone, off = [] }: { off?: string[]; x: number; y: number; h: number; name: string; color: string; items: string[]; first: number; gap: number; itemH: number; tone: { fill: string; stroke: string } }) {
   return (
     <g>
       <rect x={x} y={y} width={500} height={h} rx={14} fill="none" stroke={color} strokeWidth={2} strokeDasharray="7 6" />
@@ -133,7 +149,7 @@ function Layer({ x, y, h, name, color, items, first, gap, itemH, tone }: { x: nu
       </text>
       {items.map((it, i) => (
         <g key={it}>
-          <rect x={x + 20} y={y + first + i * gap} width={460} height={itemH} rx={9} fill={tone.fill} stroke={tone.stroke} strokeWidth={1.5} />
+          <rect x={x + 20} y={y + first + i * gap} width={460} height={itemH} rx={9} fill={off.includes(it) ? 'none' : tone.fill} stroke={off.includes(it) ? GREY.stroke : tone.stroke} strokeWidth={1.5} strokeDasharray={off.includes(it) ? '7 5' : undefined} />
           <text x={x + 250} y={y + first + i * gap + itemH / 2 + 6} textAnchor="middle" fontSize={18} fontWeight={500} fill="var(--ink)">
             {it}
           </text>

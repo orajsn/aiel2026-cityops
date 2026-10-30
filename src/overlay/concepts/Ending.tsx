@@ -40,31 +40,50 @@ export function WithWithout({ kicker, message, notebook, question, without, with
     { from: 'person', text: question },
     { from: 'copilot', text: answer },
   ];
+  const head = (text: string, color: string) => <div style={{ fontSize: 22, fontWeight: 700, color, marginBottom: 14, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{text}</div>;
   return (
-    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="with-without">
-      <Fill justify="space-evenly" gap={24}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, marginTop: 8 }}>
-          <div data-side="without">
-            <div style={{ fontSize: 25, fontWeight: 700, color: 'var(--ink-dim)', marginBottom: 12, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Without memory</div>
-            {/* the chat window is laid out for a side panel: shown larger here, where the page has the room */}
-            <div style={{ zoom: 1.35 }}>
-              <ChatWindow items={chat(without)} testId="chat-without" />
+    <WidePanel wide kicker={kicker} message={message} notebook={notebook} testId="with-without">
+      <Fill style={{ overflowY: 'hidden' }}>
+        {/* the Lab 3 teaching layout (3.4): the two answers, then what changes as a numbered line */}
+        <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 30fr) minmax(0, 36fr) minmax(0, 34fr)', marginTop: 4, borderTop: '1px solid var(--line)', paddingTop: 14 }}>
+          <div data-side="without" style={{ paddingRight: 24, borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column' }}>
+            {head('Without memory', 'var(--ink-dim)')}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingBottom: 40 }}>
+              <div style={{ zoom: 1.2, filter: 'grayscale(0.6)' }}>
+                <ChatWindow items={chat(without)} testId="chat-without" />
+              </div>
+              <div style={{ marginTop: 26, fontSize: 26, color: 'var(--ink-dim)' }}>Every chat starts from zero.</div>
             </div>
           </div>
-          <div data-side="with">
-            <div style={{ fontSize: 25, fontWeight: 700, color: 'var(--teal)', marginBottom: 12, letterSpacing: '0.06em', textTransform: 'uppercase' }}>With memory</div>
-            <div style={{ zoom: 1.35 }}>
-              <ChatWindow items={chat(withMemory)} testId="chat-with" />
+          <div data-side="with" style={{ padding: '0 24px', borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column' }}>
+            {head('With memory', 'var(--teal)')}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingBottom: 40 }}>
+              <div style={{ zoom: 1.2 }}>
+                <ChatWindow items={chat(withMemory)} testId="chat-with" />
+              </div>
+              <div style={{ marginTop: 26, fontSize: 26, color: 'var(--ink)' }}>Mercer’s finding is <b className="hl">fetched from memory</b>.</div>
             </div>
           </div>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
-          {COMPARE_ROWS.map((r, i) => (
-            <motion.div key={r} data-row={r} style={{ display: 'flex', alignItems: 'center', gap: 18, padding: '24px 26px', borderRadius: 14, background: TEAL_TINT, border: '2px solid var(--teal)', fontSize: 27, color: 'var(--ink)' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.6 + i * 0.25, duration: 0.45, ease: EASE }}>
-              <LineIcon name={ROW_ICONS[i]} size={44} />
-              {r}
-            </motion.div>
-          ))}
+          <div style={{ paddingLeft: 24, display: 'flex', flexDirection: 'column' }}>
+            {head('What changes', 'var(--ink-dim)')}
+            <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+              {COMPARE_ROWS.map((r, i) => {
+                const last = i === COMPARE_ROWS.length - 1;
+                return (
+                  <motion.div key={r} data-row={r} style={{ flex: last ? 'none' : '1 0 auto', display: 'grid', gridTemplateColumns: '50px 1fr', columnGap: 18 }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 + i * 0.5, duration: 0.45, ease: EASE }}>
+                    <div style={{ position: 'relative' }}>
+                      <span style={{ width: 50, height: 50, borderRadius: '50%', background: 'var(--teal)', color: '#fff', fontWeight: 700, fontSize: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{i + 1}</span>
+                      {!last && <span style={{ position: 'absolute', left: 24, top: 56, bottom: 6, borderLeft: '2.5px dotted var(--teal)' }} />}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, paddingBottom: last ? 0 : 20 }}>
+                      <LineIcon name={ROW_ICONS[i]} size={44} />
+                      <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.25, paddingTop: 8 }}>{r}</div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </Fill>
     </WidePanel>

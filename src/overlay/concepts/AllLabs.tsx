@@ -5,6 +5,7 @@ import { Db, Doc, Portrait, SitePhoto } from './ThreeLabs';
 import { QuizCard } from './Ending';
 import { ArrowRight, DIM, INK, SHAPES, TEAL, TEAL_D, TINT, fadeIn, pop } from './Recap';
 import { FlowDown, Shield } from './lab1/parts';
+import { Rich } from '../Rich';
 
 /**
  * 3.18 · Takeaways of all three labs, the last page of the show (owner approved Flow318V3, 29 Oct): a tight
@@ -62,7 +63,7 @@ function AgentPicture({ t }: { t: number }) {
             <span style={{ position: 'absolute', left: 43, top: 6, width: 14, height: 14, borderRadius: '50%', background: TEAL }} />
           </motion.div>
         </motion.div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'auto auto', gap: 5 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'auto auto', gap: 5, minWidth: 0 }}>
           {SHAPES.map((s, i) => (
             <motion.div key={s.title} {...pop(t + 1 + i * 0.15)} style={{ background: TINT, borderRadius: 9, padding: '5px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
               {s.icon}
@@ -104,25 +105,24 @@ function MemoryPicture({ t }: { t: number }) {
 }
 
 const PICTURES = [AssistantPicture, AgentPicture, MemoryPicture];
-const HEIGHTS = [88, 94, 100];
 
 function Stair({ n, step, children }: { n: number; step: AllLabsProps['steps'][number]; children: ReactNode }) {
   const t = STEP_AT[n];
   return (
     <motion.div
       data-stair={n + 1}
-      style={{ flex: 1, minWidth: 0, height: `${HEIGHTS[n]}%`, transformOrigin: 'bottom', borderRadius: '14px 14px 0 0', background: `linear-gradient(180deg, rgba(27,138,156,${0.06 + n * 0.05}), rgba(27,138,156,${0.16 + n * 0.05}))`, border: `2px solid ${TEAL}`, borderBottom: 0, padding: '16px 14px 14px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}
+      style={{ flex: 1, minWidth: 0, height: '100%', transformOrigin: 'bottom', borderRadius: 14, background: `linear-gradient(180deg, rgba(27,138,156,${0.06 + n * 0.05}), rgba(27,138,156,${0.16 + n * 0.05}))`, border: `2px solid ${TEAL}`, padding: '16px 14px 14px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}
       initial={{ scaleY: 0, opacity: 0 }}
       animate={{ scaleY: 1, opacity: 1 }}
       transition={{ delay: t, duration: 0.9, ease: EASE }}
     >
       <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.1em', color: TEAL_D, textTransform: 'uppercase' }}>{step.tag}</div>
-      <div style={{ fontSize: 30, fontWeight: 700, marginTop: 4, lineHeight: 1.15, color: INK }}>{step.title}</div>
+      <div style={{ fontSize: 30, fontWeight: 700, marginTop: 4, lineHeight: 1.15, color: INK, minHeight: '2.3em' }}>{step.title}</div>
       <motion.div {...fadeIn(t + 0.6)} style={{ flex: 1, minHeight: 0, margin: '14px 0', borderRadius: 12, background: 'var(--panel-strong)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         {/* the picture grows with the step */}
-        <div style={{ zoom: 1.2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>{children}</div>
+        <div style={{ zoom: 1.1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>{children}</div>
       </motion.div>
-      <div style={{ fontSize: 20, lineHeight: 1.35, color: INK }}>{step.line}</div>
+      <div style={{ fontSize: 21, lineHeight: 1.35, color: INK, minHeight: '4.05em' }}><Rich text={step.line} /></div>
       <div style={{ fontSize: 15, color: DIM, marginTop: 4 }}>{step.where}</div>
     </motion.div>
   );
@@ -133,8 +133,8 @@ export function AllLabs({ kicker, message, steps, foundation, quiz }: AllLabsPro
     <WidePanel kicker={kicker} message={message} testId="all-labs" kickerColor="var(--teal)">
       <div style={{ display: 'flex', gap: 24, flex: 1, minHeight: 0, marginTop: 6 }}>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-          {/* the staircase: no empty gap, each lab one step up */}
-          <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', flex: 1, minHeight: 0 }}>
+          {/* three cards of one height, each rising in turn; the foundation stands apart under them */}
+          <div style={{ display: 'flex', gap: 6, alignItems: 'stretch', flex: 1, minHeight: 0, marginBottom: 20 }}>
             {steps.map((s, i) => {
               const Picture = PICTURES[i];
               return [
@@ -151,7 +151,7 @@ export function AllLabs({ kicker, message, steps, foundation, quiz }: AllLabsPro
           </div>
           <motion.div
             data-foundation
-            style={{ height: 66, flex: 'none', transformOrigin: 'left', borderRadius: '0 0 14px 14px', background: TEAL, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 25, fontWeight: 700 }}
+            style={{ height: 66, flex: 'none', transformOrigin: 'left', borderRadius: 14, background: TEAL, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 25, fontWeight: 700 }}
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ delay: FOUNDATION_AT, duration: 1.1, ease: EASE }}

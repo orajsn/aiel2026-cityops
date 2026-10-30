@@ -80,7 +80,7 @@ export function DeskCabinet({ kicker, message, step, notebook }: DeskCabinetProp
 const SWEEP_MS = 1300;
 
 /** the desk is a wooden table (owner, 29 Oct: "context window is like table so brown"); muted wood, never orange */
-const WOOD = { top: '#a47b55', edge: '#7d5a3c', leg: '#6b4c33', grain: 'rgba(255, 255, 255, 0.07)' };
+const WOOD = { top: '#a47b55', edge: '#7d5a3c', leg: '#6b4c33' };
 
 /** a wooden table seen a little from above: the top (where the cards lie), its front edge, two legs */
 function Table({ width, children, label, top }: { width: number; children: ReactNode; label: ReactNode; /** a fixed height for the top; by default it takes its column's height */ top?: number }) {
@@ -96,8 +96,7 @@ function Table({ width, children, label, top }: { width: number; children: React
           display: 'flex',
           flexDirection: 'column',
           borderRadius: '14px 14px 4px 4px',
-          background: `repeating-linear-gradient(90deg, ${WOOD.top} 0 120px, ${WOOD.grain} 120px 122px, ${WOOD.top} 122px 240px)`,
-          backgroundColor: WOOD.top,
+          background: WOOD.top,
           padding: '20px 22px 22px',
           boxShadow: `inset 0 2px 0 rgba(255,255,255,0.18)`,
           overflow: 'hidden',
