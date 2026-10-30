@@ -3,6 +3,7 @@ import { LAB_STOPS, stopCells } from '../content/labStops';
 import { guideSteps } from '../content/labGuide';
 import { handsOnTaskCount } from '../content/lab1HandsOn';
 import { LAB2_FOCUS } from '../content/lab2Focus';
+import { NB_PAGES } from '../content/lab2Notebook';
 import { useSceneStore } from './store';
 
 /**
@@ -63,8 +64,8 @@ function runsHere(): number {
 
 /* ---------- Lab 2's notebook focus (src/content/lab2Focus.ts): the same line for every Next and Back ---------- */
 
-/** how many focus steps a page has (0: none, the page behaves as before) */
-export const focusStepCount = (id: string): number => LAB2_FOCUS[id]?.length ?? 0;
+/** how many focus steps a page has (0: none, the page behaves as before). A notebook page (lab2Notebook.ts) shows its first step at once, so Next has one fewer */
+export const focusStepCount = (id: string): number => (NB_PAGES[id] ? NB_PAGES[id].steps.length - 1 : LAB2_FOCUS[id]?.length ?? 0);
 
 /** the focus page on screen now, once its camera has arrived */
 function focusHere(): number {

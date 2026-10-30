@@ -1,3 +1,4 @@
+import { NB_PAGES } from '../../src/content/lab2Notebook';
 import { fireEvent, render } from '@testing-library/react';
 import { highlightPython } from '../../src/overlay/jupyter/highlight';
 import { LAB_STOPS, stopCells, todoLines } from '../../src/content/labStops';
@@ -74,7 +75,7 @@ test('every code cell of both notebooks is in a stop', () => {
 });
 
 test('the drawer never shows a word the screen must not show', () => {
-  for (const id of Object.keys(LAB_STOPS)) {
+  for (const id of Object.keys(LAB_STOPS).filter((k) => !NB_PAGES[k])) {
     const { container, getByRole, unmount } = render(<JupyterDrawer sceneId={id} />);
     fireEvent.click(getByRole('button', { name: /(run|open) in jupyter/i }));
     expect(container.textContent, id).not.toMatch(/Kirkland|\bMEA\b|\bMWA\b|\bBMA\b|fictional/);

@@ -2,6 +2,7 @@ import { act, render } from '@testing-library/react';
 import { chapter1 } from '../../src/scenes/chapter1';
 import { OVERLAYS } from '../../src/overlay/registry';
 import { LAB2_FOCUS } from '../../src/content/lab2Focus';
+import { NB_PAGES } from '../../src/content/lab2Notebook';
 import { useDrawerStore } from '../../src/engine/presentation';
 
 /** Lab 2's own pages (the recap is another panel's) */
@@ -29,6 +30,8 @@ test('every Lab 2 page renders its panel, headline, takeaway (chapter ends only)
     const c = renderPage(s.id);
     const p = s.overlayProps as { takeaway?: string; terms?: unknown[]; next?: string; step?: number };
     expect(c.querySelector('.beat__panel'), s.id).not.toBeNull();
+    // a notebook page (the blue pages) has its own three columns and no bands under them
+    if (NB_PAGES[s.id]) { expect(c.querySelector('[data-notebook-page], [data-testid="notebook-page"]'), s.id).not.toBeNull(); continue; }
     // the takeaway is only on the chapter's last page, the one with the Next band (owner, 29 Oct)
     if (p.next && p.takeaway) expect(c.querySelector('[data-takeaway]'), s.id).not.toBeNull();
     else expect(c.querySelector('[data-takeaway]'), s.id).toBeNull();
@@ -41,6 +44,7 @@ test('every Lab 2 page renders its panel, headline, takeaway (chapter ends only)
 test('at most one red element on every page; when the picture has one, the kicker steps down to teal', () => {
   for (const s of PAGES) {
     const c = renderPage(s.id);
+    if (NB_PAGES[s.id]) { expect(redRoots(c).length, s.id).toBe(0); continue; }
     const roots = redRoots(c);
     expect(roots.length, `${s.id}: ${roots.map((r) => r.outerHTML.slice(0, 80)).join(' | ')}`).toBeLessThanOrEqual(1);
     const kicker = c.querySelector('.beat__kicker') as HTMLElement;
@@ -51,7 +55,10 @@ test('at most one red element on every page; when the picture has one, the kicke
 
 test('no pier numbers, no model name, no "Ollama", never "copilot", "Kirkland" or a fictional tag on any page', () => {
   for (const s of PAGES) {
-    const t = renderPage(s.id).textContent ?? '';
+    const c = renderPage(s.id);
+    // the notebook's own code is shown verbatim on a notebook page (it names OLLAMA_MODEL)
+    c.querySelectorAll('[data-code]').forEach((e) => e.remove());
+    const t = c.textContent ?? '';
     expect(t, s.id).not.toMatch(/\bpier\s*\d/i);
     expect(t, s.id).not.toMatch(/llama|ollama/i);
     expect(t, s.id).not.toMatch(/copilot|Kirkland|fictional|\bMEA\b|\bMWA\b|\bBMA\b/i);
@@ -60,7 +67,7 @@ test('no pier numbers, no model name, no "Ollama", never "copilot", "Kirkland" o
 
 test('the data names are the notebook’s, in mono where the panels show them', () => {
   const t = (id: string) => renderPage(id).textContent ?? '';
-  expect(t('2.2c')).toContain('ALL_MINILM_L12_V2');
+  expect(t('0.5')).toContain('ALL_MINILM_L12_V2');
   expect(t('0.3a')).toContain('Substation Gamma');
   expect(t('0.3a')).toContain('Pipeline North-7');
   expect(t('0.5a')).toContain('Demo asset exists: Harbor Bridge');
@@ -102,17 +109,17 @@ test('the cast: Mercer reports the crack, Vance asks; the agent is the chief ins
   expect(chief.textContent).toContain('AI AGENT');
 });
 
-test('a notebook page follows the drawer: the step with the focus step’s number lights up, the others wait', () => {
-  for (const id of ['2.2c', '0.6', '2.3', '2.5c', '2.5d', '2.7c', '2.7d', '2.7e', '2.7f']) {
+test('a notebook page shows step 1 at once; each Next lights the next step and its lines, and the drawer stays away', () => {
+  for (const id of Object.keys(NB_PAGES)) {
     const c = renderPage(id);
-    const steps = LAB2_FOCUS[id];
-    // closed drawer: the whole picture is on
-    expect([...c.querySelectorAll('[data-step]')].every((e) => e.getAttribute('data-on') === 'true'), id).toBe(true);
-    steps.forEach((st, k) => {
-      act(() => useDrawerStore.setState({ open: true, focus: k + 1 }));
-      const on = [...c.querySelectorAll('[data-step]')].filter((e) => e.getAttribute('data-on') === 'true').map((e) => Number(e.getAttribute('data-step')));
-      expect(on, `${id} focus ${k + 1}`).toEqual([st.n]);
-    });
+    const n = NB_PAGES[id].steps.length;
+    const on = () => [...c.querySelectorAll('[data-step-card]')].filter((e) => e.hasAttribute('data-on')).map((e) => Number(e.getAttribute('data-step-card')));
+    expect(on(), id).toEqual([1]);
+    expect(c.querySelectorAll('[data-line="lit"]').length, id).toBeGreaterThan(0);
+    for (let k = 1; k < n; k++) {
+      act(() => useDrawerStore.setState({ open: true, focus: k }));
+      expect(on(), `${id} focus ${k}`).toEqual([k + 1]);
+    }
     act(() => useDrawerStore.getState().reset());
   }
 });

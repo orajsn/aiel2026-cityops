@@ -45,6 +45,10 @@ A deterministic, offline, click-through 3D web experience for two Oracle LiveLab
 - **If you are a session running on the VM:** you are editing the live site the audience sees, so every saved file shows at once. Commit your own work and `git push origin main`, so the PC gets it on its next sync. Do not run `tools/sync-vm.sh` there (it is for the PC). Page previews (`tools/capture-thumbs.mjs`) need the PC's headless browser.
 - **The PC copy** (`C:\Users\UsEr\claude\cityops-live`, port 5174) is the development copy; its Cloudflare quick tunnel is the old way to share and no longer needed.
 
+## Lab 2 notebook pages (owner, 30 Oct)
+
+The 18 blue pages of the Harbor Bridge deck (0.6, 2.2c, 2.2d, 2.3, 2.3a, 2.4f-h, 2.5c, 2.5d, 2.6b, 2.6c, 2.7, 2.7c-f, 2.8) use overlay `L2Notebook` (`lab2/NotebookPage.tsx`): everyday picture | numbered steps | only the key notebook lines, with an animated line from the step to its lines. Steps and lines are data in `src/content/lab2Notebook.ts` (`NB_PAGES`); pictures in `nbArtA.tsx`/`nbArtB.tsx`. Step 1 shows at once, each Next lights the next step (`focusStepCount` = steps - 1), and the Jupyter drawer does not open on these pages.
+
 ## Open items (26 Oct)
 
 - Page 0's script line ("Good afternoon. Below us is Bangkok, from above. Let us fly down.") is a draft for the owner to reword.
