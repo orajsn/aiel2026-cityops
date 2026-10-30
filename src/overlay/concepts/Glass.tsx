@@ -32,9 +32,9 @@ export const CURATION: { word: string; title: string; text: string; icon: IconNa
   { word: 'Timing', title: 'The right memory, at the wrong moment', text: 'Her finding was loaded at the start, not fetched again when Vance asked.', icon: 'clock' },
 ];
 
-const GREY_LINE = '#8a919c';
-const GREY_FILL = 'rgba(138, 145, 156, 0.28)';
-const TEAL_FILL = 'rgba(27, 138, 156, 0.30)';
+export const GREY_LINE = '#8a919c';
+export const GREY_FILL = 'rgba(138, 145, 156, 0.28)';
+export const TEAL_FILL = 'rgba(27, 138, 156, 0.30)';
 
 /**
  * 3.3 · The glass: the context window as a tumbler that fills, layer by layer, with everything the model
@@ -196,10 +196,10 @@ function GlassFill() {
 /* ---------- step 2 ---------- */
 
 /** each glass plays for about 2 s, one after another */
-const SLOT = 1.1;
-const START = 0.4;
+export const SLOT = 1.1;
+export const START = 0.4;
 
-const WRONG: { word: string; text: string }[] = [
+export const WRONG: { word: string; text: string }[] = [
   { word: 'Volume', text: 'every tool result piles in; by turn 15 it overflows' },
   { word: 'Relevance', text: '30 search results crowd in, and Mercer’s finding spills out' },
   { word: 'Accuracy', text: 'a summary squeezes her finding to “rust on the pier”: the 25% falls out' },
@@ -209,7 +209,7 @@ const WRONG: { word: string; text: string }[] = [
 /** a tumbler 200 wide, rim at y=40, base at y=230; pieces are drawn inside it */
 const TUMBLER = 'M22 40L44 228Q100 238 156 228L178 40';
 
-function MiniGlass({ word, t0, children }: { word: string; t0: number; children: (t0: number) => ReactNode }) {
+export function MiniGlass({ word, t0, children }: { word: string; t0: number; children: (t0: number) => ReactNode }) {
   return (
     <svg data-glass={word} width={290} height={392} viewBox="0 0 200 270" style={{ overflow: 'visible', width: '100%', maxWidth: 290, height: 'auto' }} aria-hidden="true">
       {children(t0)}
@@ -219,7 +219,7 @@ function MiniGlass({ word, t0, children }: { word: string; t0: number; children:
   );
 }
 
-const pop = (delay: number) => ({ initial: { opacity: 0, y: -14 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.35, ease: EASE } });
+export const pop = (delay: number) => ({ initial: { opacity: 0, y: -14 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.35, ease: EASE } });
 
 const VolumeGlass = (t0: number) => (
   <>

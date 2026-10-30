@@ -75,12 +75,12 @@ export function Train() {
         <rect x="-32" y="140" width="14" height="12" rx="2" fill="#dfe6ea" />
         <rect x="-14" y="140" width="14" height="12" rx="2" fill="#dfe6ea" />
         <rect x="12" y="158" width="8" height="4" fill={G_DARK} />
-        {/* engine */}
-        <rect x="20" y="140" width="46" height="28" rx="4" fill={G_DARK} />
-        <rect x="56" y="122" width="26" height="46" rx="4" fill={G_DARK} />
-        <rect x="61" y="128" width="16" height="12" rx="2" fill="#dfe6ea" />
-        <rect x="28" y="126" width="10" height="14" rx="2" fill={G_DARK} />
-        <path d="M82 168l8 6H20" fill={G_DARK} />
+        {/* engine, facing the way it travels: the cab at the back (left), the boiler, chimney and cowcatcher at the front (right) */}
+        <rect x="20" y="122" width="26" height="46" rx="4" fill={G_DARK} />
+        <rect x="25" y="128" width="16" height="12" rx="2" fill="#dfe6ea" />
+        <rect x="40" y="140" width="44" height="28" rx="4" fill={G_DARK} />
+        <rect x="68" y="124" width="10" height="16" rx="2" fill={G_DARK} />
+        <path d="M84 150l12 18H84z" fill={G_DARK} />
         {/* wheels */}
         {[-28, -2, 30, 50, 72].map((cx) => (
           <g key={cx}>

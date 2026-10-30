@@ -157,9 +157,11 @@ function Clerk() {
       <path d="M82 94v38" stroke="var(--teal)" strokeWidth={3} />
       <rect x="76" y="68" width="12" height="12" rx="5" fill={SKIN2} />
       <Head who="mercer" cx={82} cy={50} r={20} />
-      {/* arm reaching to the folder */}
-      <path d="M100 92c12 2 26 -2 46 -12" stroke={MERCER_TOP} strokeWidth={13} strokeLinecap="round" fill="none" />
-      <circle cx="148" cy="78" r="7" fill={SKIN2} />
+      {/* arm reaching to the folder: it lets go once the folder is in the drawer and draws back (the hand never rides along) */}
+      <motion.g initial={{ x: 0 }} animate={{ x: [0, 0, -34] }} transition={{ delay: 0.6, duration: 2.2, times: [0, 0.55, 1], ease: EASE }}>
+        <path d="M100 92c12 2 26 -2 46 -12" stroke={MERCER_TOP} strokeWidth={13} strokeLinecap="round" fill="none" />
+        <circle cx="148" cy="78" r="7" fill={SKIN2} />
+      </motion.g>
       {/* the folder slides into the open teal drawer */}
       <motion.g initial={{ x: 0, y: 0, opacity: 0 }} animate={{ x: [0, 0, 38], y: [0, 0, 12], opacity: [0, 1, 1] }} transition={{ delay: 0.6, duration: 1.4, ease: EASE }}>
         <g transform="rotate(8 169 71)">
@@ -169,7 +171,6 @@ function Clerk() {
           <rect x="158" y="73" width="22" height="3.5" rx="1.7" fill="rgba(255,255,255,0.85)" />
           <rect x="158" y="82" width="14" height="3.5" rx="1.7" fill="rgba(255,255,255,0.85)" />
         </g>
-        <circle cx="150" cy="78" r="7" fill={SKIN2} />
       </motion.g>
     </svg>
   );
@@ -470,24 +471,37 @@ function HarnessLoop() {
 function Problems({ which }: { which: Which }) {
   const fixes = FIXES[which];
   let k = 0;
+  // every box starts grey (owner, 30 Oct); the ones this discipline fixes then tick and turn teal, one after another
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
       {CURATION.map((c) => {
         const how = fixes[c.word];
-        const delay = how ? TICKS_AT + k++ * 0.4 : TICKS_AT;
-        return how ? (
-          <motion.div key={c.word} data-fix={c.word} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay, duration: 0.5, ease: EASE }} style={{ flex: '1 0 auto', display: 'flex', alignItems: 'center', gap: 16, padding: '10px 18px', borderRadius: 12, border: '2px solid var(--teal)', background: TEAL_TINT }}>
-            <Tick size={38} />
+        const delay = how ? TICKS_AT + k++ * 0.4 : 0;
+        return (
+          <motion.div
+            key={c.word}
+            data-fix={how ? c.word : undefined}
+            data-unfixed={how ? undefined : c.word}
+            initial={{ borderColor: 'rgba(127,127,127,0.35)', backgroundColor: 'rgba(127,127,127,0.06)' }}
+            animate={how ? { borderColor: 'rgba(27,138,156,1)', backgroundColor: TEAL_TINT } : {}}
+            transition={{ delay, duration: 0.5, ease: EASE }}
+            style={{ flex: '1 1 0', minHeight: 0, display: 'flex', alignItems: 'center', gap: 16, padding: '10px 18px', borderRadius: 12, borderWidth: 2, borderStyle: how ? 'solid' : 'dashed' }}
+          >
+            <span style={{ position: 'relative', width: 38, height: 38, flex: 'none' }}>
+              <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid rgba(127,127,127,0.4)', boxSizing: 'border-box' }} />
+              {how && (
+                <motion.span style={{ position: 'absolute', inset: 0 }} initial={{ opacity: 0, scale: 0.4 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay, duration: 0.4, ease: EASE }}>
+                  <Tick size={38} />
+                </motion.span>
+              )}
+            </span>
             <div>
-              <div style={{ fontSize: 27, fontWeight: 700, color: 'var(--ink)' }}>{c.word}</div>
-              <div style={{ fontSize: 21, color: 'var(--teal)', fontWeight: 500, lineHeight: 1.25 }}>{how}</div>
+              <motion.div initial={{ color: 'var(--ink-dim)' }} animate={how ? { color: 'var(--ink)' } : {}} transition={{ delay, duration: 0.4 }} style={{ fontSize: 27, fontWeight: 700 }}>{c.word}</motion.div>
+              {how && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: delay + 0.2, duration: 0.4 }} style={{ fontSize: 21, color: 'var(--teal)', fontWeight: 500, lineHeight: 1.25 }}>{how}</motion.div>
+              )}
             </div>
           </motion.div>
-        ) : (
-          <div key={c.word} data-unfixed={c.word} style={{ flex: '1 0 auto', display: 'flex', alignItems: 'center', gap: 16, padding: '10px 18px', borderRadius: 12, border: '2px dashed var(--line)', opacity: 0.6 }}>
-            <span style={{ width: 38, height: 38, borderRadius: '50%', border: '2px solid var(--line)', flex: 'none' }} />
-            <div style={{ fontSize: 27, fontWeight: 700, color: GREY }}>{c.word}</div>
-          </div>
         );
       })}
       <div style={{ fontSize: 18, color: GREY }}>the four problems in the glass</div>

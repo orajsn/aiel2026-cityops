@@ -68,7 +68,7 @@ function Footer({ takeaway, terms, next }: Pick<L2Props, 'takeaway' | 'terms' | 
       <div style={{ display: 'grid', gridTemplateColumns: terms?.length ? 'minmax(0, 1fr) minmax(0, 0.95fr)' : 'minmax(0, 1fr)', gap: 18, alignItems: 'stretch' }}>
         <AnimatePresence mode="wait">
           {takeaway && (
-            <motion.div key={takeaway} data-takeaway initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4, ease: EASE, delay: 0.2 }} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '12px 20px', borderLeft: `5px solid ${TEAL}`, background: TINT, borderRadius: '0 10px 10px 0' }}>
+            <motion.div key={takeaway} data-takeaway initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease: EASE, delay: 3.4 }} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '12px 20px', borderLeft: `5px solid ${TEAL}`, background: TINT, borderRadius: '0 10px 10px 0' }}>
               <div style={{ ...capTeal, fontSize: 13 }}>Takeaway</div>
               <div style={{ fontSize: 22, lineHeight: 1.35, color: INK, fontWeight: 500 }}>
                 <Rich text={takeaway} />
@@ -78,7 +78,7 @@ function Footer({ takeaway, terms, next }: Pick<L2Props, 'takeaway' | 'terms' | 
         </AnimatePresence>
         <AnimatePresence mode="wait">
           {!!terms?.length && (
-            <motion.div key={terms.map((t) => t.join()).join('|')} data-terms initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4, ease: EASE, delay: 0.3 }} style={{ padding: '10px 18px', borderTop: `4px solid ${TEAL}`, borderRadius: 10, background: CARD, boxShadow: '0 2px 10px rgba(0,0,0,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4 }}>
+            <motion.div key={terms.map((t) => t.join()).join('|')} data-terms initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease: EASE, delay: 3.6 }} style={{ padding: '10px 18px', borderTop: `4px solid ${TEAL}`, borderRadius: 10, background: CARD, boxShadow: '0 2px 10px rgba(0,0,0,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4 }}>
               <div style={{ ...cap, fontSize: 13 }}>Picture → technical term</div>
               {terms.map(([pic, term]) => (
                 <div key={pic} data-term={term} style={{ fontSize: 19, lineHeight: 1.35, color: INK }}>

@@ -159,13 +159,14 @@ export function RouteMap({ stops }: { stops: RouteStop[] }) {
         );
       })}
       {/* the empty corner of the bottom row explains the two chips */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: DRIVE + 0.5, duration: 0.6 }} style={{ position: 'absolute', left: colX(0) - 100, top: Y2 - 70, width: 210, display: 'flex', flexDirection: 'column', gap: 12, fontSize: 22, color: DIM, lineHeight: 1.35 }}>
-        <span>
-          <Kind k="idea" /> <span style={{ color: INK }}>first</span>,
-        </span>
-        <span>
-          then the <Kind k="notebook" /> section that shows it
-        </span>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: DRIVE + 0.5, duration: 0.6 }} style={{ position: 'absolute', left: colX(0) - 110, top: Y2 - 80, width: 250, display: 'flex', flexDirection: 'column', gap: 14, padding: '16px 18px', borderRadius: 14, border: '2px solid rgba(127,127,127,0.25)', background: 'var(--panel-strong)', boxSizing: 'border-box' }}>
+        <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '0.12em', color: DIM, textTransform: 'uppercase' }}>Each stop</span>
+        {([['idea', 'the idea, explained first'], ['notebook', 'then the notebook section that shows it']] as const).map(([k, t]) => (
+          <span key={k} style={{ display: 'grid', gridTemplateColumns: '104px 1fr', alignItems: 'center', columnGap: 10, fontSize: 19, color: INK, lineHeight: 1.3 }}>
+            <span><Kind k={k} /></span>
+            {t}
+          </span>
+        ))}
       </motion.div>
     </FitBox>
   );
