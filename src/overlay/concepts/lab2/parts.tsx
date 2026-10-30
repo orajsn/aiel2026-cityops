@@ -90,7 +90,7 @@ function Footer({ takeaway, terms, next }: Pick<L2Props, 'takeaway' | 'terms' | 
         </AnimatePresence>
       </div>
       {next && (
-        <motion.div data-next {...fade(0.6)} style={{ alignSelf: 'flex-end', display: 'flex', alignItems: 'center', gap: 12, padding: '8px 18px', borderRadius: 999, background: TEAL, color: '#fff', fontSize: 19, fontWeight: 600 }}>
+        <motion.div data-next {...fade(3.8)} style={{ alignSelf: 'flex-end', display: 'flex', alignItems: 'center', gap: 12, padding: '8px 18px', borderRadius: 999, background: TEAL, color: '#fff', fontSize: 19, fontWeight: 600 }}>
           <span style={{ opacity: 0.85, fontWeight: 500 }}>Next in the notebook</span>
           <span aria-hidden>→</span>
           <span>{next}</span>
