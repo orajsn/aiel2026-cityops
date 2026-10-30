@@ -1,3 +1,4 @@
+import { LAB2_FOCUS } from './lab2Focus';
 /**
  * Lab 2's notebook pages, as the Harbor Bridge deck shows them (owner, 30 Oct): our own picture and numbered steps on
  * the left, only the key lines of the notebook on the right, a line drawn from the step being explained to the lines
@@ -158,3 +159,10 @@ export const NB_PAGES: Record<string, NbPage> = {
     ],
   },
 };
+
+/**
+ * Lab 2 shows its code inside the page (owner, 30 Oct), never in the Jupyter popup. The notebook pages above carry their
+ * key lines; these are the older run-it-yourself stops, whose sections the pages above and the workbench pages now cover. The focus pages (lab2Focus.ts) keep stepping their picture on Next, without the popup.
+ */
+const OLD_STOPS = ['2.1a', '2.2b', '2.4b', '2.5b', '2.6a', '2.7b', '2.9'];
+export const noDrawer = (id: string): boolean => id in NB_PAGES || id in LAB2_FOCUS || OLD_STOPS.includes(id);

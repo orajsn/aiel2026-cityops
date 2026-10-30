@@ -50,8 +50,9 @@ test('5.4’s eight parts each start on a real line of the cell, in order, so a 
 
 test('page 2.7b steps through 5 blocks and 5.4’s 8 parts: 13 steps, and the clicker walks the same', () => {
   expect(guideSteps('2.7b')).toHaveLength(13);
-  expect(stopStepCount('2.7b')).toBe(13);
-  expect(stopStepCount('2.1a')).toBe(7); // pages without a guide still step through their cells to run
+  // Lab 2 shows its code inside the page, so its pages no longer walk a drawer (lab2Notebook.ts); the guide data stays
+  expect(stopStepCount('2.7b')).toBe(0);
+  expect(stopStepCount('2.1a')).toBe(0);
 });
 
 test('on a block the drawer shows its note under the heading; on a part it highlights that part’s lines', () => {

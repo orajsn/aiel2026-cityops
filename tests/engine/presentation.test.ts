@@ -1,10 +1,11 @@
-import { LAB_STOPS, stopCells } from '../../src/content/labStops';
+import { LAB_STOPS } from '../../src/content/labStops';
 import { useSceneStore } from '../../src/engine/store';
 import { bindKeys } from '../../src/engine/keys';
-import { useDrawerStore, presentNext, presentPrev, usePresentationStore } from '../../src/engine/presentation';
+import { useDrawerStore, presentNext, presentPrev, usePresentationStore, stopStepCount } from '../../src/engine/presentation';
 
-const STOP = Object.keys(LAB_STOPS)[0];
-const RUNS = stopCells(LAB_STOPS[STOP]).filter((c) => c.run).length;
+// a Lab 3 page: Lab 2 shows its code inside the page, with no drawer to walk (lab2Notebook.ts)
+const STOP = Object.keys(LAB_STOPS).find((id) => id.startsWith('3.'))!;
+const RUNS = stopStepCount(STOP);
 
 /** where the walk is: the page, and the drawer if it is open */
 const at = () => {

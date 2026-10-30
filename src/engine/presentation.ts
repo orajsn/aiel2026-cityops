@@ -3,7 +3,7 @@ import { LAB_STOPS, stopCells } from '../content/labStops';
 import { guideSteps } from '../content/labGuide';
 import { handsOnTaskCount } from '../content/lab1HandsOn';
 import { LAB2_FOCUS } from '../content/lab2Focus';
-import { NB_PAGES } from '../content/lab2Notebook';
+import { NB_PAGES, noDrawer } from '../content/lab2Notebook';
 import { useSceneStore } from './store';
 
 /**
@@ -50,6 +50,7 @@ useSceneStore.subscribe((s, prev) => {
 /** how many steps a page's drawer has: its guide's sections and parts (labGuide.ts), else its cells to run, else its Lab 1 hands-on steps */
 export function stopStepCount(id: string): number {
   if (focusStepCount(id)) return focusStepCount(id);
+  if (noDrawer(id)) return 0;
   const stop = LAB_STOPS[id];
   // Lab 1's Hands-on drawer (lab1HandsOn.ts): opens on its overview, then one step per task on the chosen 3A / 3B path
   if (!stop) return handsOnTaskCount(id);

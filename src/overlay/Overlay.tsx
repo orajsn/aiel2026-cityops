@@ -6,6 +6,7 @@ import { useUiStore } from '../engine/ui';
 import { OVERLAYS } from './registry';
 import { HandoffCard } from './HandoffCard';
 import { JupyterDrawer } from './jupyter/JupyterDrawer';
+import { noDrawer } from '../content/lab2Notebook';
 import { StepsDrawer } from './handsOn/StepsDrawer';
 import { JumpMenu } from './JumpMenu';
 import { CameraEditor } from './CameraEditor';
@@ -132,7 +133,8 @@ export function Overlay() {
       {scene.card && settled && !trafficEditing && <HandoffCard card={scene.card} />}
 
       {/* lab guide: on a page with a notebook stop, the Jupyter drawer waits on the left edge */}
-      {settled && !trafficEditing && <JupyterDrawer key={scene.id} sceneId={scene.id} />}
+      {/* Lab 2 shows its code inside the page, never in a popup (owner, 30 Oct) */}
+      {settled && !trafficEditing && !noDrawer(scene.id) && <JupyterDrawer key={scene.id} sceneId={scene.id} />}
       {/* Lab 1: on a hands-on page (lab1HandsOn.ts), the dark Hands-on drawer waits on the same edge */}
       {settled && !trafficEditing && <StepsDrawer key={`hd-${scene.id}`} sceneId={scene.id} />}
 
