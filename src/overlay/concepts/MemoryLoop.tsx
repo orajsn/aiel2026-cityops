@@ -23,7 +23,7 @@ export const ENGINES = ['Vector search', 'SQL', 'JSON', 'Graph', 'Spatial'];
  */
 export function MemoryLoop({ kicker, message, notebook }: MemoryLoopProps) {
   return (
-    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="memory-loop">
+    <WidePanel wide kicker={kicker} message={message} notebook={notebook} testId="memory-loop">
       <Stack />
     </WidePanel>
   );

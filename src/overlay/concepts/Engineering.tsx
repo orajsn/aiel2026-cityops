@@ -525,7 +525,7 @@ export interface DisciplineProps {
 export function Discipline({ kicker, message, which, notebook }: DisciplineProps) {
   const e = EVERYDAY[which];
   return (
-    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="discipline">
+    <WidePanel wide kicker={kicker} message={message} notebook={notebook} testId="discipline">
       <Fill>
       <div data-which={which} style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '410px 1fr 300px', gap: 0, marginTop: 10, borderTop: '1px solid var(--line)', paddingTop: 20 }}>
         <div style={{ paddingRight: 26, borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column' }}>
@@ -576,7 +576,7 @@ export interface WhoFixesWhatProps {
 export function WhoFixesWhat({ kicker, message, notebook }: WhoFixesWhatProps) {
   let k = 0;
   return (
-    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="who-fixes-what">
+    <WidePanel wide kicker={kicker} message={message} notebook={notebook} testId="who-fixes-what">
       <Fill>
       <div data-grid style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '320px repeat(3, 1fr)', gridTemplateRows: 'auto repeat(4, minmax(96px, 1fr))', columnGap: 14, rowGap: 14, marginTop: 16, alignItems: 'stretch' }}>
         <div />
