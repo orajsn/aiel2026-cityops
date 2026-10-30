@@ -527,7 +527,7 @@ export function Discipline({ kicker, message, which, notebook }: DisciplineProps
   return (
     <WidePanel wide kicker={kicker} message={message} notebook={notebook} testId="discipline">
       <Fill>
-      <div data-which={which} style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '410px 1fr 300px', gap: 0, marginTop: 10, borderTop: '1px solid var(--line)', paddingTop: 20 }}>
+      <div data-which={which} style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: '440px minmax(0, 1fr) 560px', gap: 0, marginTop: 10, borderTop: '1px solid var(--line)', paddingTop: 20 }}>
         <div style={{ paddingRight: 26, borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column' }}>
           <div style={label}>In everyday life</div>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
