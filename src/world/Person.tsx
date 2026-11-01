@@ -27,13 +27,15 @@ export interface PersonProps {
   facing?: number;
   /** total height in the parent's units */
   height: number;
+  /** whether the person casts a shadow (default yes); a room floating above the street has none to cast */
+  shadow?: boolean;
 }
 
 /**
  * One person. Walks from `from` to `position` (facing the way they walk), then turns to `facing`
  * and plays `pose`. The model is normalised to `height` so the same code works in any diorama.
  */
-export function Person({ who, position, from, walkMs = 2400, delayMs = 0, pose, facing = 0, height }: PersonProps) {
+export function Person({ who, position, from, walkMs = 2400, delayMs = 0, pose, facing = 0, height, shadow = true }: PersonProps) {
   const gltf = useGLTF(url(who));
   const model = useMemo(() => cloneSkinned(gltf.scene) as THREE.Object3D, [gltf]);
   const size = useMemo(() => {
@@ -49,11 +51,11 @@ export function Person({ who, position, from, walkMs = 2400, delayMs = 0, pose, 
     model.traverse((o) => {
       const m = o as THREE.Mesh;
       if (m.isMesh) {
-        m.castShadow = true;
+        m.castShadow = shadow;
         m.frustumCulled = false; // skinned bounds are stale after scaling
       }
     });
-  }, [model]);
+  }, [model, shadow]);
 
   const play = (name: Pose | 'walk') => {
     const next = actions[name];

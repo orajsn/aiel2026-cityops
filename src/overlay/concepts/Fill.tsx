@@ -14,17 +14,23 @@ export function useFitZoom(outer: RefObject<HTMLElement>, inner: RefObject<HTMLE
     const o = outer.current;
     const w = inner.current;
     if (!o || !w) return;
+    // Only ever scales down, and only when the content really is taller than its box: re-measuring from scale 1 each time
+    // made pages that sit right at the edge flip between two sizes a few seconds after they opened (owner, 31 Oct)
     const fit = () => {
-      w.style.zoom = '1';
       const have = o.clientHeight;
       if (have <= 0) return;
-      let z = 1;
-      // the content's natural height at this scale; narrower text wraps less when scaled down, so go round a few times
-      for (let n = 0; n < 4; n++) {
-        const need = w.scrollHeight * z;
-        if (need <= have + 1) break;
-        z = Math.max(0.55, z * (have / need));
-        w.style.zoom = String(z);
+      // a page that is a pixel or two over is left alone; the first decision is made on 1% (+4 px), and later checks only
+      // act when the content has grown by more than 6%. A picture that scales with its width grows again when the box
+      // is scaled down, so repeated shrinking would never settle.
+      for (let n = 0; n < 2; n++) {
+        const cur = parseFloat(w.style.zoom || '1') || 1;
+        const need = w.scrollHeight * cur;
+        const slack = w.dataset.fitted ? 0.06 : 0.01;
+        if (need <= have * (1 + slack) + 4) break;
+        const next = Math.max(0.6, cur * (have / need));
+        if (next >= cur - 0.004) break;
+        w.style.zoom = String(next);
+        w.dataset.fitted = '1';
       }
     };
     fit();

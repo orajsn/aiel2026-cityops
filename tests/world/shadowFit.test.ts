@@ -43,8 +43,8 @@ test('the shadow area is centred on the map', async () => {
 
 // owner, 28 Oct: the lag is in the camera moves. The sun's shadows do not depend on the camera, so while it moves
 // they are redrawn every third frame instead of every frame
-test('during a camera move the shadows redraw every third frame, and every frame when the camera holds', () => {
+test('during a camera move the shadows redraw every third frame, and every second frame when the camera holds', () => {
   const frames = (moving: boolean) => Array.from({ length: 9 }, (_, i) => shadowRedraw(moving, i)).filter(Boolean).length;
-  expect(frames(false)).toBe(9);
+  expect(frames(false)).toBe(5);
   expect(frames(true)).toBe(3);
 });

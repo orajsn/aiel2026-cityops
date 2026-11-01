@@ -158,7 +158,7 @@ function Gauge({ total }: { total: number }) {
         <circle cx="130" cy="130" r={r} fill="none" stroke={T} strokeWidth={20} strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - k / total)} transform="rotate(-90 130 130)" style={{ transition: `stroke-dashoffset ${TICK_GAP}s linear` }} />
       </svg>
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'visible' }}>
-        <div style={{ fontSize: 68, fontWeight: 700, color: TEAL_D, lineHeight: 1.15 }}>
+        <div style={{ fontSize: 68, fontWeight: 700, color: TEAL_D, lineHeight: 1.15, fontVariantNumeric: 'tabular-nums', minWidth: '4.6ch', textAlign: 'center', whiteSpace: 'nowrap' }}>
           {k}
           <span style={{ fontSize: 34, color: DIM }}>/{total}</span>
         </div>

@@ -58,7 +58,8 @@ function Prop({ name, width, position, rotation = 0, screen }: { name: string; w
   const { obj, scale, offset, size } = useMemo(() => {
     const o = gltf.scene.clone(true);
     o.traverse((m) => {
-      if ((m as THREE.Mesh).isMesh) (m as THREE.Mesh).castShadow = (m as THREE.Mesh).receiveShadow = true;
+      // the room floats above the street: its shadows would never reach anything, and drawing them is not free
+      if ((m as THREE.Mesh).isMesh) (m as THREE.Mesh).castShadow = (m as THREE.Mesh).receiveShadow = false;
     });
     const b = new THREE.Box3().setFromObject(o);
     const s = width / Math.max(1e-6, b.max.x - b.min.x);
@@ -93,7 +94,7 @@ function Room() {
   return (
     <group>
       {/* floor slab with a teal edge */}
-      <mesh position={[0, -0.15, 0]} receiveShadow>
+      <mesh position={[0, -0.15, 0]}>
         <boxGeometry args={[FLOOR.w, 0.3, FLOOR.d]} />
         <meshStandardMaterial color="#e9e6df" roughness={0.9} />
       </mesh>
@@ -102,7 +103,7 @@ function Room() {
         <meshBasicMaterial color="#1B8A9C" />
       </mesh>
       {/* back wall carrying the video wall */}
-      <mesh position={[0, 1.6, -FLOOR.d / 2 + 0.1]} castShadow receiveShadow>
+      <mesh position={[0, 1.6, -FLOOR.d / 2 + 0.1]}>
         <boxGeometry args={[FLOOR.w, 3.2, 0.2]} />
         <meshStandardMaterial color="#2a313c" roughness={0.8} />
       </mesh>
@@ -112,6 +113,9 @@ function Room() {
           <mesh key={i} position={[x, 1.75, -FLOOR.d / 2 + 0.22 + Math.abs(i - 1) * 0.35]} rotation={[0, -(i - 1) * 0.22, 0]}>
             <planeGeometry args={[3.0, 1.7]} />
             <meshBasicMaterial map={tex} toneMapped={false} />
+            {/* what moves on the wall is drawn as two small meshes: the screens themselves are drawn once */}
+            {i === 0 && <PulseRing />}
+            {i === 1 && <BlinkingCursor />}
           </mesh>
         );
       })}
@@ -121,11 +125,11 @@ function Room() {
           <Prop name="computerScreen" width={0.62} position={[-0.38, DESK_TOP, -0.15]} screen={desk} />
           <Prop name="computerScreen" width={0.62} position={[0.38, DESK_TOP, -0.15]} screen={desk} />
           <Prop name="chairDesk" width={0.62} position={[0, 0, 0.75]} rotation={Math.PI} />
-          <Person who={d.who} position={[0, 0.05, 0.75]} pose="sit" facing={Math.PI} height={1.15} />
+          <Person who={d.who} position={[0, 0.05, 0.75]} pose="sit" facing={Math.PI} height={1.15} shadow={false} />
         </group>
       ))}
       {/* the shift lead at the video wall */}
-      <Person who="character-female-f" position={[3.9, 0, -2.2]} pose="interact-right" facing={Math.PI * 0.85} height={1.3} />
+      <Person who="character-female-f" position={[3.9, 0, -2.2]} pose="interact-right" facing={Math.PI * 0.85} height={1.3} shadow={false} />
       <Prop name="pottedPlant" width={0.6} position={[-4.4, 0, 2.6]} />
       <Prop name="pottedPlant" width={0.6} position={[4.4, 0, 2.6]} />
       <Html position={[0, 3.6, -FLOOR.d / 2]} center zIndexRange={[15, 0]} style={{ pointerEvents: 'none' }}>
@@ -181,27 +185,61 @@ function useWallTextures(): THREE.CanvasTexture[] {
       }),
     [canvases],
   );
-  const draw = (time: number) => {
-    drawMap(canvases[0].getContext('2d')!, time);
-    drawIncidents(canvases[1].getContext('2d')!, time);
+  // drawn once (and again when the bundled fonts are ready): redrawing three 1200 x 680 canvases and sending them to
+  // the graphics card several times a second was what made the Ops pages stutter (owner, 31 Oct)
+  const draw = () => {
+    drawMap(canvases[0].getContext('2d')!);
+    drawIncidents(canvases[1].getContext('2d')!);
     drawToday(canvases[2].getContext('2d')!);
     textures.forEach((t) => (t.needsUpdate = true));
   };
   useEffect(() => {
-    draw(0);
+    draw();
     // redraw once the bundled fonts are ready
-    document.fonts?.ready.then(() => draw(0));
+    document.fonts?.ready.then(draw);
     return () => textures.forEach((t) => t.dispose());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const last = useRef(0);
-  useFrame(({ clock }) => {
-    // the map's alert ring pulses: redraw a few times a second, not every frame
-    if (clock.elapsedTime - last.current < 0.15) return;
-    last.current = clock.elapsedTime;
-    draw(clock.elapsedTime);
-  });
   return textures;
+}
+
+/** one canvas pixel in the wall's plane units (a screen is 3.0 wide for 1200 px) */
+const PX = 3.0 / W;
+const planeX = (cx: number) => (cx / W - 0.5) * 3.0;
+const planeY = (cy: number) => (0.5 - cy / H) * 1.7;
+
+/** the map's alert ring around Harbor Bridge: it widens and fades about once every 1.4 s */
+function PulseRing() {
+  const ring = useRef<THREE.Mesh>(null);
+  const hb = PINS.find((p) => p.id === 'Harbor Bridge')!;
+  useFrame(({ clock }) => {
+    const m = ring.current;
+    if (!m) return;
+    const ph = (clock.elapsedTime * 0.7) % 1;
+    const r = (14 + ph * 46) * PX;
+    m.scale.set(r, r, 1);
+    (m.material as THREE.MeshBasicMaterial).opacity = 1 - ph;
+  });
+  return (
+    <mesh ref={ring} position={[planeX(mx(hb.x)), planeY(mz(hb.z)), 0.004]}>
+      <ringGeometry args={[0.92, 1, 40]} />
+      <meshBasicMaterial color={RED} transparent depthWrite={false} toneMapped={false} />
+    </mesh>
+  );
+}
+
+/** the cursor blinking on the open incident */
+function BlinkingCursor() {
+  const m = useRef<THREE.Mesh>(null);
+  useFrame(({ clock }) => {
+    if (m.current) m.current.visible = Math.floor(clock.elapsedTime * 2) % 2 === 0;
+  });
+  return (
+    <mesh ref={m} position={[planeX(W - 81), planeY(124), 0.004]}>
+      <planeGeometry args={[18 * PX, 18 * PX]} />
+      <meshBasicMaterial color={RED} toneMapped={false} />
+    </mesh>
+  );
 }
 
 function frame(ctx: CanvasRenderingContext2D, title: string) {
@@ -222,7 +260,7 @@ const MAP = { x0: -78, x1: 8, z0: -82, z1: -14 };
 const mx = (x: number) => 40 + ((x - MAP.x0) / (MAP.x1 - MAP.x0)) * (W - 80);
 const mz = (z: number) => 100 + ((z - MAP.z0) / (MAP.z1 - MAP.z0)) * (H - 140);
 
-function drawMap(ctx: CanvasRenderingContext2D, time: number) {
+function drawMap(ctx: CanvasRenderingContext2D) {
   frame(ctx, 'CITY MAP · 28 ASSETS');
   ctx.save();
   ctx.beginPath();
@@ -242,19 +280,13 @@ function drawMap(ctx: CanvasRenderingContext2D, time: number) {
     ctx.fill();
   }
   const hb = PINS.find((p) => p.id === 'Harbor Bridge')!;
-  const ph = (time * 0.7) % 1;
-  ctx.strokeStyle = `rgba(226,96,76,${1 - ph})`;
-  ctx.lineWidth = 5;
-  ctx.beginPath();
-  ctx.arc(mx(hb.x), mz(hb.z), 14 + ph * 46, 0, Math.PI * 2);
-  ctx.stroke();
   ctx.fillStyle = INK;
   ctx.font = '28px Inter, sans-serif';
   ctx.fillText('Harbor Bridge', mx(hb.x) + 22, mz(hb.z) - 18);
   ctx.restore();
 }
 
-function drawIncidents(ctx: CanvasRenderingContext2D, time: number) {
+function drawIncidents(ctx: CanvasRenderingContext2D) {
   frame(ctx, 'INCIDENTS');
   const rows: [string, string, string][] = [
     [RED, 'Harbor Bridge · the crack', 'hairline crack · 0.12 mm · Lab 2'],
@@ -273,11 +305,6 @@ function drawIncidents(ctx: CanvasRenderingContext2D, time: number) {
     ctx.font = '30px Inter, sans-serif';
     ctx.fillText(b, 80, y + 56);
   });
-  // a cursor blinking on the open incident
-  if (Math.floor(time * 2) % 2 === 0) {
-    ctx.fillStyle = RED;
-    ctx.fillRect(W - 90, 115, 18, 18);
-  }
   ctx.fillStyle = DIM;
   ctx.font = '28px "JetBrains Mono", monospace';
   ctx.fillText('AI agent · language model · ready', 40, H - 46);

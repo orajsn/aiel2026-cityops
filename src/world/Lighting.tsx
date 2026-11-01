@@ -18,9 +18,11 @@ export const SHADOW = { center: [-57.11, 0, -54.04] as [number, number, number],
 /**
  * Whether the shadow texture is redrawn on this frame. The sun's shadows do not depend on the camera, so while the
  * camera moves between pages (owner, 28 Oct: that is where it lagged) every third frame is enough; the cars, the
- * only things moving fast, are too small for their shadows to show it. When the camera holds, every frame.
+ * only things moving fast, are too small for their shadows to show it. When the camera holds, every second frame
+ * (owner, 31 Oct: the Ops pages stutter): the shadow pass draws the whole map again each time, and nothing in it moves
+ * fast enough for a thirty-per-second shadow to show.
  */
-export const shadowRedraw = (moving: boolean, frame: number) => !moving || frame % 3 === 0;
+export const shadowRedraw = (moving: boolean, frame: number) => (moving ? frame % 3 === 0 : frame % 2 === 0);
 
 export function Lighting() {
   const theme = useUiStore((s) => s.theme);
