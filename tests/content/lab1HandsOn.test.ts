@@ -1,4 +1,4 @@
-import { FIGURES, LAB1_HANDS_ON, SEER_GUIDE, figureUrl, handsOnPart, handsOnTitle, handsOnTaskCount } from '../../src/content/lab1HandsOn';
+import { FIGURES, LAB1_HANDS_ON, SEER_GUIDE, figureUrl, handsOnPart, handsOnTitle, handsOnTaskCount, handsOnStepCount, stepAt, firstStepOf } from '../../src/content/lab1HandsOn';
 import { buildScenes } from '../../src/scenes';
 import raw from '../../src/content/seerGuide.json';
 
@@ -37,6 +37,16 @@ test('every page shows its part of the guide, step for step', () => {
   expect(handsOnTaskCount('1.6a', '3a')).toBe(6);
   expect(handsOnTaskCount('1.6a', '3b')).toBe(4);
   expect(handsOnTaskCount('1.0')).toBe(0);
+  // the clicker walks one press per guide step
+  const e = LAB1_HANDS_ON['1.6a'];
+  const tasks = handsOnPart(e, '3a').tasks;
+  expect(handsOnStepCount('1.6a', '3a')).toBe(tasks.reduce((n, k) => n + k.steps.length, 0));
+  expect(stepAt(tasks, 0)).toBeNull();
+  expect(stepAt(tasks, 1)).toEqual({ task: 0, step: 0 });
+  expect(stepAt(tasks, tasks[0].steps.length + 1)).toEqual({ task: 1, step: 0 });
+  expect(stepAt(tasks, 9999)).toEqual({ task: tasks.length - 1, step: tasks[tasks.length - 1].steps.length - 1 });
+  expect(firstStepOf(tasks, 1)).toBe(tasks[0].steps.length + 1);
+  expect(handsOnStepCount('1.0')).toBe(0);
 });
 
 test('every referenced screenshot exists and is bundled', () => {

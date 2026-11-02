@@ -134,6 +134,27 @@ export const handsOnTaskCount = (sceneId: string, route: Route = useRouteStore.g
   return e ? handsOnPart(e, route).tasks.length : 0;
 };
 
+/** how many steps a page's drawer walks on the chosen path: one clicker press per guide step (owner, 3 Nov: the guide scrolls to each) */
+export const handsOnStepCount = (sceneId: string, route: Route = useRouteStore.getState().route): number => {
+  const e = handsOnFor(sceneId);
+  return e ? handsOnPart(e, route).tasks.reduce((n, k) => n + k.steps.length, 0) : 0;
+};
+
+/** the task and the step inside it (both 0-based) that the k-th step overall (1-based; 0 is the overview) is in */
+export function stepAt(tasks: GuideTask[], k: number): { task: number; step: number } | null {
+  if (k < 1) return null;
+  let left = k;
+  for (let i = 0; i < tasks.length; i++) {
+    if (left <= tasks[i].steps.length) return { task: i, step: left - 1 };
+    left -= tasks[i].steps.length;
+  }
+  const last = tasks.length - 1;
+  return last < 0 ? null : { task: last, step: tasks[last].steps.length - 1 };
+}
+
+/** the step number overall (1-based) at which a task begins */
+export const firstStepOf = (tasks: GuideTask[], taskIndex: number): number => 1 + tasks.slice(0, taskIndex).reduce((n, k) => n + k.steps.length, 0);
+
 const ROUTE_KEY = 'cityops.handsOnRoute';
 function storedRoute(): Route {
   try {

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { LAB_STOPS, stopCells } from '../content/labStops';
 import { guideSteps } from '../content/labGuide';
-import { handsOnTaskCount } from '../content/lab1HandsOn';
+import { handsOnStepCount } from '../content/lab1HandsOn';
 import { LAB2_FOCUS } from '../content/lab2Focus';
 import { NB_PAGES, noDrawer } from '../content/lab2Notebook';
 import { useSceneStore } from './store';
@@ -52,8 +52,8 @@ export function stopStepCount(id: string): number {
   if (focusStepCount(id)) return focusStepCount(id);
   if (noDrawer(id)) return 0;
   const stop = LAB_STOPS[id];
-  // Lab 1's Hands-on drawer (lab1HandsOn.ts): opens on its overview, then one step per task on the chosen 3A / 3B path
-  if (!stop) return handsOnTaskCount(id);
+  // Lab 1's Hands-on drawer (lab1HandsOn.ts): opens on its overview, then one press per guide step on the chosen 3A / 3B path
+  if (!stop) return handsOnStepCount(id);
   return guideSteps(id).length || stopCells(stop).filter((c) => c.run).length;
 }
 

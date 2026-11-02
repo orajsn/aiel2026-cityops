@@ -1,8 +1,8 @@
 import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import { StepsDrawer } from '../../src/overlay/handsOn/StepsDrawer';
-import { FIGURES, LAB1_HANDS_ON, SEER_GUIDE, handsOnPart, useRouteStore } from '../../src/content/lab1HandsOn';
+import { FIGURES, LAB1_HANDS_ON, SEER_GUIDE, handsOnPart, handsOnStepCount, useRouteStore } from '../../src/content/lab1HandsOn';
 import { LAB_STOPS } from '../../src/content/labStops';
-import { useDrawerStore, stopStepCount, presentNext } from '../../src/engine/presentation';
+import { useDrawerStore, stopStepCount, presentNext, presentPrev } from '../../src/engine/presentation';
 import { useSceneStore } from '../../src/engine/store';
 import { useUiStore } from '../../src/engine/ui';
 
@@ -91,7 +91,7 @@ test('the 3A / 3B switch changes the tasks and is remembered across pages', () =
   expect(useRouteStore.getState().route).toBe('3b');
   expect(first.getAllByRole('tab')).toHaveLength(1 + 4);
   expect(first.getByRole('dialog').textContent).toContain('Hands-on 3 · Launch the Sample Application');
-  expect(stopStepCount('1.6a')).toBe(4);
+  expect(stopStepCount('1.6a')).toBe(handsOnStepCount('1.6a', '3b'));
   first.unmount();
   useDrawerStore.getState().reset();
   // the next page opens on the same path
@@ -117,8 +117,9 @@ test('Thai shows the guide in Thai', () => {
   expect(container.querySelector('.hd__exp')!.textContent).toContain('ผลลัพธ์ที่คาดหวัง');
 });
 
-test('the clicker opens the drawer, walks it task by task, closes it, then goes on', () => {
-  const n = handsOnPart(LAB1_HANDS_ON['1.8'], '3a').tasks.length;
+test('the clicker opens the drawer, walks it step by step (the guide marks and scrolls to each), closes it, then goes on', () => {
+  const tasks = handsOnPart(LAB1_HANDS_ON['1.8'], '3a').tasks;
+  const n = tasks.reduce((c, k) => c + k.steps.length, 0);
   expect(stopStepCount('1.8')).toBe(n);
   expect(stopStepCount('1.0')).toBe(0);
   useSceneStore.getState().setScenes([
@@ -134,6 +135,12 @@ test('the clicker opens the drawer, walks it task by task, closes it, then goes 
   for (let i = 0; i < n; i++) act(() => presentNext());
   expect(useDrawerStore.getState().focus).toBe(n);
   expect(container.querySelector('.hd__ttab.is-on')!.textContent).toBe('Task 4');
+  // the step on screen is the last step of the last task, marked
+  expect(container.querySelector('.hd__step.is-now')!.getAttribute('data-step-id')).toBe(tasks[tasks.length - 1].steps[tasks[tasks.length - 1].steps.length - 1].id);
+  // one press back to the first step of the first task shows that step
+  act(() => presentPrev());
+  expect(useDrawerStore.getState().focus).toBe(n - 1);
+  act(() => presentNext());
   act(() => presentNext());
   expect(useDrawerStore.getState().open).toBe(false);
   act(() => presentNext());

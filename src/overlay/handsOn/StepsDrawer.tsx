@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { FIGURES, figureUrl, handsOnFor, handsOnPart, handsOnTitle, hasRoutes, useRouteStore, type GuideStep, type Route } from '../../content/lab1HandsOn';
+import { FIGURES, figureUrl, firstStepOf, handsOnFor, handsOnPart, handsOnStepCount, handsOnTitle, hasRoutes, stepAt, useRouteStore, type GuideStep, type Route } from '../../content/lab1HandsOn';
 import { useDrawerStore } from '../../engine/presentation';
 import { useUiStore } from '../../engine/ui';
 
@@ -10,8 +10,9 @@ import { useUiStore } from '../../engine/ui';
  * key): tabs for the overview and each task, numbered steps with their expected result, code in JetBrains Mono and
  * the guide's OCI Console screenshots, which open large on a click. No red.
  *
- * Open and focus live in useDrawerStore: focus 0 is the overview, focus k is task k. A clicker in Presentation mode
- * opens the drawer, walks it task by task, closes it and goes on (presentation.ts). A page without an entry renders
+ * Open and focus live in useDrawerStore: focus 0 is the overview, focus k is the k-th guide step overall. A clicker in
+ * Presentation mode opens the drawer and walks it step by step (the guide shows the step's task, scrolls to the step and
+ * marks it), then closes it and goes on (presentation.ts). A page without an entry renders
  * nothing. Hands-on 3-5 have a 3A Build | 3B Launch switch, remembered across pages (useRouteStore).
  */
 const UI = {
@@ -50,11 +51,6 @@ export function StepsDrawer({ sceneId }: { sceneId: string }) {
   const scroller = useRef<HTMLDivElement>(null);
   // a page's drawer starts closed when it appears
   useEffect(() => useDrawerStore.getState().reset(), [sceneId]);
-  // a new task starts at its top
-  // (in braces: a newer browser's scrollTo returns a promise, which React would take for a cleanup)
-  useEffect(() => {
-    scroller.current?.scrollTo?.({ top: 0 });
-  }, [focus, route, open]);
   // the lightbox closes with Escape and when the drawer closes
   useEffect(() => {
     if (!big) return;
@@ -70,19 +66,28 @@ export function StepsDrawer({ sceneId }: { sceneId: string }) {
   useEffect(() => {
     if (!open) setBig(null);
   }, [open]);
+  // each press scrolls the guide to its step (the overview and a new page start at the top); the step is marked in the list
+  useEffect(() => {
+    const sc = scroller.current;
+    if (!sc) return;
+    const el = focus > 0 ? (sc.querySelector('[data-now="true"]') as HTMLElement | null) : null;
+    const top = el ? Math.max(0, el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 18) : 0;
+    sc.scrollTo?.({ top, behavior: 'smooth' });
+  }, [focus, route, open]);
   if (!entry) return null;
 
   const t = UI[lang];
   const th = lang === 'th';
   const { lab, tasks } = handsOnPart(entry, route);
-  // a path with fewer tasks keeps the last one in view
-  const shown = Math.min(focus, tasks.length);
+  // the guide step the presenter is on (focus counts steps across the tasks); a path with fewer steps keeps the last in view
+  const pos = stepAt(tasks, focus);
+  const shown = pos ? pos.task + 1 : 0;
   const task = shown > 0 ? tasks[shown - 1] : null;
   // about 80% of the 1920 stage (owner, 29 Oct): room for each step and its screenshot side by side
   const width = 1536;
   const pickRoute = (r: Route) => {
     useRouteStore.getState().setRoute(r);
-    if (useDrawerStore.getState().focus > handsOnPart(entry, r).tasks.length) setFocus(handsOnPart(entry, r).tasks.length);
+    if (useDrawerStore.getState().focus > handsOnStepCount(sceneId, r)) setFocus(handsOnStepCount(sceneId, r));
   };
   const fig = big ? FIGURES[big] : null;
 
@@ -147,7 +152,7 @@ export function StepsDrawer({ sceneId }: { sceneId: string }) {
                     className={`hd__ttab${shown === i + 1 ? ' is-on' : ''}`}
                     data-task={i + 1}
                     title={th ? k.title_th : k.title_en}
-                    onClick={() => setFocus(i + 1)}
+                    onClick={() => setFocus(firstStepOf(tasks, i))}
                   >
                     {taskLabel(th ? k.title_th : k.title_en)}
                   </button>
@@ -160,7 +165,7 @@ export function StepsDrawer({ sceneId }: { sceneId: string }) {
                   <p className="hd__intro">{th ? lab.intro_th : lab.intro_en}</p>
                   <div className="hd__olabel">{t.task}</div>
                   {tasks.map((k, i) => (
-                    <button key={k.id} type="button" className="hd__orow" onClick={() => setFocus(i + 1)}>
+                    <button key={k.id} type="button" className="hd__orow" onClick={() => setFocus(firstStepOf(tasks, i))}>
                       <span className="hd__otitle">{th ? k.title_th : k.title_en}</span>
                       <span className="hd__ocount">
                         {k.steps.length} {t.steps}
@@ -174,7 +179,7 @@ export function StepsDrawer({ sceneId }: { sceneId: string }) {
                   <h2 className="hd__ttitle">{th ? task.title_th : task.title_en}</h2>
                   <ol className="hd__steps">
                     {task.steps.map((s, i) => (
-                      <Step key={s.id} s={s} n={i + 1} th={th} expected={t.expected} onImage={setBig} />
+                      <Step key={s.id} s={s} n={i + 1} th={th} expected={t.expected} onImage={setBig} now={pos?.step === i} />
                     ))}
                   </ol>
                 </div>
@@ -214,10 +219,10 @@ function taskLabel(title: string): string {
   return m ? m[1] : title;
 }
 
-function Step({ s, n, th, expected, onImage }: { s: GuideStep; n: number; th: boolean; expected: string; onImage(id: string): void }) {
+function Step({ s, n, th, expected, onImage, now }: { s: GuideStep; n: number; th: boolean; expected: string; onImage(id: string): void; now: boolean }) {
   const exp = th ? s.expected_th : s.expected_en;
   return (
-    <li className={`hd__step${s.images.length ? ' hd__step--shots' : ''}`} data-step-id={s.id}>
+    <li className={`hd__step${s.images.length ? ' hd__step--shots' : ''}${now ? ' is-now' : ''}`} data-step-id={s.id} data-now={now}>
       <div className="hd__n">{n}</div>
       <div className="hd__body">
         <div className="hd__text">
