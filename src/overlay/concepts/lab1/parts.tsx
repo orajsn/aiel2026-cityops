@@ -163,6 +163,89 @@ export function Net({ w = 120, live = false, dim = false, who = 'model' }: { w?:
   );
 }
 
+/**
+ * A model drawn at its own size (owner, 2 Nov): `small` is the lower-cost model (3 layers, a few nodes), `large` the expensive
+ * multimodal one (7 layers, many nodes). When data reaches it a wave of light runs through its layers, once per `period`
+ * seconds starting at `start`; `netWaveEnd` says when the wave has left, so the coins can breathe right after it.
+ */
+const NET_SHAPES = {
+  small: { layers: [2, 3, 2], w: 110, h: 66 },
+  large: { layers: [3, 5, 6, 6, 6, 5, 3], w: 220, h: 100 },
+} as const;
+export type NetShape = keyof typeof NET_SHAPES;
+const WAVE_STEP = 0.32;
+const WAVE_LIT = 0.7;
+export const netWaveEnd = (shape: NetShape, start: number) => start + (NET_SHAPES[shape].layers.length - 1) * WAVE_STEP + WAVE_LIT;
+
+export function ModelNet({ w, shape, who, period, start }: { w: number; shape: NetShape; who: string; period: number; start: number | number[] }) {
+  const starts = ([] as number[]).concat(start);
+  const { layers, w: vw, h: vh } = NET_SHAPES[shape];
+  const pad = 12;
+  const gx = (vw - 2 * pad) / (layers.length - 1);
+  const nodes = layers.flatMap((n, c) => Array.from({ length: n }, (_, k) => ({ c, x: pad + c * gx, y: 10 + (k * (vh - 20)) / (n - 1) })));
+  const r = shape === 'large' ? 5 : 6;
+  return (
+    <svg data-net={who} data-layers={layers.length} data-nodes={nodes.length} width={w} height={(w * vh) / vw} viewBox={`0 0 ${vw} ${vh}`} aria-hidden="true" style={{ flex: 'none' }}>
+      <g stroke={TEAL} strokeOpacity={shape === 'large' ? 0.28 : 0.35} strokeWidth={shape === 'large' ? 1 : 1.4}>
+        {nodes.flatMap((a) => nodes.filter((b) => b.c === a.c + 1).map((b) => <line key={`${a.x}${a.y}-${b.x}${b.y}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} />))}
+      </g>
+      {nodes.map((n, i) => {
+        const at = (x: number) => Math.min(1, Math.max(0, x / period));
+        const lo = 'rgba(27,138,156,0.18)';
+        const hi = 'rgba(27,138,156,0.95)';
+        const times = [0, ...starts.flatMap((s0) => {
+          const s = s0 + n.c * WAVE_STEP;
+          return [at(s), at(s + WAVE_LIT / 2), at(s + WAVE_LIT)];
+        }), 1];
+        const fills = [lo, ...starts.flatMap(() => [lo, hi, lo]), lo];
+        return (
+          <motion.circle
+            key={i}
+            cx={n.x}
+            cy={n.y}
+            r={r}
+            stroke={TEAL}
+            strokeWidth={shape === 'large' ? 1.6 : 2}
+            initial={{ fill: lo }}
+            animate={{ fill: fills }}
+            transition={{ duration: period, repeat: Infinity, ease: 'linear', times }}
+          />
+        );
+      })}
+    </svg>
+  );
+}
+
+/**
+ * a coin that breathes once per `period`, from `start`: the cheap one softly in pale teal, the expensive one deeper, bigger and
+ * with a glow, so the two read as different at a glance (never red)
+ */
+export function BreathingCoin({ size = 30, period, start, strong = false }: { size?: number; period: number; start: number | number[]; strong?: boolean }) {
+  const starts = ([] as number[]).concat(start);
+  const at = (x: number) => Math.min(1, Math.max(0, x / period));
+  const lo = TINT2;
+  const hi = strong ? 'rgba(20,111,127,1)' : 'rgba(27,138,156,0.4)';
+  const times = [0, ...starts.flatMap((s) => [at(s), at(s + 0.9), at(s + 1.8)]), 1];
+  const rep = <T,>(a: T, b: T, c: T): T[] => [a, ...starts.flatMap(() => [a, b, c]), a];
+  const peak = strong ? 1.22 : 1.08;
+  return (
+    <motion.svg
+      data-coin
+      data-breath={strong ? 'strong' : 'soft'}
+      width={size}
+      height={size}
+      viewBox="0 0 26 26"
+      aria-hidden="true"
+      animate={{ scale: rep(1, peak, 1), filter: rep('drop-shadow(0 0 0 rgba(27,138,156,0))', `drop-shadow(0 0 ${strong ? 9 : 4}px rgba(27,138,156,${strong ? 0.85 : 0.45}))`, 'drop-shadow(0 0 0 rgba(27,138,156,0))') }}
+      transition={{ duration: period, repeat: Infinity, ease: 'linear', times }}
+      style={{ flex: 'none', overflow: 'visible' }}
+    >
+      <motion.circle cx="13" cy="13" r="11.5" stroke={TEAL} strokeWidth={2} initial={{ fill: lo }} animate={{ fill: rep(lo, hi, lo) }} transition={{ duration: period, repeat: Infinity, ease: 'linear', times }} />
+      <motion.text x="13" y="17.6" textAnchor="middle" fontSize="13" fontWeight="700" fontFamily="Inter, sans-serif" initial={{ fill: TEAL_D }} animate={{ fill: rep(TEAL_D, strong ? '#ffffff' : TEAL_D, TEAL_D) }} transition={{ duration: period, repeat: Infinity, ease: 'linear', times }}>$</motion.text>
+    </motion.svg>
+  );
+}
+
 /** a coin for relative cost: a teal ring with a dollar sign, never a number */
 export function Coin({ delay = 0, size = 26 }: { delay?: number; size?: number }) {
   return (

@@ -4,6 +4,7 @@ import { LAB_STOPS } from '../../src/content/labStops';
 import { LAB_GUIDE, guideSteps, partLines } from '../../src/content/labGuide';
 import { JupyterDrawer } from '../../src/overlay/jupyter/JupyterDrawer';
 import { useDrawerStore, stopStepCount } from '../../src/engine/presentation';
+import { useUiStore } from '../../src/engine/ui';
 
 beforeEach(() => useDrawerStore.getState().reset());
 
@@ -105,6 +106,7 @@ test('while the Jupyter drawer is open the caption steps aside, and comes back w
   const { useSceneStore } = await import('../../src/engine/store');
   useSceneStore.getState().setScenes([{ id: '2.6a', chapter: 1, title: 'One query', shot: 'sky', script: 'One call, four data models.' }]);
   useSceneStore.getState().setSettled(true);
+  useUiStore.setState({ scriptOpen: true });
   const c = render(<Overlay />).container;
   expect(c.querySelector('.script')).not.toBeNull();
   act(() => useDrawerStore.setState({ open: true }));

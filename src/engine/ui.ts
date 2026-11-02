@@ -22,9 +22,10 @@ const initial = storedTheme();
 
 function storedScript(): boolean {
   try {
-    return localStorage.getItem('cityops.script') !== 'off';
+    // captions (CC) start closed (owner, 2 Nov); the choice is remembered on this device
+    return localStorage.getItem('cityops.script') === 'on';
   } catch {
-    return true;
+    return false;
   }
 }
 if (typeof document !== 'undefined') applyThemeToDocument(initial);

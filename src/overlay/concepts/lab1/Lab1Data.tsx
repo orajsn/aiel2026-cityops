@@ -37,10 +37,10 @@ function Box({ title, ho, children, style, ...rest }: { title: ReactNode; ho: nu
 export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-assistant" kickerColor="var(--teal)">
-      <Fill max={1.12}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 270fr) 34px minmax(0, 880fr) 34px minmax(0, 236fr)', alignItems: 'stretch', columnGap: 4, marginTop: 4, flex: 1 }}>
+      <Fill max={1.25}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 270fr) 34px minmax(0, 880fr) 34px minmax(0, 236fr)', alignItems: 'stretch', columnGap: 4, marginTop: 8, flex: 1 }}>
         {/* the app */}
-        <motion.div data-app {...fadeUp(0.2)} style={{ borderRadius: 12, background: '#1f2a33', color: '#e6e9ef', padding: '14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <motion.div data-app {...fadeUp(0.2)} style={{ borderRadius: 12, background: '#1f2a33', color: '#e6e9ef', padding: '16px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span style={{ ...cap, color: '#aab4bf', fontSize: 15 }}>The app</span>
             <HandsOn n={3} solid />
@@ -51,7 +51,7 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
             <SteelPhoto w={42} label={false} />
             or attach a delivery photo
           </div>
-          <div style={{ marginTop: 'auto', fontSize: 16, color: '#aab4bf' }}>scoped to one project code</div>
+          <div style={{ fontSize: 16, color: '#aab4bf', marginTop: 6 }}>scoped to one project code</div>
         </motion.div>
 
         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -97,7 +97,19 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
                 <Chip style={{ background: '#1f2a33', color: '#fff' }}>file_search</Chip>
                 finds the passage
               </div>
-              <div style={{ marginTop: 'auto', borderRadius: 8, background: SOFT, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 17, color: 'var(--ink)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22, padding: '14px 0 12px' }}>
+                <div style={{ display: 'grid', gap: 5 }}>
+                  {[0, 1, 2, 3].map((i) => (
+                    <span key={i} style={{ width: 84, height: 13, borderRadius: 3, border: `1.5px solid ${TEAL}`, background: TINT }} />
+                  ))}
+                </div>
+                <svg width="92" height="56" viewBox="0 0 46 28" aria-hidden="true">
+                  {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                    <circle key={i} cx={6 + (i % 4) * 11} cy={i < 4 ? 6 : 20} r={4} fill={TEAL} />
+                  ))}
+                </svg>
+              </div>
+              <div style={{ borderRadius: 8, background: SOFT, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 17, color: 'var(--ink)' }}>
                 <PdfIcon size={30} />
                 <b>Object Storage bucket</b>
                 <Flow w={26} delay={2.4} />
@@ -109,8 +121,17 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
                 <Chip style={{ background: '#1f2a33', color: '#fff' }}>NL2SQL</Chip>
                 asks the database in plain words
               </div>
-              <div style={{ fontSize: 18, fontWeight: 600, color: TEAL_D, margin: 'auto 0' }}>✓ SQL checked: it cannot reach other projects</div>
-              <div style={{ marginTop: 'auto', borderRadius: 8, background: SOFT, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 17, color: 'var(--ink)' }}>
+              <div style={{ display: 'grid', gap: 5, padding: '14px 0 10px', justifyItems: 'center' }}>
+                {[0, 1, 2].map((r) => (
+                  <div key={r} style={{ display: 'flex', gap: 5 }}>
+                    {[0, 1, 2, 3].map((c) => (
+                      <span key={c} style={{ width: 52, height: 13, borderRadius: 3, background: r === 0 ? TEAL : TINT, border: `1.5px solid ${TEAL}` }} />
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 600, color: TEAL_D, margin: '0 0 10px' }}>✓ SQL checked: it cannot reach other projects</div>
+              <div style={{ borderRadius: 8, background: SOFT, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 17, color: 'var(--ink)' }}>
                 <DbIcon size={28} />
                 <b>Autonomous AI Database</b>
                 <Flow w={26} delay={2.6} />
@@ -125,14 +146,14 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
         </div>
 
         {/* the answer */}
-        <motion.div data-answer {...fadeUp(3)} style={{ ...card(true), background: TINT, padding: '14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <motion.div data-answer {...fadeUp(3)} style={{ ...card(true), background: TINT, padding: '16px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 14 }}>
           <div style={capTeal}>The answer</div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 19, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.2 }}>
             <PdfIcon size={34} />
             cites the specification
           </div>
-          <div data-engineer style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, fontSize: 19, fontWeight: 700, color: 'var(--ink)' }}>
-            <Avatar who="engineer" size={54} />
+          <div data-engineer style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10, fontSize: 19, fontWeight: 700, color: 'var(--ink)' }}>
+            <Avatar who="engineer" size={64} />
             the engineer decides
           </div>
         </motion.div>

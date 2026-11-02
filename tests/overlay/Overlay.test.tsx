@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { Overlay } from '../../src/overlay/Overlay';
 import { useSceneStore } from '../../src/engine/store';
+import { useUiStore } from '../../src/engine/ui';
 
 beforeEach(() => {
   useSceneStore.getState().setScenes([
@@ -37,6 +38,7 @@ test('on-screen Next and Back buttons step through the scenes (iPad has no arrow
 });
 
 test('the presenter script shows under the page and the Script button hides and shows it', async () => {
+  useUiStore.setState({ scriptOpen: true });
   const { fireEvent } = await import('@testing-library/react');
   useSceneStore.getState().setScenes([{ id: 'a', chapter: 0, title: 'A', shot: 'city-high', script: 'Say this line.' }]);
   render(<Overlay />);

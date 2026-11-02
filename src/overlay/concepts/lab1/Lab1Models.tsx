@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import type { CSSProperties, ReactNode } from 'react';
 import { WidePanel } from '../WidePanel';
-import { CARD, Clip, Coin, DbIcon, DIM, Flow, LockIcon, Net, RuntimeBar, SOFT, Shield, Spark, SteelPhoto, Switch, TEAL, TEAL_D, GREY, TextIcon, TINT, cap, capTeal, card, fade, fadeUp, mono, Fill } from './parts';
+import { CARD, Clip, BreathingCoin, Coin, DbIcon, DIM, Flow, LockIcon, ModelNet, Net, netWaveEnd, RuntimeBar, SOFT, Shield, Spark, SteelPhoto, Switch, TEAL, TEAL_D, GREY, TextIcon, TINT, cap, capTeal, card, fade, fadeUp, mono, Fill } from './parts';
 import type { Lab1Props } from './parts';
 
 /**
@@ -264,68 +264,119 @@ export function L1SitePhoto({ kicker, message, notebook }: Lab1Props) {
 /* ---------- 1.7 · the baseline ---------- */
 
 export const REQUESTS = [
-  { kind: 'text', title: 'Specification requirements' },
-  { kind: 'text', title: 'Supplier recommendation' },
-  { kind: 'photo', title: 'structural-steel delivery' },
+  { kind: 'text', title: 'Easy question', sub: 'a quick text question' },
+  { kind: 'text', title: 'Super complex question', sub: 'with the knowledge base retrieved', kb: true },
+  { kind: 'photo', title: 'Photo with site notes', sub: 'a delivery photo and its caption' },
 ] as const;
 
-function Request({ kind, title, coins, delay, h = 120 }: { kind: 'text' | 'photo'; title: string; coins?: number; delay: number; h?: number }) {
+/** the three requests, the same on the baseline and on the routing page (same rows, same left column) */
+const ROW_H = 150;
+const ROW_GAP = 24;
+const COL_H = ROW_H * 3 + ROW_GAP * 2;
+
+/** a lit window: the element glows from `start` to `end` seconds of each `period`, easing in and out */
+interface Lit {
+  period: number;
+  wins: [number, number][];
+}
+const litKeys = ({ period, wins }: Lit) => {
+  const at = (x: number) => Math.min(1, Math.max(0, x / period));
+  return { times: [0, ...wins.flatMap(([s, e]) => [at(s), at(s + 0.35), at(e - 0.35), at(e)]), 1], opacity: [0, ...wins.flatMap(() => [0, 1, 1, 0]), 0] };
+};
+
+/** a teal frame and halo over its box while it is lit (the box must be position: relative) */
+function Glow({ lit, radius }: { lit: Lit; radius: number }) {
+  const k = litKeys(lit);
+  return (
+    <motion.span
+      data-glow
+      aria-hidden="true"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: k.opacity }}
+      transition={{ duration: lit.period, repeat: Infinity, ease: 'linear', times: k.times }}
+      style={{ position: 'absolute', inset: -2, borderRadius: radius + 2, border: `3px solid ${TEAL}`, background: 'rgba(27,138,156,0.10)', boxShadow: '0 0 22px rgba(27,138,156,0.45)', pointerEvents: 'none' }}
+    />
+  );
+}
+
+/** one stretch of the route drawn in light: it draws itself from `from` to `to`, stays lit until `until`, then fades */
+function LitPath({ d, period, from, to, until }: { d: string; period: number; from: number; to: number; until: number }) {
+  const at = (x: number) => Math.min(1, Math.max(0, x / period));
+  return (
+    <motion.path
+      data-lit-path
+      d={d}
+      fill="none"
+      stroke={TEAL}
+      strokeWidth={5}
+      strokeLinecap="round"
+      initial={{ pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: [0, 0, 1, 1, 1], opacity: [0, 1, 1, 1, 0] }}
+      transition={{ duration: period, repeat: Infinity, ease: 'linear', times: [0, at(from), at(to), at(until), at(until + 0.4)] }}
+      style={{ filter: 'drop-shadow(0 0 6px rgba(27,138,156,0.8))' }}
+    />
+  );
+}
+
+function Request({ kind, title, sub, kb, coins, delay, breath, runtime, lit }: { kind: 'text' | 'photo'; title: string; sub: string; kb?: boolean; coins?: number; delay: number; breath?: { period: number; start: number }; runtime?: boolean; lit?: Lit }) {
   const photo = kind === 'photo';
   return (
-    <motion.div data-request={kind} {...fadeUp(delay)} style={{ height: h, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 16, padding: '0 22px', borderRadius: 12, background: photo ? TINT : SOFT, border: `2px solid ${photo ? TEAL : 'transparent'}` }}>
-      {photo ? <SteelPhoto w={100} label={false} /> : <TextIcon size={44} />}
+    <motion.div data-request={kind} {...fadeUp(delay)} style={{ position: 'relative', height: ROW_H, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 18, padding: '0 22px', borderRadius: 14, background: photo ? TINT : SOFT, border: `2px solid ${photo ? TEAL : 'transparent'}` }}>
+      {lit && <Glow lit={lit} radius={14} />}
+      {photo ? <SteelPhoto w={132} label={false} /> : kb ? <DbIcon size={60} /> : <TextIcon size={60} />}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ ...cap, fontSize: 13 }}>{photo ? 'Photo' : 'Text'}</div>
-        <div style={{ fontSize: 22, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.2 }}>{title}</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.15, whiteSpace: 'nowrap' }}>{title}</div>
+        <div style={{ fontSize: 16, color: DIM, lineHeight: 1.25, marginTop: 1 }}>{sub}</div>
+        {runtime && (
+          <motion.div {...fadeUp(delay + 2)} style={{ marginTop: 6 }}>
+            <RuntimeBar model="the multimodal model" routing="disabled" size={13} />
+          </motion.div>
+        )}
       </div>
       {coins !== undefined && (
-        <div data-cost={coins} style={{ display: 'flex', gap: 3 }}>
+        <motion.div data-cost={coins} {...fadeUp(delay + 1.6)} style={{ display: 'flex', gap: 4 }}>
           {Array.from({ length: coins }, (_, i) => (
-            <Coin key={i} delay={delay + 1.6 + i * 0.08} size={30} />
+            <BreathingCoin key={i} size={34} strong period={breath?.period ?? 7} start={(breath?.start ?? 4.5) + i * 0.12} />
           ))}
-        </div>
+        </motion.div>
       )}
     </motion.div>
   );
 }
 
+/* one pass of the baseline: the data arrives at 1.8 s, the model's wave runs through its layers, then the coins breathe */
+const BASE_P = 7;
+const BASE_WAVE = 1.8;
+
 export function L1Baseline({ kicker, message, notebook }: Lab1Props) {
+  const breathAt = netWaveEnd('large', BASE_WAVE) + 0.1;
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-baseline" kickerColor="var(--teal)">
-      <Fill max={1.06}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 430fr) 140px minmax(0, 380fr) auto', alignItems: 'center', alignContent: 'center', columnGap: 10, marginTop: 6, flex: 1 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
+      <Fill max={1.25}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 680fr) 100px minmax(0, 520fr)', alignItems: 'stretch', marginTop: 10, flex: 1 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: ROW_GAP, justifyContent: 'center' }}>
           {REQUESTS.map((r, i) => (
-            <Request key={r.title} kind={r.kind} title={r.title} coins={3} delay={0.3 + i * 0.3} h={140} />
+            <Request key={r.title} kind={r.kind} title={r.title} sub={r.sub} kb={'kb' in r} coins={3} runtime delay={0.3 + i * 0.3} breath={{ period: BASE_P, start: breathAt }} />
           ))}
         </div>
-        <svg data-flow="all-to-one" width="140" height="492" viewBox="0 0 170 492" preserveAspectRatio="none" fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" aria-hidden="true">
-          <path d="M0 70C90 70 80 246 170 246" />
-          <path d="M0 246H170" />
-          <path d="M0 422C90 422 80 246 170 246" />
-          <motion.circle r={5} fill={TEAL} stroke="none" initial={{ cx: 4, cy: 246, opacity: 0 }} animate={{ cx: [4, 164], opacity: [0, 1, 1, 0] }} transition={{ delay: 1.6, duration: 2.4, repeat: Infinity, repeatDelay: 2.6, ease: 'easeInOut' }} />
+        <svg data-flow="all-to-one" width="100" height={COL_H} viewBox={`0 0 110 ${COL_H}`} preserveAspectRatio="none" fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" aria-hidden="true" style={{ alignSelf: 'center', width: 100 }}>
+          <path d={`M0 ${ROW_H / 2}C70 ${ROW_H / 2} 40 ${COL_H / 2} 110 ${COL_H / 2}`} />
+          <path d={`M0 ${COL_H / 2}H110`} />
+          <path d={`M0 ${COL_H - ROW_H / 2}C70 ${COL_H - ROW_H / 2} 40 ${COL_H / 2} 110 ${COL_H / 2}`} />
+          <motion.circle r={5} fill={TEAL} stroke="none" initial={{ cx: 4, cy: COL_H / 2, opacity: 0 }} animate={{ cx: [4, 4, 106, 106], opacity: [0, 1, 0, 0] }} transition={{ duration: BASE_P, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4 / BASE_P, (BASE_WAVE - 0.1) / BASE_P, 1] }} />
         </svg>
-        <motion.div data-model="multimodal" {...fadeUp(1)} style={{ ...card(true), padding: '56px 28px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 18, boxShadow: '0 8px 24px rgba(27,138,156,0.12)' }}>
-          <Net w={270} live who="multimodal" />
-          <div style={{ fontSize: 29, fontWeight: 700, color: 'var(--ink)' }}>the multimodal model</div>
-          <div style={{ fontSize: 18, color: DIM, lineHeight: 1.35 }}>reads text and sees photos: the more capable model, and the costlier one</div>
-        </motion.div>
-        <motion.div {...fadeUp(2.2)} style={{ paddingLeft: 16, maxWidth: 380 }}>
-          <div style={{ ...cap, fontSize: 13, marginBottom: 10 }}>The runtime bar, each time</div>
-          <div style={{ display: 'grid', gap: 10, justifyItems: 'start' }}>
-            {[0, 1, 2].map((i) => (
-              <motion.div key={i} {...fadeUp(2.4 + i * 0.3)}>
-                <RuntimeBar model="the multimodal model" routing="disabled" size={14} />
-              </motion.div>
-            ))}
-          </div>
-          <div style={{ fontSize: 19, color: DIM, marginTop: 16, lineHeight: 1.45 }}>
-            <b style={{ color: 'var(--ink)' }}>Same model, every time.</b> Write it down, with the rough response time: that is the baseline.
+        <motion.div data-model="multimodal" {...fadeUp(1)} style={{ ...card(true), border: `2.5px solid ${TEAL}`, height: COL_H, boxSizing: 'border-box', alignSelf: 'center', padding: '18px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 10, boxShadow: '0 8px 24px rgba(27,138,156,0.16)' }}>
+          <ModelNet w={430} shape="large" who="multimodal" period={BASE_P} start={BASE_WAVE} />
+          <div style={{ fontSize: 27, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.1 }}>Multimodal model</div>
+          <div style={{ fontSize: 18, color: DIM, lineHeight: 1.3 }}>reads text and sees photos: the most capable model, and the costliest</div>
+          <div style={{ fontSize: 19, color: DIM, lineHeight: 1.3, marginTop: 4 }}>
+            <b style={{ color: 'var(--ink)' }}>Same model, every time.</b> Write down the rough response time: that is the baseline.
           </div>
         </motion.div>
       </div>
-      <motion.div data-question="baseline" {...fadeUp(3.6)} style={{ marginTop: 26, borderRadius: 12, background: TINT, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 20 }}>
-        <span style={capTeal}>The question</span>
+      <motion.div data-question="baseline" {...fadeUp(3.6)} style={{ marginTop: 22, borderRadius: 14, background: TINT, padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 20 }}>
+        <span style={{ ...capTeal, whiteSpace: 'nowrap' }}>The question</span>
         <span style={{ fontSize: 24, color: 'var(--ink)' }}>
           Two of these three requests are text only. <b>Do they need a model that can see?</b>
         </span>
@@ -337,79 +388,112 @@ export function L1Baseline({ kicker, message, notebook }: Lab1Props) {
 
 /* ---------- 1.8 · model routing ---------- */
 
-function ModelCard({ id, name, sub, coins, delay }: { id: string; name: string; sub: string; coins: number; delay: number }) {
+/* the routing page runs three passes in one loop, one request at a time (the easy question, the complex one, the photo). In a
+   pass the request lights up, its line draws itself in light to the "has an image?" check, the check lights, the branch draws
+   itself to its model, the model lights and its layers run a wave, and last its coins breathe. */
+const PASS = 7.2;
+const ROUTE_P = PASS * 3;
+const T0 = [0.1, 0.1 + PASS, 0.1 + 2 * PASS];
+/** which model each request reaches: the text requests the lower-cost one, the photo the multimodal one */
+const GOES_TO = ['low', 'low', 'high'] as const;
+const WAVE_AT = 2.5;
+/** the lower-cost card's centre; the multimodal one is mirrored below the middle */
+const CARD_MID = (COL_H - ROW_GAP) / 4;
+const MID = COL_H / 2;
+const rowY = (i: number) => ROW_H / 2 + i * (ROW_H + ROW_GAP);
+const startsFor = (m: 'low' | 'high') => T0.filter((_, i) => GOES_TO[i] === m).map((s) => s + WAVE_AT);
+const litFor = (pick: (i: number) => [number, number] | null): Lit => ({ period: ROUTE_P, wins: T0.map((s, i) => [s, i] as const).flatMap(([s, i]) => { const w = pick(i); return w ? [[s + w[0], s + w[1]] as [number, number]] : []; }) });
+
+function ModelCard({ id, name, sub, coins, delay, shape, which }: { id: string; name: string; sub: string; coins: number; delay: number; shape: 'small' | 'large'; which: 'low' | 'high' }) {
+  const big = shape === 'large';
+  const waves = startsFor(which);
+  const breaths = waves.map((s) => netWaveEnd(shape, s) + 0.1);
+  const lit = litFor((i) => (GOES_TO[i] === which ? [WAVE_AT - 0.3, PASS - 0.2] : null));
   return (
-    <motion.div data-model={id} {...fadeUp(delay)} style={{ ...card(true), flex: 1, padding: '18px 22px', display: 'flex', alignItems: 'center', gap: 20 }}>
-      <Net w={120} who={id} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)' }}>{name}</div>
-        <div style={{ fontSize: 18, color: DIM, marginBottom: 10 }}>{sub}</div>
-        <RuntimeBar model={name} routing="enabled" size={15} />
+    <motion.div data-model={id} {...fadeUp(delay)} style={{ ...card(true), position: 'relative', flex: 1, minHeight: 0, boxSizing: 'border-box', padding: '12px 20px', display: 'grid', gridTemplateColumns: '190px 1fr', gridTemplateRows: '1fr auto', columnGap: 16, rowGap: 6, alignItems: 'center', ...(big ? { border: `2.5px solid ${TEAL}`, boxShadow: '0 8px 24px rgba(27,138,156,0.16)' } : null) }}>
+      <Glow lit={lit} radius={14} />
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <ModelNet w={big ? 190 : 120} shape={shape} who={id} period={ROUTE_P} start={waves} />
       </div>
-      <div data-cost={coins} style={{ display: 'flex', gap: 3, alignSelf: 'flex-start' }}>
-        {Array.from({ length: coins }, (_, i) => (
-          <Coin key={i} delay={delay + 0.6 + i * 0.08} size={30} />
-        ))}
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: 23, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.1 }}>{name}</div>
+        <div style={{ fontSize: 17, color: DIM, margin: '2px 0 6px' }}>{sub}</div>
+        <div data-cost={coins} style={{ display: 'flex', gap: 4 }}>
+          {Array.from({ length: coins }, (_, i) => (
+            <BreathingCoin key={i} size={big ? 32 : 30} strong={big} period={ROUTE_P} start={breaths.map((s) => s + i * 0.12)} />
+          ))}
+        </div>
+      </div>
+      <div style={{ gridColumn: '1 / 3' }}>
+        <RuntimeBar model={id === 'multimodal' ? 'the multimodal model' : 'the lower-cost model'} routing="enabled" size={13} />
       </div>
     </motion.div>
   );
 }
 
 export function L1Routing({ kicker, message, notebook }: Lab1Props) {
+  const upper = (i: number) => (GOES_TO[i] === 'low' ? CARD_MID : COL_H - CARD_MID);
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-routing" kickerColor="var(--teal)">
-      <Fill max={1.1}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 360fr) 100px 200px 100px minmax(0, 600fr)', alignItems: 'center', alignContent: 'center', marginTop: 6, flex: 1 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+      <Fill max={1.25}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 560fr) 80px 170px 80px minmax(0, 560fr)', alignItems: 'center', marginTop: 10, flex: 1 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: ROW_GAP }}>
           {REQUESTS.map((r, i) => (
-            <Request key={r.title} kind={r.kind} title={r.kind === 'photo' ? 'steel delivery photo' : r.title} delay={0.3 + i * 0.25} h={104} />
+            <Request key={r.title} kind={r.kind} title={r.title} sub={r.sub} kb={'kb' in r} delay={0.3 + i * 0.25} lit={litFor((k) => (k === i ? [0, PASS - 0.2] : null))} />
           ))}
         </div>
-        <svg width="100" height="356" viewBox="0 0 110 356" preserveAspectRatio="none" fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" aria-hidden="true">
-          <path d="M0 52C60 52 50 178 110 178M0 178H110M0 304C60 304 50 178 110 178" />
+        <svg width="80" height={COL_H} viewBox={`0 0 110 ${COL_H}`} preserveAspectRatio="none" fill="none" aria-hidden="true" overflow="visible">
+          {REQUESTS.map((r, i) => (
+            <path key={r.title} d={`M0 ${rowY(i)}C60 ${rowY(i)} 50 ${MID} 110 ${MID}`} stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" />
+          ))}
+          {REQUESTS.map((r, i) => (
+            <LitPath key={`lit-${r.title}`} d={`M0 ${rowY(i)}C60 ${rowY(i)} 50 ${MID} 110 ${MID}`} period={ROUTE_P} from={T0[i] + 0.2} to={T0[i] + 1.2} until={T0[i] + PASS - 0.6} />
+          ))}
         </svg>
-        <motion.div data-router {...fadeUp(1)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 136, height: 136, transform: 'rotate(45deg)', border: `2.5px solid ${TEAL}`, borderRadius: 8, background: CARD, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ transform: 'rotate(-45deg)', fontSize: 20, fontWeight: 700, color: 'var(--ink)', textAlign: 'center', lineHeight: 1.2 }}>
+        {/* the diamond sits exactly where the three request lines meet (the middle of the column) */}
+        <motion.div data-router {...fadeUp(1)} style={{ position: 'relative', height: COL_H }}>
+          <div style={{ position: 'absolute', left: '50%', top: '50%', width: 124, height: 124, transform: 'translate(-50%, -50%) rotate(45deg)', border: `2.5px solid ${TEAL}`, borderRadius: 8, background: CARD, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ transform: 'rotate(-45deg)', fontSize: 19, fontWeight: 700, color: 'var(--ink)', textAlign: 'center', lineHeight: 1.2 }}>
               has an
               <br />
               image?
             </span>
+            <Glow lit={litFor(() => [1.1, PASS - 0.8])} radius={8} />
           </div>
-          <span style={{ marginTop: 20, padding: '4px 12px', borderRadius: 6, background: TINT, ...mono(17), fontWeight: 700 }}>response_model</span>
-          <span style={{ fontSize: 16, color: DIM }}>in llm.py</span>
+          <div style={{ position: 'absolute', left: 0, right: 0, top: 'calc(50% + 84px)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <span style={{ padding: '4px 12px', borderRadius: 6, background: TINT, ...mono(17), fontWeight: 700 }}>response_model</span>
+            <span style={{ fontSize: 16, color: DIM }}>in llm.py</span>
+          </div>
         </motion.div>
-        <svg width="100" height="380" viewBox="0 0 110 380" fill="none" aria-hidden="true">
-          <path d="M0 190C60 190 50 92 110 92" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" />
-          <path d="M0 190C60 190 50 288 110 288" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" />
-          <text x="62" y="84" fontSize="17" fontWeight="700" fill={TEAL_D} fontFamily="Inter, sans-serif">no</text>
-          <text x="62" y="314" fontSize="17" fontWeight="700" fill={TEAL_D} fontFamily="Inter, sans-serif">yes</text>
-          <motion.circle r={5} fill={TEAL} initial={{ cx: 2, cy: 190, opacity: 0 }} animate={{ cx: [2, 40, 70, 108], cy: [190, 180, 110, 92], opacity: [0, 1, 1, 0] }} transition={{ delay: 2, duration: 2, repeat: Infinity, repeatDelay: 2.6, ease: 'easeInOut' }} />
+        <svg width="80" height={COL_H} viewBox={`0 0 110 ${COL_H}`} fill="none" aria-hidden="true" overflow="visible">
+          {[CARD_MID, COL_H - CARD_MID].map((y) => (
+            <path key={y} d={`M0 ${MID}C60 ${MID} 50 ${y} 110 ${y}`} stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" />
+          ))}
+          <text x="56" y={CARD_MID - 14} fontSize="18" fontWeight="700" fill={TEAL_D} fontFamily="Inter, sans-serif">no</text>
+          <text x="52" y={COL_H - CARD_MID + 34} fontSize="18" fontWeight="700" fill={TEAL_D} fontFamily="Inter, sans-serif">yes</text>
+          {REQUESTS.map((r, i) => (
+            <LitPath key={`b-${r.title}`} d={`M0 ${MID}C60 ${MID} 50 ${upper(i)} 110 ${upper(i)}`} period={ROUTE_P} from={T0[i] + 1.3} to={T0[i] + 2.3} until={T0[i] + PASS - 0.6} />
+          ))}
         </svg>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, height: 380 }}>
-          <ModelCard id="lower-cost" name="the lower-cost model" sub="text-only requests" coins={1} delay={1.6} />
-          <ModelCard id="multimodal" name="the multimodal model" sub="requests with an image" coins={3} delay={1.9} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: ROW_GAP, height: COL_H }}>
+          <ModelCard id="lower-cost" name="Lower-cost model" sub="text-only requests" coins={1} delay={1.6} shape="small" which="low" />
+          <ModelCard id="multimodal" name="Multimodal model" sub="requests with an image" coins={3} delay={1.9} shape="large" which="high" />
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginTop: 24 }}>
-        <motion.div data-turn-on {...fadeUp(2.8)} style={{ ...card(), border: 'none', padding: '16px 22px', display: 'grid', gridTemplateColumns: '100px 1fr', rowGap: 10, alignItems: 'center' }}>
-          <span style={{ ...cap, fontSize: 13, gridColumn: '1 / 3' }}>Turn it on</span>
-          <b style={{ fontSize: 19, color: 'var(--ink)' }}>Build</b>
-          <span style={{ fontSize: 18, color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            add one line to <span style={mono(16, 'var(--ink)')}>llm.py</span>, set <span style={{ padding: '1px 6px', borderRadius: 4, background: TINT, ...mono(15), fontWeight: 700 }}>…ROUTING_ENABLED=true</span>
-          </span>
-          <b style={{ fontSize: 19, color: 'var(--ink)' }}>Launch</b>
-          <span style={{ fontSize: 18, color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 22 }}>
+        <motion.div data-turn-on {...fadeUp(2.8)} style={{ ...card(), border: 'none', padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 10, justifyContent: 'center' }}>
+          <span style={cap}>Turn it on</span>
+          <span style={{ fontSize: 20, fontWeight: 600, color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: 14 }}>
             Runtime configuration › Model routing <Switch on delay={3.4} w={46} />
           </span>
         </motion.div>
-        <motion.div data-cost-note {...fadeUp(3.1)} style={{ borderRadius: 12, background: TINT, padding: '16px 22px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+        <motion.div data-cost-note {...fadeUp(3.1)} style={{ borderRadius: 14, background: TINT, padding: '16px 24px', display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 24 }}>
           <div>
-            <div style={{ ...capTeal, fontSize: 13, marginBottom: 6 }}>The cost, honestly</div>
-            <div style={{ fontSize: 19, color: 'var(--ink)', lineHeight: 1.4 }}>Text requests move to the cheaper model; photos keep the capable one.</div>
+            <div style={{ ...capTeal, marginBottom: 6 }}>The cost, honestly</div>
+            <div style={{ fontSize: 20, color: 'var(--ink)', lineHeight: 1.35 }}>Text requests move to the cheaper model; photos keep the capable one.</div>
           </div>
-          <div style={{ borderLeft: '1.5px solid rgba(27,138,156,0.35)', paddingLeft: 18, fontSize: 16, color: DIM, lineHeight: 1.45 }}>
-            The runtime bar shows <b style={{ color: 'var(--ink)' }}>which model</b>, not billable tokens. <b style={{ color: 'var(--ink)' }}>Response time is not cost.</b> No saving is claimed without full token counts and current prices.
+          <div style={{ borderLeft: '1.5px solid rgba(27,138,156,0.35)', paddingLeft: 20, fontSize: 16, color: DIM, lineHeight: 1.45 }}>
+            The runtime bar shows <b style={{ color: 'var(--ink)' }}>which model</b>, not billable tokens. <b style={{ color: 'var(--ink)' }}>Response time is not cost.</b> No saving is claimed without token counts and current prices.
           </div>
         </motion.div>
       </div>

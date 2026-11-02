@@ -50,8 +50,8 @@ export const lab1: SceneDef[] = [
   atBridge('1.5', 'Which supplier is ready', 'L1Suppliers', { kicker: 'Hands-on 2 · Semantic Store', message: 'Ask in plain words. Get **governed data**, for this project only.' }),
   atBridge('1.6a', 'Launch the app', 'L1Launch', { kicker: 'Hands-on 3 · Launch the app', message: 'Launch the packaged app **on OCI**. No key is stored.' }),
   atBridge('1.6', 'A photo from the site', 'L1SitePhoto', { kicker: 'Hands-on 3 · Test the app with a photo', message: 'A photo shows **what is visible**. It cannot prove what is safe.' }),
-  atBridge('1.7', 'Does every question need the big model?', 'L1Baseline', { kicker: 'Hands-on 4 · First, the baseline', message: 'Today, **every request** goes to the multimodal model.' }),
-  atBridge('1.8', 'Model routing', 'L1Routing', { kicker: 'Hands-on 4 · Model routing', message: 'Text goes to the **lower-cost model**. Photos stay on the multimodal one.' }),
+  atBridge('1.7', 'Does every question need the big model?', 'L1Baseline', { kicker: 'Hands-on 4 · First, the baseline', message: 'Today, **every request** goes to the **multimodal model**.' }),
+  atBridge('1.8', 'Model routing', 'L1Routing', { kicker: 'Hands-on 4 · Model routing', message: 'Text goes to the **lower-cost model**. Photos stay on the **multimodal model**.' }),
   atBridge('1.9', 'Guardrails', 'L1Guardrails', { kicker: 'Hands-on 5 · Guardrails', message: 'Check every prompt **before** the model sees it.' }),
   // 1.10 · the Lab 1 recap (owner approved Flow110V2, 29 Oct): what we built, then NEXT, the crack
   atBridge('1.10', 'Lab 1 recap', 'L1Recap', {

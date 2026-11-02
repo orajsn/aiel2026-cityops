@@ -31,7 +31,7 @@ test('1.7 baseline: three requests, text or photo, all on the multimodal model; 
   const c = render(<L1Baseline kicker="k" message="m" />).container;
   expect(attrs(c, 'data-request')).toEqual(['text', 'text', 'photo']);
   expect(c.querySelector('[data-flow="all-to-one"]')).not.toBeNull();
-  expect(c.querySelector('[data-model="multimodal"]')?.textContent).toContain('the multimodal model');
+  expect(c.querySelector('[data-model="multimodal"]')?.textContent).toContain('Multimodal model');
   expect(attrs(c, 'data-runtime')).toEqual(['the multimodal model', 'the multimodal model', 'the multimodal model']);
   expect(attrs(c, 'data-cost')).toEqual(['3', '3', '3']);
   expect(c.querySelector('[data-question="baseline"]')?.textContent).toContain('Do they need a model that can see?');
