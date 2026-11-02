@@ -779,3 +779,12 @@ body.is-idle, body.is-idle * { cursor: none !important; }
 .hd__lbfig img { max-width: 1700px; max-height: 930px; border-radius: 8px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); background: #fff; }
 .hd__lbfig figcaption { font-size: 18px; color: #d7dee5; }
 .hd__lbclose { right: 28px; top: 28px; }
+
+/* Lab 1's people and places on the bridge (src/world/Lab1Story.tsx): round icon markers anchored in 3D */
+.l1-chip { position: relative; width: 62px; height: 62px; box-sizing: border-box; border-radius: 50%; background: #fff; border: 4px solid #1B8A9C; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); }
+.l1-chip--var { border-color: var(--l1); transition: border-color 400ms; }
+.l1-chip__tag { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(247, 247, 247, 0.96); color: #1d2a33; }
+.l1-chip__tag--right { left: 72px; }
+.l1-chip__tag--left { right: 72px; }
+.l1-chip__tag--var { border-color: var(--l1); transition: border-color 400ms; }
+.l1-chip__tag--var .marker-label__pier { color: var(--l1); }

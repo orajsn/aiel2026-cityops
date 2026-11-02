@@ -35,6 +35,8 @@ export interface WorldProps {
   inspect?: { pier: 'pier3' | 'pier2'; who: string; leave?: boolean };
   /** true: both incident markers (Pier 3 and Pier 2); 'pier2': only Pier 2, the problem Lab 3 comes back for */
   markers?: boolean | 'pier2';
+  /** Lab 1's first three pages on the bridge (Lab1Story.tsx): the crack, the plan, the photo */
+  lab1?: 'crack' | 'plan' | 'capture';
   /** which AI idea the sky stage over the Ops Center is showing (none = hidden) */
   sky?: SkyAct;
   /** close-up of the Ops Center control room, with the city faded behind it */
