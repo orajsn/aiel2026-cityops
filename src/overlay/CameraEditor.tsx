@@ -36,7 +36,7 @@ export function CameraEditor() {
       <div className="cam-edit__row">
         <span className="cam-edit__title mono">
           Camera · page {scene.id} · place {scene.shot}
-          {overrides[scene.id] ? ' · saved angle' : ''}
+          {scene.heldView ? ' · holds the part’s view: a saved angle is not used here' : overrides[scene.id] ? ' · saved angle' : scene.sameAngleAs && overrides[scene.sameAngleAs] ? ` · saved angle (from page ${scene.sameAngleAs})` : ''}
         </span>
         <span className={`cam-edit__badge${clean ? ' is-ok' : ' is-warn'}`}>{clean ? 'only city in frame' : 'sky or map edge in frame'}</span>
       </div>

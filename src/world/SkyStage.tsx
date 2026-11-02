@@ -13,7 +13,7 @@ import { SkyLab2, type Lab2Act } from './SkyLab2';
 import { NeuralNet } from './NeuralNet';
 import { ReferenceFolder } from './ReferenceFolder';
 import { Rich } from '../overlay/Rich';
-import type { Vec3 } from './shots';
+import { SHOTS, type Vec3 } from './shots';
 import { SKY_ANCHOR, at, MODEL, MODEL_SCALE, MODEL_IN, MODEL_OUT, DB, CLOUD, ENVELOPE, OPS_TOP, along, DB_WIDE, MODEL_WIDE, MODEL_WIDE_IN, BRIEF_AT, FOLDER } from './skyPlaces';
 import { UnifiedBoard } from './UnifiedBoard';
 import { boardPoint } from './answerBoard';
@@ -40,6 +40,17 @@ const A = SKY_ANCHOR;
 const CLOUD_SCALE = 0.075;
 /** the question as a point in the cloud's own space (near the "structural" cluster) */
 const QUERY: Vec3 = [8, 6, -4];
+/**
+ * Lab 1's 4a (owner, 2 Nov: show what it means that points group together): the question lands inside the "steel" group
+ * (the second of the cloud's three clusters), so its nearest five are the steel passages. The groups are drawn as rings
+ * with a name each: similar meaning sits together, other topics sit elsewhere.
+ */
+const QUERY_STEEL: Vec3 = [12.5, -2, 5];
+const GROUPS: { c: Vec3; r: number; name: string; focus: boolean }[] = [
+  { c: [-13, 7, -8], r: 9.5, name: 'other topics', focus: false },
+  { c: [14, -3, 7], r: 10.5, name: 'steel · materials', focus: true },
+  { c: [-1, -11, 15], r: 8.5, name: 'other topics', focus: false },
+];
 
 const LAB2_ACTS: (SkyAct | null)[] = ['note'];
 /** Lab 2 pages 5 and 6: the database far left, the model far right (skyPlaces), the tools or the four shapes between */
@@ -126,7 +137,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
     [],
   );
   const cloud = useMemo(() => layoutCloud(600, 7), []);
-  const near = useMemo(() => nearestK(cloud, QUERY, 5), [cloud]);
+  const near = useMemo(() => nearestK(cloud, act === 'retrieve' ? QUERY_STEEL : QUERY, 5), [cloud, act]);
   const nearWorld = useMemo<Vec3[]>(
     () => near.map((i) => [CLOUD[0] + cloud[i][0] * CLOUD_SCALE, CLOUD[1] + cloud[i][1] * CLOUD_SCALE, CLOUD[2] + cloud[i][2] * CLOUD_SCALE]),
     [near, cloud],
@@ -141,6 +152,8 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
   const hasDb = embedAct || env;
   const embedded = env || act === 'vector3' || (act === 'vector2' && t > 400) || (act === 'embed' && t > 2600);
   const showQuery = env || (act === 'vector3' && t > 500) || (act === 'embed' && t > 4200);
+  // the groups appear once the points exist (click 2) and the steel one lights when the question lands in it (click 3)
+  const showGroups = (act === 'vector2' && t > 1400) || act === 'vector3';
   const semantic = act === 'semantic' || act === 'semantic2' || act === 'semantic3' || act === 'semantic4';
   const semanticStage = semantic ? Number((act as string).slice(-1)) || 1 : 0;
 
@@ -179,7 +192,8 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
             {act && WIDE_ACTS.includes(act) && <ModelOrb position={MODEL_WIDE} lit doubt={false} producing={act === 'tools' || t > 5600} labelled={visible} scale={MODEL_SCALE} />}
             {hasDb && (
               <group position={CLOUD} scale={CLOUD_SCALE}>
-                <VectorField phase={embedded ? 'embedded' : 'documents'} query={showQuery ? QUERY : undefined} k={5} spin={false} documentsOffset={[0, -14, 0]} tweenMs={1400} />
+                <VectorField phase={embedded ? 'embedded' : 'documents'} query={showQuery ? (vec || act === 'retrieve' ? QUERY_STEEL : QUERY) : undefined} k={5} spin={false} documentsOffset={[0, -14, 0]} tweenMs={1400} />
+                {showGroups && <ClusterRings focus={act === 'vector3'} visible={visible} />}
               </group>
             )}
             {env && (
@@ -234,6 +248,34 @@ function ModelOrb({ position, lit, doubt, labelled, producing, scale = 1 }: { po
         </Html>
       )}
     </group>
+  );
+}
+
+/** the cloud's groups drawn as rings facing the camera, each with a name: points that mean the same thing sit together (cloud space) */
+function ClusterRings({ focus, visible }: { focus: boolean; visible: boolean }) {
+  const facing = useMemo(() => {
+    const m = new THREE.Matrix4().lookAt(new THREE.Vector3(...SHOTS.sky.position), new THREE.Vector3(...SHOTS.sky.target), new THREE.Vector3(0, 1, 0));
+    return new THREE.Quaternion().setFromRotationMatrix(m);
+  }, []);
+  const circle = useMemo(() => Array.from({ length: 65 }, (_, i) => [Math.cos((i / 64) * Math.PI * 2), Math.sin((i / 64) * Math.PI * 2), 0] as Vec3), []);
+  return (
+    <>
+      {GROUPS.map((g, i) => {
+        const hot = g.focus && focus;
+        return (
+          <group key={i}>
+            <mesh position={g.c}>
+              <sphereGeometry args={[g.r, 24, 18]} />
+              <meshBasicMaterial color={g.focus ? '#1B8A9C' : '#8a919c'} transparent opacity={hot ? 0.16 : 0.07} depthWrite={false} toneMapped={false} />
+            </mesh>
+            <group position={g.c} quaternion={facing} scale={g.r}>
+              <Line points={circle} color={g.focus ? '#1B8A9C' : '#8a919c'} lineWidth={hot ? 3 : 1.5} transparent opacity={g.focus ? 1 : 0.7} />
+            </group>
+            {visible && <SkyLabel position={[g.c[0], g.c[1] + g.r * 1.15, g.c[2]]} text={g.name} show tone={g.focus ? 'teal' : 'grey'} />}
+          </group>
+        );
+      })}
+    </>
   );
 }
 
