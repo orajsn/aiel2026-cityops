@@ -170,7 +170,8 @@ function Cloud3D({ show, groups, ask, pick, flyTo, fly }: { show: number; groups
       // the five nearest fly out to the book (click 4)
       const pos = isNear && fly > 0 ? lerp(at, flyTo, ease(fly)) : at;
       dummy.position.set(...pos);
-      dummy.scale.setScalar(isNear ? (pick > 0 ? 2.4 + Math.sin(pick * 6) * 0.2 : 1.8) : 1);
+      // once the five have flown into the folder they are in it: they do not stay behind as a red dot
+      dummy.scale.setScalar(isNear ? (fly > 0.97 ? 0 : pick > 0 ? 2.4 + Math.sin(pick * 6) * 0.2 : 1.8) : 1);
       dummy.updateMatrix();
       m.setMatrixAt(i, dummy.matrix);
       const c = member[i];
@@ -218,7 +219,7 @@ function Cloud3D({ show, groups, ask, pick, flyTo, fly }: { show: number; groups
             <ringGeometry args={[0.24, 0.29, 36]} />
             <meshBasicMaterial color="#ffffff" toneMapped={false} side={THREE.DoubleSide} />
           </mesh>
-          <Card at={[0.95, -0.62]} show={ask}>
+          <Card at={[-0.5, -0.7]} show={ask}>
             <div style={{ fontSize: 22, fontWeight: 700, color: '#c74634', background: 'rgba(255,255,255,0.95)', padding: '2px 10px', borderRadius: 8, whiteSpace: 'nowrap' }}>the question</div>
           </Card>
         </group>
@@ -353,7 +354,7 @@ export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'r
           <Card at={[NET_AT[0], NET_AT[1] - 1.15]} show={ease((t - 3300) / 500)}>
             <div style={{ fontSize: 18, fontWeight: 700, color: '#1d2733', background: 'rgba(255,255,255,0.92)', padding: '2px 10px', borderRadius: 6 }}>the language model</div>
           </Card>
-          <Glyph at={[NET_AT[0], 0.55]} g="↓" show={ease((t - 4300) / 500)} />
+          <Glyph at={[NET_AT[0], 0.0]} g="↓" show={ease((t - 4300) / 500)} />
           <Card at={[-4.2, -0.55]} show={ease((t - 4800) / 600)}>
             <div style={{ width: 600, padding: '14px 20px', background: '#fff', border: '3px solid #1b8a9c', borderRadius: 14, boxShadow: '0 6px 16px rgba(20,40,60,.25)' }}>
               <div style={{ fontSize: 24, fontWeight: 700, color: '#1d2733' }}>the answer cites the specification</div>
