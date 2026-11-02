@@ -9,6 +9,7 @@ import { VectorField } from './VectorField';
 import { layoutCloud, nearestK } from './vectorLayout';
 import { SkyShapes } from './SkyShapes';
 import { SkySemantic } from './SkySemantic';
+import { SkyVectorize } from './SkyVectorize';
 import { SkyLab2, type Lab2Act } from './SkyLab2';
 import { NeuralNet } from './NeuralNet';
 import { ReferenceFolder } from './ReferenceFolder';
@@ -154,10 +155,12 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
   const vec = act === 'vector' || act === 'vector2' || act === 'vector3';
   const embedAct = act === 'embed' || vec;
   const hasDb = embedAct || env;
-  const embedded = env || act === 'vector3' || (act === 'vector2' && t > 400) || (act === 'embed' && t > 2600);
-  const showQuery = env || (act === 'vector3' && t > 500) || (act === 'embed' && t > 4200);
+  const embedded = env || act === 'vector3' || (act === 'vector2' && t > 2600) || (act === 'embed' && t > 2600);
+  const showQuery = env || (act === 'vector3' && t > 2700) || (act === 'embed' && t > 4200);
+  // the cloud of points is not there while the PDFs come in (click 1) or turn into numbers (until 2.6 s of click 2)
+  const cloudShown = act !== 'vector' && !(act === 'vector2' && t < 2600);
   // the groups appear once the points exist (click 2) and the steel one lights when the question lands in it (click 3)
-  const showGroups = (act === 'vector2' && t > 1400) || act === 'vector3';
+  const showGroups = (act === 'vector2' && t > 4200) || act === 'vector3';
   const semantic = act === 'semantic' || act === 'semantic2' || act === 'semantic3' || act === 'semantic4';
   const semanticStage = semantic ? Number((act as string).slice(-1)) || 1 : 0;
 
@@ -183,7 +186,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       <group position={A}>
         <group ref={root}>
           <group position={[-A[0], -A[1], -A[2]]}>
-            {(act === 'model' || embedAct || env) && <ModelOrb position={MODEL} lit={env && te > 3800} doubt={act === 'model' && t > 2600} producing={(act === 'model' && t > 2300) || (env && te > 3800)} labelled={visible} scale={MODEL_SCALE} />}
+            {(act === 'model' || act === 'embed' || env) && <ModelOrb position={MODEL} lit={env && te > 3800} doubt={act === 'model' && t > 2600} producing={(act === 'model' && t > 2300) || (env && te > 3800)} labelled={visible} scale={MODEL_SCALE} />}
             {/* page 4: one folder of references; it swells as three questions pile in, and still does not take them */}
             {act === 'overflow' && (
               <group position={FOLDER} scale={2.0}>
@@ -193,13 +196,14 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
             {act === 'brain' && <ModelOrb position={[A[0], A[1] + 0.4, A[2]]} lit doubt={false} producing labelled={visible} scale={2.2} />}
             {act && LAB2_ACTS.includes(act) && <SkyLab2 act={act as Lab2Act} center={[A[0], A[1] + 0.2, A[2]]} t={t} red={theme.red} opsTop={OPS_TOP} />}
             {(hasDb || semantic) && <SkyDatabase color={theme.red} appearMs={0} t={act === 'vector' || act === 'semantic' || act === 'embed' || act === 'envelope' ? t : 9999} />}
+            {vec && <SkyVectorize act={act as 'vector' | 'vector2' | 'vector3'} t={t} visible={visible} />}
             {semantic && <SkySemantic t={t} stage={semanticStage} visible={visible} />}
             {act && WIDE_ACTS.includes(act) && <SkyDatabase color={theme.red} appearMs={0} t={9999} position={DB_WIDE} />}
             {act && WIDE_ACTS.includes(act) && <ModelOrb position={MODEL_WIDE} lit doubt={false} producing={act === 'tools' || t > 5600} labelled={visible} scale={MODEL_SCALE} />}
             {hasDb && (
-              <group position={CLOUD} scale={CLOUD_SCALE}>
+              <group position={CLOUD} scale={CLOUD_SCALE} visible={cloudShown}>
                 <VectorField phase={embedded ? 'embedded' : 'documents'} query={showQuery ? (vec || act === 'retrieve' ? QUERY_STEEL : QUERY) : undefined} k={5} spin={false} documentsOffset={[0, -14, 0]} tweenMs={1400} />
-                {showGroups && <ClusterRings focus={act === 'vector3'} ask={act === 'vector3' && t > 400} visible={visible} />}
+                {showGroups && <ClusterRings focus={act === 'vector3'} ask={act === 'vector3' && t > 2700} visible={visible} />}
               </group>
             )}
             {env && (
@@ -235,7 +239,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       </group>
       {/* flows between the city and the stage (outside the scaled group so they stay anchored to the city) */}
       {visible && act === 'model' && <FlowArc key="q-up" from={along([QUESTION_AT[0], QUESTION_AT[1] - 0.4, QUESTION_AT[2]], 1.5)} to={MODEL_IN} lift={0.4} radius={0.05} durationMs={1600} delayMs={900} fadeMs={900} color="#ffffff" />}
-      {visible && embedAct &&
+      {visible && act === 'embed' &&
         sources.map((s, i) => <FlowArc key={`doc-${i}`} from={s} to={DB} lift={2.5} radius={0.04} durationMs={1300} delayMs={500 + i * 180} fadeMs={600} color={theme.data} />)}
       {/* page 6: the query comes up from the Ops Center into the database; the brief goes into the model's first layer */}
       {visible && act === 'unified' && <FlowArc key="query" from={OPS_TOP} to={[DB_WIDE[0], DB_WIDE[1] + 0.5, DB_WIDE[2]]} lift={1.2} radius={0.05} durationMs={1200} delayMs={200} fadeMs={800} color="#ffffff" />}

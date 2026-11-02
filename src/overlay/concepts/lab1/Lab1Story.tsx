@@ -75,9 +75,9 @@ export const CAPTURE: StoryConfig = {
  */
 export const VECTOR: StoryConfig = {
   steps: [
-    { title: 'The specification', sub: 'A PDF in Object Storage, synced in.', icon: 'doc' },
-    { title: 'Meaning becomes numbers', sub: 'Each chunk is 384 numbers, a point. Similar meaning lands in the same group.', icon: 'points' },
-    { title: 'The question is a point too', sub: 'It lands in the steel group; its five nearest points light up.', icon: 'chat' },
+    { title: 'The specification', sub: 'Three PDFs from Object Storage, synced into the database.', icon: 'doc' },
+    { title: 'Meaning becomes numbers', sub: 'Each PDF becomes rows of 384 numbers: points in space. Similar meaning lands in the same group.', icon: 'points' },
+    { title: 'The question is a point too', sub: 'It becomes 384 numbers the same way, lands in the steel group, and its five nearest points light up.', icon: 'chat' },
     { title: 'The top five go to the model', sub: 'The five nearest points are picked out, then file_search hands them over.', icon: 'target' },
   ],
   pill: 'Nearest by meaning, not by matching words',
