@@ -1,8 +1,7 @@
-import { useMemo } from 'react';
-import * as THREE from 'three';
+import type * as THREE from 'three';
+import { useThree } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
 import { FlowArc } from './FlowArc';
-import { SHOTS } from './shots';
 import { CLOUD, DB, OPS_TOP } from './skyPlaces';
 import type { Vec3 } from './shots';
 
@@ -12,11 +11,17 @@ import type { Vec3 } from './shots';
  * Center, the SQL check frames the rows of this one project (the others dim: they cannot be reached), and the rows come
  * back down to the Ops Center. Nothing here is text: the words are in the page's panel.
  */
+type Quat = THREE.Quaternion;
 const ease = (t: number) => {
   const c = Math.max(0, Math.min(1, t));
   return c < 0.5 ? 4 * c * c * c : 1 - Math.pow(-2 * c + 2, 3) / 2;
 };
 
+const mix = (k: number) => {
+  const a = [0xaa, 0xb4, 0xbd];
+  const b = [0x1b, 0x8a, 0x9c];
+  return `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * k)).join(',')})`;
+};
 const COLS = 3;
 const ROWS = 5;
 const W = 2.7;
@@ -32,7 +37,7 @@ const TABLES: { y: number; mine: number }[] = [
   { y: 0.05, mine: 2 },
 ];
 
-function Table({ y, t, index, facing, stage }: { y: number; t: number; index: number; facing: THREE.Quaternion; stage: number }) {
+function Table({ y, t, index, facing, stage }: { y: number; t: number; index: number; facing: Quat; stage: number }) {
   const k = stage > 1 ? 1 : ease((t - SEMANTIC_MS.tables - index * 260) / 700);
   const checked = stage > 3 ? 1 : stage === 3 ? ease((t - 300) / 600) : 0;
   const cw = (W - 0.2) / COLS;
@@ -52,7 +57,7 @@ function Table({ y, t, index, facing, stage }: { y: number; t: number; index: nu
           const mine = MINE.includes(r);
           // before the check every row reads the same; after it, this project's rows turn teal and the rest dim
           const lit = mine ? checked : 0;
-          const color = new THREE.Color('#aab4bd').lerp(new THREE.Color('#1B8A9C'), lit);
+          const color = mix(lit);
           return (
             <mesh key={`${r}-${c}`} position={[-W / 2 + 0.1 + cw * (c + 0.5), H / 2 - 0.26 - rh * (r + 0.5), 0.01]}>
               <planeGeometry args={[cw - 0.08, rh - 0.05]} />
@@ -66,10 +71,7 @@ function Table({ y, t, index, facing, stage }: { y: number; t: number; index: nu
 }
 
 export function SkySemantic({ t, stage, visible }: { t: number; stage: number; visible: boolean }) {
-  const facing = useMemo(() => {
-    const m = new THREE.Matrix4().lookAt(new THREE.Vector3(...SHOTS.sky.position), new THREE.Vector3(...SHOTS.sky.target), new THREE.Vector3(0, 1, 0));
-    return new THREE.Quaternion().setFromRotationMatrix(m);
-  }, []);
+  const facing = useThree((s) => s.camera).quaternion;
   const top: Vec3 = [DB[0], DB[1] + 1.0, DB[2]];
   const mid: Vec3 = [CLOUD[0], CLOUD[1] + TABLES[1].y - 2.2, CLOUD[2]];
   // the SQL check: a teal frame round this project's rows of the middle table

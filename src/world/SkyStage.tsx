@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
 import { ASSETS, project } from '../content/geo';
 import { useUiStore } from '../engine/ui';
@@ -10,6 +10,7 @@ import { layoutCloud, nearestK } from './vectorLayout';
 import { SkyShapes } from './SkyShapes';
 import { SkySemantic } from './SkySemantic';
 import { SkyVectorize } from './SkyVectorize';
+import { basisOf, offset } from './skyView';
 import { SkyLab2, type Lab2Act } from './SkyLab2';
 import { NeuralNet } from './NeuralNet';
 import { ReferenceFolder } from './ReferenceFolder';
@@ -69,11 +70,7 @@ const ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 0.9, MODEL_OUT[2]], 0.5)
 const BARE_A = '“!!I don’t have any reports!! about a Harbor Bridge in your city. In general, bridges can show cracking, corrosion or bearing wear…”';
 /** Lab 2 page 3: the answer comes out of the model's last layer, built from the references (draft wording, no recorded run) */
 const RAG_ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 1.4, MODEL_OUT[2]], 0.5);
-/** 4a: the answer stands below the model, so it stays clear of the page's panel on the right */
-const RETRIEVE_ANSWER_AT: Vec3 = along([MODEL[0], MODEL[1] - 2.3, MODEL[2]], -0.9);
 /** 4b: the SQL the semantic store wrote (click 3) and the rows that come back (click 4), standing right of the tables, clear of the panel */
-const SQL_AT: Vec3 = at(2.0, 1.7);
-const ROWS_AT: Vec3 = at(2.0, 1.2);
 const SQL_TEXT = 'SELECT … FROM **governed views** WHERE project = **this project**';
 const ROWS_TEXT = '**supplier** · recommendation status · fit score · risk level · explanation';
 const RAG_A = '“Harbor Bridge has **two recent findings**: a **hairline crack** near a bearing plate, !!0.12 mm!!, and **surface corrosion** on a bearing assembly, !!about 25% section loss!!. From the **five reports retrieved**.”';
@@ -95,12 +92,18 @@ function useActClock(act: SkyAct | null) {
   const start = useRef(performance.now());
   const last = useRef(0);
   const [t, setT] = useState(0);
+  // Lab 1's 4a and 4b play after the camera has arrived (a click from the bridge flies for about 3 s first); the older acts keep
+  // their clock from the page change
+  const settled = useSceneStore((s) => s.settled);
+  const waits = !!act && /^(vector|retrieve|semantic)/.test(act);
+  const running = !waits || settled;
   useEffect(() => {
     start.current = performance.now();
     last.current = 0;
     setT(0);
-  }, [act]);
+  }, [act, running]);
   useFrame(() => {
+    if (!running) return;
     const now = performance.now();
     const elapsed = now - start.current;
     if (elapsed > ACT_MS + 100 || now - last.current < 33) return;
@@ -138,10 +141,13 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
     [],
   );
   const cloud = useMemo(() => layoutCloud(600, 7), []);
-  const camFacing = useMemo(() => {
-    const m = new THREE.Matrix4().lookAt(new THREE.Vector3(...SHOTS.sky.position), new THREE.Vector3(...SHOTS.sky.target), new THREE.Vector3(0, 1, 0));
-    return new THREE.Quaternion().setFromRotationMatrix(m);
-  }, []);
+  const camera = useThree((s) => s.camera);
+  const camFacing = camera.quaternion;
+  const basis = basisOf(camera);
+  // cards that stand beside things are placed on the screen's right and up of the live camera (skyView.ts)
+  const retrieveAnswerAt = offset(basis, MODEL, -0.9, -2.3);
+  const sqlAt = offset(basis, A, 2.0, 1.7);
+  const rowsAt = offset(basis, A, 2.0, 1.2);
   const near = useMemo(() => nearestK(cloud, act === 'retrieve' ? QUERY_STEEL : QUERY, 5), [cloud, act]);
   const nearWorld = useMemo<Vec3[]>(
     () => near.map((i) => [CLOUD[0] + cloud[i][0] * CLOUD_SCALE, CLOUD[1] + cloud[i][1] * CLOUD_SCALE, CLOUD[2] + cloud[i][2] * CLOUD_SCALE]),
@@ -247,11 +253,11 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       {/* 1.1: the inspector's question goes in bare, and a general guess comes out */}
       {visible && act === 'model' && <SkyCard position={QUESTION_AT} who="the question" text={BARE_Q} show={t > 200} />}
       {visible && act === 'model' && <SkyCard position={ANSWER_AT} who="the language model · answer" text={BARE_A} show={t > 3900} tone="grey" anchor="left" />}
-      {visible && act === 'semantic3' && <SkyCard position={SQL_AT} who="NL2SQL · the SQL it wrote" text={SQL_TEXT} show={t > 500} />}
+      {visible && act === 'semantic3' && <SkyCard position={sqlAt} who="NL2SQL · the SQL it wrote" text={SQL_TEXT} show={t > 500} />}
       {visible && act === 'semantic3' && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="SQL checked: it cannot reach other projects" show={t > 1300} />}
-      {visible && act === 'semantic4' && <SkyCard position={ROWS_AT} who="the semantic store · rows for this project" text={ROWS_TEXT} show={t > 1700} />}
+      {visible && act === 'semantic4' && <SkyCard position={rowsAt} who="the semantic store · rows for this project" text={ROWS_TEXT} show={t > 1700} />}
       {visible && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="Oracle AI Database · 384 numbers per text" show={(act === 'embed' && t > 2800) || act === 'vector2' || act === 'vector3'} />}
-      {visible && env && <SkyCard position={act === 'retrieve' ? RETRIEVE_ANSWER_AT : RAG_ANSWER_AT} who="the language model · answer, from the references" text={RAG_A} show={te > 5200} anchor={act === 'retrieve' ? 'center' : 'left'} />}
+      {visible && env && <SkyCard position={act === 'retrieve' ? retrieveAnswerAt : RAG_ANSWER_AT} who="the language model · answer, from the references" text={RAG_A} show={te > 5200} anchor={act === 'retrieve' ? 'center' : 'left'} />}
       </group>
     </>
   );
@@ -277,10 +283,8 @@ function ModelOrb({ position, lit, doubt, labelled, producing, scale = 1 }: { po
 
 /** the cloud's groups drawn as rings facing the camera, each with a name: points that mean the same thing sit together (cloud space) */
 function ClusterRings({ focus, ask, visible }: { focus: boolean; ask: boolean; visible: boolean }) {
-  const facing = useMemo(() => {
-    const m = new THREE.Matrix4().lookAt(new THREE.Vector3(...SHOTS.sky.position), new THREE.Vector3(...SHOTS.sky.target), new THREE.Vector3(0, 1, 0));
-    return new THREE.Quaternion().setFromRotationMatrix(m);
-  }, []);
+  // the rings face the live camera, so a saved angle shows them square
+  const facing = useThree((s) => s.camera).quaternion;
   const circle = useMemo(() => Array.from({ length: 65 }, (_, i) => [Math.cos((i / 64) * Math.PI * 2), Math.sin((i / 64) * Math.PI * 2), 0] as Vec3), []);
   return (
     <>

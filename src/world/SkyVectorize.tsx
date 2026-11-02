@@ -1,6 +1,8 @@
 import { Html } from '@react-three/drei';
 import type { ReactNode } from 'react';
-import { DB, at } from './skyPlaces';
+import { useThree } from '@react-three/fiber';
+import { DB } from './skyPlaces';
+import { basisOf, offset } from './skyView';
 import type { Vec3 } from './shots';
 
 /**
@@ -57,15 +59,15 @@ export function PdfBook({ name, size = 1 }: { name?: string; size?: number }) {
 function Strip({ t, seed, icon, tone }: { t: number; seed: number; icon: ReactNode; tone: 'teal' | 'red' }) {
   const text = vectorNumbers(seed);
   const col = tone === 'teal' ? '#146f7f' : '#C74634';
-  const shift = -((t * 0.06) % 900);
+  const shift = -((t * 0.09) % 1400);
   return (
-    <div style={{ ...card, display: 'flex', alignItems: 'center', gap: 12, width: 520, padding: '8px 14px', background: 'rgba(255,255,255,0.96)', borderRadius: 12, border: `2px solid ${col}`, boxShadow: '0 6px 16px rgba(20,40,60,0.25)' }}>
+    <div style={{ ...card, display: 'flex', alignItems: 'center', gap: 16, width: 800, padding: '12px 20px', background: 'rgba(255,255,255,0.96)', borderRadius: 12, border: `2px solid ${col}`, boxShadow: '0 6px 16px rgba(20,40,60,0.25)' }}>
       <div style={{ flex: 'none', display: 'flex' }}>{icon}</div>
-      <span style={{ color: col, fontSize: 24, fontWeight: 700 }}>→</span>
-      <div style={{ flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', fontFamily: 'var(--font-mono, "JetBrains Mono", monospace)', fontSize: 17, fontWeight: 600, color: '#1f2a33', maskImage: 'linear-gradient(to right, transparent, #000 8%, #000 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, #000 8%, #000 80%, transparent)' }}>
+      <span style={{ color: col, fontSize: 36, fontWeight: 700 }}>→</span>
+      <div style={{ flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', fontFamily: 'var(--font-mono, "JetBrains Mono", monospace)', fontSize: 26, fontWeight: 600, color: '#1f2a33', maskImage: 'linear-gradient(to right, transparent, #000 8%, #000 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, #000 8%, #000 80%, transparent)' }}>
         <span style={{ display: 'inline-block', transform: `translateX(${shift}px)` }}>( {text}, … )</span>
       </div>
-      <span style={{ flex: 'none', fontSize: 15, fontWeight: 700, color: col, background: tone === 'teal' ? 'rgba(27,138,156,0.12)' : 'rgba(199,70,52,0.1)', padding: '3px 9px', borderRadius: 999 }}>384 numbers</span>
+      <span style={{ flex: 'none', fontSize: 22, fontWeight: 700, color: col, background: tone === 'teal' ? 'rgba(27,138,156,0.12)' : 'rgba(199,70,52,0.1)', padding: '3px 9px', borderRadius: 999 }}>384 numbers</span>
     </div>
   );
 }
@@ -73,8 +75,10 @@ function Strip({ t, seed, icon, tone }: { t: number; seed: number; icon: ReactNo
 const HOLD = (t: number, from: number, to: number, fade = 350) => Math.min(ease((t - from) / fade), 1 - ease((t - to) / fade));
 
 export function SkyVectorize({ act, t, visible }: { act: 'vector' | 'vector2' | 'vector3'; t: number; visible: boolean }) {
+  const camera = useThree((s) => s.camera);
   if (!visible) return null;
-  const dbTop: Vec3 = [DB[0], DB[1] + 1.1, DB[2]];
+  const b = basisOf(camera);
+  const dbTop = offset(b, DB, 0, 1.1);
   if (act === 'vector') {
     // three PDFs fly in from the top left and drop into the database, one after another
     return (
@@ -82,13 +86,13 @@ export function SkyVectorize({ act, t, visible }: { act: 'vector' | 'vector2' | 
         {PDFS.map((name, i) => {
           const start = 300 + i * 1000;
           const k = ease((t - start) / 1300);
-          const from = at(-6.4 + i * 0.5, 6.4 - i * 0.7);
+          const from = offset(b, DB, -4.2 + i * 0.7, 5.6 - i * 0.6);
           const pos = lerp3(from, dbTop, k);
           const op = Math.min(ease((t - start + 250) / 300), 1 - ease((t - start - 1100) / 300));
           if (op <= 0.01) return null;
           return (
             <Html key={name} position={pos} center zIndexRange={[16, 0]} style={{ pointerEvents: 'none', opacity: op, transform: `scale(${1 - 0.55 * k})`, transformOrigin: 'center' }}>
-              <PdfBook name={name} />
+              <PdfBook name={name} size={1.5} />
             </Html>
           );
         })}
@@ -104,10 +108,10 @@ export function SkyVectorize({ act, t, visible }: { act: 'vector' | 'vector2' | 
           const op = HOLD(t, start, 3300);
           if (op <= 0.01) return null;
           const rise = ease((t - start) / 700);
-          const pos: Vec3 = [DB[0], DB[1] + 1.4 + (1.2 + i * 1.0) * rise, DB[2]];
+          const pos = offset(b, DB, 1.4, 1.4 + (1.3 + i * 1.25) * rise);
           return (
             <Html key={name} position={pos} center zIndexRange={[16, 0]} style={{ pointerEvents: 'none', opacity: op }}>
-              <Strip t={t} seed={i + 3} tone="teal" icon={<PdfBook size={0.42} />} />
+              <Strip t={t} seed={i + 3} tone="teal" icon={<PdfBook size={0.62} />} />
             </Html>
           );
         })}
@@ -118,14 +122,14 @@ export function SkyVectorize({ act, t, visible }: { act: 'vector' | 'vector2' | 
   const op = HOLD(t, 200, 2900);
   if (op <= 0.01) return null;
   const rise = ease((t - 200) / 700);
-  const pos: Vec3 = [DB[0], DB[1] + 1.4 + 2.2 * rise, DB[2]];
+  const pos = offset(b, DB, 1.4, 1.4 + 2.6 * rise);
   return (
     <Html position={pos} center zIndexRange={[16, 0]} style={{ pointerEvents: 'none', opacity: op }}>
       <Strip
         t={t}
         seed={11}
         tone="red"
-        icon={<div style={{ ...card, fontSize: 17, fontWeight: 700, color: '#1f2a33', maxWidth: 120, lineHeight: 1.2 }}>“Which supplier is ready?”</div>}
+        icon={<div style={{ ...card, fontSize: 24, fontWeight: 700, color: '#1f2a33', maxWidth: 190, lineHeight: 1.2 }}>“Which supplier is ready?”</div>}
       />
     </Html>
   );
