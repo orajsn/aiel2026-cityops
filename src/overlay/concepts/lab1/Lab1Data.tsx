@@ -38,7 +38,7 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-assistant" kickerColor="var(--teal)">
       <Fill max={1.25}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 270fr) 34px minmax(0, 880fr) 34px minmax(0, 236fr)', alignItems: 'stretch', columnGap: 4, marginTop: 8, flex: 1 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 270fr) 34px minmax(0, 800fr) 34px minmax(0, 360fr)', alignItems: 'stretch', columnGap: 4, marginTop: 8, flex: 1 }}>
         {/* the app */}
         <motion.div data-app {...fadeUp(0.2)} style={{ borderRadius: 12, background: '#1f2a33', color: '#e6e9ef', padding: '16px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -145,14 +145,23 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
           <Flow w={32} delay={3} />
         </div>
 
-        {/* the answer */}
-        <motion.div data-answer {...fadeUp(3)} style={{ ...card(true), background: TINT, padding: '16px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 14 }}>
+        {/* the answer: three kinds of evidence it can bring back, then the person who decides */}
+        <motion.div data-answer {...fadeUp(3)} style={{ ...card(true), background: TINT, padding: '16px 14px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={capTeal}>The answer</div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 19, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.2 }}>
-            <PdfIcon size={34} />
-            cites the specification
-          </div>
-          <div data-engineer style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10, fontSize: 19, fontWeight: 700, color: 'var(--ink)' }}>
+          {[
+            { key: 'spec', icon: <PdfIcon size={54} />, title: 'cites the specification', sub: 'the passage it found' },
+            { key: 'data', icon: <DbIcon size={50} />, title: 'governed supplier fields', sub: 'for this project only' },
+            { key: 'photo', icon: <SteelPhoto w={72} label={false} />, title: 'what the photo shows', sub: 'apart from what it assumes' },
+          ].map((r, i) => (
+            <motion.div key={r.key} data-evidence={r.key} {...fadeUp(3.2 + i * 0.25)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, background: CARD, borderRadius: 10, padding: '8px 12px' }}>
+              <span style={{ width: 76, display: 'flex', justifyContent: 'center', flex: 'none' }}>{r.icon}</span>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.2, overflowWrap: 'anywhere' }}>{r.title}</div>
+                <div style={{ fontSize: 15, color: DIM, marginTop: 2 }}>{r.sub}</div>
+              </div>
+            </motion.div>
+          ))}
+          <div data-engineer style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 20, fontWeight: 700, color: 'var(--ink)', paddingTop: 4 }}>
             <Avatar who="engineer" size={64} />
             the engineer decides
           </div>
