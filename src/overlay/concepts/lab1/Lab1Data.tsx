@@ -3,6 +3,8 @@ import type { CSSProperties, ReactNode } from 'react';
 import { WidePanel } from '../WidePanel';
 import { Avatar, CARD, Clip, Chip, DbIcon, DIM, Flow, FlowDown, GREY, HandsOn, MONO, PdfIcon, SOFT, Shield, Spark, SteelPhoto, Switch, TEAL, TEAL_D, TINT, cap, capTeal, card, fade, fadeUp, mono, Fill } from './parts';
 import type { Lab1Props } from './parts';
+import seerAppVideo from '../../../assets/video/seer-app.mp4';
+import seerAppPoster from '../../../assets/video/seer-app-poster.jpg';
 
 /**
  * Lab 1 · AI Economics, the assistant and its data (V2, from the real workshop guide).
@@ -187,83 +189,42 @@ export function L1App({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-app" kickerColor="var(--teal)">
       <Fill>
-      <motion.div data-window="app" {...fadeUp(0.2)} style={{ marginTop: 4, borderRadius: 12, border: '2px solid var(--line)', overflow: 'hidden', background: CARD }}>
-        {/* the browser bar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px', background: 'rgba(138,151,163,0.18)' }}>
-          {[0, 1, 2].map((i) => (
-            <i key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: GREY, opacity: 0.6 }} />
-          ))}
-          <span style={{ marginLeft: 14, padding: '3px 12px', borderRadius: 6, background: CARD, ...mono(13, 'var(--ink)') }}>http://&lt;application-url&gt;:8080/</span>
-        </div>
-        {/* the app header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--line)' }}>
-          <span style={{ width: 26, height: 26, borderRadius: 6, background: TEAL }} />
-          <span style={{ fontSize: 21, fontWeight: 700, color: 'var(--ink)' }}>Seer Construction Intelligence</span>
-          <HandsOn n={3} />
-          <span style={{ fontSize: 14, color: DIM }}>you get it running in Hands-on 3</span>
-          <span data-scope style={{ marginLeft: 'auto', padding: '4px 10px', borderRadius: 6, background: TINT, fontSize: 14, fontWeight: 600, color: 'var(--ink)' }}>
-            Project code · <span style={mono(13)}>&lt;one project&gt;</span>
-          </span>
-          <span style={{ fontSize: 13, color: DIM }}>answers stay inside this project</span>
-        </div>
-        {/* the runtime bar */}
-        <div data-runtime-bar style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 16px', background: TINT, borderBottom: '1px solid var(--line)' }}>
-          <span style={{ ...cap, fontSize: 12 }}>Runtime bar</span>
-          <span style={tag()}>
-            model · <i style={{ color: DIM }}>the model that answered</i>
-          </span>
-          <span style={tag(true)}>Routing enabled</span>
-          <span style={tag(true)}>Guardrails enabled</span>
-          <span style={{ marginLeft: 'auto' }}>
-            <HandsOn n={4} solid />
-          </span>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px' }}>
-          {/* the chat */}
-          <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10, borderRight: '1px solid var(--line)' }}>
-            <motion.div {...fadeUp(0.8)} style={{ alignSelf: 'flex-end', padding: '6px 12px', borderRadius: 8, background: SOFT, fontSize: 16, color: 'var(--ink)' }}>
-              the <b>Specification requirements</b> sample question
-            </motion.div>
-            <motion.div data-reply="spec" {...fadeUp(1.1)} style={{ width: '88%', border: '1.5px solid var(--line)', borderRadius: 8, padding: '10px 14px', display: 'grid', gap: 7 }}>
-              <Bar w="92%" />
-              <Bar w="74%" />
-              <Bar w="54%" />
-              <span style={{ justifySelf: 'start', padding: '2px 9px', borderRadius: 999, border: `1.5px solid ${TEAL}`, fontSize: 13, fontWeight: 700, color: TEAL_D }}>cites the specification ✓</span>
-            </motion.div>
-            <motion.div {...fadeUp(1.5)} style={{ alignSelf: 'flex-end', padding: '6px 12px', borderRadius: 8, background: SOFT, fontSize: 16, color: 'var(--ink)' }}>
-              the <b>Supplier recommendation</b> sample question
-            </motion.div>
-            <motion.div data-reply="supplier" {...fadeUp(1.8)} style={{ width: '88%', border: '1.5px solid var(--line)', borderRadius: 8, padding: '10px 14px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr 0.9fr 0.9fr 1.1fr', gap: 12 }}>
-                {SUPPLIER_FIELDS.map((f) => (
-                  <div key={f} data-field={f} style={{ display: 'grid', gap: 6 }}>
-                    <span style={mono(13, 'var(--ink)')}>{f}</span>
-                    <Bar w="100%" h={7} />
-                    <Bar w="100%" h={7} />
-                  </div>
-                ))}
-              </div>
-              <span style={{ display: 'inline-block', marginTop: 8, padding: '2px 9px', borderRadius: 999, border: `1.5px solid ${TEAL}`, fontSize: 13, fontWeight: 700, color: TEAL_D }}>from governed project data ✓</span>
-            </motion.div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, border: '1.5px solid var(--line)', borderRadius: 8, padding: '7px 10px' }}>
-              <Clip />
-              <span style={{ fontSize: 15, color: DIM }}>Ask about the project, or attach a photo</span>
-              <span style={{ marginLeft: 'auto', padding: '4px 12px', borderRadius: 6, background: TEAL, color: '#fff', fontSize: 14, fontWeight: 700 }}>Submit</span>
-            </div>
-            <div data-try style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 14, fontWeight: 600, color: DIM }}>Try a prompt</span>
-              {TRY_A_PROMPT.map((t, i) => (
-                <span key={t} data-prompt={t} style={{ padding: '5px 12px', borderRadius: 6, border: `1.5px solid ${i === 2 ? 'var(--red)' : 'var(--line)'}`, color: i === 2 ? 'var(--red)' : 'var(--ink)', fontSize: 15, fontWeight: i === 2 ? 700 : 500 }}>
-                  {t}
-                </span>
-              ))}
-            </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.12fr) minmax(0, 1fr)', gap: 24, marginTop: 8, flex: 1, alignItems: 'start' }}>
+        {/* the real app, as the participants will see it (owner's screen recording, 2 Nov) */}
+        <motion.div data-window="app" {...fadeUp(0.2)} style={{ borderRadius: 12, border: '2px solid var(--line)', overflow: 'hidden', background: CARD }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px', background: 'rgba(138,151,163,0.18)' }}>
+            {[0, 1, 2].map((i) => (
+              <i key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: GREY, opacity: 0.6 }} />
+            ))}
+            <span style={{ marginLeft: 14, padding: '3px 12px', borderRadius: 6, background: CARD, ...mono(13, 'var(--ink)') }}>http://&lt;application-url&gt;:8080/</span>
+          </div>
+          <video data-app-video src={seerAppVideo} poster={seerAppPoster} autoPlay muted loop playsInline preload="auto" style={{ display: 'block', width: '100%', height: 'auto', aspectRatio: '1288 / 1106', background: '#fff' }} />
+        </motion.div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 24, fontWeight: 700, color: 'var(--ink)' }}>Seer Construction Intelligence</span>
+            <HandsOn n={3} />
+            <span data-scope style={{ marginLeft: 'auto', padding: '5px 12px', borderRadius: 6, background: TINT, fontSize: 16, fontWeight: 600, color: 'var(--ink)' }}>
+              Project code · <span style={mono(15)}>&lt;one project&gt;</span>
+            </span>
+          </div>
+          {/* the runtime bar */}
+          <div data-runtime-bar style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', borderRadius: 10, background: TINT, flexWrap: 'wrap' }}>
+            <span style={{ ...cap, fontSize: 13 }}>Runtime bar</span>
+            <span style={{ ...tag(), fontSize: 15 }}>
+              model · <i style={{ color: DIM }}>the model that answered</i>
+            </span>
+            <span style={{ ...tag(true), fontSize: 15 }}>Routing enabled</span>
+            <span style={{ ...tag(true), fontSize: 15 }}>Guardrails enabled</span>
+            <span style={{ marginLeft: 'auto' }}>
+              <HandsOn n={4} solid />
+            </span>
           </div>
           {/* Runtime configuration */}
-          <div data-config style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', borderBottom: '1px solid var(--line)', paddingBottom: 6 }}>
-              <span style={{ fontSize: 19, fontWeight: 700, color: 'var(--ink)' }}>Runtime configuration</span>
-              <span style={{ fontSize: 13, color: DIM }}>Launch path</span>
+          <div data-config style={{ ...card(), padding: '12px 18px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', borderBottom: '1px solid var(--line)', paddingBottom: 8 }}>
+              <span style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink)' }}>Runtime configuration</span>
+              <span style={{ fontSize: 15, color: DIM }}>one switch per hands-on step</span>
             </div>
             {SWITCHES.map((s, i) => (
               <motion.div
@@ -271,20 +232,28 @@ export function L1App({ kicker, message, notebook }: Lab1Props) {
                 data-config-switch={s.ho}
                 initial={{ backgroundColor: 'rgba(27,138,156,0)' }}
                 animate={{ backgroundColor: ['rgba(27,138,156,0)', 'rgba(27,138,156,0.12)', 'rgba(27,138,156,0)'] }}
-                transition={{ delay: 4 + i * 1.6, duration: 1.6, repeat: Infinity, repeatDelay: SWITCHES.length * 1.6 - 1.6 + 2, ease: 'easeInOut' }}
-                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 6px', borderBottom: '1px solid var(--line)' }}
+                transition={{ delay: 2 + i * 1.6, duration: 1.6, repeat: Infinity, repeatDelay: SWITCHES.length * 1.6 - 1.6 + 2, ease: 'easeInOut' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '11px 6px', borderBottom: '1px solid var(--line)' }}
               >
-                <Switch on delay={1.2 + i * 0.6} />
+                <Switch on delay={1.2 + i * 0.6} w={50} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.15 }}>{s.name}</div>
-                  <div style={{ fontSize: 13, color: DIM }}>{s.sub}</div>
+                  <div style={{ fontSize: 21, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.15 }}>{s.name}</div>
+                  <div style={{ fontSize: 16, color: DIM }}>{s.sub}</div>
                 </div>
                 <HandsOn n={s.ho} solid />
               </motion.div>
             ))}
           </div>
+          <div data-try style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 16, fontWeight: 600, color: DIM }}>Try a prompt</span>
+            {TRY_A_PROMPT.map((t, i) => (
+              <span key={t} data-prompt={t} style={{ padding: '7px 14px', borderRadius: 6, border: `1.5px solid ${i === 2 ? 'var(--red)' : 'var(--line)'}`, color: i === 2 ? 'var(--red)' : 'var(--ink)', fontSize: 16, fontWeight: 600 }}>
+                {t}
+              </span>
+            ))}
+          </div>
         </div>
-      </motion.div>
+      </div>
       </Fill>
     </WidePanel>
   );

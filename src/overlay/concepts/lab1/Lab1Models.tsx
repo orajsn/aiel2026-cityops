@@ -659,7 +659,7 @@ export function L1Guardrails({ kicker, message, notebook }: Lab1Props) {
             </motion.div>
           </Lane>
         </motion.div>
-        <motion.div data-fail-closed {...fadeUp(2.8)} style={{ ...card(true), background: TINT, padding: '20px 26px', display: 'grid', gridTemplateColumns: 'minmax(0, 280fr) minmax(0, 260fr) 60px auto minmax(0, 300fr)', alignItems: 'center', columnGap: 18 }}>
+        <motion.div data-fail-closed {...fadeUp(2.8)} style={{ ...card(true), background: TINT, padding: '20px 26px', boxSizing: 'border-box', width: '100%', minWidth: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 250fr) minmax(0, 240fr) 56px minmax(0, 290fr) minmax(0, 250fr)', alignItems: 'center', columnGap: 16 }}>
           <div>
             <div style={{ ...capTeal, fontSize: 13 }}>Fail closed</div>
             <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.25 }}>If the check itself cannot run</div>

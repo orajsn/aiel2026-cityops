@@ -27,8 +27,8 @@ test('1.3a meet the app: runtime bar, Try a prompt, Runtime configuration with o
   expect(attrs(c, 'data-config-switch')).toEqual(['1', '2', '4', '5']);
   expect(SWITCHES.map((s) => s.name)).toEqual(['Specification search', 'Governed project data', 'Model routing', 'Prompt-injection protection']);
   expect(c.querySelectorAll('[data-config] [data-switch="on"]')).toHaveLength(4);
-  expect(attrs(c, 'data-field')).toEqual(SUPPLIER_FIELDS);
   expect(c.querySelector('[data-scope]')?.textContent).toContain('Project code');
+  expect(c.querySelector('video[data-app-video]')).not.toBeNull();
   expectOneRed(c, '[data-prompt="Guardrail challenge"]');
 });
 
