@@ -4,6 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
 import { ASSETS, project } from '../content/geo';
 import { useUiStore } from '../engine/ui';
+import { useSceneStore } from '../engine/store';
 import { FlowArc } from './FlowArc';
 import { VectorField } from './VectorField';
 import { layoutCloud, nearestK } from './vectorLayout';
