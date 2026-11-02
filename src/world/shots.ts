@@ -34,6 +34,18 @@ export function northShot(subject: Vec3, dist: number, pitchDeg: number, screenX
   return { position, target, durationMs, ease: 'inOut', subject };
 }
 
+/**
+ * Lab 1's 4a and 4b (owner, 2 Nov): a fixed frame in the sky over the Ops Center (SkyStage4.tsx), 16 x 9 units of 1.2 m, facing
+ * heading -20. Each click looks at it from its own place, so the camera moves through the steps and the two pages
+ * look from different sides: 4a from the left, 4b from the right.
+ */
+export const STAGE4 = { center: [assetPosition('City Operations Control Center').x, 9, assetPosition('City Operations Control Center').z] as Vec3, heading: -20, unit: 1.2 };
+function stageShot(xu: number, yu: number, dist: number, pitch: number, screenX: number, heading: number, ms: number): Shot {
+  const hd = (STAGE4.heading * Math.PI) / 180;
+  const subject: Vec3 = [STAGE4.center[0] + Math.cos(hd) * xu * STAGE4.unit, STAGE4.center[1] + yu * STAGE4.unit, STAGE4.center[2] + Math.sin(hd) * xu * STAGE4.unit];
+  return northShot(subject, dist, pitch, screenX, ms, heading);
+}
+
 // The five places of the story (and the opening). Every city camera looks roughly north, and every frame
 // shows only city:
 // tests/world/frame.test.ts checks all four corners of every page and every move between pages.
@@ -57,6 +69,17 @@ export const SHOTS: Record<ShotId, Shot> = {
   /** the sky stage over the Ops Center, where the AI ideas are explained (SkyStage.tsx), the Ops Center below */
   // lower and more forward than the city cameras so the stage is seen from the side; the haze shows at the top
   sky: northShot([OPS.x, 9, OPS.z], 17, 22, -0.18, 2200, -20, -1),
+  // 4a (Vector Store) looks from the left of the frame, 4b (Semantic Store) from the right; every click moves the camera
+  // the content keeps within x -7.6 to 1.8 (the panel covers the right), so every click looks from about 13 units out, centred in the
+  // free left of the screen (screenX -0.375); the moves come from the side, the height and the pitch
+  'sky-v1': stageShot(-5.6, 0.1, 11, 24, -0.4, -36, 2400),
+  'sky-v2': stageShot(-2.9, 0.2, 13.5, 26, -0.375, -26, 2200),
+  'sky-v3': stageShot(-2.9, 0.5, 13.5, 22, -0.375, -6, 2200),
+  'sky-v4': stageShot(-2.9, 0.2, 13.5, 28, -0.375, -18, 2200),
+  'sky-s1': stageShot(-3.1, 0.4, 13.5, 28, -0.375, 18, 2400),
+  'sky-s2': stageShot(-3.1, 0.4, 13.5, 24, -0.375, 6, 2200),
+  'sky-s3': stageShot(-3.1, 0.4, 13.5, 30, -0.375, 26, 2200),
+  'sky-s4': stageShot(-3.1, 0.4, 13.5, 24, -0.375, 12, 2200),
   /** the bare model (Lab 2 page 1): the same view, pushed in with the language model in the middle (SkyStage MODEL = anchor + [3, 0.3, 0]) */
   'sky-model': northShot([OPS.x + 3.0, 9.3, OPS.z], 10, 22, 0, 2200, -20, -1),
   /** close on the control room over the Ops Center (OpsRoom.tsx, floor at y 2.6): over the operators' shoulders to the video wall */

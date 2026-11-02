@@ -28,7 +28,7 @@ test('Lab 1 pages: ids 1.x, part 3, at the whole-bridge view where the Introduct
     expect(s.id).toMatch(/^1\.\d+[a-z]?\d?$/);
     expect(s.chapter).toBe(3);
     if (['1.0', '1.1', '1.2'].includes(s.id)) expect(s.shot).toBe('pier3');
-    else if (/^1\.3[vs]\d$/.test(s.id)) expect(s.shot).toBe('sky');
+    else if (/^1\.3[ps]\d$/.test(s.id)) expect(s.shot).toMatch(/^sky-[vs]\d$/);
     else expect(s.shot).toBe(chapter0[chapter0.length - 1].shot);
     expect(SHOTS[s.shot]).toBeDefined();
     expect(LAB1_SCRIPT[s.id]?.length).toBeGreaterThan(40);
@@ -46,9 +46,9 @@ test('Lab 1 names its exercises Hands-on 1 to 5, never Lab 2 or Lab 3 (only its 
 
 // owner, 29 Oct (V2 from the real workshop guide): two new pages, Meet the app and Two ways to launch
 test('Lab 1 runs in the V2 order and ends on its recap (1.10), all at the bridge, each page with its own registered panel', () => {
-  expect(lab1.map((s) => s.id)).toEqual(['1.0', '1.1', '1.2', '1.3', '1.3v1', '1.3v2', '1.3v3', '1.3v4', '1.3s1', '1.3s2', '1.3s3', '1.3s4', '1.3a', '1.4', '1.5', '1.6a', '1.6', '1.7', '1.8', '1.9', '1.10']);
+  expect(lab1.map((s) => s.id)).toEqual(['1.0', '1.1', '1.2', '1.3', '1.3p1', '1.3p2', '1.3p3', '1.3p4', '1.3s1', '1.3s2', '1.3s3', '1.3s4', '1.3a', '1.4', '1.5', '1.6a', '1.6', '1.7', '1.8', '1.9', '1.10']);
   expect(lab1.map((s) => s.overlay)).toEqual(['L1Crack', 'L1Plan', 'L1Capture', 'L1Assistant', ...Array(4).fill('L1Vector'), ...Array(4).fill('L1Semantic'), 'L1App', 'L1Specs', 'L1Suppliers', 'L1Launch', 'L1SitePhoto', 'L1Baseline', 'L1Routing', 'L1Guardrails', 'L1Recap']);
-  expect(new Set(lab1.map((s) => s.shot))).toEqual(new Set(['bridge', 'pier3', 'sky']));
+  expect(new Set(lab1.map((s) => s.shot))).toEqual(new Set(['bridge', 'pier3', 'sky-v1', 'sky-v2', 'sky-v3', 'sky-v4', 'sky-s1', 'sky-s2', 'sky-s3', 'sky-s4']));
   for (const s of lab1) expect(OVERLAYS[s.overlay!]).toBeDefined();
 });
 
@@ -71,7 +71,7 @@ test('1.0 to 1.2 close in on the crack with a character, one camera, then the br
     expect(s.chapter).toBe(3);
   }
   expect(lab1[3].shot).toBe('bridge');
-  for (const s of lab1.slice(3).filter((x) => !/^1\.3[vs]\d$/.test(x.id))) {
+  for (const s of lab1.slice(3).filter((x) => !/^1\.3[ps]\d$/.test(x.id))) {
     expect(s.shot).toBe('bridge');
     expect(s.world).toEqual({ bridge: true });
   }
@@ -81,17 +81,19 @@ test('1.0 to 1.2 close in on the crack with a character, one camera, then the br
 test('4a and 4b: four clicks each on the sky stage, one camera, one panel, shown as 4a and 4b; page 5 stays page 5', async () => {
   const { pageLabel, pageNumber } = await import('../../src/scenes/index');
   const ids = lab1.map((s) => s.id);
-  expect(ids.slice(3, 13)).toEqual(['1.3', '1.3v1', '1.3v2', '1.3v3', '1.3v4', '1.3s1', '1.3s2', '1.3s3', '1.3s4', '1.3a']);
-  expect(['1.3', '1.3v1', '1.3v4', '1.3s1', '1.3s4', '1.3a'].map(pageLabel)).toEqual(['4', '4a', '4a', '4b', '4b', '5']);
+  expect(ids.slice(3, 13)).toEqual(['1.3', '1.3p1', '1.3p2', '1.3p3', '1.3p4', '1.3s1', '1.3s2', '1.3s3', '1.3s4', '1.3a']);
+  expect(['1.3', '1.3p1', '1.3p4', '1.3s1', '1.3s4', '1.3a'].map(pageLabel)).toEqual(['4', '4a', '4a', '4b', '4b', '5']);
   expect(pageNumber('1.4')).toBe(6);
-  const vec = lab1.filter((s) => s.id.startsWith('1.3v'));
+  const vec = lab1.filter((s) => s.id.startsWith('1.3p'));
   const sem = lab1.filter((s) => s.id.startsWith('1.3s'));
   expect(vec.map((s) => (s.world as { sky: string }).sky)).toEqual(['vector', 'vector2', 'vector3', 'retrieve']);
   expect(sem.map((s) => (s.world as { sky: string }).sky)).toEqual(['semantic', 'semantic2', 'semantic3', 'semantic4']);
   for (const group of [vec, sem]) {
     expect(new Set(group.map((s) => s.overlayGroup)).size).toBe(1);
     expect(group.map((s) => (s.overlayProps as { step: number }).step)).toEqual([1, 2, 3, 4]);
-    expect(group.every((s) => s.shot === 'sky')).toBe(true);
   }
-  expect(sem.every((s) => s.sameAngleAs === '1.3v1')).toBe(true);
+  // each click has its own camera: 4a looks from the left of the frame, 4b from the right (shots.ts)
+  expect(vec.map((s) => s.shot)).toEqual(['sky-v1', 'sky-v2', 'sky-v3', 'sky-v4']);
+  expect(sem.map((s) => s.shot)).toEqual(['sky-s1', 'sky-s2', 'sky-s3', 'sky-s4']);
+  expect(new Set([...vec, ...sem].map((s) => s.shot)).size).toBe(8);
 });

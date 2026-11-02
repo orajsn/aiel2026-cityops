@@ -57,16 +57,17 @@ test('on pages with the right-hand panel, the place the page is about sits left 
   expect(bad).toEqual([]);
 });
 
-test('the camera only moves when the story changes place: five places and the sky stage, at most 16 city moves in 38 pages', () => {
+test('the camera only moves when the story changes place: five places and the sky stage, at most 27 city moves', () => {
   const places = new Set(SCENES.filter((s) => isCity(s.shot)).map((s) => s.shot));
   // only the owner's places (pier3, the crack's close-up, is free since Lab 2 tells the crack in its panel)
-  for (const p of places) expect(['bridge', 'city', 'ops', 'pier2', 'pier2-close', 'pier2-inspect', 'pier3', 'sky', 'sky-model']).toContain(p);
+  for (const p of places) expect(['bridge', 'city', 'ops', 'pier2', 'pier2-close', 'pier2-inspect', 'pier3', 'sky', 'sky-model', 'sky-v1', 'sky-v2', 'sky-v3', 'sky-v4', 'sky-s1', 'sky-s2', 'sky-s3', 'sky-s4']).toContain(p);
   let moves = 0;
   SCENES.forEach((s, i) => {
     if (i > 0 && SCENES[i - 1].shot !== s.shot && isCity(s.shot) && isCity(SCENES[i - 1].shot)) moves++;
   });
   // 17: the push-in on the bare model (Lab 2 page 1, owner) and back out for the database
-  expect(moves).toBeLessThanOrEqual(17);
+  // 27: Lab 1's 4a and 4b move the camera at every click (owner, 2 Nov)
+  expect(moves).toBeLessThanOrEqual(27);
 });
 
 test('every page at the Ops Center shows the control room; sky pages name the Ops Center below', () => {

@@ -1,21 +1,20 @@
 import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react';
 import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
-import { useSceneStore } from '../engine/store';
 import { layoutCloud, nearestK } from './vectorLayout';
 import { NeuralNet } from './NeuralNet';
 import { PdfBook, PDFS, Strip } from './SkyVectorize';
-import type { Vec3 } from './shots';
+import { STAGE4, type Vec3 } from './shots';
 
 /**
  * Lab 1's 4a (Vector Store) and 4b (Semantic Store) on the sky stage, built from the two approved drafts (owner, 2 Nov).
- * Everything stands in one frame glued to the camera, 8 units in front of it and sized so the screen is 16 x 9 units: the
- * layout is the same whatever angle the owner saved. Inside it the pieces are real 3D (the database, the PDF books, the cloud
- * of points, the language model); the cards are HTML on 3D anchors. The page's panel covers x from 2.3 to 7.6, so the pieces
- * keep to the left. Each click is one act; `t` is ms since the camera arrived.
+ * Everything stands in one fixed frame in the sky over the Ops Center (shots.ts STAGE4: 16 x 9 units of 1.2 m), and each click
+ * has its own camera (shots 'sky-v1' to 'sky-s4'), so the camera moves through the steps. Inside the frame the pieces are real 3D (the
+ * database, the PDF books, the cloud of points, the language model); the cards are HTML on 3D anchors that grow and shrink with
+ * the camera's distance. The page's panel covers x from 2.3 up, so everything keeps left of x = 2. `t` is ms since the camera arrived.
  */
-const D = 8;
+/** the camera distance at which one unit is 120 px: the HTML cards are sized for it (drei's distanceFactor) */
+const CARD_SCALE = 0.8284 * 13;
 const ease = (x: number) => {
   const c = Math.max(0, Math.min(1, x));
   return c < 0.5 ? 4 * c * c * c : 1 - Math.pow(-2 * c + 2, 3) / 2;
@@ -24,21 +23,9 @@ const lerp = (a: Vec3, b: Vec3, k: number): Vec3 => [a[0] + (b[0] - a[0]) * k, a
 /** 1 while t is inside [from, to], easing in and out over `fade` ms */
 const win = (t: number, from: number, to: number, fade = 350) => Math.min(ease((t - from) / fade), 1 - ease((t - to) / fade));
 
-const fwd = new THREE.Vector3();
 function StageFrame({ children }: { children: ReactNode }) {
-  const ref = useRef<THREE.Group>(null);
-  const settled = useSceneStore((s) => s.settled);
-  useFrame(({ camera }) => {
-    const g = ref.current;
-    if (!g) return;
-    const cam = camera as THREE.PerspectiveCamera;
-    fwd.set(0, 0, -1).applyQuaternion(cam.quaternion);
-    g.position.copy(cam.position).addScaledVector(fwd, D);
-    g.quaternion.copy(cam.quaternion);
-    g.scale.setScalar((2 * D * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2))) / 9);
-  });
   return (
-    <group ref={ref} visible={settled}>
+    <group position={STAGE4.center} rotation={[0, (-STAGE4.heading * Math.PI) / 180, 0]} scale={STAGE4.unit}>
       {children}
     </group>
   );
@@ -47,7 +34,7 @@ function StageFrame({ children }: { children: ReactNode }) {
 const cardStyle = { pointerEvents: 'none' as const, whiteSpace: 'nowrap' as const, fontFamily: 'var(--font-body, Inter, sans-serif)' };
 const Card = ({ at, children, show = 1, z = 0 }: { at: Vec3 | [number, number]; children: ReactNode; show?: number; z?: number }) =>
   show > 0.01 ? (
-    <Html position={[at[0], at[1], z]} center zIndexRange={[16, 0]} style={{ ...cardStyle, opacity: show }}>
+    <Html position={[at[0], at[1], z]} center distanceFactor={CARD_SCALE} zIndexRange={[16, 0]} style={{ ...cardStyle, opacity: show }}>
       {children}
     </Html>
   ) : null;
@@ -77,13 +64,13 @@ function Arrow({ pts, color = '#1B8A9C', k = 1, dashed = true }: { pts: Vec3[]; 
 }
 
 /** the Oracle database: three red discs, tilted so the tops show */
-function DB3D({ at, s = 0.8 }: { at: [number, number]; s?: number }) {
+function DB3D({ at, s = 0.8, pulse = 0 }: { at: [number, number]; s?: number; pulse?: number }) {
   return (
-    <group position={[at[0], at[1], 0]} scale={s} rotation={[0.42, 0, 0]}>
+    <group position={[at[0], at[1], 0]} scale={s * (1 + 0.06 * pulse)}>
       {[0, 1, 2].map((i) => (
         <mesh key={i} position={[0, i * 0.5 - 0.5, 0]}>
           <cylinderGeometry args={[1.05, 1.05, 0.38, 44]} />
-          <meshStandardMaterial color="#c74634" emissive="#5a1d14" emissiveIntensity={0.55} roughness={0.5} />
+          <meshStandardMaterial color="#c74634" emissive="#5a1d14" emissiveIntensity={0.55 + 0.8 * pulse} roughness={0.5} />
         </mesh>
       ))}
     </group>
@@ -96,9 +83,9 @@ const DBLabel = ({ at, s = 0.8 }: { at: [number, number]; s?: number }) => (
 );
 
 /** a PDF as a small 3D book: cover, a block of pages, a spine */
-function Book3D({ at, s = 1, rot = 0.28 }: { at: Vec3; s?: number; rot?: number }) {
+function Book3D({ at, s = 1, rot = 0.12, lay = 0 }: { at: Vec3; s?: number; rot?: number; lay?: number }) {
   return (
-    <group position={at} scale={s} rotation={[0.12, rot, 0]}>
+    <group position={at} scale={s} rotation={[0.05 + lay * 0.9, rot, 0]}>
       <mesh position={[0, 0, -0.09]}>
         <boxGeometry args={[0.9, 1.2, 0.05]} />
         <meshStandardMaterial color="#1b8a9c" roughness={0.5} />
@@ -134,9 +121,9 @@ const CL: [number, number, number, number][] = [
 ];
 const GROUP_NAMES = ['surface preparation', 'steel · materials', 'inspection · acceptance'];
 export const QUERY_STEEL: Vec3 = [12.5, -2, 5];
-const CS = 1.9 / 30;
-const CLOUD_AT: Vec3 = [0.1, 0.9, 0];
-const EULER = new THREE.Euler(0.22, 0.5, 0);
+const CS = 1.5 / 30;
+const CLOUD_AT: Vec3 = [-0.6, 0.5, 0];
+const EULER = new THREE.Euler(0.12, 0.35, 0);
 /** a point of the cloud (cloud space) as a stage position */
 const place = (p: Vec3): Vec3 => {
   const v = new THREE.Vector3(p[0] * CS, p[1] * CS, p[2] * CS).applyEuler(EULER);
@@ -228,9 +215,11 @@ function Cloud3D({ show, groups, ask, pick, flyTo, fly }: { show: number; groups
   );
 }
 
-const BOOK_AT: Vec3 = [-6.1, 1.5, 0];
-const NET_AT: Vec3 = [-3.0, 1.7, 0];
-const DB_AT: [number, number] = [-5.5, -3.2];
+const BOOK_AT: Vec3 = [-6.0, 1.0, 0];
+const NET_AT: Vec3 = [-3.2, 1.2, 0];
+/** 4a keeps the database higher (nothing stands over it); 4b has the Project view above, so it sits lower */
+const DB_AT: [number, number] = [-5.0, -2.2];
+const DB_SEM: [number, number] = [-5.0, -3.6];
 
 export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'retrieve'; t: number }) {
   const dbTop: Vec3 = [DB_AT[0], DB_AT[1] + 0.9, 0];
@@ -254,48 +243,50 @@ export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'r
   }
   return (
     <StageFrame>
-      <DB3D at={DB_AT} />
+      <DB3D at={DB_AT} pulse={act === 'vector' ? PDFS.reduce((m, _, i) => Math.max(m, Math.sin(Math.PI * Math.max(0, Math.min(1, (t - (700 + i * 2600) - 1500) / 900)))), 0) : 0} />
       <DBLabel at={DB_AT} />
-      {/* click 1: three PDFs fly in and drop into the database */}
+      {/* click 1: three PDFs, one after another, float down in a slow curve and sink into the database; each landing makes it glow */}
       {act === 'vector' &&
         PDFS.map((name, i) => {
-          const start = 300 + i * 1000;
-          const k = ease((t - start) / 1300);
-          const op = Math.min(ease((t - start + 250) / 300), 1 - ease((t - start - 1100) / 300));
-          if (op <= 0.01) return null;
-          const from: Vec3 = [-7 + i * 0.7, 3.7 - i * 0.55, 0];
+          const start = 700 + i * 2600;
+          const k = ease((t - start) / 2200);
+          const appear = ease((t - start + 500) / 600);
+          const sink = ease((t - start - 1500) / 700);
+          if (appear <= 0.01 || sink >= 0.99) return null;
+          const from: Vec3 = [-6.3, 2.4, 0];
+          const land: Vec3 = [dbTop[0], dbTop[1], 0];
+          // an arc: it drifts right and rises a little before it comes down onto the database
+          const base = lerp(from, land, k);
+          const arc = Math.sin(k * Math.PI) * 0.7;
+          const pos: Vec3 = [base[0] + Math.sin(k * Math.PI) * 0.5, base[1] + arc, 0];
+          const s = (1 - 0.45 * k) * (1 - 0.5 * sink);
           return (
-            <group key={name} scale={op}>
-              <Book3D at={lerp(from, dbTop, k)} s={1 - 0.55 * k} />
-              <Card at={[from[0] + (dbTop[0] - from[0]) * k, from[1] + (dbTop[1] - from[1]) * k - 0.95 * (1 - 0.55 * k)]} show={op * (1 - k)}>
-                <div style={{ fontSize: 17, fontWeight: 600, color: '#1d2733', background: 'rgba(255,255,255,0.92)', padding: '2px 8px', borderRadius: 6, whiteSpace: 'nowrap' }}>{name}</div>
+            <group key={name} scale={appear * (1 - sink)}>
+              <Book3D at={pos} s={s} lay={k} />
+              <Card at={[pos[0], pos[1] + 0.95 * s + 0.15]} show={appear * (1 - ease(k * 1.6))}>
+                <div style={{ fontSize: 20, fontWeight: 600, color: '#1d2733', background: 'rgba(255,255,255,0.94)', padding: '3px 10px', borderRadius: 6 }}>{name}</div>
               </Card>
             </group>
           );
         })}
-      {act === 'vector' && (
-        <Card at={[-4.6, 0.1]} show={ease((t - 600) / 500)}>
-          <div style={{ fontSize: 19, fontWeight: 700, color: '#146f7f', background: 'rgba(27,138,156,0.14)', border: '2px solid #1b8a9c', padding: '6px 16px', borderRadius: 999, whiteSpace: 'nowrap' }}>Object Storage → data sync connector</div>
-        </Card>
-      )}
       {/* click 2: each PDF becomes a long row of numbers, then the points appear */}
       {act === 'vector2' &&
         PDFS.map((name, i) => {
           const op = win(t, 300 + i * 800, 3600);
           return (
-            <Card key={name} at={[-4.6, 3.4 - i * 1.3]} show={op}>
-              <Strip t={t} seed={i + 3} tone="teal" icon={<PdfBook size={0.62} />} width={640} />
+            <Card key={name} at={[-4.9, 3.0 - i * 1.2]} show={op}>
+              <Strip t={t} seed={i + 3} tone="teal" icon={<PdfBook size={0.62} />} width={560} />
             </Card>
           );
         })}
-      {act === 'vector2' && PDFS.map((n, i) => <Arrow key={n} k={win(t, 1500 + i * 300, 3200)} pts={[[-1.6, 3.4 - i * 1.3, 0], [-0.9, 3.0 - i * 0.9, 0], place(CL[i][0] === -13 ? [-13, 7, -8] : i === 1 ? [14, -3, 7] : [-1, -11, 15])]} />)}
+      {act === 'vector2' && PDFS.map((n, i) => <Arrow key={n} k={win(t, 1500 + i * 300, 3200)} pts={[[-2.45, 3.0 - i * 1.2, 0], [-1.9, 2.8 - i * 0.9, 0], place(CL[i][0] === -13 ? [-13, 7, -8] : i === 1 ? [14, -3, 7] : [-1, -11, 15])]} />)}
       {/* click 3: the question turns into numbers the same way */}
       {act === 'vector3' && (
-        <Card at={[-4.4, 3.0]} show={win(t, 200, 3000)}>
-          <Strip t={t} seed={11} tone="red" width={700} icon={<div style={{ fontSize: 24, fontWeight: 700, color: '#1d2733', maxWidth: 200, lineHeight: 1.2 }}>“Which supplier is ready?”</div>} />
+        <Card at={[-4.8, 3.4]} show={win(t, 200, 3000)}>
+          <Strip t={t} seed={11} tone="red" width={600} icon={<div style={{ fontSize: 24, fontWeight: 700, color: '#1d2733', maxWidth: 200, lineHeight: 1.2 }}>“Which supplier is ready?”</div>} />
         </Card>
       )}
-      {act === 'vector3' && <Arrow color="#c74634" dashed={false} k={win(t, 2000, 12000, 500)} pts={[[-1.0, 3.0, 0], [-0.2, 2.6, 0], place(QUERY_STEEL)]} />}
+      {act === 'vector3' && <Arrow color="#c74634" dashed={false} k={win(t, 2000, 12000, 500)} pts={[[-1.8, 3.4, 0], [-1.0, 3.0, 0], place(QUERY_STEEL)]} />}
       {act === 'retrieve' && (
         <Card at={[-4.4, 3.4]} show={ease((t - 200) / 500)}>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#c74634', background: 'rgba(255,255,255,0.94)', padding: '4px 14px', borderRadius: 8, whiteSpace: 'nowrap' }}>the five nearest points = the retrieved passages</div>
@@ -318,8 +309,8 @@ export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'r
           <Card at={[NET_AT[0], NET_AT[1] - 1.2]} show={ease((t - 3300) / 500)}>
             <div style={{ fontSize: 18, fontWeight: 700, color: '#1d2733', background: 'rgba(255,255,255,0.92)', padding: '2px 10px', borderRadius: 6 }}>the language model</div>
           </Card>
-          <Arrow k={ease((t - 4300) / 600)} pts={[[NET_AT[0], NET_AT[1] - 1.5, 0], [-3.4, -0.1, 0], [-4.0, -0.7, 0]]} />
-          <Card at={[-4.2, -1.4]} show={ease((t - 4800) / 600)}>
+          <Arrow k={ease((t - 4300) / 600)} pts={[[NET_AT[0], NET_AT[1] - 1.5, 0], [-3.4, 0.0, 0], [-4.0, -0.3, 0]]} />
+          <Card at={[-4.2, -0.9]} show={ease((t - 4800) / 600)}>
             <div style={{ width: 600, padding: '14px 20px', background: '#fff', border: '3px solid #1b8a9c', borderRadius: 14, boxShadow: '0 6px 16px rgba(20,40,60,.25)' }}>
               <div style={{ fontSize: 24, fontWeight: 700, color: '#1d2733' }}>the answer cites the specification</div>
               <div style={{ fontSize: 19, color: '#5c6b78', marginTop: 4 }}>written only from the five passages</div>
@@ -334,11 +325,11 @@ export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'r
 /* ------------------------------------------------------------------ the semantic store */
 
 const VIEWS: { raw: string; rawCols: string[]; name: string; cols: string[]; at: [number, number] }[] = [
-  { raw: 'SUP_MST', rawCols: ['SUP_ID', 'SUP_NM_TH', 'RDY_FLG', 'FIT_SC', 'RSK_CD'], name: 'Supplier', cols: ['supplier', 'recommendation status', 'fit score', 'risk level'], at: [-5.9, 2.35] },
-  { raw: 'DLV_TXN', rawCols: ['DLV_ID', 'SUP_ID', 'DLV_ST', 'EVT_CD', 'PRJ_ID'], name: 'Delivery', cols: ['delivery', 'status', 'event', 'supplier'], at: [-2.3, 2.35] },
-  { raw: 'PRJ_REF', rawCols: ['PRJ_ID', 'PRJ_CD', 'OWN_ID', 'CRT_DT', 'ST_CD'], name: 'Project', cols: ['project code', 'name', 'owner', 'dates'], at: [-5.9, -0.65] },
+  { raw: 'SUP_MST', rawCols: ['SUP_ID', 'SUP_NM_TH', 'RDY_FLG', 'FIT_SC', 'RSK_CD'], name: 'Supplier', cols: ['supplier', 'recommendation status', 'fit score', 'risk level'], at: [-5.3, 1.95] },
+  { raw: 'DLV_TXN', rawCols: ['DLV_ID', 'SUP_ID', 'DLV_ST', 'EVT_CD', 'PRJ_ID'], name: 'Delivery', cols: ['delivery', 'status', 'event', 'supplier'], at: [-1.9, 1.95] },
+  { raw: 'PRJ_REF', rawCols: ['PRJ_ID', 'PRJ_CD', 'OWN_ID', 'CRT_DT', 'ST_CD'], name: 'Project', cols: ['project code', 'name', 'owner', 'dates'], at: [-5.3, -1.05] },
 ];
-const OPS_AT: [number, number] = [-1.7, -3.3];
+const OPS_AT: [number, number] = [-2.2, -3.7];
 
 function ViewCard({ v, show, hot, dim, rawShow }: { v: (typeof VIEWS)[number]; show: number; hot: number[]; dim: boolean; rawShow: number }) {
   return (
@@ -385,8 +376,8 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
   const hot = (i: number) => (stage === 2 ? (i === 0 ? [0, 1] : i === 1 ? [1] : [0]) : stage === 3 ? (i === 0 ? [0, 1, 2, 3] : i === 2 ? [0] : []) : []);
   return (
     <StageFrame>
-      <DB3D at={DB_AT} />
-      <DBLabel at={DB_AT} />
+      <DB3D at={DB_SEM} />
+      <DBLabel at={DB_SEM} />
       {/* the Control Center, where the question starts and the rows land */}
       <group position={[OPS_AT[0], OPS_AT[1], 0]}>
         <mesh>
@@ -401,14 +392,14 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
       <Card at={[OPS_AT[0], OPS_AT[1] - 0.65]}>
         <div style={{ fontSize: 18, fontWeight: 600, color: '#1d2733', background: 'rgba(255,255,255,0.9)', padding: '2px 8px', borderRadius: 6, whiteSpace: 'nowrap' }}>City Operations Control Center</div>
       </Card>
-      <Card at={[-4.3, 4.25]} show={ease((t - 200) / 500)}>
+      <Card at={[-3.9, 3.5]} show={ease((t - 200) / 500)}>
         <div style={{ fontSize: 22, fontWeight: 700, color: '#146f7f', background: 'rgba(255,255,255,0.92)', padding: '2px 12px', borderRadius: 8, whiteSpace: 'nowrap' }}>Governed views · business words over the raw tables</div>
       </Card>
       {VIEWS.map((v, i) => (
         <ViewCard key={v.name} v={v} show={rise(i)} hot={hot(i)} dim={stage === 4 && i === 2} rawShow={1} />
       ))}
       {stage === 1 && (
-        <Card at={[-0.5, 0.2]} show={ease((t - 1800) / 600)}>
+        <Card at={[-0.4, -0.1]} show={ease((t - 1800) / 600)}>
           <div style={{ width: 470, padding: '12px 18px', background: '#fff', borderRadius: 12, border: '1px solid #cfd8df', boxShadow: '0 6px 14px rgba(20,40,60,.2)' }}>
             <div style={{ fontSize: 20, fontWeight: 700, color: '#1d2733' }}>Under the glass</div>
             <div style={{ fontSize: 18, color: '#5c6b78', marginTop: 4 }}>SUP_ID, RDY_FLG, FIT_SC: raw names nobody speaks</div>
@@ -418,8 +409,8 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
       {/* click 2: the question rises from the Ops Center; its words match the views */}
       {stage >= 2 && stage <= 3 && (
         <>
-          <Arrow k={stage === 2 ? ease((t - 200) / 900) : 1} pts={[[OPS_AT[0], OPS_AT[1] + 0.5, 0], [OPS_AT[0] - 0.3, -2.0, 0], [-1.0, -1.5, 0]]} />
-          <Card at={[-0.8, -1.2]} show={stage === 2 ? ease((t - 900) / 500) : 1}>
+          <Arrow k={stage === 2 ? ease((t - 200) / 900) : 1} pts={[[OPS_AT[0], OPS_AT[1] + 0.5, 0], [OPS_AT[0] - 0.2, -2.4, 0], [-2.7, -1.6, 0]]} />
+          <Card at={[-0.5, -1.6]} show={stage === 2 ? ease((t - 900) / 500) : 1}>
             <div style={{ width: 520, padding: '14px 22px', background: '#fff', border: '3px solid #1b8a9c', borderRadius: 14, fontSize: 28, fontWeight: 600, color: '#1d2733', boxShadow: '0 6px 14px rgba(20,40,60,.25)' }}>
               “Which <span style={{ color: '#146f7f', fontWeight: 700 }}>supplier</span> is <span style={{ color: '#146f7f', fontWeight: 700 }}>ready</span>?”
             </div>
@@ -428,9 +419,9 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
       )}
       {stage === 2 && (
         <>
-          <Arrow k={ease((t - 1500) / 800)} pts={[[-2.4, -0.8, 0], [-3.9, 0.2, 0], [-4.2, 1.5, 0]]} />
-          <Arrow k={ease((t - 1800) / 800)} pts={[[-1.4, -0.8, 0], [-1.7, 0.2, 0], [-2.2, 1.2, 0]]} />
-          <Card at={[-0.8, -2.2]} show={ease((t - 2400) / 500)}>
+          <Arrow k={ease((t - 1500) / 800)} pts={[[-2.2, -1.1, 0], [-3.4, -0.4, 0], [-3.7, 0.9, 0]]} />
+          <Arrow k={ease((t - 1800) / 800)} pts={[[-1.2, -1.1, 0], [-1.5, -0.2, 0], [-1.9, 0.8, 0]]} />
+          <Card at={[-0.5, -2.6]} show={ease((t - 2400) / 500)}>
             <div style={{ fontSize: 19, color: '#33414d', background: 'rgba(255,255,255,0.92)', padding: '4px 12px', borderRadius: 8, lineHeight: 1.4 }}>“supplier” is the Supplier view<br />“ready” is Delivery · status</div>
           </Card>
         </>
@@ -438,21 +429,21 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
       {/* click 3: the SQL it wrote, and the check that keeps it to this project */}
       {stage === 3 && (
         <>
-          <Card at={[-0.8, 0.9]} show={ease((t - 300) / 600)}>
+          <Card at={[-0.5, 0.5]} show={ease((t - 300) / 600)}>
             <div style={{ width: 520, padding: '14px 20px', background: '#1f2a33', borderRadius: 12, fontFamily: 'var(--font-mono, monospace)', boxShadow: '0 6px 14px rgba(20,40,60,.3)' }}>
               <div style={{ fontSize: 17, fontWeight: 700, color: '#7fd3e0' }}>NL2SQL · the SQL it wrote</div>
               <div style={{ fontSize: 20, color: '#e6e9ef', marginTop: 8 }}>SELECT … FROM <span style={{ color: '#7fd3e0' }}>governed views</span></div>
               <div style={{ fontSize: 20, color: '#e6e9ef' }}>WHERE project = <span style={{ color: '#7fd3e0' }}>this project</span></div>
             </div>
           </Card>
-          <Line points={[[-7.8, -2.0, 0.2], [-4.0, -2.0, 0.2], [-4.0, 1.0, 0.2], [-7.8, 1.0, 0.2], [-7.8, -2.0, 0.2]]} color="#1b8a9c" lineWidth={4} dashed dashSize={0.22} gapSize={0.14} transparent opacity={ease((t - 800) / 500)} />
-          <Card at={[-0.8, -2.5]} show={ease((t - 1400) / 600)}>
+          <Line points={[[-7.1, -2.3, 0.2], [-3.5, -2.3, 0.2], [-3.5, 0.2, 0.2], [-7.1, 0.2, 0.2], [-7.1, -2.3, 0.2]]} color="#1b8a9c" lineWidth={4} dashed dashSize={0.22} gapSize={0.14} transparent opacity={ease((t - 800) / 500)} />
+          <Card at={[-0.5, -2.8]} show={ease((t - 1400) / 600)}>
             <div style={{ ...pillStyle, display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ width: 26, height: 26, borderRadius: '50%', background: '#1b8a9c', color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>✓</span>
               SQL checked: other projects stay out
             </div>
           </Card>
-          <Card at={[-0.8, -3.3]} show={ease((t - 2000) / 600)}>
+          <Card at={[-0.5, -3.5]} show={ease((t - 2000) / 600)}>
             <div style={{ fontSize: 19, color: '#5c6b78', background: 'rgba(255,255,255,0.9)', padding: '3px 12px', borderRadius: 8 }}>🔒 other projects and suppliers: locked</div>
           </Card>
         </>
@@ -460,7 +451,7 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
       {/* click 4: the rows come back down to the Ops Center */}
       {stage === 4 && (
         <>
-          <Card at={[-0.8, 0.5]} show={ease((t - 300) / 600)}>
+          <Card at={[-0.5, 0.2]} show={ease((t - 300) / 600)}>
             <div style={{ width: 540, padding: '14px 22px', background: '#fff', border: '3px solid #1b8a9c', borderRadius: 14, boxShadow: '0 6px 14px rgba(20,40,60,.25)' }}>
               <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: 1.2, color: '#146f7f' }}>ROWS FOR THIS PROJECT</div>
               {['supplier', 'recommendation status', 'fit score', 'risk level', 'explanation'].map((f, i) => (
@@ -471,8 +462,8 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
               ))}
             </div>
           </Card>
-          <Arrow k={ease((t - 900) / 900)} pts={[[-1.2, -1.0, 0], [-1.5, -2.0, 0], [OPS_AT[0] + 0.2, OPS_AT[1] + 0.5, 0]]} />
-          <Card at={[-0.2, -1.9]} show={ease((t - 1500) / 500)}>
+          <Arrow k={ease((t - 900) / 900)} pts={[[-1.4, -1.0, 0], [-1.8, -2.2, 0], [OPS_AT[0] + 0.2, OPS_AT[1] + 0.5, 0]]} />
+          <Card at={[-0.3, -1.9]} show={ease((t - 1500) / 500)}>
             <div style={{ ...pillStyle, background: '#1b8a9c', color: '#fff' }}>governed data · this project only</div>
           </Card>
         </>
