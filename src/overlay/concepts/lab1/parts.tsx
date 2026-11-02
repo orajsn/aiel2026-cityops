@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { useLayoutEffect, useRef } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { EASE } from '../WidePanel';
+import steelDelivery from '../../../assets/photos/steel-delivery.webp';
 
 /**
  * Lab 1's shared drawings and pieces (V2 pages, from the real workshop guide): teal for data, cool greys for
@@ -368,31 +369,18 @@ export function LockIcon({ size = 26, color = '#fff' }: { size?: number; color?:
 }
 
 /** the synthetic structural-steel delivery photo: I-beams stacked on timber, a project placard beside the stack */
-export function SteelPhoto({ w = 300, label = true, fluid = false }: { w?: number; label?: boolean; /** as wide as its box */ fluid?: boolean }) {
+/**
+ * the delivery photo of the workshop guide (the exact image, owner 2 Nov). Small copies show its middle (the placard and the
+ * stacked steel); `full` shows all of it, square, as the guide does.
+ */
+export function SteelPhoto({ w = 300, label = true, fluid = false, full = false, children }: { w?: number; label?: boolean; /** as wide as its box */ fluid?: boolean; /** the whole square picture */ full?: boolean; children?: ReactNode }) {
+  void label;
+  const ratio = full ? 1 : 0.66;
   return (
-    <svg data-photo="steel-delivery" width={fluid ? '100%' : w} height={fluid ? undefined : w * 0.66} viewBox="0 0 420 278" aria-hidden="true" style={{ display: 'block', borderRadius: 10, flex: 'none', ...(fluid ? { height: 'auto', aspectRatio: '420 / 278' } : null) }}>
-      <rect width="420" height="278" fill="#d3dae0" />
-      <rect y="200" width="420" height="78" fill="#b9c3bf" />
-      <g fill="#6d7884">
-        {[0, 1, 2, 3, 4].map((i) => (
-          <path key={`t${i}`} d={`M${86 + i * 52} 108h40v8h-15v36h15v8h-40v-8h15v-36h-15z`} />
-        ))}
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <path key={`b${i}`} d={`M${60 + i * 52} 160h40v8h-15v36h15v8h-40v-8h15v-36h-15z`} />
-        ))}
-      </g>
-      <rect x="44" y="210" width="340" height="9" rx="2" fill="#8d8a84" />
-      <rect x="54" y="219" width="12" height="9" fill="#7a7772" />
-      <rect x="362" y="219" width="12" height="9" fill="#7a7772" />
-      <rect x="352" y="70" width="5" height="140" fill="#6d757e" />
-      <rect x="326" y="40" width="70" height="46" rx="3" fill="#fff" stroke="#6d757e" strokeWidth={2} />
-      <path d="M334 52h44M334 62h54M334 72h36" stroke="#b7c3cb" strokeWidth={3} strokeLinecap="round" />
-      {label && (
-        <text x="14" y="264" fontSize="15" fill="#6d757e" fontFamily="Inter, sans-serif">
-          synthetic photo
-        </text>
-      )}
-    </svg>
+    <div data-photo="steel-delivery" style={{ position: 'relative', overflow: 'hidden', borderRadius: 10, flex: 'none', background: '#d3dae0', ...(fluid ? { width: '100%', aspectRatio: full ? '1 / 1' : '3 / 2' } : { width: w, height: w * ratio }) }}>
+      <img src={steelDelivery} alt="" draggable={false} style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: full ? 'center' : '42% 66%' }} />
+      {children}
+    </div>
   );
 }
 

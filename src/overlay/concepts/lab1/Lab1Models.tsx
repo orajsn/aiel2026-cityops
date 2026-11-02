@@ -1,6 +1,8 @@
 import { motion } from 'motion/react';
 import type { CSSProperties, ReactNode } from 'react';
 import { WidePanel } from '../WidePanel';
+import { LineIcon, type IconName } from '../icons';
+import steelDelivery from '../../../assets/photos/steel-delivery.webp';
 import { CARD, Clip, BreathingCoin, Coin, DbIcon, DIM, Flow, LockIcon, ModelNet, Net, netWaveEnd, RuntimeBar, SOFT, Shield, Spark, SteelPhoto, Switch, TEAL, TEAL_D, GREY, TextIcon, TINT, cap, capTeal, card, fade, fadeUp, mono, Fill } from './parts';
 import type { Lab1Props } from './parts';
 
@@ -191,6 +193,55 @@ export function L1Launch({ kicker, message, notebook }: Lab1Props) {
 export const OBSERVED = ['steel members stacked on timber', 'a staging area on site', 'a project placard beside the stack'];
 export const ASSUMED = ['what the steel grade is', 'whether it was certified', 'whether it was accepted'];
 export const CANNOT_PROVE = ['certification', 'material grade', 'acceptance', 'structural safety'];
+const ASSUMED_ICONS: IconName[] = ['beams', 'clipboard', 'shield'];
+const CANNOT_ICONS: IconName[] = ['clipboard', 'beams', 'shield', 'foundation'];
+
+/**
+ * the photo being read (owner, 2 Nov): a scanner line sweeps down the picture, and as it passes each thing the assistant can
+ * actually see, that thing is outlined and numbered like its line in the "Observed" list. Then it holds, and the scan runs again.
+ */
+const SCAN_P = 9;
+const SCAN_FROM = 0.5;
+const SCAN_SECS = 3.2;
+/** what is visible in the photo, as % of the square picture; `n` is its line in OBSERVED */
+const SEEN = [
+  { n: 2, x: 31, y: 1.5, w: 68, h: 33 },
+  { n: 3, x: 25.5, y: 43, w: 33.5, h: 28 },
+  { n: 1, x: 58, y: 63, w: 41, h: 30 },
+] as const;
+
+function ScannedPhoto() {
+  const at = (x: number) => Math.min(1, Math.max(0, x / SCAN_P));
+  const pass = (y: number) => SCAN_FROM + (SCAN_SECS * y) / 100;
+  return (
+    <SteelPhoto fluid full>
+      <motion.div
+        data-scan
+        aria-hidden="true"
+        initial={{ top: '0%', opacity: 0 }}
+        animate={{ top: ['0%', '0%', '100%', '100%'], opacity: [0, 1, 1, 0] }}
+        transition={{ duration: SCAN_P, repeat: Infinity, ease: 'linear', times: [at(SCAN_FROM - 0.05), at(SCAN_FROM), at(SCAN_FROM + SCAN_SECS), at(SCAN_FROM + SCAN_SECS + 0.3)] }}
+        style={{ position: 'absolute', left: 0, right: 0, height: 0, pointerEvents: 'none' }}
+      >
+        <span style={{ position: 'absolute', left: 0, right: 0, top: -70, height: 70, background: 'linear-gradient(to bottom, rgba(27,138,156,0), rgba(27,138,156,0.34))' }} />
+        <span style={{ position: 'absolute', left: 0, right: 0, top: -2, height: 4, background: '#7fd3e0', boxShadow: '0 0 14px 3px rgba(127,211,224,0.9)' }} />
+      </motion.div>
+      {SEEN.map((s) => (
+        <motion.div
+          key={s.n}
+          data-seen={s.n}
+          aria-hidden="true"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0, 1, 1, 0] }}
+          transition={{ duration: SCAN_P, repeat: Infinity, ease: 'linear', times: [0, at(pass(s.y)), at(pass(s.y) + 0.35), at(SCAN_P - 0.8), 1] }}
+          style={{ position: 'absolute', left: `${s.x}%`, top: `${s.y}%`, width: `${s.w}%`, height: `${s.h}%`, border: '3px solid #7fd3e0', borderRadius: 8, background: 'rgba(27,138,156,0.16)', boxShadow: '0 0 18px rgba(127,211,224,0.55)', pointerEvents: 'none' }}
+        >
+          <span style={{ position: 'absolute', top: -14, left: -14, width: 30, height: 30, borderRadius: '50%', background: TEAL, color: '#fff', fontWeight: 700, fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 3px #fff' }}>{s.n}</span>
+        </motion.div>
+      ))}
+    </SteelPhoto>
+  );
+}
 
 export function L1SitePhoto({ kicker, message, notebook }: Lab1Props) {
   return (
@@ -204,7 +255,7 @@ export function L1SitePhoto({ kicker, message, notebook }: Lab1Props) {
               <Clip /> structural-steel delivery photo
             </span>
           </div>
-          <SteelPhoto fluid />
+          <ScannedPhoto />
           <div data-question="photo" style={{ fontSize: 20, fontStyle: 'italic', color: DIM, marginTop: 12, lineHeight: 1.4 }}>
             “Describe what you see. Keep observations apart from assumptions.”
           </div>
@@ -214,21 +265,29 @@ export function L1SitePhoto({ kicker, message, notebook }: Lab1Props) {
             <Spark size={40} />
             <span style={{ fontSize: 24, fontWeight: 700, color: 'var(--ink)' }}>The AI assistant answers in two parts</span>
           </motion.div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, flex: 1 }}>
-            <motion.div data-observed="list" {...fadeUp(0.9)} style={{ ...card(true), padding: '14px 20px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 1fr', gap: 16, flex: 1 }}>
+            <motion.div data-observed="list" {...fadeUp(0.9)} style={{ ...card(true), padding: '14px 18px', display: 'flex', flexDirection: 'column' }}>
               <div style={{ ...capTeal, fontSize: 13, paddingBottom: 6 }}>Observed · visible in the photo</div>
-              {OBSERVED.map((o, i) => (
-                <motion.div key={o} data-observed={o} {...fadeUp(1.2 + i * 0.3)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderTop: '1px solid var(--line)', fontSize: 21, color: 'var(--ink)', lineHeight: 1.3 }}>
-                  <span style={{ width: 14, height: 14, borderRadius: '50%', background: TEAL, flex: 'none' }} />
-                  {o}
-                </motion.div>
-              ))}
+              {OBSERVED.map((o, i) => {
+                const s = SEEN.find((x) => x.n === i + 1)!;
+                return (
+                  <motion.div key={o} data-observed={o} {...fadeUp(1.2 + i * 0.3)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 16, padding: '8px 0', borderTop: '1px solid var(--line)', fontSize: 21, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.25 }}>
+                    <span data-crop={s.n} style={{ position: 'relative', flex: 'none', width: 150, height: Math.round((150 * s.h) / s.w), maxHeight: 108, borderRadius: 8, border: `2.5px solid ${TEAL}`, backgroundImage: `url(${steelDelivery})`, backgroundRepeat: 'no-repeat', backgroundSize: `${10000 / s.w}% ${10000 / s.h}%`, backgroundPosition: `${(s.x / (100 - s.w)) * 100}% ${(s.y / (100 - s.h)) * 100}%` }}>
+                      <span style={{ position: 'absolute', top: -12, left: -12, width: 26, height: 26, borderRadius: '50%', background: TEAL, color: '#fff', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 3px #fff' }}>{i + 1}</span>
+                    </span>
+                    {o}
+                  </motion.div>
+                );
+              })}
             </motion.div>
-            <motion.div data-assumed="list" {...fadeUp(1.6)} style={{ ...card(), padding: '14px 20px', display: 'flex', flexDirection: 'column' }}>
+            <motion.div data-assumed="list" {...fadeUp(1.6)} style={{ ...card(), padding: '14px 18px', display: 'flex', flexDirection: 'column' }}>
               <div style={{ ...cap, fontSize: 13, paddingBottom: 6 }}>Assumed · not shown</div>
               {ASSUMED.map((o, i) => (
-                <motion.div key={o} data-assumed={o} {...fadeUp(1.9 + i * 0.3)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderTop: '1px solid var(--line)', fontSize: 21, color: 'var(--ink)', lineHeight: 1.3 }}>
-                  <span style={{ width: 14, height: 14, borderRadius: '50%', border: `1.5px solid ${GREY}`, flex: 'none' }} />
+                <motion.div key={o} data-assumed={o} {...fadeUp(1.9 + i * 0.3)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 16, padding: '8px 0', borderTop: '1px solid var(--line)', fontSize: 21, color: 'var(--ink)', lineHeight: 1.25 }}>
+                  <span style={{ position: 'relative', flex: 'none', width: 84, height: 84, borderRadius: 14, border: `2.5px dashed ${GREY}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <LineIcon name={ASSUMED_ICONS[i]} size={46} color={GREY} />
+                    <span style={{ position: 'absolute', top: -12, right: -12, width: 28, height: 28, borderRadius: '50%', background: CARD, border: `2px solid ${GREY}`, color: DIM, fontWeight: 700, fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>?</span>
+                  </span>
                   {o}
                 </motion.div>
               ))}
@@ -237,8 +296,11 @@ export function L1SitePhoto({ kicker, message, notebook }: Lab1Props) {
           <motion.div data-caution {...fadeUp(2.9)} style={{ borderRadius: 12, border: '2px solid var(--red)', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
             <span style={{ ...cap, fontSize: 14, color: 'var(--red)', width: 130, flex: 'none', lineHeight: 1.35 }}>A photo alone cannot prove</span>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, flex: 1 }}>
-              {CANNOT_PROVE.map((c) => (
-                <span key={c} style={{ padding: '5px 12px', borderRadius: 6, background: SOFT, fontSize: 17, fontWeight: 600, color: 'var(--ink)' }}>{c}</span>
+              {CANNOT_PROVE.map((c, i) => (
+                <span key={c} style={{ padding: '6px 14px 6px 8px', borderRadius: 8, background: SOFT, fontSize: 19, fontWeight: 600, color: 'var(--ink)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <LineIcon name={CANNOT_ICONS[i]} size={28} color={GREY} />
+                  {c}
+                </span>
               ))}
             </div>
             <span style={{ color: TEAL, fontSize: 22 }}>→</span>
@@ -321,7 +383,7 @@ function LitPath({ d, period, from, to, until }: { d: string; period: number; fr
 function Request({ kind, title, sub, kb, coins, delay, breath, runtime, lit }: { kind: 'text' | 'photo'; title: string; sub: string; kb?: boolean; coins?: number; delay: number; breath?: { period: number; start: number }; runtime?: boolean; lit?: Lit }) {
   const photo = kind === 'photo';
   return (
-    <motion.div data-request={kind} {...fadeUp(delay)} style={{ position: 'relative', height: ROW_H, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 18, padding: '0 22px', borderRadius: 14, background: photo ? TINT : SOFT, border: `2px solid ${photo ? TEAL : 'transparent'}` }}>
+    <motion.div data-request={kind} {...fadeUp(delay)} style={{ position: 'relative', height: ROW_H, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 18, padding: '0 22px', borderRadius: 14, background: SOFT, border: '2px solid transparent' }}>
       {lit && <Glow lit={lit} radius={14} />}
       {photo ? <SteelPhoto w={132} label={false} /> : kb ? <DbIcon size={60} /> : <TextIcon size={60} />}
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -345,29 +407,36 @@ function Request({ kind, title, sub, kb, coins, delay, breath, runtime, lit }: {
   );
 }
 
-/* one pass of the baseline: the data arrives at 1.8 s, the model's wave runs through its layers, then the coins breathe */
-const BASE_P = 7;
-const BASE_WAVE = 1.8;
+/* the baseline runs three passes in one loop, one request at a time: the request lights, its line draws itself in light to the
+   model, the model lights and its layers run a wave, and last that request's coins breathe */
+const B_PASS = 6.5;
+const B_P = B_PASS * 3;
+const B_T0 = [0.1, 0.1 + B_PASS, 0.1 + 2 * B_PASS];
+const B_WAVE = 1.7;
 
 export function L1Baseline({ kicker, message, notebook }: Lab1Props) {
-  const breathAt = netWaveEnd('large', BASE_WAVE) + 0.1;
+  const litAt = (win: (s: number) => [number, number]): Lit => ({ period: B_P, wins: B_T0.map(win) });
+  const y = (i: number) => ROW_H / 2 + i * (ROW_H + ROW_GAP);
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-baseline" kickerColor="var(--teal)">
       <Fill max={1.25}>
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 680fr) 100px minmax(0, 520fr)', alignItems: 'stretch', marginTop: 10, flex: 1 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: ROW_GAP, justifyContent: 'center' }}>
           {REQUESTS.map((r, i) => (
-            <Request key={r.title} kind={r.kind} title={r.title} sub={r.sub} kb={'kb' in r} coins={3} runtime delay={0.3 + i * 0.3} breath={{ period: BASE_P, start: breathAt }} />
+            <Request key={r.title} kind={r.kind} title={r.title} sub={r.sub} kb={'kb' in r} coins={3} runtime delay={0.3 + i * 0.3} breath={{ period: B_P, start: B_T0[i] + netWaveEnd('large', B_WAVE) + 0.1 }} lit={{ period: B_P, wins: [[B_T0[i], B_T0[i] + B_PASS - 0.2]] }} />
           ))}
         </div>
-        <svg data-flow="all-to-one" width="100" height={COL_H} viewBox={`0 0 110 ${COL_H}`} preserveAspectRatio="none" fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" aria-hidden="true" style={{ alignSelf: 'center', width: 100 }}>
-          <path d={`M0 ${ROW_H / 2}C70 ${ROW_H / 2} 40 ${COL_H / 2} 110 ${COL_H / 2}`} />
-          <path d={`M0 ${COL_H / 2}H110`} />
-          <path d={`M0 ${COL_H - ROW_H / 2}C70 ${COL_H - ROW_H / 2} 40 ${COL_H / 2} 110 ${COL_H / 2}`} />
-          <motion.circle r={5} fill={TEAL} stroke="none" initial={{ cx: 4, cy: COL_H / 2, opacity: 0 }} animate={{ cx: [4, 4, 106, 106], opacity: [0, 1, 0, 0] }} transition={{ duration: BASE_P, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4 / BASE_P, (BASE_WAVE - 0.1) / BASE_P, 1] }} />
+        <svg data-flow="all-to-one" width="100" height={COL_H} viewBox={`0 0 110 ${COL_H}`} preserveAspectRatio="none" fill="none" aria-hidden="true" overflow="visible" style={{ alignSelf: 'center' }}>
+          {REQUESTS.map((r, i) => (
+            <path key={r.title} d={`M0 ${y(i)}C70 ${y(i)} 40 ${COL_H / 2} 110 ${COL_H / 2}`} stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" />
+          ))}
+          {REQUESTS.map((r, i) => (
+            <LitPath key={`lit-${r.title}`} d={`M0 ${y(i)}C70 ${y(i)} 40 ${COL_H / 2} 110 ${COL_H / 2}`} period={B_P} from={B_T0[i] + 0.2} to={B_T0[i] + 1.4} until={B_T0[i] + B_PASS - 0.6} />
+          ))}
         </svg>
-        <motion.div data-model="multimodal" {...fadeUp(1)} style={{ ...card(true), border: `2.5px solid ${TEAL}`, height: COL_H, boxSizing: 'border-box', alignSelf: 'center', padding: '18px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 10, boxShadow: '0 8px 24px rgba(27,138,156,0.16)' }}>
-          <ModelNet w={430} shape="large" who="multimodal" period={BASE_P} start={BASE_WAVE} />
+        <motion.div data-model="multimodal" {...fadeUp(1)} style={{ ...card(true), position: 'relative', border: `2.5px solid ${TEAL}`, height: COL_H, boxSizing: 'border-box', alignSelf: 'center', padding: '18px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 10, boxShadow: '0 8px 24px rgba(27,138,156,0.16)' }}>
+          <Glow lit={litAt((s) => [s + 1.3, s + B_PASS - 0.2])} radius={14} />
+          <ModelNet w={430} shape="large" who="multimodal" period={B_P} start={B_T0.map((s) => s + B_WAVE)} />
           <div style={{ fontSize: 27, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.1 }}>Multimodal model</div>
           <div style={{ fontSize: 18, color: DIM, lineHeight: 1.3 }}>reads text and sees photos: the most capable model, and the costliest</div>
           <div style={{ fontSize: 19, color: DIM, lineHeight: 1.3, marginTop: 4 }}>
