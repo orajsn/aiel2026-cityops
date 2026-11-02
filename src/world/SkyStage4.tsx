@@ -1,6 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react';
 import * as THREE from 'three';
-import { Html, Line } from '@react-three/drei';
+import { Billboard, Html, Line } from '@react-three/drei';
+import { OPS_TOP } from './skyPlaces';
 import { layoutCloud, nearestK } from './vectorLayout';
 import { NeuralNet } from './NeuralNet';
 import { PDFS, vectorNumbers } from './SkyVectorize';
@@ -28,6 +29,25 @@ function StageFrame({ children }: { children: ReactNode }) {
     <group position={STAGE4.center} rotation={[0, (-STAGE4.heading * Math.PI) / 180, 0]} scale={STAGE4.unit}>
       {children}
     </group>
+  );
+}
+
+/** a world point as a stage-frame position (the frame is turned to the camera's heading and scaled; see StageFrame) */
+const toFrame = (w: Vec3): Vec3 => {
+  const v = [(w[0] - STAGE4.center[0]) / STAGE4.unit, (w[1] - STAGE4.center[1]) / STAGE4.unit, (w[2] - STAGE4.center[2]) / STAGE4.unit];
+  const f = (STAGE4.heading * Math.PI) / 180;
+  return [v[0] * Math.cos(f) + v[2] * Math.sin(f), v[1], -v[0] * Math.sin(f) + v[2] * Math.cos(f)];
+};
+
+/** a calm board behind the cards, always square to the screen, so the busy city does not fight the words (drawn first) */
+function Backdrop({ show = 1 }: { show?: number }) {
+  return (
+    <Billboard position={[-2.95, 0.15, -1.5]}>
+      <mesh renderOrder={-10}>
+        <planeGeometry args={[10.3, 8.7]} />
+        <meshBasicMaterial color="#eef3f7" transparent opacity={0.84 * show} depthWrite={false} depthTest={false} toneMapped={false} />
+      </mesh>
+    </Billboard>
   );
 }
 
@@ -353,31 +373,23 @@ const VIEWS: { raw: string; rawCols: string[]; name: string; cols: string[]; at:
   { raw: 'DLV_TXN', rawCols: ['DLV_ID', 'SUP_ID', 'DLV_ST', 'EVT_CD', 'PRJ_ID'], name: 'Delivery', cols: ['delivery', 'status', 'event', 'supplier'], at: [-1.9, 1.95] },
   { raw: 'PRJ_REF', rawCols: ['PRJ_ID', 'PRJ_CD', 'OWN_ID', 'CRT_DT', 'ST_CD'], name: 'Project', cols: ['project code', 'name', 'owner', 'dates'], at: [-5.3, -1.05] },
 ];
-const OPS_AT: [number, number] = [-2.2, -3.7];
+/** a path between the real Ops Center pin (in the city) and a point in the frame */
+const opsArrow = (x: number, y: number): Vec3[] => {
+  const o = toFrame([OPS_TOP[0], OPS_TOP[1] + 0.6, OPS_TOP[2]]);
+  return [[o[0], o[1], 0], [(o[0] + x) / 2, (o[1] + y) / 2 - 0.4, 0], [x, y, 0]];
+};
 
 function ViewCard({ v, show, hot, dim, rawShow }: { v: (typeof VIEWS)[number]; show: number; hot: number[]; dim: boolean; rawShow: number }) {
   return (
     <>
-      <group position={[v.at[0] - 0.14, v.at[1] + 0.14, -0.25]} scale={show}>
-        <mesh>
-          <boxGeometry args={[3.3, 2.1, 0.08]} />
-          <meshStandardMaterial color="#cfd6dc" roughness={0.9} />
-        </mesh>
-      </group>
       <Card at={[v.at[0] - 0.14, v.at[1] + 0.14]} show={show * rawShow * (dim ? 0.4 : 1)} z={-0.2}>
-        <div style={{ width: 380, height: 250, borderRadius: 10, background: 'rgba(207,214,220,0.0)', fontFamily: 'var(--font-mono, monospace)', color: '#7b8996', padding: '10px 14px' }}>
+        <div style={{ width: 380, height: 250, borderRadius: 10, background: '#d3dae0', border: '1px solid #aeb9c2', fontFamily: 'var(--font-mono, monospace)', color: '#7b8996', padding: '10px 14px' }}>
           <div style={{ fontWeight: 700, fontSize: 18 }}>{v.raw}</div>
           {v.rawCols.map((c) => (
             <div key={c} style={{ fontSize: 15, marginTop: 4 }}>{c}</div>
           ))}
         </div>
       </Card>
-      <group position={[v.at[0], v.at[1], 0]} scale={show}>
-        <mesh>
-          <boxGeometry args={[3.33, 2.13, 0.1]} />
-          <meshStandardMaterial color="#1b8a9c" roughness={0.5} transparent opacity={dim ? 0.35 : 1} />
-        </mesh>
-      </group>
       <Card at={v.at} show={show * (dim ? 0.38 : 1)} z={0.08}>
         <div style={{ width: 392, height: 250, background: '#fff', borderRadius: 8, overflow: 'hidden', boxShadow: '0 6px 14px rgba(20,40,60,.25)' }}>
           <div style={{ background: '#1b8a9c', color: '#fff', fontSize: 26, fontWeight: 700, padding: '8px 16px' }}>{v.name}</div>
@@ -400,22 +412,9 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
   const hot = (i: number) => (stage === 2 ? (i === 0 ? [0, 1] : i === 1 ? [1] : [0]) : stage === 3 ? (i === 0 ? [0, 1, 2, 3] : i === 2 ? [0] : []) : []);
   return (
     <StageFrame>
+      <Backdrop show={ease(t / 800)} />
       <DB3D at={DB_SEM} />
       <DBLabel at={DB_SEM} />
-      {/* the Control Center, where the question starts and the rows land */}
-      <group position={[OPS_AT[0], OPS_AT[1], 0]}>
-        <mesh>
-          <boxGeometry args={[1.5, 0.7, 0.6]} />
-          <meshStandardMaterial color="#43525e" />
-        </mesh>
-        <mesh position={[0, 0.1, 0.31]}>
-          <boxGeometry args={[1.2, 0.25, 0.02]} />
-          <meshBasicMaterial color="#7fd3e0" />
-        </mesh>
-      </group>
-      <Card at={[OPS_AT[0], OPS_AT[1] - 0.65]}>
-        <div style={{ fontSize: 18, fontWeight: 600, color: '#1d2733', background: 'rgba(255,255,255,0.9)', padding: '2px 8px', borderRadius: 6, whiteSpace: 'nowrap' }}>City Operations Control Center</div>
-      </Card>
       <Card at={[-3.9, 3.5]} show={ease((t - 200) / 500)}>
         <div style={{ fontSize: 22, fontWeight: 700, color: '#146f7f', background: 'rgba(255,255,255,0.92)', padding: '2px 12px', borderRadius: 8, whiteSpace: 'nowrap' }}>Governed views · business words over the raw tables</div>
       </Card>
@@ -433,7 +432,7 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
       {/* click 2: the question rises from the Ops Center; its words match the views */}
       {stage >= 2 && stage <= 3 && (
         <>
-          <Arrow k={stage === 2 ? ease((t - 200) / 900) : 1} pts={[[OPS_AT[0], OPS_AT[1] + 0.5, 0], [OPS_AT[0] - 0.2, -2.4, 0], [-2.7, -1.6, 0]]} />
+          <Arrow k={stage === 2 ? ease((t - 200) / 900) : 1} pts={opsArrow(-2.7, -1.6)} />
           <Card at={[-0.5, -1.6]} show={stage === 2 ? ease((t - 900) / 500) : 1}>
             <div style={{ width: 520, padding: '14px 22px', background: '#fff', border: '3px solid #1b8a9c', borderRadius: 14, fontSize: 28, fontWeight: 600, color: '#1d2733', boxShadow: '0 6px 14px rgba(20,40,60,.25)' }}>
               “Which <span style={{ color: '#146f7f', fontWeight: 700 }}>supplier</span> is <span style={{ color: '#146f7f', fontWeight: 700 }}>ready</span>?”
@@ -486,7 +485,7 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
               ))}
             </div>
           </Card>
-          <Arrow k={ease((t - 900) / 900)} pts={[[-1.4, -1.0, 0], [-1.8, -2.2, 0], [OPS_AT[0] + 0.2, OPS_AT[1] + 0.5, 0]]} />
+          <Arrow k={ease((t - 900) / 900)} pts={opsArrow(-1.4, -1.0).reverse()} />
           <Card at={[-0.3, -1.9]} show={ease((t - 1500) / 500)}>
             <div style={{ ...pillStyle, background: '#1b8a9c', color: '#fff' }}>governed data · this project only</div>
           </Card>
