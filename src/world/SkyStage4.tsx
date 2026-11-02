@@ -4,6 +4,7 @@ import { Billboard, Html, Line } from '@react-three/drei';
 import { OPS_TOP } from './skyPlaces';
 import { layoutCloud, nearestK } from './vectorLayout';
 import { NeuralNet } from './NeuralNet';
+import { ReferenceFolder } from './ReferenceFolder';
 import { PDFS, vectorNumbers } from './SkyVectorize';
 import { STAGE4, type Vec3 } from './shots';
 
@@ -337,16 +338,25 @@ export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'r
         </Card>
       )}
       <Cloud3D show={cloudShow} groups={groups} ask={ask} pick={pick} fly={act === 'retrieve' ? fly : 0} flyTo={BOOK_AT} />
-      {/* click 4: the five become a book of passages, go to the model, and the answer stands */}
+      {/* click 4 (the Lab 2 envelope): the five nearest points fly into a folder with the question; the folder goes into the model */}
       {act === 'retrieve' && (
         <>
-          <group scale={ease((t - 2400) / 600)}>
-            <Book3D at={BOOK_AT} s={1.1} />
-          </group>
-          <Card at={[BOOK_AT[0], BOOK_AT[1] - 1.1]} show={ease((t - 2600) / 500)}>
-            <div style={{ fontSize: 18, fontWeight: 600, color: '#1d2733', background: 'rgba(255,255,255,0.92)', padding: '2px 8px', borderRadius: 6 }}>five passages</div>
-          </Card>
-          <Arrow k={ease((t - 3000) / 600)} pts={[[BOOK_AT[0] + 0.7, BOOK_AT[1], 0], [-4.5, 1.7, 0], [NET_AT[0] - 1.4, NET_AT[1], 0]]} />
+          {(() => {
+            const arrive = ease((t - 1700) / 500);
+            const go = ease((t - 3400) / 1100);
+            const taken = 1 - ease((t - 4500) / 500);
+            const folderAt: Vec3 = lerp(BOOK_AT, [NET_AT[0] - 1.7, NET_AT[1], 0], go);
+            return (
+              <>
+                <group position={folderAt} scale={1.7 * arrive * taken}>
+                  <ReferenceFolder sheets={[0, 1, 2, 3, 4].map((i) => t > 2000 + i * 220)} opacity={arrive * taken} />
+                </group>
+                <Card at={[BOOK_AT[0], BOOK_AT[1] + 1.35]} show={ease((t - 2900) / 500) * (1 - go)}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: '#1d2733', background: 'rgba(255,255,255,0.95)', padding: '3px 12px', borderRadius: 8, boxShadow: '0 3px 10px rgba(20,40,60,.2)' }}>5 references + the question</div>
+                </Card>
+              </>
+            );
+          })()}
           <group position={NET_AT} scale={ease((t - 3000) / 700) * 0.95}>
             <NeuralNet producing={t > 3800} doubt={false} />
           </group>
