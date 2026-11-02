@@ -25,6 +25,8 @@ export interface SceneDef {
   enterFrom?: ShotId;
   /** shown as page 0 of its part, before page 1 (the Introduction's opening view); the pages after keep their numbers */
   pageZero?: boolean;
+  /** an extra page inside the one before it: it is shown as that page's number and this letter (4a, 4b) and does not count as a page */
+  pageSub?: string;
   world?: Record<string, unknown>;
   overlay?: OverlayKey;
   overlayProps?: Record<string, unknown>;

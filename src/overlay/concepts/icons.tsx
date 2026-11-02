@@ -47,6 +47,11 @@ const PATHS = {
   truck: <><path d="M4 12h24v22H4z" /><path d="M28 20h10l6 8v6H28z" /><circle cx="13" cy="36" r="4" /><circle cx="36" cy="36" r="4" /></>,
   shield: <><path d="M24 5l16 6v12c0 11-7 17-16 21-9-4-16-10-16-21V11z" /><path d="M17 24l5 5 9-11" /></>,
   camera: <><rect x="4" y="14" width="40" height="26" rx="4" /><circle cx="24" cy="27" r="7" /><path d="M16 14l3-6h10l3 6" /></>,
+  // Lab 1's 4a and 4b (the vector store and the semantic store)
+  doc: <><path d="M12 5h18l8 8v30H12z" /><path d="M30 5v8h8M18 22h14M18 29h14M18 36h9" /></>,
+  points: <><circle cx="10" cy="14" r="3" /><circle cx="22" cy="8" r="3" /><circle cx="36" cy="16" r="3" /><circle cx="16" cy="28" r="3" /><circle cx="30" cy="30" r="3" /><circle cx="40" cy="38" r="3" /><circle cx="12" cy="40" r="3" /></>,
+  chat: <><path d="M6 8h36v24H20l-8 8v-8H6z" /><path d="M19 17a5 5 0 0 1 10 0c0 3-5 3-5 7M24 28v1" /></>,
+  table: <><rect x="5" y="8" width="38" height="32" rx="3" /><path d="M5 18h38M5 28h38M19 18v22M31 18v22" /></>,
 } satisfies Record<string, ReactNode>;
 
 export type IconName = keyof typeof PATHS;

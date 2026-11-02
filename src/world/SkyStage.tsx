@@ -8,12 +8,13 @@ import { FlowArc } from './FlowArc';
 import { VectorField } from './VectorField';
 import { layoutCloud, nearestK } from './vectorLayout';
 import { SkyShapes } from './SkyShapes';
+import { SkySemantic } from './SkySemantic';
 import { SkyLab2, type Lab2Act } from './SkyLab2';
 import { NeuralNet } from './NeuralNet';
 import { ReferenceFolder } from './ReferenceFolder';
 import { Rich } from '../overlay/Rich';
 import type { Vec3 } from './shots';
-import { SKY_ANCHOR, MODEL, MODEL_SCALE, MODEL_IN, MODEL_OUT, DB, CLOUD, ENVELOPE, OPS_TOP, along, DB_WIDE, MODEL_WIDE, MODEL_WIDE_IN, BRIEF_AT, FOLDER } from './skyPlaces';
+import { SKY_ANCHOR, at, MODEL, MODEL_SCALE, MODEL_IN, MODEL_OUT, DB, CLOUD, ENVELOPE, OPS_TOP, along, DB_WIDE, MODEL_WIDE, MODEL_WIDE_IN, BRIEF_AT, FOLDER } from './skyPlaces';
 import { UnifiedBoard } from './UnifiedBoard';
 import { boardPoint } from './answerBoard';
 
@@ -32,7 +33,7 @@ import { boardPoint } from './answerBoard';
  *  - shapes:   what the inspector's answer needs: four panels (table, JSON, graph, vectors) around one Oracle AI Database;
  *  - brain:    the small model alone, centre stage.
  */
-export type SkyAct = 'model' | 'embed' | 'envelope' | 'shapes' | 'brain' | 'tools' | 'unified' | 'overflow' | Lab2Act;
+export type SkyAct = 'model' | 'embed' | 'vector' | 'vector2' | 'vector3' | 'retrieve' | 'semantic' | 'semantic2' | 'semantic3' | 'semantic4' | 'envelope' | 'shapes' | 'brain' | 'tools' | 'unified' | 'overflow' | Lab2Act;
 
 export { SKY_ANCHOR } from './skyPlaces';
 const A = SKY_ANCHOR;
@@ -56,6 +57,13 @@ const ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 0.9, MODEL_OUT[2]], 0.5)
 const BARE_A = '“!!I don’t have any reports!! about a Harbor Bridge in your city. In general, bridges can show cracking, corrosion or bearing wear…”';
 /** Lab 2 page 3: the answer comes out of the model's last layer, built from the references (draft wording, no recorded run) */
 const RAG_ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 1.4, MODEL_OUT[2]], 0.5);
+/** 4a: the answer stands below the model, so it stays clear of the page's panel on the right */
+const RETRIEVE_ANSWER_AT: Vec3 = along([MODEL[0], MODEL[1] - 2.3, MODEL[2]], -0.9);
+/** 4b: the SQL the semantic store wrote (click 3) and the rows that come back (click 4), standing right of the tables, clear of the panel */
+const SQL_AT: Vec3 = at(2.0, 1.7);
+const ROWS_AT: Vec3 = at(2.0, 1.2);
+const SQL_TEXT = 'SELECT … FROM **governed views** WHERE project = **this project**';
+const ROWS_TEXT = '**supplier** · recommendation status · fit score · risk level · explanation';
 const RAG_A = '“Harbor Bridge has **two recent findings**: a **hairline crack** near a bearing plate, !!0.12 mm!!, and **surface corrosion** on a bearing assembly, !!about 25% section loss!!. From the **five reports retrieved**.”';
 
 const ease = (t: number) => {
@@ -124,19 +132,27 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
     [near, cloud],
   );
 
-  const hasDb = act === 'embed' || act === 'envelope';
-  const embedded = act === 'envelope' || (act === 'embed' && t > 2600);
-  const showQuery = act === 'envelope' || (act === 'embed' && t > 4200);
+  // Lab 1's 4a plays the Lab 2 sequence one click at a time (owner, 2 Nov): vector = the documents reach the database,
+  // vector2 = they become points, vector3 = the question is a point and its five nearest light up, retrieve = those five go to
+  // the language model and the answer stands. They share the stage, so the database and its cloud stay put between clicks.
+  const env = act === 'envelope' || act === 'retrieve';
+  const vec = act === 'vector' || act === 'vector2' || act === 'vector3';
+  const embedAct = act === 'embed' || vec;
+  const hasDb = embedAct || env;
+  const embedded = env || act === 'vector3' || (act === 'vector2' && t > 400) || (act === 'embed' && t > 2600);
+  const showQuery = env || (act === 'vector3' && t > 500) || (act === 'embed' && t > 4200);
+  const semantic = act === 'semantic' || act === 'semantic2' || act === 'semantic3' || act === 'semantic4';
+  const semanticStage = semantic ? Number((act as string).slice(-1)) || 1 : 0;
 
   // page 3: the 5 references fly in and stack up (0.8-2.2 s), the stack goes into the model's first layer (2.4-3.6 s)
   // and is taken in there; the model writes, and the answer stands at its last layer (5.2 s)
-  const fly = act === 'envelope' ? ease((t - 800) / 1200) : 0;
-  const travel = act === 'envelope' ? ease((t - 2400) / 1200) : 0;
+  const fly = env ? ease((t - 800) / 1200) : 0;
+  const travel = env ? ease((t - 2400) / 1200) : 0;
   // the envelope goes to the model's first layer and is taken in there
   const dock = along(MODEL_IN, -0.45);
   const envPos: Vec3 = [ENVELOPE[0] + (dock[0] - ENVELOPE[0]) * travel, ENVELOPE[1] + (dock[1] - ENVELOPE[1]) * travel, ENVELOPE[2] + (dock[2] - ENVELOPE[2]) * travel];
   // once it has arrived there it fades away in place (a scale would shrink it towards the world origin: a warp)
-  const intake = act === 'envelope' ? 1 - ease((t - 3600) / 600) : 1;
+  const intake = env ? 1 - ease((t - 3600) / 600) : 1;
 
   return (
     <>
@@ -148,7 +164,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       <group position={A}>
         <group ref={root}>
           <group position={[-A[0], -A[1], -A[2]]}>
-            {(act === 'model' || act === 'embed' || act === 'envelope') && <ModelOrb position={MODEL} lit={act === 'envelope' && t > 3800} doubt={act === 'model' && t > 2600} producing={(act === 'model' && t > 2300) || (act === 'envelope' && t > 3800)} labelled={visible} scale={MODEL_SCALE} />}
+            {(act === 'model' || embedAct || env) && <ModelOrb position={MODEL} lit={env && t > 3800} doubt={act === 'model' && t > 2600} producing={(act === 'model' && t > 2300) || (env && t > 3800)} labelled={visible} scale={MODEL_SCALE} />}
             {/* page 4: one folder of references; it swells as three questions pile in, and still does not take them */}
             {act === 'overflow' && (
               <group position={FOLDER} scale={2.0}>
@@ -157,7 +173,8 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
             )}
             {act === 'brain' && <ModelOrb position={[A[0], A[1] + 0.4, A[2]]} lit doubt={false} producing labelled={visible} scale={2.2} />}
             {act && LAB2_ACTS.includes(act) && <SkyLab2 act={act as Lab2Act} center={[A[0], A[1] + 0.2, A[2]]} t={t} red={theme.red} opsTop={OPS_TOP} />}
-            {hasDb && <SkyDatabase color={theme.red} appearMs={0} t={t} />}
+            {(hasDb || semantic) && <SkyDatabase color={theme.red} appearMs={0} t={act === 'vector' || act === 'semantic' || act === 'embed' || act === 'envelope' ? t : 9999} />}
+            {semantic && <SkySemantic t={t} stage={semanticStage} visible={visible} />}
             {act && WIDE_ACTS.includes(act) && <SkyDatabase color={theme.red} appearMs={0} t={9999} position={DB_WIDE} />}
             {act && WIDE_ACTS.includes(act) && <ModelOrb position={MODEL_WIDE} lit doubt={false} producing={act === 'tools' || t > 5600} labelled={visible} scale={MODEL_SCALE} />}
             {hasDb && (
@@ -165,7 +182,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
                 <VectorField phase={embedded ? 'embedded' : 'documents'} query={showQuery ? QUERY : undefined} k={5} spin={false} documentsOffset={[0, -14, 0]} tweenMs={1400} />
               </group>
             )}
-            {act === 'envelope' && (
+            {env && (
               <>
                 {nearWorld.map((p, i) => (
                   <mesh key={i} position={[p[0] + (envPos[0] - p[0]) * fly, p[1] + (envPos[1] - p[1]) * fly, p[2] + (envPos[2] - p[2]) * fly]} visible={travel < 0.05 && t < 1150 + i * 230}>
@@ -184,7 +201,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       </group>
       {/* flows between the city and the stage (outside the scaled group so they stay anchored to the city) */}
       {visible && act === 'model' && <FlowArc key="q-up" from={along([QUESTION_AT[0], QUESTION_AT[1] - 0.4, QUESTION_AT[2]], 1.5)} to={MODEL_IN} lift={0.4} radius={0.05} durationMs={1600} delayMs={900} fadeMs={900} color="#ffffff" />}
-      {visible && act === 'embed' &&
+      {visible && embedAct &&
         sources.map((s, i) => <FlowArc key={`doc-${i}`} from={s} to={DB} lift={2.5} radius={0.04} durationMs={1300} delayMs={500 + i * 180} fadeMs={600} color={theme.data} />)}
       {/* page 6: the query comes up from the Ops Center into the database; the brief goes into the model's first layer */}
       {visible && act === 'unified' && <FlowArc key="query" from={OPS_TOP} to={[DB_WIDE[0], DB_WIDE[1] + 0.5, DB_WIDE[2]]} lift={1.2} radius={0.05} durationMs={1200} delayMs={200} fadeMs={800} color="#ffffff" />}
@@ -192,8 +209,11 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       {/* 1.1: the inspector's question goes in bare, and a general guess comes out */}
       {visible && act === 'model' && <SkyCard position={QUESTION_AT} who="the question" text={BARE_Q} show={t > 200} />}
       {visible && act === 'model' && <SkyCard position={ANSWER_AT} who="the language model · answer" text={BARE_A} show={t > 3900} tone="grey" anchor="left" />}
-      {visible && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="Oracle AI Database · 384 numbers per text" show={act === 'embed' && t > 2800} />}
-      {visible && act === 'envelope' && <SkyCard position={RAG_ANSWER_AT} who="the language model · answer, from the references" text={RAG_A} show={t > 5200} anchor="left" />}
+      {visible && act === 'semantic3' && <SkyCard position={SQL_AT} who="NL2SQL · the SQL it wrote" text={SQL_TEXT} show={t > 500} />}
+      {visible && act === 'semantic3' && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="SQL checked: it cannot reach other projects" show={t > 1300} />}
+      {visible && act === 'semantic4' && <SkyCard position={ROWS_AT} who="the semantic store · rows for this project" text={ROWS_TEXT} show={t > 1700} />}
+      {visible && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="Oracle AI Database · 384 numbers per text" show={(act === 'embed' && t > 2800) || act === 'vector2' || act === 'vector3'} />}
+      {visible && env && <SkyCard position={act === 'retrieve' ? RETRIEVE_ANSWER_AT : RAG_ANSWER_AT} who="the language model · answer, from the references" text={RAG_A} show={t > 5200} anchor={act === 'retrieve' ? 'center' : 'left'} />}
       </group>
     </>
   );

@@ -22,11 +22,13 @@ interface Step {
 interface StoryConfig {
   steps: Step[];
   /** when each step turns on, and when it is ticked (seconds; null: it stays the current one) */
-  on: number[];
-  tick: (number | null)[];
+  on?: number[];
+  tick?: (number | null)[];
   /** the closing line and when it arrives */
   pill: string;
-  pillAt: number;
+  pillAt?: number;
+  /** panel width in px (the sky pages keep the left of the screen for the 3D) */
+  width?: number;
 }
 
 export const CRACK: StoryConfig = {
@@ -65,6 +67,33 @@ export const CAPTURE: StoryConfig = {
   pillAt: 6.9,
 };
 
+/**
+ * 4a and 4b (owner, 2 Nov): on the sky stage the page's 3D plays (the vector store's cloud of points, the semantic store's
+ * governed tables) and this card, on the right as on the story pages, names each step with its own icon. Each click lights
+ * the next step and plays that step's sky act (SkyStage: vector, vector2, vector3, retrieve; semantic to semantic4), so the
+ * page has its own sequence inside it.
+ */
+export const VECTOR: StoryConfig = {
+  steps: [
+    { title: 'The specification', sub: 'A PDF in Object Storage, synced in.', icon: 'doc' },
+    { title: 'Meaning becomes numbers', sub: 'Each chunk is 384 numbers: a point in space.', icon: 'points' },
+    { title: 'The question is a point too', sub: 'Close in meaning means close in space. The nearest five light up.', icon: 'chat' },
+    { title: 'The top five go to the model', sub: 'file_search hands the passages over; the answer cites them.', icon: 'target' },
+  ],
+  pill: 'Nearest by meaning, not by matching words',
+  width: 640,
+};
+export const SEMANTIC: StoryConfig = {
+  steps: [
+    { title: 'Governed views', sub: 'The database exposes views, not raw tables.', icon: 'table' },
+    { title: 'Ask in plain words', sub: 'The question needs no SQL.', icon: 'chat' },
+    { title: 'SQL, checked', sub: 'NL2SQL writes it; the check keeps it to this project.', icon: 'shield' },
+    { title: 'Rows come back', sub: 'Through the ADB MCP Server, to the app.', icon: 'database' },
+  ],
+  pill: 'Governed data for this project only',
+  width: 640,
+};
+
 /** the page's clock in seconds: runs once from when the page appears, then holds on the last beat */
 function useStoryClock(): number {
   const [t, setT] = useState(0);
@@ -80,20 +109,25 @@ function useStoryClock(): number {
   return t;
 }
 
-function StoryCard({ kicker, message, cfg }: Lab1Props & { cfg: StoryConfig }) {
-  const t = useStoryClock();
+function StoryCard({ kicker, message, cfg, step }: Lab1Props & { cfg: StoryConfig }) {
+  // a click-by-click page (step given) lights its steps by click; the story pages run on their own clock
+  const clock = useStoryClock();
+  const t = step === undefined ? clock : 0;
+  const isOn = (i: number) => (step === undefined ? t >= (cfg.on?.[i] ?? 0) : i + 1 <= step);
+  const isDone = (i: number) => (step === undefined ? cfg.tick?.[i] != null && t >= (cfg.tick[i] as number) : i + 1 < step);
+  const pillOn = step === undefined ? t >= (cfg.pillAt ?? Infinity) : step >= cfg.steps.length;
   const scriptOpen = useUiStore((s) => s.scriptOpen);
   return (
     <div className="beat" data-l1-story>
-      <div className={`beat__panel beat__panel--cast${scriptOpen ? '' : ' is-free'}`} data-testid="l1-story">
+      <div className={`beat__panel beat__panel--cast${scriptOpen ? '' : ' is-free'}`} data-testid="l1-story" style={cfg.width ? { width: cfg.width } : undefined}>
         <div className="beat__kicker" style={{ color: 'var(--teal)' }}>{kicker}</div>
         <div className="beat__headline">
           <Rich text={message} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', marginTop: 8 }}>
           {cfg.steps.map((s, i) => {
-            const on = t >= cfg.on[i];
-            const done = cfg.tick[i] !== null && t >= (cfg.tick[i] as number);
+            const on = isOn(i);
+            const done = isDone(i);
             const k = 'var(--cast-k, 1)';
             return (
               <div key={s.title} data-step={i + 1} data-on={on || undefined} data-done={done || undefined} style={{ display: 'grid', gridTemplateColumns: `calc(68px * ${k}) 1fr`, columnGap: 20, position: 'relative', paddingBottom: i < cfg.steps.length - 1 ? `calc(18px * ${k})` : 0 }}>
@@ -110,7 +144,7 @@ function StoryCard({ kicker, message, cfg }: Lab1Props & { cfg: StoryConfig }) {
             );
           })}
         </div>
-        <div data-pill style={{ marginTop: 16, padding: '10px 16px', borderRadius: 12, border: '2px solid var(--teal)', background: 'rgba(27, 138, 156, 0.1)', fontSize: 'calc(18px * var(--cast-k, 1))', fontWeight: 600, color: 'var(--ink)', opacity: t >= cfg.pillAt ? 1 : 0, transition: 'opacity 500ms' }}>{cfg.pill}</div>
+        <div data-pill style={{ marginTop: 16, padding: '10px 16px', borderRadius: 12, border: '2px solid var(--teal)', background: 'rgba(27, 138, 156, 0.1)', fontSize: 'calc(18px * var(--cast-k, 1))', fontWeight: 600, color: 'var(--ink)', opacity: pillOn ? 1 : 0, transition: 'opacity 500ms' }}>{cfg.pill}</div>
       </div>
     </div>
   );
@@ -119,3 +153,5 @@ function StoryCard({ kicker, message, cfg }: Lab1Props & { cfg: StoryConfig }) {
 export const L1Crack = (p: Lab1Props) => <StoryCard {...p} cfg={CRACK} />;
 export const L1Plan = (p: Lab1Props) => <StoryCard {...p} cfg={PLAN} />;
 export const L1Capture = (p: Lab1Props) => <StoryCard {...p} cfg={CAPTURE} />;
+export const L1Vector = (p: Lab1Props) => <StoryCard {...p} cfg={VECTOR} />;
+export const L1Semantic = (p: Lab1Props) => <StoryCard {...p} cfg={SEMANTIC} />;

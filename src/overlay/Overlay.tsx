@@ -14,7 +14,7 @@ import { TrafficEditor } from './TrafficEditor';
 import { useTrafficStore } from '../engine/traffic';
 import { Rich } from './Rich';
 import { SettingsPanel } from './SettingsPanel';
-import { pageNumber } from '../scenes';
+import { pageLabel } from '../scenes';
 import { focusNext, focusPrev, pagePrev, useDrawerStore, usePresentationStore } from '../engine/presentation';
 import { FRAME, useGraphicsStore } from '../engine/graphics';
 
@@ -103,7 +103,7 @@ export function Overlay() {
         <span className="strip__sep" />
         <span className="strip__chapter">{CHAPTER_LABEL[scene.chapter]}</span>
         <span className="strip__sep" />
-        <span className="strip__id mono">{pageNumber(scene.id)}</span>
+        <span className="strip__id mono">{pageLabel(scene.id)}</span>
         <span className="strip__sep" />
         <span className="strip__title">{scene.title}</span>
       </div>

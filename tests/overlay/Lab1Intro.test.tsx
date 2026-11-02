@@ -12,7 +12,7 @@ test('1.0 opening: three questions into one AI assistant (Seer Construction Inte
     expect(c.textContent).toContain(w);
   expect(attrs(c, 'data-hands-on')).toEqual(['1', '2', '3', '4', '5']);
   expect(HANDS_ON_STEPS).toEqual(['Unstructured RAG', 'Semantic Store', 'Launch the app', 'Model routing', 'Guardrails']);
-  expect(c.querySelector('[data-engineer] svg[data-person="engineer"]')).not.toBeNull();
+  expect(c.querySelector('[data-engineer] [data-person="engineer"]')).not.toBeNull();
   expect(c.querySelector('[data-net]')).not.toBeNull();
   expectNoRed(c);
 });

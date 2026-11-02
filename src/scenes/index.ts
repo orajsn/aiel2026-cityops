@@ -14,8 +14,16 @@ export const SCENES: SceneDef[] = buildScenes(WITH_LAB1);
 
 /** a page's number on screen: 1, 2, 3 inside its part (Introduction, Lab 1, Lab 2, Lab 3), a page-zero page is 0; ids stay for the address */
 const NUMBERS = new Map<string, number>();
+const LABELS = new Map<string, string>();
 for (const c of [0, 1, 2, 3]) {
   let n = 0;
-  SCENES.filter((s) => s.chapter === c).forEach((s) => NUMBERS.set(s.id, s.pageZero ? 0 : ++n));
+  SCENES.filter((s) => s.chapter === c).forEach((s) => {
+    // an extra page (pageSub) sits inside the page before it: 4a, 4b; the pages after keep counting from there
+    if (!s.pageSub) NUMBERS.set(s.id, s.pageZero ? 0 : ++n);
+    else NUMBERS.set(s.id, n);
+    LABELS.set(s.id, s.pageSub ? `${n}${s.pageSub}` : String(NUMBERS.get(s.id)));
+  });
 }
 export const pageNumber = (id: string) => NUMBERS.get(id) ?? 0;
+/** what the screen shows for a page: its number, or the number and letter of an extra page (4a) */
+export const pageLabel = (id: string) => LABELS.get(id) ?? '0';

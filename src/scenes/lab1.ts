@@ -25,6 +25,32 @@ const atBridge = (id: string, title: string, overlay: string, props: object): Sc
   overlayProps: props as Record<string, unknown>,
 });
 
+/** 4a and 4b: the sky stage over the Ops Center, one camera angle for both, one click per step, the panel on the right */
+const VECTOR_STEPS = [
+  { title: 'The specification reaches the database', act: 'vector' },
+  { title: 'Meaning becomes numbers', act: 'vector2' },
+  { title: 'The question is a point too', act: 'vector3' },
+  { title: 'The top five go to the model', act: 'retrieve' },
+];
+const SEMANTIC_STEPS = [
+  { title: 'Governed views', act: 'semantic' },
+  { title: 'Ask in plain words', act: 'semantic2' },
+  { title: 'The SQL is checked', act: 'semantic3' },
+  { title: 'Rows come back', act: 'semantic4' },
+];
+const atSky = (id: string, sub: string, title: string, overlay: string, group: string, act: string, props: object, angle: string): SceneDef => ({
+  id,
+  chapter: 3,
+  title,
+  pageSub: sub,
+  shot: 'sky',
+  world: { pins: 'all', sky: act, highlight: ['City Operations Control Center'] },
+  ...(id === angle ? {} : { sameAngleAs: angle }),
+  overlay,
+  overlayGroup: group,
+  overlayProps: props as Record<string, unknown>,
+});
+
 /**
  * 1.0 to 1.2 work like Lab 3's opening pages (owner, 2 Nov): the camera closes in on the crack, a real character stands
  * there with the label, and one panel on the right carries the message and steps. One camera for the three pages.
@@ -45,6 +71,11 @@ export const lab1: SceneDef[] = [
   atCrack('1.1', 'Plan the repair', { kicker: 'Lab 1 · Plan the repair', message: 'Turn the observation **into a project.**' }, 'character-male-b'),
   atCrack('1.2', 'Capture the steel delivery', { kicker: 'Lab 1 · Capture the delivery', message: 'The technician adds **evidence from the site.**' }, 'character-male-e'),
   atBridge('1.3', 'One assistant', 'L1Assistant', { kicker: 'One assistant', message: 'One question goes in through **OCI Enterprise AI** and comes back with its sources.' }),
+  // 4a and 4b (owner, 2 Nov): what a Vector Store and a Semantic Store are, on the sky stage with a panel on the right. Each has
+  // its own sequence: one click per step, the panel stays and the stage plays that step. They sit inside page 4 (pageSub), so
+  // the pages after keep their numbers from the Lab 1 plan.
+  ...VECTOR_STEPS.map((s, i) => atSky(`1.3v${i + 1}`, 'a', s.title, 'L1Vector', 'l1-vector', s.act, { kicker: 'Hands-on 1 · The Vector Store', message: 'A vector store finds **by meaning**, not by keyword.', step: i + 1 }, '1.3v1')),
+  ...SEMANTIC_STEPS.map((s, i) => atSky(`1.3s${i + 1}`, 'b', s.title, 'L1Semantic', 'l1-semantic', s.act, { kicker: 'Hands-on 2 · The Semantic Store', message: 'A semantic store lets you **ask the database in plain words**.', step: i + 1 }, '1.3v1')),
   atBridge('1.3a', 'Meet the app', 'L1App', { kicker: 'Meet the app', message: 'You will run **Seer Construction Intelligence**. Each switch is one hands-on step.' }),
   atBridge('1.4', 'What the specifications require', 'L1Specs', { kicker: 'Hands-on 1 · Unstructured RAG', message: 'Put the specification in a vector store, and the answers **cite it**.' }),
   atBridge('1.5', 'Which supplier is ready', 'L1Suppliers', { kicker: 'Hands-on 2 · Semantic Store', message: 'Ask in plain words. Get **governed data**, for this project only.' }),
@@ -67,7 +98,7 @@ export const lab1: SceneDef[] = [
 ];
 
 export const LAB1_SECTIONS: Section[] = [
-  { chapter: 3, name: 'The repair and its data', pages: ['1.0', '1.1', '1.2', '1.3', '1.3a'] },
+  { chapter: 3, name: 'The repair and its data', pages: ['1.0', '1.1', '1.2', '1.3', '1.3v1', '1.3v2', '1.3v3', '1.3v4', '1.3s1', '1.3s2', '1.3s3', '1.3s4', '1.3a'] },
   { chapter: 3, name: 'One assistant, step by step', pages: ['1.4', '1.5', '1.6a', '1.6'] },
   { chapter: 3, name: 'The right model, the right rules', pages: ['1.7', '1.8', '1.9'] },
   { chapter: 3, name: 'Closing Lab 1', pages: ['1.10'] },
@@ -78,6 +109,14 @@ export const LAB1_SCRIPT: Record<string, string> = {
   '1.0': 'The project manager walks the deck of Harbor Bridge and notices a crack near a pier, hairline, about 0.12 millimetres. It is recorded as an issue and a repair project starts. Evidence comes first: the engineer assesses the damage before anything is approved.',
   '1.1': 'Now the project manager turns the observation into a project: define the scope, specify the materials, schedule the delivery, and send it to the engineer for review. To plan well, the project needs specifications, supplier records and evidence from the site.',
   '1.2': 'The technician adds evidence from the site. One photo of the steel delivery joins the project documents and data. Three kinds of evidence: a specification, which is a document; supplier records, which are database records; and a delivery photo, which is an image.',
+  '1.3v1': 'First, the vector store. The specification is a PDF in Object Storage. A data sync connector brings it into the database, where it will be searched by meaning.',
+  '1.3v2': 'The database cuts the specification into chunks and turns each chunk into 384 numbers. Every chunk is now a point in space, and chunks with a similar meaning sit close together.',
+  '1.3v3': 'The question is turned into numbers too, so it is a point in the same space. The five points nearest to it light up: the passages closest in meaning, not the ones that share the same words.',
+  '1.3v4': 'Those five passages are handed to the language model with the question. This is what file_search does for the assistant: the answer is written from them and cites the specification.',
+  '1.3s1': 'Next, the semantic store. The database does not expose raw tables to the assistant. It exposes governed views: supplier records, deliveries and the project.',
+  '1.3s2': 'You ask in plain words, for example which supplier is ready. The question needs no SQL from you; it goes to the database through the semantic store.',
+  '1.3s3': 'NL2SQL writes the SQL, and a check frames only the rows of this one project. The other rows stay out of reach: the query cannot touch other projects.',
+  '1.3s4': 'The rows come back through the ADB MCP Server to the app, as governed data for this project only. The engineer reads them and decides.',
   '1.3': 'The assistant in one picture. A question comes in through the app. Guardrails check it, routing picks the model, then it looks up the specification and the supplier data. The answer comes back with its sources, and the engineer decides. Each piece is one hands-on step.',
   '1.3a': 'This is the app you will run: Seer Construction Intelligence. Ask a question or pick a sample under Try a prompt. The runtime bar shows which model answered. On the right, Runtime configuration: each switch is one hands-on step, from searching the specification to the guardrails.',
   '1.4': 'Hands-on 1. The specification PDF waits in Object Storage. A data sync connector reads it into a vector store, which cuts it into chunks and embeddings. The assistant searches it with file_search, and every answer cites the specification.',

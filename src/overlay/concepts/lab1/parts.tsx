@@ -2,6 +2,8 @@ import { motion } from 'motion/react';
 import { useLayoutEffect, useRef } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { EASE } from '../WidePanel';
+import mercerPortrait from '../../../assets/portraits/mercer.png';
+import vancePortrait from '../../../assets/portraits/vance.png';
 import steelDelivery from '../../../assets/photos/steel-delivery.webp';
 
 /**
@@ -21,6 +23,8 @@ export const CARD = 'var(--panel-strong)';
 export const MONO = 'JetBrains Mono, monospace';
 
 export interface Lab1Props {
+  /** a click-by-click page (4a, 4b): which step the presenter is on, 1-based */
+  step?: number;
   kicker: string;
   message: string;
   notebook?: string;
@@ -116,14 +120,18 @@ export function Chip({ children, style }: { children: ReactNode; style?: CSSProp
 
 /** a flat person in a round badge (the project manager, the engineer); a hard hat for both */
 export function Avatar({ who, size = 60 }: { who: string; size?: number }) {
+  // the same 3D portraits as the other labs (owner, 2 Nov): the engineer is Mercer, the project manager Vance
+  const src = who === 'engineer' ? mercerPortrait : vancePortrait;
   return (
-    <svg data-person={who} width={size} height={size} viewBox="0 0 60 60" aria-hidden="true" style={{ flex: 'none' }}>
-      <circle cx="30" cy="30" r="29" fill={TINT} />
-      <path d="M12 56c0-12 8-18 18-18s18 6 18 18z" fill={TEAL} />
-      <circle cx="30" cy="27" r="9" fill="#c98e6b" />
-      <path d="M20 24a10 9 0 0 1 20 0z" fill="#aab2bd" />
-      <rect x="17" y="22" width="26" height="4" rx="2" fill="#aab2bd" />
-    </svg>
+    <img
+      data-person={who}
+      src={src}
+      alt=""
+      width={size}
+      height={size}
+      draggable={false}
+      style={{ width: size, height: size, borderRadius: '50%', border: '3px solid rgba(27, 138, 156, 0.85)', background: 'rgba(127,127,127,0.15)', objectFit: 'cover', flex: 'none', display: 'block' }}
+    />
   );
 }
 
