@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
 import { ASSETS, project } from '../content/geo';
 import { useUiStore } from '../engine/ui';
@@ -9,9 +9,7 @@ import { FlowArc } from './FlowArc';
 import { VectorField } from './VectorField';
 import { layoutCloud, nearestK } from './vectorLayout';
 import { SkyShapes } from './SkyShapes';
-import { SkySemantic } from './SkySemantic';
-import { SkyVectorize } from './SkyVectorize';
-import { basisOf, offset } from './skyView';
+import { Vector4, Semantic4 } from './SkyStage4';
 import { SkyLab2, type Lab2Act } from './SkyLab2';
 import { NeuralNet } from './NeuralNet';
 import { ReferenceFolder } from './ReferenceFolder';
@@ -43,17 +41,6 @@ const A = SKY_ANCHOR;
 const CLOUD_SCALE = 0.075;
 /** the question as a point in the cloud's own space (near the "structural" cluster) */
 const QUERY: Vec3 = [8, 6, -4];
-/**
- * Lab 1's 4a (owner, 2 Nov: show what it means that points group together): the question lands inside the "steel" group
- * (the second of the cloud's three clusters), so its nearest five are the steel passages. The groups are drawn as rings
- * with a name each: similar meaning sits together, other topics sit elsewhere.
- */
-const QUERY_STEEL: Vec3 = [12.5, -2, 5];
-const GROUPS: { c: Vec3; r: number; name: string; focus: boolean }[] = [
-  { c: [-13, 7, -8], r: 9.5, name: 'surface preparation', focus: false },
-  { c: [14, -3, 7], r: 10.5, name: 'steel · materials', focus: true },
-  { c: [-1, -11, 15], r: 8.5, name: 'inspection · acceptance', focus: false },
-];
 
 const LAB2_ACTS: (SkyAct | null)[] = ['note'];
 /** Lab 2 pages 5 and 6: the database far left, the model far right (skyPlaces), the tools or the four shapes between */
@@ -71,9 +58,6 @@ const ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 0.9, MODEL_OUT[2]], 0.5)
 const BARE_A = '“!!I don’t have any reports!! about a Harbor Bridge in your city. In general, bridges can show cracking, corrosion or bearing wear…”';
 /** Lab 2 page 3: the answer comes out of the model's last layer, built from the references (draft wording, no recorded run) */
 const RAG_ANSWER_AT: Vec3 = along([MODEL_OUT[0], MODEL[1] - 1.4, MODEL_OUT[2]], 0.5);
-/** 4b: the SQL the semantic store wrote (click 3) and the rows that come back (click 4), standing right of the tables, clear of the panel */
-const SQL_TEXT = 'SELECT … FROM **governed views** WHERE project = **this project**';
-const ROWS_TEXT = '**supplier** · recommendation status · fit score · risk level · explanation';
 const RAG_A = '“Harbor Bridge has **two recent findings**: a **hairline crack** near a bearing plate, !!0.12 mm!!, and **surface corrosion** on a bearing assembly, !!about 25% section loss!!. From the **five reports retrieved**.”';
 
 const ease = (t: number) => {
@@ -142,14 +126,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
     [],
   );
   const cloud = useMemo(() => layoutCloud(600, 7), []);
-  const camera = useThree((s) => s.camera);
-  const camFacing = camera.quaternion;
-  const basis = basisOf(camera);
-  // cards that stand beside things are placed on the screen's right and up of the live camera (skyView.ts)
-  const retrieveAnswerAt = offset(basis, MODEL, -0.9, -2.3);
-  const sqlAt = offset(basis, A, 2.0, 1.7);
-  const rowsAt = offset(basis, A, 2.0, 1.2);
-  const near = useMemo(() => nearestK(cloud, act === 'retrieve' ? QUERY_STEEL : QUERY, 5), [cloud, act]);
+  const near = useMemo(() => nearestK(cloud, QUERY, 5), [cloud, act]);
   const nearWorld = useMemo<Vec3[]>(
     () => near.map((i) => [CLOUD[0] + cloud[i][0] * CLOUD_SCALE, CLOUD[1] + cloud[i][1] * CLOUD_SCALE, CLOUD[2] + cloud[i][2] * CLOUD_SCALE]),
     [near, cloud],
@@ -158,23 +135,18 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
   // Lab 1's 4a plays the Lab 2 sequence one click at a time (owner, 2 Nov): vector = the documents reach the database,
   // vector2 = they become points, vector3 = the question is a point and its five nearest light up, retrieve = those five go to
   // the language model and the answer stands. They share the stage, so the database and its cloud stay put between clicks.
-  const env = act === 'envelope' || act === 'retrieve';
-  const vec = act === 'vector' || act === 'vector2' || act === 'vector3';
-  const embedAct = act === 'embed' || vec;
+  // (4a and 4b are drawn by SkyStage4: one frame glued to the camera, built from the approved drafts)
+  const env = act === 'envelope';
+  const vec = act === 'vector' || act === 'vector2' || act === 'vector3' || act === 'retrieve';
+  const embedAct = act === 'embed';
   const hasDb = embedAct || env;
   const embedded = env || act === 'vector3' || (act === 'vector2' && t > 2600) || (act === 'embed' && t > 2600);
   const showQuery = env || (act === 'vector3' && t > 2700) || (act === 'embed' && t > 4200);
-  // the cloud of points is not there while the PDFs come in (click 1) or turn into numbers (until 2.6 s of click 2)
-  const cloudShown = act !== 'vector' && !(act === 'vector2' && t < 2600);
-  // the groups appear once the points exist (click 2) and the steel one lights when the question lands in it (click 3)
-  const showGroups = (act === 'vector2' && t > 4200) || act === 'vector3';
   const semantic = act === 'semantic' || act === 'semantic2' || act === 'semantic3' || act === 'semantic4';
-  const semanticStage = semantic ? Number((act as string).slice(-1)) || 1 : 0;
 
   // page 3: the 5 references fly in and stack up (0.8-2.2 s), the stack goes into the model's first layer (2.4-3.6 s)
   // and is taken in there; the model writes, and the answer stands at its last layer (5.2 s)
-  // 4a's last click first lights the five retrieved points for 1.5 s (te runs that much later than the act clock)
-  const te = act === 'retrieve' ? t - 1500 : t;
+  const te = t;
   const fly = env ? ease((te - 800) / 1200) : 0;
   const travel = env ? ease((te - 2400) / 1200) : 0;
   // the envelope goes to the model's first layer and is taken in there
@@ -202,33 +174,16 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
             )}
             {act === 'brain' && <ModelOrb position={[A[0], A[1] + 0.4, A[2]]} lit doubt={false} producing labelled={visible} scale={2.2} />}
             {act && LAB2_ACTS.includes(act) && <SkyLab2 act={act as Lab2Act} center={[A[0], A[1] + 0.2, A[2]]} t={t} red={theme.red} opsTop={OPS_TOP} />}
-            {(hasDb || semantic) && <SkyDatabase color={theme.red} appearMs={0} t={act === 'vector' || act === 'semantic' || act === 'embed' || act === 'envelope' ? t : 9999} />}
-            {vec && <SkyVectorize act={act as 'vector' | 'vector2' | 'vector3'} t={t} visible={visible} />}
-            {semantic && <SkySemantic t={t} stage={semanticStage} visible={visible} />}
+            {hasDb && <SkyDatabase color={theme.red} appearMs={0} t={t} />}
             {act && WIDE_ACTS.includes(act) && <SkyDatabase color={theme.red} appearMs={0} t={9999} position={DB_WIDE} />}
             {act && WIDE_ACTS.includes(act) && <ModelOrb position={MODEL_WIDE} lit doubt={false} producing={act === 'tools' || t > 5600} labelled={visible} scale={MODEL_SCALE} />}
             {hasDb && (
-              <group position={CLOUD} scale={CLOUD_SCALE} visible={cloudShown}>
-                <VectorField phase={embedded ? 'embedded' : 'documents'} query={showQuery ? (vec || act === 'retrieve' ? QUERY_STEEL : QUERY) : undefined} k={5} spin={false} documentsOffset={[0, -14, 0]} tweenMs={1400} />
-                {showGroups && <ClusterRings focus={act === 'vector3'} ask={act === 'vector3' && t > 2700} visible={visible} />}
+              <group position={CLOUD} scale={CLOUD_SCALE}>
+                <VectorField phase={embedded ? 'embedded' : 'documents'} query={showQuery ? QUERY : undefined} k={5} spin={false} documentsOffset={[0, -14, 0]} tweenMs={1400} />
               </group>
             )}
             {env && (
               <>
-                {/* click 4: the five retrieved points are picked out before they leave: ringed, numbered by a glow, named */}
-                {act === 'retrieve' && te < 1300 && nearWorld.map((p, i) => (
-                  <group key={`pick-${i}`} position={p}>
-                    <mesh>
-                      <sphereGeometry args={[0.2, 16, 12]} />
-                      <meshBasicMaterial color={theme.red} toneMapped={false} />
-                    </mesh>
-                    <mesh quaternion={camFacing}>
-                      <ringGeometry args={[0.3, 0.36, 32]} />
-                      <meshBasicMaterial color="#ffffff" toneMapped={false} side={THREE.DoubleSide} />
-                    </mesh>
-                  </group>
-                ))}
-                {visible && act === 'retrieve' && <SkyLabel position={[nearWorld[0][0], nearWorld[0][1] + 1.0, nearWorld[0][2]]} text="the five nearest points: the retrieved passages" show={t > 150 && te < 1300} />}
                 {nearWorld.map((p, i) => (
                   <mesh key={i} position={[p[0] + (envPos[0] - p[0]) * fly, p[1] + (envPos[1] - p[1]) * fly, p[2] + (envPos[2] - p[2]) * fly]} visible={travel < 0.05 && te < 1150 + i * 230}>
                     <sphereGeometry args={[0.09, 10, 10]} />
@@ -244,6 +199,9 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
           </group>
         </group>
       </group>
+      {/* 4a and 4b: one frame glued to the camera (SkyStage4.tsx) */}
+      {visible && vec && <Vector4 act={act as 'vector' | 'vector2' | 'vector3' | 'retrieve'} t={t} />}
+      {visible && semantic && <Semantic4 act={act as 'semantic' | 'semantic2' | 'semantic3' | 'semantic4'} t={t} />}
       {/* flows between the city and the stage (outside the scaled group so they stay anchored to the city) */}
       {visible && act === 'model' && <FlowArc key="q-up" from={along([QUESTION_AT[0], QUESTION_AT[1] - 0.4, QUESTION_AT[2]], 1.5)} to={MODEL_IN} lift={0.4} radius={0.05} durationMs={1600} delayMs={900} fadeMs={900} color="#ffffff" />}
       {visible && act === 'embed' &&
@@ -254,11 +212,8 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       {/* 1.1: the inspector's question goes in bare, and a general guess comes out */}
       {visible && act === 'model' && <SkyCard position={QUESTION_AT} who="the question" text={BARE_Q} show={t > 200} />}
       {visible && act === 'model' && <SkyCard position={ANSWER_AT} who="the language model · answer" text={BARE_A} show={t > 3900} tone="grey" anchor="left" />}
-      {visible && act === 'semantic3' && <SkyCard position={sqlAt} who="NL2SQL · the SQL it wrote" text={SQL_TEXT} show={t > 500} />}
-      {visible && act === 'semantic3' && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="SQL checked: it cannot reach other projects" show={t > 1300} />}
-      {visible && act === 'semantic4' && <SkyCard position={rowsAt} who="the semantic store · rows for this project" text={ROWS_TEXT} show={t > 1700} />}
-      {visible && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="Oracle AI Database · 384 numbers per text" show={(act === 'embed' && t > 2800) || act === 'vector2' || act === 'vector3'} />}
-      {visible && env && <SkyCard position={act === 'retrieve' ? retrieveAnswerAt : RAG_ANSWER_AT} who="the language model · answer, from the references" text={RAG_A} show={te > 5200} anchor={act === 'retrieve' ? 'center' : 'left'} />}
+      {visible && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="Oracle AI Database · 384 numbers per text" show={act === 'embed' && t > 2800} />}
+      {visible && env && <SkyCard position={RAG_ANSWER_AT} who="the language model · answer, from the references" text={RAG_A} show={te > 5200} anchor="left" />}
       </group>
     </>
   );
@@ -279,45 +234,6 @@ function ModelOrb({ position, lit, doubt, labelled, producing, scale = 1 }: { po
         </Html>
       )}
     </group>
-  );
-}
-
-/** the cloud's groups drawn as rings facing the camera, each with a name: points that mean the same thing sit together (cloud space) */
-function ClusterRings({ focus, ask, visible }: { focus: boolean; ask: boolean; visible: boolean }) {
-  // the rings face the live camera, so a saved angle shows them square
-  const facing = useThree((s) => s.camera).quaternion;
-  const circle = useMemo(() => Array.from({ length: 65 }, (_, i) => [Math.cos((i / 64) * Math.PI * 2), Math.sin((i / 64) * Math.PI * 2), 0] as Vec3), []);
-  return (
-    <>
-      {GROUPS.map((g, i) => {
-        const hot = g.focus && focus;
-        return (
-          <group key={i}>
-            <mesh position={g.c}>
-              <sphereGeometry args={[g.r, 24, 18]} />
-              <meshBasicMaterial color={g.focus ? '#1B8A9C' : '#8a919c'} transparent opacity={hot ? 0.16 : 0.07} depthWrite={false} toneMapped={false} />
-            </mesh>
-            <group position={g.c} quaternion={facing} scale={g.r}>
-              <Line points={circle} color={g.focus ? '#1B8A9C' : '#8a919c'} lineWidth={hot ? 3 : 1.5} transparent opacity={g.focus ? 1 : 0.7} />
-            </group>
-            {visible && <SkyLabel position={[g.c[0], g.c[1] + g.r * 1.15, g.c[2]]} text={g.name} show tone={g.focus ? 'teal' : 'grey'} />}
-          </group>
-        );
-      })}
-      {/* the question as a point (click 3): big enough to see, ringed, named; the nearest five are lit by the field itself */}
-      {ask && (
-        <group position={QUERY_STEEL}>
-          <mesh>
-            <sphereGeometry args={[1.9, 20, 16]} />
-            <meshBasicMaterial color="#C74634" toneMapped={false} />
-          </mesh>
-          <group quaternion={facing}>
-            <Line points={circle} color="#ffffff" lineWidth={3} scale={3.4} />
-          </group>
-          {visible && <SkyLabel position={[0, -4.6, 0]} text="the question" show tone="teal" />}
-        </group>
-      )}
-    </>
   );
 }
 

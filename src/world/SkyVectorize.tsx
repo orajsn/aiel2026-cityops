@@ -56,12 +56,12 @@ export function PdfBook({ name, size = 1 }: { name?: string; size?: number }) {
 }
 
 /** one text turning into numbers: its icon, an arrow, a row of numbers that scrolls past, and "384 numbers" */
-function Strip({ t, seed, icon, tone }: { t: number; seed: number; icon: ReactNode; tone: 'teal' | 'red' }) {
+export function Strip({ t, seed, icon, tone, width = 800 }: { t: number; seed: number; icon: ReactNode; tone: 'teal' | 'red'; width?: number }) {
   const text = vectorNumbers(seed);
   const col = tone === 'teal' ? '#146f7f' : '#C74634';
   const shift = -((t * 0.09) % 1400);
   return (
-    <div style={{ ...card, display: 'flex', alignItems: 'center', gap: 16, width: 800, padding: '12px 20px', background: 'rgba(255,255,255,0.96)', borderRadius: 12, border: `2px solid ${col}`, boxShadow: '0 6px 16px rgba(20,40,60,0.25)' }}>
+    <div style={{ ...card, display: 'flex', alignItems: 'center', gap: 16, width, padding: '12px 20px', background: 'rgba(255,255,255,0.96)', borderRadius: 12, border: `2px solid ${col}`, boxShadow: '0 6px 16px rgba(20,40,60,0.25)' }}>
       <div style={{ flex: 'none', display: 'flex' }}>{icon}</div>
       <span style={{ color: col, fontSize: 36, fontWeight: 700 }}>→</span>
       <div style={{ flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', fontFamily: 'var(--font-mono, "JetBrains Mono", monospace)', fontSize: 26, fontWeight: 600, color: '#1f2a33', maskImage: 'linear-gradient(to right, transparent, #000 8%, #000 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, #000 8%, #000 80%, transparent)' }}>
