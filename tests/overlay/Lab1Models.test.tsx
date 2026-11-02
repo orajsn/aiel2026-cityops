@@ -54,6 +54,7 @@ test('1.8 routing: response_model asks "has an image?", text to the lower-cost m
 
 test('1.9 guardrails: allowed passes, the attack is blocked before the model (the one red), and the check fails closed', () => {
   const c = render(<L1Guardrails kicker="k" message="m" />).container;
+  expect(c.querySelector('[data-setting]')?.textContent).toContain('OCI_GENAI_PROMPT_PROTECTION_ENABLED=true');
   expect(attrs(c, 'data-lane')).toEqual(['allowed', 'attack']);
   expect(c.querySelector('[data-question="allowed"]')?.textContent).toBe('Supplier recommendation');
   expect(c.querySelector('[data-question="attack"]')?.textContent).toBe(`“${ATTACK}”`);

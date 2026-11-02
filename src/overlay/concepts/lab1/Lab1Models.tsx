@@ -595,7 +595,17 @@ export function L1Guardrails({ kicker, message, notebook }: Lab1Props) {
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-guardrails" kickerColor="var(--teal)">
       <Fill max={1.1}>
-      <div style={{ display: 'grid', gridTemplateRows: 'minmax(0, 1fr) minmax(0, 1fr) auto', gap: 18, marginTop: 6, flex: 1 }}>
+      <div style={{ display: 'grid', gridTemplateRows: 'auto minmax(0, 1fr) minmax(0, 1fr) auto', gap: 18, marginTop: 6, flex: 1 }}>
+        {/* the one setting that turns the check on (owner, 2 Nov: page 12 shows it) */}
+        <motion.div data-setting {...fadeUp(0.1)} style={{ ...card(), border: 'none', padding: '14px 22px', display: 'flex', alignItems: 'center', gap: 20 }}>
+          <span style={{ ...cap, whiteSpace: 'nowrap' }}>Turn it on</span>
+          <span style={{ padding: '8px 16px', borderRadius: 8, background: TINT, border: `2px solid ${TEAL}`, color: 'var(--ink)', ...mono(24), fontWeight: 700, whiteSpace: 'nowrap' }}>
+            OCI_GENAI_PROMPT_PROTECTION_ENABLED=<span style={{ color: TEAL_D }}>true</span>
+          </span>
+          <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12, fontSize: 19, color: DIM, whiteSpace: 'nowrap' }}>
+            Runtime configuration › Prompt-injection protection <Switch on delay={0.8} w={46} />
+          </span>
+        </motion.div>
         <motion.div {...fadeUp(0.2)}>
           <Lane id="allowed">
             <div>
