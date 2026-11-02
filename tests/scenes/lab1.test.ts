@@ -27,7 +27,8 @@ test('Lab 1 pages: ids 1.x, part 3, at the whole-bridge view where the Introduct
   for (const s of lab1) {
     expect(s.id).toMatch(/^1\.\d+a?$/);
     expect(s.chapter).toBe(3);
-    expect(s.shot).toBe(chapter0[chapter0.length - 1].shot);
+    if (['1.0', '1.1', '1.2'].includes(s.id)) expect(s.shot).toBe('pier3');
+    else expect(s.shot).toBe(chapter0[chapter0.length - 1].shot);
     expect(SHOTS[s.shot]).toBeDefined();
     expect(LAB1_SCRIPT[s.id]?.length).toBeGreaterThan(40);
   }
@@ -45,12 +46,31 @@ test('Lab 1 names its exercises Hands-on 1 to 5, never Lab 2 or Lab 3 (only its 
 // owner, 29 Oct (V2 from the real workshop guide): two new pages, Meet the app and Two ways to launch
 test('Lab 1 runs in the V2 order and ends on its recap (1.10), all at the bridge, each page with its own registered panel', () => {
   expect(lab1.map((s) => s.id)).toEqual(['1.0', '1.1', '1.2', '1.3', '1.3a', '1.4', '1.5', '1.6a', '1.6', '1.7', '1.8', '1.9', '1.10']);
-  expect(lab1.map((s) => s.overlay)).toEqual(['L1Opening', 'L1Damage', 'L1Scattered', 'L1Assistant', 'L1App', 'L1Specs', 'L1Suppliers', 'L1Launch', 'L1SitePhoto', 'L1Baseline', 'L1Routing', 'L1Guardrails', 'L1Recap']);
-  expect(new Set(lab1.map((s) => s.shot))).toEqual(new Set(['bridge']));
+  expect(lab1.map((s) => s.overlay)).toEqual(['L1Crack', 'L1Plan', 'L1Capture', 'L1Assistant', 'L1App', 'L1Specs', 'L1Suppliers', 'L1Launch', 'L1SitePhoto', 'L1Baseline', 'L1Routing', 'L1Guardrails', 'L1Recap']);
+  expect(new Set(lab1.map((s) => s.shot))).toEqual(new Set(['bridge', 'pier3']));
   for (const s of lab1) expect(OVERLAYS[s.overlay!]).toBeDefined();
 });
 
 test('Lab 1 never shows a price or claims a measured saving, and talks about suppliers', () => {
   const text = JSON.stringify([lab1, LAB1_SCRIPT]);
   expect(text).not.toMatch(/\$\s*\d|\d\s*%|contractor/i);
+});
+
+// owner, 2 Nov: 1.0 to 1.2 work like Lab 3's opening pages: close in on the crack, a character there, one panel
+test('1.0 to 1.2 close in on the crack with a character, one camera, then the bridge returns at 1.3', () => {
+  const first = lab1.slice(0, 3);
+  expect(first.map((s) => [s.id, s.title, s.world])).toEqual([
+    ['1.0', 'A crack starts a project', { bridge: true, inspect: { pier: 'pier3', who: 'character-male-b' } }],
+    ['1.1', 'Plan the repair', { bridge: true, inspect: { pier: 'pier3', who: 'character-male-b' } }],
+    ['1.2', 'Capture the steel delivery', { bridge: true, inspect: { pier: 'pier3', who: 'character-male-e' } }],
+  ]);
+  for (const s of first) {
+    expect(s.shot).toBe('pier3');
+    expect(s.heldView).toBeUndefined();
+    expect(s.chapter).toBe(3);
+  }
+  for (const s of lab1.slice(3)) {
+    expect(s.shot).toBe('bridge');
+    expect(s.world).toEqual({ bridge: true });
+  }
 });
