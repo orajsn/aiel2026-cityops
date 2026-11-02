@@ -1,10 +1,15 @@
 import { registerOverlay } from '../../registry';
 import { L1Damage, L1Opening, L1Scattered } from './Lab1Intro';
 import { L1App, L1Assistant, L1Specs, L1Suppliers } from './Lab1Data';
+import { L1Capture, L1Crack, L1Plan } from './Lab1Story';
 import { L1Recap } from './Lab1Recap';
 import { L1Baseline, L1Guardrails, L1Launch, L1Routing, L1SitePhoto } from './Lab1Models';
 
 /** Lab 1's panels (src/scenes/lab1.ts registers them by importing this file) */
+// L1Opening, L1Damage and L1Scattered are no longer used by a scene (2 Nov: 1.0 to 1.2 are the story pages below); kept with their tests
+registerOverlay('L1Crack', L1Crack);
+registerOverlay('L1Plan', L1Plan);
+registerOverlay('L1Capture', L1Capture);
 registerOverlay('L1Opening', L1Opening);
 registerOverlay('L1Damage', L1Damage);
 registerOverlay('L1Scattered', L1Scattered);

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Rich } from '../../Rich';
 import { useUiStore } from '../../../engine/ui';
 import { BEAT_MS } from '../../../world/Lab1Story';
-import type { Lab1Props } from './Lab1Intro';
+import type { Lab1Props } from './parts';
 
 /**
  * Lab 1's first three pages (owner, 2 Nov; storyboard slides 1 to 3, animated design approved on the canvas): the story
@@ -120,8 +120,8 @@ function StoryCard({ kicker, message, cfg }: Lab1Props & { cfg: StoryConfig }) {
         </div>
         <div data-pill style={{ marginTop: 12, padding: '8px 14px', borderRadius: 12, border: '2px solid var(--teal)', background: 'rgba(27, 138, 156, 0.1)', fontSize: 18, fontWeight: 600, color: 'var(--ink)', opacity: t >= cfg.pillAt ? 1 : 0, transition: 'opacity 500ms' }}>{cfg.pill}</div>
       </div>
-      <div data-team style={{ position: 'absolute', left: 48, bottom: scriptOpen ? 150 : 110, width: 524, borderRadius: 14, background: 'var(--panel-strong)', padding: '18px 24px 20px', boxShadow: '0 8px 30px rgba(0, 0, 0, 0.3)', pointerEvents: 'auto' }}>
-        <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--red)' }}>Lab 1 · Today’s team</div>
+      <div data-team style={{ position: 'absolute', left: 48, bottom: scriptOpen ? 164 : 110, width: 524, borderRadius: 14, background: 'var(--panel-strong)', padding: '18px 24px 20px', boxShadow: '0 8px 30px rgba(0, 0, 0, 0.3)', pointerEvents: 'auto' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--teal)' }}>Lab 1 · Today’s team</div>
         {TEAM.map((m) => (
           <div key={m.id} data-who={m.id} style={{ display: 'flex', gap: 14, alignItems: 'center', marginTop: 10 }}>
             <span style={{ width: 46, height: 46, borderRadius: '50%', background: '#e8f1f2', border: '3px solid var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
