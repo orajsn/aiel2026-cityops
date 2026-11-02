@@ -11,7 +11,7 @@ test('1.0 opening: three questions into one AI assistant (Seer Construction Inte
   for (const w of ['One AI assistant', 'Seer Construction Intelligence', 'Searches the specification', 'Looks up governed project data', 'Reads a site photo', 'The right model for each question', 'Guardrails check every request first', 'The engineer decides'])
     expect(c.textContent).toContain(w);
   expect(attrs(c, 'data-hands-on')).toEqual(['1', '2', '3', '4', '5']);
-  expect(HANDS_ON_STEPS).toEqual(['Unstructured RAG', 'Semantic Store', 'Run the app · 3A Build or 3B Launch', 'Model routing', 'Guardrails']);
+  expect(HANDS_ON_STEPS).toEqual(['Unstructured RAG', 'Semantic Store', 'Launch the app', 'Model routing', 'Guardrails']);
   expect(c.querySelector('[data-engineer] svg[data-person="engineer"]')).not.toBeNull();
   expect(c.querySelector('[data-net]')).not.toBeNull();
   expectNoRed(c);

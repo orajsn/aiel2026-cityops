@@ -5,8 +5,8 @@ import '../overlay/concepts/lab1/register';
 /**
  * Lab 1 · AI Economics (owner, 29 Oct; V2 from the real workshop guide): the Harbor Bridge repair project. The project
  * manager gathers the facts the engineer needs with an AI assistant on OCI Enterprise AI, which participants run as
- * Seer Construction Intelligence in Hands-on 1 to 5: unstructured RAG, the semantic store, the app (3A Build or
- * 3B Launch), model routing and guardrails. Played after the Introduction and before Lab 2.
+ * Seer Construction Intelligence in Hands-on 1 to 5: unstructured RAG, the semantic store, the app (launched
+ * on OCI), model routing and guardrails. Played after the Introduction and before Lab 2.
  *
  * To cut it out of the show, set WITH_LAB1 to false: the Introduction, Lab 2 and Lab 3 stay exactly as they are.
  * Everything Lab 1 has lives here, in src/overlay/concepts/lab1/ and in tests/overlay/Lab1*.
@@ -48,7 +48,7 @@ export const lab1: SceneDef[] = [
   atBridge('1.3a', 'Meet the app', 'L1App', { kicker: 'Meet the app', message: 'You will run **Seer Construction Intelligence**. Each switch is one hands-on step.' }),
   atBridge('1.4', 'What the specifications require', 'L1Specs', { kicker: 'Hands-on 1 · Unstructured RAG', message: 'Put the specification in a vector store, and the answers **cite it**.' }),
   atBridge('1.5', 'Which supplier is ready', 'L1Suppliers', { kicker: 'Hands-on 2 · Semantic Store', message: 'Ask in plain words. Get **governed data**, for this project only.' }),
-  atBridge('1.6a', 'Two ways to launch', 'L1Launch', { kicker: 'Hands-on 3 · Two ways to launch', message: 'Two paths to **the same app**. Choose one.' }),
+  atBridge('1.6a', 'Launch the app', 'L1Launch', { kicker: 'Hands-on 3 · Launch the app', message: 'Launch the packaged app **on OCI**. No key is stored.' }),
   atBridge('1.6', 'A photo from the site', 'L1SitePhoto', { kicker: 'Hands-on 3 · Test the app with a photo', message: 'A photo shows **what is visible**. It cannot prove what is safe.' }),
   atBridge('1.7', 'Does every question need the big model?', 'L1Baseline', { kicker: 'Hands-on 4 · First, the baseline', message: 'Today, **every request** goes to the multimodal model.' }),
   atBridge('1.8', 'Model routing', 'L1Routing', { kicker: 'Hands-on 4 · Model routing', message: 'Text goes to the **lower-cost model**. Photos stay on the multimodal one.' }),
@@ -82,7 +82,7 @@ export const LAB1_SCRIPT: Record<string, string> = {
   '1.3a': 'This is the app you will run: Seer Construction Intelligence. Ask a question or pick a sample under Try a prompt. The runtime bar shows which model answered. On the right, Runtime configuration: each switch is one hands-on step, from searching the specification to the guardrails.',
   '1.4': 'Hands-on 1. The specification PDF waits in Object Storage. A data sync connector reads it into a vector store, which cuts it into chunks and embeddings. The assistant searches it with file_search, and every answer cites the specification.',
   '1.5': 'Hands-on 2. The project manager asks which supplier to use. The semantic store knows what the tables mean, NL2SQL writes the query, the app checks it stays inside this project, and the ADB MCP Server fetches the answer: status, fit score, risk level and why.',
-  '1.6a': 'Hands-on 3 has two paths, and you pick one. Build runs the app on your own computer with your API key. Launch puts the packaged app on OCI Container Instances, where OCI hands it short-lived credentials, so no key sits in the image. Both reach the same app.',
+  '1.6a': 'Hands-on 3 launches the packaged app on OCI Container Instances from Cloud Shell. OCI hands it short-lived credentials through a resource principal, so no key sits in the image. The app opens with the same three stores from Hands-on 1 and 2.',
   '1.6': 'Now a photo from the site: a structural-steel delivery. The assistant says what it can see, and keeps that apart from what it is only assuming. A photo cannot prove the grade, the certificate or that the steel is safe; that comes from governed data and the engineer.',
   '1.7': 'Before we change anything, we record a baseline. Right now every request, text or photo, goes to the same multimodal model, and the runtime bar says so each time. Note the model and the rough response time. Then ask: do text questions need a model that can see?',
   '1.8': 'Hands-on 4. One check decides the model: does the request carry an image? Text-only goes to the lower-cost model, photos stay on the multimodal one, and the runtime bar shows which answered. Response time is not cost, so we compare models, not claim a saving.',

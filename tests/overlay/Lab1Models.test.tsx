@@ -2,14 +2,13 @@ import { render } from '@testing-library/react';
 import { ASSUMED, ATTACK, CANNOT_PROVE, FAIL_CLOSED, L1Baseline, L1Guardrails, L1Launch, L1Routing, L1SitePhoto, OBSERVED } from '../../src/overlay/concepts/lab1/Lab1Models';
 import { attrs, expectNoCostNumbers, expectNoRed, expectOneRed } from './lab1Helpers';
 
-test('1.6a two ways to launch: 3A Build with your API key, or 3B Launch with a resource principal; both reach the same app', () => {
+test('1.6a launch the app: 3B Launch on OCI with a resource principal, no key stored; it opens the same app', () => {
   const c = render(<L1Launch kicker="k" message="m" />).container;
-  expect(attrs(c, 'data-path')).toEqual(['3A', '3B']);
-  expect(c.querySelectorAll('[data-path="3A"] [data-launch-step]')).toHaveLength(4);
+  expect(attrs(c, 'data-path')).toEqual(['3B']);
   expect(c.querySelectorAll('[data-path="3B"] [data-launch-step]')).toHaveLength(4);
-  expect(c.querySelector('[data-path="3A"] [data-credential="api-key"]')?.textContent).toContain('Your OCI API key');
-  expect(c.querySelector('[data-path="3B"] [data-credential="resource-principal"]')?.textContent).toContain('no key is stored in the image');
-  for (const w of ['On your own computer', 'On OCI Container Instances', 'Cloud Shell', 'Launch Helper', 'Project OCID', 'semantic store OCID']) expect(c.textContent).toContain(w);
+  expect(c.querySelector('[data-credential="resource-principal"]')?.textContent).toContain('no key is stored in the image');
+  expect(c.textContent).not.toContain('3A');
+  for (const w of ['On OCI Container Instances', 'Cloud Shell', 'Launch Helper', 'Project OCID', 'semantic store OCID']) expect(c.textContent).toContain(w);
   expect(c.querySelector('[data-app]')?.textContent).toContain('Seer Construction Intelligence');
   expectNoRed(c);
 });

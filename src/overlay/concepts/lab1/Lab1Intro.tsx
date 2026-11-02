@@ -26,7 +26,7 @@ const JOBS = [
   { title: 'Looks up governed project data', sub: 'suppliers, scoped to one project', n: 2 },
   { title: 'Reads a site photo', sub: 'says what it sees, and what it cannot tell', n: 3 },
 ];
-export const HANDS_ON_STEPS = ['Unstructured RAG', 'Semantic Store', 'Run the app · 3A Build or 3B Launch', 'Model routing', 'Guardrails'];
+export const HANDS_ON_STEPS = ['Unstructured RAG', 'Semantic Store', 'Launch the app', 'Model routing', 'Guardrails'];
 
 function RouteIcon() {
   return (

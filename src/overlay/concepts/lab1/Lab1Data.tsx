@@ -51,10 +51,6 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
             <SteelPhoto w={42} label={false} />
             or attach a delivery photo
           </div>
-          <div style={{ ...cap, color: '#aab4bf', fontSize: 15, marginTop: 4 }}>Try a prompt</div>
-          {TRY_A_PROMPT.map((t) => (
-            <span key={t} style={{ alignSelf: 'flex-start', border: '1px solid rgba(255,255,255,0.4)', borderRadius: 6, padding: '3px 7px', fontSize: 15, fontWeight: 600, whiteSpace: 'nowrap' }}>{t}</span>
-          ))}
           <div style={{ marginTop: 'auto', fontSize: 16, color: '#aab4bf' }}>scoped to one project code</div>
         </motion.div>
 
@@ -66,7 +62,7 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
         <motion.div data-oci {...fadeUp(0.5)} style={{ ...card(true), background: TINT, padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
             <span style={{ fontSize: 23, fontWeight: 700, color: TEAL_D }}>OCI Enterprise AI</span>
-            <span style={{ fontSize: 17, color: DIM }}>one project holds the stores and settings · the Responses API runs each request</span>
+            <span style={{ fontSize: 17, color: DIM }}>one project, one API</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <Box data-step="check" title={<><Num n={1} /> Check the request</>} ho={5}>
@@ -74,7 +70,7 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
                 <Shield size={60} />
                 <div style={{ fontSize: 18, color: 'var(--ink)', lineHeight: 1.35 }}>
                   <div style={mono(18)}>ApplyGuardrails</div>
-                  checks every request for prompt injection <b>before</b> the model is called
+                  blocks prompt injection <b>before</b> the model
                 </div>
               </div>
             </Box>
@@ -89,7 +85,6 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
                   <span style={{ padding: '3px 10px', borderRadius: 6, border: `2px solid ${TEAL}`, background: solid ? TEAL : CARD, color: solid ? '#fff' : TEAL_D, fontSize: 18, fontWeight: 700 }}>{String(m)}</span>
                 </div>
               ))}
-              <div style={{ fontSize: 16, color: DIM }}>the runtime bar shows which model answered</div>
             </Box>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -100,21 +95,7 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
             <Box data-store="vector" title="Vector store" ho={1} style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 17, color: 'var(--ink)' }}>
                 <Chip style={{ background: '#1f2a33', color: '#fff' }}>file_search</Chip>
-                finds passages in the specification
-              </div>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, margin: '10px 0', fontSize: 18, color: DIM }}>
-                <div style={{ display: 'grid', gap: 3 }}>
-                  {[0, 1, 2, 3].map((i) => (
-                    <span key={i} style={{ width: 64, height: 10, borderRadius: 2, border: `1.5px solid ${TEAL}`, background: TINT }} />
-                  ))}
-                </div>
-                split into chunks →
-                <svg width="69" height="42" viewBox="0 0 46 28" aria-hidden="true">
-                  {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                    <circle key={i} cx={6 + (i % 4) * 11} cy={i < 4 ? 6 : 20} r={4} fill={TEAL} />
-                  ))}
-                </svg>
-                embeddings, searched by meaning
+                finds the passage
               </div>
               <div style={{ marginTop: 'auto', borderRadius: 8, background: SOFT, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 17, color: 'var(--ink)' }}>
                 <PdfIcon size={30} />
@@ -126,14 +107,9 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
             <Box data-store="semantic" title="Semantic store" ho={2} style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 17, color: 'var(--ink)' }}>
                 <Chip style={{ background: '#1f2a33', color: '#fff' }}>NL2SQL</Chip>
-                turns the question into SQL, checked for project scope
+                asks the database in plain words
               </div>
-              <div style={{ margin: '8px 0 4px', borderRadius: 6, background: '#1f2a33', color: '#e6e9ef', padding: '6px 10px', fontFamily: MONO, fontSize: 16, lineHeight: 1.5 }}>
-                SELECT … FROM <span style={{ color: '#7fd3e0' }}>governed views</span>
-                <br />
-                WHERE project = <span style={{ color: '#7fd3e0' }}>&lt;one project&gt;</span>
-              </div>
-              <div style={{ fontSize: 17, fontWeight: 600, color: TEAL_D }}>✓ SQL checked: it cannot reach other projects</div>
+              <div style={{ fontSize: 18, fontWeight: 600, color: TEAL_D, margin: 'auto 0' }}>✓ SQL checked: it cannot reach other projects</div>
               <div style={{ marginTop: 'auto', borderRadius: 8, background: SOFT, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 17, color: 'var(--ink)' }}>
                 <DbIcon size={28} />
                 <b>Autonomous AI Database</b>
@@ -155,13 +131,6 @@ export function L1Assistant({ kicker, message, notebook }: Lab1Props) {
             <PdfIcon size={34} />
             cites the specification
           </div>
-          <div style={{ fontSize: 17, color: DIM }}>governed supplier fields:</div>
-          <div style={{ background: CARD, borderRadius: 6, padding: '6px 10px', ...mono(16, 'var(--ink)'), lineHeight: 1.7 }}>
-            {SUPPLIER_FIELDS.slice(1).map((f) => (
-              <div key={f}>{f}</div>
-            ))}
-          </div>
-          <div style={{ fontSize: 17, color: DIM, lineHeight: 1.35 }}>for a photo: what it sees, kept apart from what it assumes</div>
           <div data-engineer style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, fontSize: 19, fontWeight: 700, color: 'var(--ink)' }}>
             <Avatar who="engineer" size={54} />
             the engineer decides
@@ -283,9 +252,6 @@ export function L1App({ kicker, message, notebook }: Lab1Props) {
                 <HandsOn n={s.ho} solid />
               </motion.div>
             ))}
-            <div style={{ marginTop: 10, borderRadius: 8, background: SOFT, padding: '8px 12px', fontSize: 14, color: 'var(--ink)', lineHeight: 1.4 }}>
-              <b>Build path (3A)</b> has no Runtime configuration: you add routing and guardrails in the code.
-            </div>
           </div>
         </div>
       </motion.div>

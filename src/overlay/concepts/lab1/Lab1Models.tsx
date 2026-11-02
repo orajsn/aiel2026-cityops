@@ -136,45 +136,13 @@ export function L1Launch({ kicker, message, notebook }: Lab1Props) {
           <span key={t} style={{ padding: '3px 10px', borderRadius: 6, background: TINT, ...mono(14), fontWeight: 600 }}>{t}</span>
         ))}
       </motion.div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 56px 1fr', alignItems: 'stretch' }}>
-        <PathPanel
-          id="3A"
-          tag="3A · Build"
-          title="On your own computer"
-          sub="download the sample app and run it yourself"
-          delay={0.4}
-          icon={
-            <svg width="70" height="46" viewBox="0 0 90 60" aria-hidden="true">
-              <rect x="14" y="4" width="62" height="42" rx="4" fill={TINT} stroke={TEAL} strokeWidth={3} />
-              <path d="M22 16h22M22 24h34M22 32h28" stroke={TEAL} strokeWidth={3} strokeLinecap="round" />
-              <path d="M4 50h82l-4 7H8z" fill={TEAL} />
-            </svg>
-          }
-        >
-          <Steps steps={BUILD_STEPS} delay={0.8} />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <motion.div data-credential="api-key" {...fadeUp(2.2)} style={lowerCard}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 19, fontWeight: 700, color: 'var(--ink)' }}>
-                <KeyIcon size={30} /> Your OCI API key
-              </div>
-              <div style={{ fontSize: 14, color: DIM, marginTop: 6, lineHeight: 1.4 }}>kept on your computer; never share it or commit it</div>
-            </motion.div>
-            <motion.div {...fadeUp(2.4)} style={{ borderRadius: 12, border: '2px dashed rgba(138,151,163,0.6)', padding: '12px 14px' }}>
-              <div style={{ ...cap, fontSize: 12 }}>Runtime configuration</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)' }}>none in the Build starter</div>
-              <div style={{ fontSize: 14, color: DIM, lineHeight: 1.4 }}>you add routing and guardrails in code, in Hands-on 4 and 5</div>
-            </motion.div>
-          </div>
-        </PathPanel>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ width: 48, height: 48, borderRadius: '50%', border: '2px solid var(--line)', background: CARD, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, fontWeight: 600, color: DIM }}>or</span>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', alignItems: 'stretch', maxWidth: 1020, margin: '0 auto', width: '100%' }}>
         <PathPanel
           id="3B"
-          tag="3B · Launch"
+          tag="Launch"
           title="On OCI Container Instances"
           sub="launch the packaged app from Cloud Shell"
-          delay={0.6}
+          delay={0.4}
           icon={
             <svg width="70" height="46" viewBox="0 0 70 46" aria-hidden="true">
               <path d="M18 42a14 14 0 0 1-2-28 18 18 0 0 1 34-2 13 13 0 0 1 4 30z" fill={TINT} stroke={TEAL} strokeWidth={3} />
@@ -204,7 +172,7 @@ export function L1Launch({ kicker, message, notebook }: Lab1Props) {
         </PathPanel>
       </div>
       <svg width="100%" height="40" viewBox="0 0 1420 40" preserveAspectRatio="none" aria-hidden="true" style={{ display: 'block' }}>
-        <motion.path d="M380 0C380 30 710 14 710 40M1040 0C1040 30 710 14 710 40" fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 3.4, duration: 1 }} />
+        <motion.path d="M710 0V40" fill="none" stroke={TEAL} strokeWidth={2.5} strokeDasharray="4 6" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 3.4, duration: 1 }} />
       </svg>
       <motion.div data-app {...fadeUp(3.8)} style={{ margin: '0 auto', width: 'fit-content', whiteSpace: 'nowrap', borderRadius: 12, background: TEAL, color: '#fff', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 16 }}>
         <span style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 8, display: 'inline-flex' }}>

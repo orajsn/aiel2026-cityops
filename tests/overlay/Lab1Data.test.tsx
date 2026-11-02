@@ -28,7 +28,6 @@ test('1.3a meet the app: runtime bar, Try a prompt, Runtime configuration with o
   expect(SWITCHES.map((s) => s.name)).toEqual(['Specification search', 'Governed project data', 'Model routing', 'Prompt-injection protection']);
   expect(c.querySelectorAll('[data-config] [data-switch="on"]')).toHaveLength(4);
   expect(attrs(c, 'data-field')).toEqual(SUPPLIER_FIELDS);
-  expect(c.textContent).toContain('Build path (3A) has no Runtime configuration');
   expect(c.querySelector('[data-scope]')?.textContent).toContain('Project code');
   expectOneRed(c, '[data-prompt="Guardrail challenge"]');
 });
