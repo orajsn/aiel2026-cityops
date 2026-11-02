@@ -35,6 +35,8 @@ export function CameraRig() {
   const wasEditing = useRef(false);
   // the look of the page before this one, to hold the camera when the next page looks from the same place
   const lastLook = useRef<Shot | null>(null);
+  // the first page after a load (a refresh, or a #scene= address) starts at its own camera: no long flight in from far away
+  const booted = useRef(false);
 
   useEffect(() => {
     if (!scene) return;
@@ -46,6 +48,15 @@ export function CameraRig() {
     }
     const to = shotForScene(scene);
     if (!to) return;
+    if (!booted.current) {
+      booted.current = true;
+      camera.position.set(...to.position);
+      target.current = [...to.target] as Vec3;
+      camera.lookAt(...to.target);
+      lastLook.current = to;
+      setSettled(true);
+      return;
+    }
     const held = sameLook(lastLook.current, to);
     lastLook.current = to;
     // after Camera mode, start from where the free camera was looking

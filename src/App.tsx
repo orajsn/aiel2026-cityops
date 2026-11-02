@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { World } from './world/World';
+import { SHOTS } from './world/shots';
 import { Overlay } from './overlay/Overlay';
 import { Stage, useRenderDpr } from './Stage';
 import { useSceneStore } from './engine/store';
@@ -51,7 +52,8 @@ export default function App() {
           dpr={dpr}
           // anti-aliasing follows the resolution the page loaded with (graphics.ts, LOADED_AA)
           gl={{ antialias: LOADED_AA, powerPreference: 'high-performance' }}
-          camera={{ position: [10, 150, 170], fov: 45, near: 0.1, far: 4000 }}
+          // starts at the city shot, close over the city (owner, 2 Nov: no flight in from far away where the map floats); CameraRig then cuts to the page's own camera
+          camera={{ position: SHOTS.city.position, fov: 45, near: 0.1, far: 4000 }}
           style={{ position: 'absolute', inset: 0 }}
           // dev only: lets a verification script render full-size captures from any camera
           onCreated={(state) => {
