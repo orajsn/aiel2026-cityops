@@ -47,9 +47,9 @@ const QUERY: Vec3 = [8, 6, -4];
  */
 const QUERY_STEEL: Vec3 = [12.5, -2, 5];
 const GROUPS: { c: Vec3; r: number; name: string; focus: boolean }[] = [
-  { c: [-13, 7, -8], r: 9.5, name: 'other topics', focus: false },
+  { c: [-13, 7, -8], r: 9.5, name: 'surface preparation', focus: false },
   { c: [14, -3, 7], r: 10.5, name: 'steel · materials', focus: true },
-  { c: [-1, -11, 15], r: 8.5, name: 'other topics', focus: false },
+  { c: [-1, -11, 15], r: 8.5, name: 'inspection · acceptance', focus: false },
 ];
 
 const LAB2_ACTS: (SkyAct | null)[] = ['note'];
@@ -137,6 +137,10 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
     [],
   );
   const cloud = useMemo(() => layoutCloud(600, 7), []);
+  const camFacing = useMemo(() => {
+    const m = new THREE.Matrix4().lookAt(new THREE.Vector3(...SHOTS.sky.position), new THREE.Vector3(...SHOTS.sky.target), new THREE.Vector3(0, 1, 0));
+    return new THREE.Quaternion().setFromRotationMatrix(m);
+  }, []);
   const near = useMemo(() => nearestK(cloud, act === 'retrieve' ? QUERY_STEEL : QUERY, 5), [cloud, act]);
   const nearWorld = useMemo<Vec3[]>(
     () => near.map((i) => [CLOUD[0] + cloud[i][0] * CLOUD_SCALE, CLOUD[1] + cloud[i][1] * CLOUD_SCALE, CLOUD[2] + cloud[i][2] * CLOUD_SCALE]),
@@ -159,13 +163,15 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
 
   // page 3: the 5 references fly in and stack up (0.8-2.2 s), the stack goes into the model's first layer (2.4-3.6 s)
   // and is taken in there; the model writes, and the answer stands at its last layer (5.2 s)
-  const fly = env ? ease((t - 800) / 1200) : 0;
-  const travel = env ? ease((t - 2400) / 1200) : 0;
+  // 4a's last click first lights the five retrieved points for 1.5 s (te runs that much later than the act clock)
+  const te = act === 'retrieve' ? t - 1500 : t;
+  const fly = env ? ease((te - 800) / 1200) : 0;
+  const travel = env ? ease((te - 2400) / 1200) : 0;
   // the envelope goes to the model's first layer and is taken in there
   const dock = along(MODEL_IN, -0.45);
   const envPos: Vec3 = [ENVELOPE[0] + (dock[0] - ENVELOPE[0]) * travel, ENVELOPE[1] + (dock[1] - ENVELOPE[1]) * travel, ENVELOPE[2] + (dock[2] - ENVELOPE[2]) * travel];
   // once it has arrived there it fades away in place (a scale would shrink it towards the world origin: a warp)
-  const intake = env ? 1 - ease((t - 3600) / 600) : 1;
+  const intake = env ? 1 - ease((te - 3600) / 600) : 1;
 
   return (
     <>
@@ -177,7 +183,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       <group position={A}>
         <group ref={root}>
           <group position={[-A[0], -A[1], -A[2]]}>
-            {(act === 'model' || embedAct || env) && <ModelOrb position={MODEL} lit={env && t > 3800} doubt={act === 'model' && t > 2600} producing={(act === 'model' && t > 2300) || (env && t > 3800)} labelled={visible} scale={MODEL_SCALE} />}
+            {(act === 'model' || embedAct || env) && <ModelOrb position={MODEL} lit={env && te > 3800} doubt={act === 'model' && t > 2600} producing={(act === 'model' && t > 2300) || (env && te > 3800)} labelled={visible} scale={MODEL_SCALE} />}
             {/* page 4: one folder of references; it swells as three questions pile in, and still does not take them */}
             {act === 'overflow' && (
               <group position={FOLDER} scale={2.0}>
@@ -193,21 +199,35 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
             {hasDb && (
               <group position={CLOUD} scale={CLOUD_SCALE}>
                 <VectorField phase={embedded ? 'embedded' : 'documents'} query={showQuery ? (vec || act === 'retrieve' ? QUERY_STEEL : QUERY) : undefined} k={5} spin={false} documentsOffset={[0, -14, 0]} tweenMs={1400} />
-                {showGroups && <ClusterRings focus={act === 'vector3'} visible={visible} />}
+                {showGroups && <ClusterRings focus={act === 'vector3'} ask={act === 'vector3' && t > 400} visible={visible} />}
               </group>
             )}
             {env && (
               <>
+                {/* click 4: the five retrieved points are picked out before they leave: ringed, numbered by a glow, named */}
+                {act === 'retrieve' && te < 1300 && nearWorld.map((p, i) => (
+                  <group key={`pick-${i}`} position={p}>
+                    <mesh>
+                      <sphereGeometry args={[0.2, 16, 12]} />
+                      <meshBasicMaterial color={theme.red} toneMapped={false} />
+                    </mesh>
+                    <mesh quaternion={camFacing}>
+                      <ringGeometry args={[0.3, 0.36, 32]} />
+                      <meshBasicMaterial color="#ffffff" toneMapped={false} side={THREE.DoubleSide} />
+                    </mesh>
+                  </group>
+                ))}
+                {visible && act === 'retrieve' && <SkyLabel position={[nearWorld[0][0], nearWorld[0][1] + 1.0, nearWorld[0][2]]} text="the five nearest points: the retrieved passages" show={t > 150 && te < 1300} />}
                 {nearWorld.map((p, i) => (
-                  <mesh key={i} position={[p[0] + (envPos[0] - p[0]) * fly, p[1] + (envPos[1] - p[1]) * fly, p[2] + (envPos[2] - p[2]) * fly]} visible={travel < 0.05 && t < 1150 + i * 230}>
+                  <mesh key={i} position={[p[0] + (envPos[0] - p[0]) * fly, p[1] + (envPos[1] - p[1]) * fly, p[2] + (envPos[2] - p[2]) * fly]} visible={travel < 0.05 && te < 1150 + i * 230}>
                     <sphereGeometry args={[0.09, 10, 10]} />
                     <meshBasicMaterial color={theme.red} toneMapped={false} />
                   </mesh>
                 ))}
                 <group position={envPos} scale={1.5}>
-                  <ReferenceFolder sheets={nearWorld.map((_, i) => t > 1150 + i * 230)} opacity={intake} />
+                  <ReferenceFolder sheets={nearWorld.map((_, i) => te > 1150 + i * 230)} opacity={intake} />
                 </group>
-                {visible && <SkyLabel position={[ENVELOPE[0], ENVELOPE[1] + 0.9, ENVELOPE[2]]} text="5 references + the question · context is data, not instructions" show={t > 1800 && travel < 0.2} />}
+                {visible && <SkyLabel position={[ENVELOPE[0], ENVELOPE[1] + 0.9, ENVELOPE[2]]} text="5 references + the question · context is data, not instructions" show={te > 1800 && travel < 0.2} />}
               </>
             )}
           </group>
@@ -227,7 +247,7 @@ export function SkyStage({ act }: { act: SkyAct | null }) {
       {visible && act === 'semantic3' && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="SQL checked: it cannot reach other projects" show={t > 1300} />}
       {visible && act === 'semantic4' && <SkyCard position={ROWS_AT} who="the semantic store · rows for this project" text={ROWS_TEXT} show={t > 1700} />}
       {visible && <SkyLabel position={[DB[0], DB[1] - 1.2, DB[2]]} text="Oracle AI Database · 384 numbers per text" show={(act === 'embed' && t > 2800) || act === 'vector2' || act === 'vector3'} />}
-      {visible && env && <SkyCard position={act === 'retrieve' ? RETRIEVE_ANSWER_AT : RAG_ANSWER_AT} who="the language model · answer, from the references" text={RAG_A} show={t > 5200} anchor={act === 'retrieve' ? 'center' : 'left'} />}
+      {visible && env && <SkyCard position={act === 'retrieve' ? RETRIEVE_ANSWER_AT : RAG_ANSWER_AT} who="the language model · answer, from the references" text={RAG_A} show={te > 5200} anchor={act === 'retrieve' ? 'center' : 'left'} />}
       </group>
     </>
   );
@@ -252,7 +272,7 @@ function ModelOrb({ position, lit, doubt, labelled, producing, scale = 1 }: { po
 }
 
 /** the cloud's groups drawn as rings facing the camera, each with a name: points that mean the same thing sit together (cloud space) */
-function ClusterRings({ focus, visible }: { focus: boolean; visible: boolean }) {
+function ClusterRings({ focus, ask, visible }: { focus: boolean; ask: boolean; visible: boolean }) {
   const facing = useMemo(() => {
     const m = new THREE.Matrix4().lookAt(new THREE.Vector3(...SHOTS.sky.position), new THREE.Vector3(...SHOTS.sky.target), new THREE.Vector3(0, 1, 0));
     return new THREE.Quaternion().setFromRotationMatrix(m);
@@ -275,6 +295,19 @@ function ClusterRings({ focus, visible }: { focus: boolean; visible: boolean }) 
           </group>
         );
       })}
+      {/* the question as a point (click 3): big enough to see, ringed, named; the nearest five are lit by the field itself */}
+      {ask && (
+        <group position={QUERY_STEEL}>
+          <mesh>
+            <sphereGeometry args={[1.9, 20, 16]} />
+            <meshBasicMaterial color="#C74634" toneMapped={false} />
+          </mesh>
+          <group quaternion={facing}>
+            <Line points={circle} color="#ffffff" lineWidth={3} scale={3.4} />
+          </group>
+          {visible && <SkyLabel position={[0, -4.6, 0]} text="the question" show tone="teal" />}
+        </group>
+      )}
     </>
   );
 }
