@@ -1,7 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react';
 import * as THREE from 'three';
 import { Billboard, Html, Line } from '@react-three/drei';
-import { OPS_TOP } from './skyPlaces';
 import { layoutCloud, nearestK } from './vectorLayout';
 import { NeuralNet } from './NeuralNet';
 import { ReferenceFolder } from './ReferenceFolder';
@@ -33,13 +32,6 @@ function StageFrame({ children }: { children: ReactNode }) {
   );
 }
 
-/** a world point as a stage-frame position (the frame is turned to the camera's heading and scaled; see StageFrame) */
-const toFrame = (w: Vec3): Vec3 => {
-  const v = [(w[0] - STAGE4.center[0]) / STAGE4.unit, (w[1] - STAGE4.center[1]) / STAGE4.unit, (w[2] - STAGE4.center[2]) / STAGE4.unit];
-  const f = (STAGE4.heading * Math.PI) / 180;
-  return [v[0] * Math.cos(f) + v[2] * Math.sin(f), v[1], -v[0] * Math.sin(f) + v[2] * Math.cos(f)];
-};
-
 /** a calm board behind the cards, always square to the screen, so the busy city does not fight the words (drawn first) */
 function Backdrop({ show = 1 }: { show?: number }) {
   return (
@@ -60,27 +52,15 @@ const Card = ({ at, children, show = 1, z = 0 }: { at: Vec3 | [number, number]; 
     </Html>
   ) : null;
 
-/** a dashed line with an arrow head, drawn from the first point to the last as `k` goes 0 to 1 */
-function Arrow({ pts, color = '#1B8A9C', k = 1, dashed = true }: { pts: Vec3[]; color?: string; k?: number; dashed?: boolean }) {
-  const curve = useMemo(() => new THREE.CatmullRomCurve3(pts.map((p) => new THREE.Vector3(...p))), [pts]);
-  const upTo = Math.max(0.001, Math.min(1, k));
-  const line = useMemo(() => curve.getPoints(40).map((v) => [v.x, v.y, v.z] as Vec3), [curve]);
-  const shown = line.slice(0, Math.max(2, Math.round(line.length * upTo)));
-  const tip = shown[shown.length - 1];
-  const prev = shown[shown.length - 2] ?? tip;
-  const dir = new THREE.Vector3(tip[0] - prev[0], tip[1] - prev[1], 0).normalize();
-  const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.lengthSq() ? dir : new THREE.Vector3(0, 1, 0));
-  if (k <= 0.01) return null;
+/** a plain arrow glyph with an optional short caption: the only arrows on these pages (curved dashed ones were confusing) */
+function Glyph({ at, g, text, show = 1, color = '#1B8A9C' }: { at: [number, number]; g: string; text?: string; show?: number; color?: string }) {
   return (
-    <>
-      <Line points={shown} color={color} lineWidth={3.2} dashed={dashed} dashSize={0.16} gapSize={0.12} transparent opacity={0.95} />
-      {upTo > 0.97 && (
-        <mesh position={tip} quaternion={q}>
-          <coneGeometry args={[0.1, 0.24, 14]} />
-          <meshBasicMaterial color={color} toneMapped={false} />
-        </mesh>
-      )}
-    </>
+    <Card at={at} show={show}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, color, fontWeight: 800 }}>
+        <span style={{ fontSize: 46, lineHeight: 1 }}>{g}</span>
+        {text && <span style={{ fontSize: 20, fontWeight: 700, background: 'rgba(255,255,255,0.95)', padding: '3px 12px', borderRadius: 8 }}>{text}</span>}
+      </div>
+    </Card>
   );
 }
 
@@ -140,9 +120,14 @@ const CL: [number, number, number, number][] = [
   [14, -3, 7, 9],
   [-1, -11, 15, 7],
 ];
+const spreadPt = (p0: Vec3, m: number): Vec3 => {
+  const cl = CL[m];
+  return cl ? [cl[0] + (p0[0] - cl[0]) * SPREAD, cl[1] + (p0[1] - cl[1]) * SPREAD, cl[2] + (p0[2] - cl[2]) * SPREAD] : p0;
+};
 const GROUP_NAMES = ['surface preparation', 'steel · materials', 'inspection · acceptance'];
 export const QUERY_STEEL: Vec3 = [12.5, -2, 5];
 const CS = 1.5 / 30;
+const SPREAD = 1.5;
 const CLOUD_AT: Vec3 = [-0.6, 0.5, 0];
 const EULER = new THREE.Euler(0.12, 0.35, 0);
 /** a point of the cloud (cloud space) as a stage position */
@@ -176,8 +161,11 @@ function Cloud3D({ show, groups, ask, pick, flyTo, fly }: { show: number; groups
   useLayoutEffect(() => {
     const m = mesh.current;
     if (!m) return;
-    pts.forEach((p, i) => {
+    pts.forEach((p0, i) => {
       const isNear = ask > 0.5 && near.includes(i);
+      // spread each group a little around its centre so the points do not pile into one dark blob
+      const cl = CL[member[i]];
+      const p: Vec3 = cl ? [cl[0] + (p0[0] - cl[0]) * SPREAD, cl[1] + (p0[1] - cl[1]) * SPREAD, cl[2] + (p0[2] - cl[2]) * SPREAD] : p0;
       const at = place(p);
       // the five nearest fly out to the book (click 4)
       const pos = isNear && fly > 0 ? lerp(at, flyTo, ease(fly)) : at;
@@ -192,25 +180,30 @@ function Cloud3D({ show, groups, ask, pick, flyTo, fly }: { show: number; groups
     m.instanceMatrix.needsUpdate = true;
     if (m.instanceColor) m.instanceColor.needsUpdate = true;
   }, [pts, near, member, ask, pick, fly, flyTo, dummy, col]);
-  const q = place(QUERY_STEEL);
+  const q = place(spreadPt(QUERY_STEEL, 1));
   return (
     <group scale={show}>
       <instancedMesh ref={mesh} args={[undefined, undefined, pts.length]} frustumCulled={false}>
-        <sphereGeometry args={[0.05, 10, 8]} />
+        <sphereGeometry args={[0.038, 10, 8]} />
         <meshBasicMaterial toneMapped={false} />
       </instancedMesh>
       {groups > 0.01 &&
         CL.map((c, i) => {
-          const at = place([c[0], c[1], c[2]]);
+          const at = place(spreadPt([c[0], c[1], c[2]], i));
           const hot = i === 1;
+          const R = c[3] * CS * SPREAD * 1.1;
+          // names stand apart from the groups, joined by a thin line, so they never cover points or each other
+          const lab = ([[-1.3, 1.75], [0.7, 1.75], [-1.1, -1.85]] as [number, number][])[i];
+          const lp: Vec3 = [CLOUD_AT[0] + lab[0], CLOUD_AT[1] + lab[1], 0];
           return (
             <group key={i}>
               <mesh position={at}>
-                <sphereGeometry args={[c[3] * CS * 1.12, 28, 20]} />
-                <meshBasicMaterial color={hot ? '#1b8a9c' : '#8a97a3'} transparent opacity={groups * (hot && ask > 0.5 ? 0.22 : 0.1)} depthWrite={false} toneMapped={false} />
+                <sphereGeometry args={[R, 28, 20]} />
+                <meshBasicMaterial color={hot ? '#1b8a9c' : '#8a97a3'} transparent opacity={groups * (hot && ask > 0.5 ? 0.2 : 0.09)} depthWrite={false} toneMapped={false} />
               </mesh>
-              <Card at={[at[0], at[1] + c[3] * CS * 1.12 + 0.2]} show={groups}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: hot ? '#146f7f' : '#4a5966', background: 'rgba(255,255,255,0.94)', padding: '3px 12px', borderRadius: 8, whiteSpace: 'nowrap', border: hot ? '2px solid #1b8a9c' : '1px solid #b9c4cc' }}>{GROUP_NAMES[i]}</div>
+              <Line points={[lp, at]} color={hot ? '#1b8a9c' : '#8a97a3'} lineWidth={1.6} transparent opacity={groups * 0.8} />
+              <Card at={[lp[0], lp[1]]} show={groups}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: hot ? '#146f7f' : '#4a5966', background: 'rgba(255,255,255,0.96)', padding: '3px 12px', borderRadius: 8, whiteSpace: 'nowrap', border: hot ? '2px solid #1b8a9c' : '1px solid #b9c4cc' }}>{GROUP_NAMES[i]}</div>
               </Card>
             </group>
           );
@@ -218,20 +211,20 @@ function Cloud3D({ show, groups, ask, pick, flyTo, fly }: { show: number; groups
       {ask > 0.01 && (
         <group position={q}>
           <mesh scale={ask}>
-            <sphereGeometry args={[0.15, 20, 16]} />
+            <sphereGeometry args={[0.13, 20, 16]} />
             <meshBasicMaterial color="#c74634" toneMapped={false} />
           </mesh>
           <mesh scale={ask}>
             <ringGeometry args={[0.24, 0.29, 36]} />
             <meshBasicMaterial color="#ffffff" toneMapped={false} side={THREE.DoubleSide} />
           </mesh>
-          <Card at={[0, -0.55]} show={ask}>
+          <Card at={[0.95, -0.62]} show={ask}>
             <div style={{ fontSize: 22, fontWeight: 700, color: '#c74634', background: 'rgba(255,255,255,0.95)', padding: '2px 10px', borderRadius: 8, whiteSpace: 'nowrap' }}>the question</div>
           </Card>
         </group>
       )}
       {ask > 0.5 && fly <= 0 &&
-        near.map((i) => <Line key={i} points={[q, place(pts[i])]} color="#c74634" lineWidth={2.2} transparent opacity={0.85} />)}
+        near.map((i) => <Line key={i} points={[q, place(spreadPt(pts[i], member[i]))]} color="#c74634" lineWidth={2.2} transparent opacity={0.85} />)}
     </group>
   );
 }
@@ -252,8 +245,8 @@ function NumRow({ t, seed, tone, width }: { t: number; seed: number; tone: 'teal
 /** where each PDF stands: the same three places in click 1 (they arrive) and click 2 (each becomes a row of numbers beside it) */
 const SLOT = (i: number): Vec3 => [-6.6, 3.0 - i * 1.25, 0];
 
-const BOOK_AT: Vec3 = [-6.0, 1.0, 0];
-const NET_AT: Vec3 = [-3.2, 1.2, 0];
+const BOOK_AT: Vec3 = [-6.0, 1.7, 0];
+const NET_AT: Vec3 = [-3.2, 1.7, 0];
 /** 4a keeps the database higher (nothing stands over it); 4b has the Project view above, so it sits lower */
 const DB_AT: [number, number] = [-5.0, -2.2];
 const DB_SEM: [number, number] = [-5.0, -3.6];
@@ -302,7 +295,7 @@ export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'r
             </group>
           );
         })}
-      {act === 'vector' && <Arrow k={ease((t - 6900) / 800)} pts={[[-6.0, -0.3, 0], [-5.6, -0.8, 0], [DB_AT[0] - 0.3, DB_AT[1] + 1.1, 0]]} />}
+      {act === 'vector' && <Glyph at={[-5.7, -0.55]} g="↓" text="into the database" show={ease((t - 6900) / 600)} />}
       {/* click 2: each PDF stays where it stood, and a long row of numbers comes out beside it; then the points appear */}
       {act === 'vector2' &&
         PDFS.map((name, i) => {
@@ -311,11 +304,9 @@ export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'r
           return (
             <group key={name}>
               <Book3D at={s} s={0.8} lay={0} />
-              <Arrow k={ease((t - 500 - i * 900) / 500)} pts={[[s[0] + 0.55, s[1], 0], [s[0] + 0.8, s[1], 0]]} />
               <Card at={[-3.9, s[1]]} show={rowShow}>
                 <NumRow t={t} seed={i + 3} tone="teal" width={420} />
               </Card>
-              <Arrow k={win(t, 1800 + i * 300, 3400)} pts={[[-2.1, s[1], 0], [-1.8, 2.4 - i * 0.9, 0], place(CL[i][0] === -13 ? [-13, 7, -8] : i === 1 ? [14, -3, 7] : [-1, -11, 15])]} />
             </group>
           );
         })}
@@ -325,13 +316,12 @@ export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'r
           <Card at={[-5.3, 3.4]} show={win(t, 200, 3200)}>
             <div style={{ width: 340, padding: '12px 18px', background: '#fff', border: '3px solid #c74634', borderRadius: 12, fontSize: 26, fontWeight: 600, color: '#1d2733', boxShadow: '0 6px 16px rgba(20,40,60,0.25)', whiteSpace: 'normal', lineHeight: 1.25 }}>“Which supplier is ready?”</div>
           </Card>
-          <Arrow color="#c74634" dashed={false} k={win(t, 800, 3200)} pts={[[-3.8, 3.4, 0], [-3.55, 3.4, 0]]} />
+          <Glyph at={[-3.7, 3.4]} g="→" color="#C74634" show={win(t, 800, 3200)} />
           <Card at={[-1.8, 3.4]} show={win(t, 1000, 3200)}>
             <NumRow t={t} seed={11} tone="red" width={420} />
           </Card>
         </>
       )}
-      {act === 'vector3' && <Arrow color="#c74634" dashed={false} k={win(t, 2000, 12000, 500)} pts={[[0.1, 3.3, 0], [0.5, 3.0, 0], place(QUERY_STEEL)]} />}
       {act === 'retrieve' && (
         <Card at={[-4.4, 3.4]} show={ease((t - 200) / 500)}>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#c74634', background: 'rgba(255,255,255,0.94)', padding: '4px 14px', borderRadius: 8, whiteSpace: 'nowrap' }}>the five nearest points = the retrieved passages</div>
@@ -360,11 +350,11 @@ export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'r
           <group position={NET_AT} scale={ease((t - 3000) / 700) * 0.95}>
             <NeuralNet producing={t > 3800} doubt={false} />
           </group>
-          <Card at={[NET_AT[0], NET_AT[1] - 1.2]} show={ease((t - 3300) / 500)}>
+          <Card at={[NET_AT[0], NET_AT[1] - 1.15]} show={ease((t - 3300) / 500)}>
             <div style={{ fontSize: 18, fontWeight: 700, color: '#1d2733', background: 'rgba(255,255,255,0.92)', padding: '2px 10px', borderRadius: 6 }}>the language model</div>
           </Card>
-          <Arrow k={ease((t - 4300) / 600)} pts={[[NET_AT[0], NET_AT[1] - 1.5, 0], [-3.4, 0.0, 0], [-4.0, -0.3, 0]]} />
-          <Card at={[-4.2, -0.9]} show={ease((t - 4800) / 600)}>
+          <Glyph at={[NET_AT[0], 0.55]} g="↓" show={ease((t - 4300) / 500)} />
+          <Card at={[-4.2, -0.55]} show={ease((t - 4800) / 600)}>
             <div style={{ width: 600, padding: '14px 20px', background: '#fff', border: '3px solid #1b8a9c', borderRadius: 14, boxShadow: '0 6px 16px rgba(20,40,60,.25)' }}>
               <div style={{ fontSize: 24, fontWeight: 700, color: '#1d2733' }}>the answer cites the specification</div>
               <div style={{ fontSize: 19, color: '#5c6b78', marginTop: 4 }}>written only from the five passages</div>
@@ -383,12 +373,6 @@ const VIEWS: { raw: string; rawCols: string[]; name: string; cols: string[]; at:
   { raw: 'DLV_TXN', rawCols: ['DLV_ID', 'SUP_ID', 'DLV_ST', 'EVT_CD', 'PRJ_ID'], name: 'Delivery', cols: ['delivery', 'status', 'event', 'supplier'], at: [-1.9, 1.95] },
   { raw: 'PRJ_REF', rawCols: ['PRJ_ID', 'PRJ_CD', 'OWN_ID', 'CRT_DT', 'ST_CD'], name: 'Project', cols: ['project code', 'name', 'owner', 'dates'], at: [-5.3, -1.05] },
 ];
-/** a path between the real Ops Center pin (in the city) and a point in the frame */
-const opsArrow = (x: number, y: number): Vec3[] => {
-  const o = toFrame([OPS_TOP[0], OPS_TOP[1] + 0.6, OPS_TOP[2]]);
-  return [[o[0], o[1], 0], [(o[0] + x) / 2, (o[1] + y) / 2 - 0.4, 0], [x, y, 0]];
-};
-
 function ViewCard({ v, show, hot, dim, rawShow }: { v: (typeof VIEWS)[number]; show: number; hot: number[]; dim: boolean; rawShow: number }) {
   return (
     <>
@@ -442,7 +426,7 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
       {/* click 2: the question rises from the Ops Center; its words match the views */}
       {stage >= 2 && stage <= 3 && (
         <>
-          <Arrow k={stage === 2 ? ease((t - 200) / 900) : 1} pts={opsArrow(-2.7, -1.6)} />
+          <Glyph at={[-3.4, -1.6]} g="↑" text="from the Ops Center" show={stage === 2 ? ease((t - 200) / 600) : 1} />
           <Card at={[-0.5, -1.6]} show={stage === 2 ? ease((t - 900) / 500) : 1}>
             <div style={{ width: 520, padding: '14px 22px', background: '#fff', border: '3px solid #1b8a9c', borderRadius: 14, fontSize: 28, fontWeight: 600, color: '#1d2733', boxShadow: '0 6px 14px rgba(20,40,60,.25)' }}>
               “Which <span style={{ color: '#146f7f', fontWeight: 700 }}>supplier</span> is <span style={{ color: '#146f7f', fontWeight: 700 }}>ready</span>?”
@@ -452,8 +436,6 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
       )}
       {stage === 2 && (
         <>
-          <Arrow k={ease((t - 1500) / 800)} pts={[[-2.2, -1.1, 0], [-3.4, -0.4, 0], [-3.7, 0.9, 0]]} />
-          <Arrow k={ease((t - 1800) / 800)} pts={[[-1.2, -1.1, 0], [-1.5, -0.2, 0], [-1.9, 0.8, 0]]} />
           <Card at={[-0.5, -2.6]} show={ease((t - 2400) / 500)}>
             <div style={{ fontSize: 19, color: '#33414d', background: 'rgba(255,255,255,0.92)', padding: '4px 12px', borderRadius: 8, lineHeight: 1.4 }}>“supplier” is the Supplier view<br />“ready” is Delivery · status</div>
           </Card>
@@ -495,7 +477,7 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
               ))}
             </div>
           </Card>
-          <Arrow k={ease((t - 900) / 900)} pts={opsArrow(-1.4, -1.0).reverse()} />
+          <Glyph at={[-3.0, -1.0]} g="↓" text="back to the Ops Center" show={ease((t - 900) / 600)} />
           <Card at={[-0.3, -1.9]} show={ease((t - 1500) / 500)}>
             <div style={{ ...pillStyle, background: '#1b8a9c', color: '#fff' }}>governed data · this project only</div>
           </Card>

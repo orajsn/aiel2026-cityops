@@ -44,7 +44,8 @@ const atSky = (id: string, sub: string, title: string, overlay: string, group: s
   title,
   pageSub: sub,
   shot,
-  world: { pins: 'all', sky: act, highlight: ['City Operations Control Center'] },
+  // 4b's question starts at the real Ops Center pin, so its pages keep the pin; 4a has no use for the city's pins
+  world: group === 'l1-semantic' ? { pins: 'all', sky: act, highlight: ['City Operations Control Center'] } : { sky: act },
   overlay,
   overlayGroup: group,
   overlayProps: props as Record<string, unknown>,
