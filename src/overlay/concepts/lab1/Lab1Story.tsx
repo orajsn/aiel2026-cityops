@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Rich } from '../../Rich';
 import { useUiStore } from '../../../engine/ui';
+import { LineIcon, type IconName } from '../icons';
 import type { Lab1Props } from './parts';
 
 /**
@@ -15,6 +16,8 @@ export const BEAT_MS = 2300;
 interface Step {
   title: string;
   sub: string;
+  /** the step's own picture, so each one reads at a glance */
+  icon: IconName;
 }
 interface StoryConfig {
   steps: Step[];
@@ -28,10 +31,10 @@ interface StoryConfig {
 
 export const CRACK: StoryConfig = {
   steps: [
-    { title: 'Walk the site', sub: 'The project manager inspects the bridge.' },
-    { title: 'Notice the crack', sub: 'One crack, close to a pier.' },
-    { title: 'Record the issue', sub: 'Location and photo go on the tablet.' },
-    { title: 'Start the project', sub: 'The engineer reviews before anything is approved.' },
+    { title: 'Walk the site', sub: 'The project manager inspects the bridge.', icon: 'pin' },
+    { title: 'Notice the crack', sub: 'One crack, close to a pier.', icon: 'inspect' },
+    { title: 'Record the issue', sub: 'Location and photo go on the tablet.', icon: 'clipboard' },
+    { title: 'Start the project', sub: 'The engineer reviews before anything is approved.', icon: 'flag' },
   ],
   on: [0, 2.3, 4.6, 6.9],
   tick: [2.3, 4.6, 6.9, null],
@@ -40,10 +43,10 @@ export const CRACK: StoryConfig = {
 };
 export const PLAN: StoryConfig = {
   steps: [
-    { title: 'Define the scope', sub: 'Inspect the damaged area' },
-    { title: 'Specify materials', sub: 'Use the project specification' },
-    { title: 'Schedule delivery', sub: 'Check supplier readiness' },
-    { title: 'Engineer approval', sub: 'Review the repair plan' },
+    { title: 'Define the scope', sub: 'Inspect the damaged area', icon: 'target' },
+    { title: 'Specify materials', sub: 'Use the project specification', icon: 'beams' },
+    { title: 'Schedule delivery', sub: 'Check supplier readiness', icon: 'truck' },
+    { title: 'Engineer approval', sub: 'Review the repair plan', icon: 'shield' },
   ],
   on: [0, 2.3, 4.6, 6.9],
   tick: [2.3, 4.6, 6.9, null],
@@ -52,9 +55,9 @@ export const PLAN: StoryConfig = {
 };
 export const CAPTURE: StoryConfig = {
   steps: [
-    { title: 'Specification', sub: 'Document' },
-    { title: 'Supplier records', sub: 'Database' },
-    { title: 'Delivery photo', sub: 'Image' },
+    { title: 'Specification', sub: 'Document', icon: 'prompt' },
+    { title: 'Supplier records', sub: 'Database', icon: 'database' },
+    { title: 'Delivery photo', sub: 'Image', icon: 'camera' },
   ],
   on: [0, 0, 2.3],
   tick: [0, 0, 5.9],
@@ -93,9 +96,12 @@ function StoryCard({ kicker, message, cfg }: Lab1Props & { cfg: StoryConfig }) {
             const done = cfg.tick[i] !== null && t >= (cfg.tick[i] as number);
             const k = 'var(--cast-k, 1)';
             return (
-              <div key={s.title} data-step={i + 1} data-on={on || undefined} data-done={done || undefined} style={{ display: 'grid', gridTemplateColumns: `calc(44px * ${k}) 1fr`, columnGap: 18, position: 'relative', paddingBottom: i < cfg.steps.length - 1 ? `calc(18px * ${k})` : 0 }}>
-                <span style={{ width: `calc(44px * ${k})`, height: `calc(44px * ${k})`, borderRadius: '50%', background: on ? 'var(--teal)' : 'rgba(127,127,127,0.4)', color: '#fff', fontWeight: 700, fontSize: `calc(22px * ${k})`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 400ms' }}>{done ? '✓' : i + 1}</span>
-                {i < cfg.steps.length - 1 && <span style={{ position: 'absolute', left: `calc(21px * ${k})`, top: `calc(48px * ${k})`, bottom: 2, borderLeft: '2.5px dotted var(--teal)' }} />}
+              <div key={s.title} data-step={i + 1} data-on={on || undefined} data-done={done || undefined} style={{ display: 'grid', gridTemplateColumns: `calc(68px * ${k}) 1fr`, columnGap: 20, position: 'relative', paddingBottom: i < cfg.steps.length - 1 ? `calc(18px * ${k})` : 0 }}>
+                <span data-icon={s.icon} style={{ position: 'relative', width: `calc(68px * ${k})`, height: `calc(68px * ${k})`, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', background: on ? 'rgba(27, 138, 156, 0.14)' : 'rgba(127,127,127,0.14)', border: `2px solid ${on ? 'var(--teal)' : 'rgba(127,127,127,0.4)'}`, transition: 'background 400ms, border-color 400ms' }}>
+                  <LineIcon name={s.icon} size={44} color={on ? 'var(--teal)' : 'var(--ink-dim)'} />
+                  <span style={{ position: 'absolute', top: -9, left: -9, width: `calc(26px * ${k})`, height: `calc(26px * ${k})`, borderRadius: '50%', background: on ? 'var(--teal)' : 'rgba(127,127,127,0.6)', color: '#fff', fontWeight: 700, fontSize: `calc(15px * ${k})`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 400ms' }}>{done ? '✓' : i + 1}</span>
+                </span>
+                {i < cfg.steps.length - 1 && <span style={{ position: 'absolute', left: `calc(33px * ${k})`, top: `calc(74px * ${k})`, bottom: 2, borderLeft: '2.5px dotted var(--teal)' }} />}
                 <div style={{ opacity: on ? 1 : 0.45, transition: 'opacity 400ms' }}>
                   <div style={{ fontSize: `calc(23px * ${k})`, fontWeight: 700, color: 'var(--ink)' }}>{s.title}</div>
                   <div style={{ fontSize: `calc(18px * ${k})`, color: 'var(--ink-dim)', marginTop: 2 }}>{s.sub}</div>

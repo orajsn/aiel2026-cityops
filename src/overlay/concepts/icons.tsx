@@ -40,6 +40,13 @@ const PATHS = {
   foundation: <><path d="M24 4L8 14h32z" /><path d="M12 14v18M20 14v18M28 14v18M36 14v18" /><rect x="4" y="34" width="40" height="5" /><rect x="2" y="39" width="44" height="5" /></>,
   glass: <><path d="M8 6h32l-4 36H12z" /><path d="M10 16h28M11 24h26M12 32h24" /></>,
   converge: <><rect x="3" y="4" width="8" height="8" rx="1.5" /><circle cx="19" cy="8" r="4" /><path d="M27 12l4-8 4 8z" /><path d="M39 4h6v8h-6z" /><path d="M7 12l13 12M19 12l4 12M31 12l-6 12M42 12L28 24" /><ellipse cx="24" cy="28" rx="10" ry="3.5" /><path d="M14 28v12c0 2 4.5 3.5 10 3.5s10-1.5 10-3.5V28" /></>,
+  // Lab 1's first three pages (the crack, the plan, the photo)
+  route: <><circle cx="10" cy="38" r="4" /><circle cx="38" cy="10" r="4" /><path d="M14 38h14a6 6 0 0 0 0-12h-8a6 6 0 0 1 0-12h14" /></>,
+  flag: <><path d="M12 6v38" /><path d="M12 8h26l-6 9 6 9H12" /></>,
+  beams: <><path d="M6 10h36M6 22h36M6 34h36" /><path d="M14 10v24M34 10v24M6 42h36" /></>,
+  truck: <><path d="M4 12h24v22H4z" /><path d="M28 20h10l6 8v6H28z" /><circle cx="13" cy="36" r="4" /><circle cx="36" cy="36" r="4" /></>,
+  shield: <><path d="M24 5l16 6v12c0 11-7 17-16 21-9-4-16-10-16-21V11z" /><path d="M17 24l5 5 9-11" /></>,
+  camera: <><rect x="4" y="14" width="40" height="26" rx="4" /><circle cx="24" cy="27" r="7" /><path d="M16 14l3-6h10l3 6" /></>,
 } satisfies Record<string, ReactNode>;
 
 export type IconName = keyof typeof PATHS;
