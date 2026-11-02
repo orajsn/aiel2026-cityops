@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { useCameraStore, shotForScene } from '../../src/engine/camera';
+import { sameLook, useCameraStore, shotForScene } from '../../src/engine/camera';
 import { SHOTS } from '../../src/world/shots';
 import type { SceneDef } from '../../src/engine/types';
 
@@ -34,4 +34,13 @@ test('on start the saved angles come from the dev server, not the stale bundled 
   await loadOverrides();
   expect(useCameraStore.getState().overrides).toEqual(saved);
   vi.unstubAllGlobals();
+});
+
+test('pages that look from the same place hold the camera (no fly back out and in after a push-in)', () => {
+  const a = { position: [1, 2, 3], target: [4, 5, 6], durationMs: 1000 } as never;
+  const same = { position: [1, 2, 3.01], target: [4, 5, 6], durationMs: 2000 } as never;
+  const other = { position: [1, 2, 9], target: [4, 5, 6], durationMs: 1000 } as never;
+  expect(sameLook(null, a)).toBe(false);
+  expect(sameLook(a, same)).toBe(true);
+  expect(sameLook(a, other)).toBe(false);
 });

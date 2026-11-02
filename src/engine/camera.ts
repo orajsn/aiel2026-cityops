@@ -86,3 +86,14 @@ export async function persistOverrides(overrides: Record<string, SavedAngle>): P
   }
   return 'browser';
 }
+
+/**
+ * Whether two pages look from the same place: the pages of one story that share a shot. The camera then stays exactly where
+ * it is, including after the shot's slow push-in; comparing the live (pushed-in) pose with the shot's wide start sent it
+ * back out and in again on every page (owner, 3 Nov: "zoom out, zoom in, same angle, for what").
+ */
+export function sameLook(prev: Shot | null, next: Shot): boolean {
+  if (!prev) return false;
+  const near = (a: Vec3, b: Vec3) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]) < 0.05;
+  return near(prev.position, next.position) && near(prev.target, next.target);
+}

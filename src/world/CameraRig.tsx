@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import type * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useSceneStore } from '../engine/store';
-import { shotForScene, useCameraStore } from '../engine/camera';
+import { sameLook, shotForScene, useCameraStore } from '../engine/camera';
 import { SHOTS, interpolateShot, moveDuration, type Shot, type Vec3 } from './shots';
 
 /** near clipping plane: close-ups (0.4's data shapes) sit 0.3 units from the camera */
@@ -33,6 +33,8 @@ export function CameraRig() {
   const target = useRef<Vec3>([0, 0, 0]);
   const tween = useRef<{ from: Shot; to: Shot; start: number } | null>(null);
   const wasEditing = useRef(false);
+  // the look of the page before this one, to hold the camera when the next page looks from the same place
+  const lastLook = useRef<Shot | null>(null);
 
   useEffect(() => {
     if (!scene) return;
@@ -44,6 +46,8 @@ export function CameraRig() {
     }
     const to = shotForScene(scene);
     if (!to) return;
+    const held = sameLook(lastLook.current, to);
+    lastLook.current = to;
     // after Camera mode, start from where the free camera was looking
     const dir = camera.getWorldDirection(camera.position.clone());
     const here: Vec3 = wasEditing.current
@@ -56,6 +60,11 @@ export function CameraRig() {
       camera.position.set(...from.position);
       target.current = [...from.target] as Vec3;
       camera.lookAt(...from.target);
+    }
+    // the same place as the page before (a story's pages): the camera stays where it is, pushed in or not, and the panel changes
+    if (held && !cut && !wasEditing.current) {
+      setSettled(true);
+      return;
     }
     wasEditing.current = false;
     // already there (the pages of a held view): no move, the panel comes straight in
