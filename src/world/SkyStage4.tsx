@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { Html, Line } from '@react-three/drei';
 import { layoutCloud, nearestK } from './vectorLayout';
 import { NeuralNet } from './NeuralNet';
-import { PdfBook, PDFS, Strip } from './SkyVectorize';
+import { PDFS, vectorNumbers } from './SkyVectorize';
 import { STAGE4, type Vec3 } from './shots';
 
 /**
@@ -215,6 +215,22 @@ function Cloud3D({ show, groups, ask, pick, flyTo, fly }: { show: number; groups
   );
 }
 
+/** a row of numbers scrolling past, with its "384 numbers" tag: a text turned into its vector */
+function NumRow({ t, seed, tone, width }: { t: number; seed: number; tone: 'teal' | 'red'; width: number }) {
+  const col = tone === 'red' ? '#C74634' : '#146f7f';
+  const shift = -((t * 0.09) % 1400);
+  return (
+    <div style={{ width, display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', background: '#fff', borderRadius: 12, border: `2px solid ${col}`, boxShadow: '0 6px 16px rgba(20,40,60,0.25)' }}>
+      <div style={{ flex: 1, overflow: 'hidden', fontFamily: 'var(--font-mono, "JetBrains Mono", monospace)', fontSize: 24, fontWeight: 600, color: '#1d2733', maskImage: 'linear-gradient(to right, transparent, #000 6%, #000 90%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, #000 6%, #000 90%, transparent)' }}>
+        <span style={{ display: 'inline-block', transform: `translateX(${shift}px)` }}>( {vectorNumbers(seed)}, … )</span>
+      </div>
+      <span style={{ flex: 'none', fontSize: 20, fontWeight: 700, color: col, background: tone === 'red' ? 'rgba(199,70,52,0.1)' : 'rgba(27,138,156,0.12)', padding: '3px 10px', borderRadius: 999 }}>384 numbers</span>
+    </div>
+  );
+}
+/** where each PDF stands: the same three places in click 1 (they arrive) and click 2 (each becomes a row of numbers beside it) */
+const SLOT = (i: number): Vec3 => [-6.6, 3.0 - i * 1.25, 0];
+
 const BOOK_AT: Vec3 = [-6.0, 1.0, 0];
 const NET_AT: Vec3 = [-3.2, 1.2, 0];
 /** 4a keeps the database higher (nothing stands over it); 4b has the Project view above, so it sits lower */
@@ -222,7 +238,6 @@ const DB_AT: [number, number] = [-5.0, -2.2];
 const DB_SEM: [number, number] = [-5.0, -3.6];
 
 export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'retrieve'; t: number }) {
-  const dbTop: Vec3 = [DB_AT[0], DB_AT[1] + 0.9, 0];
   let cloudShow = 1;
   let groups = 1;
   let ask = 0;
@@ -243,50 +258,59 @@ export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'r
   }
   return (
     <StageFrame>
-      <DB3D at={DB_AT} pulse={act === 'vector' ? PDFS.reduce((m, _, i) => Math.max(m, Math.sin(Math.PI * Math.max(0, Math.min(1, (t - (700 + i * 2600) - 1500) / 900)))), 0) : 0} />
+      <DB3D at={DB_AT} pulse={act === 'vector' ? Math.sin(Math.PI * Math.max(0, Math.min(1, (t - 7500) / 900))) : 0} />
       <DBLabel at={DB_AT} />
-      {/* click 1: three PDFs, one after another, float down in a slow curve and sink into the database; each landing makes it glow */}
+      {/* click 1: three PDFs arrive one after another and stay; then an arrow takes them into the database, which glows once */}
       {act === 'vector' &&
         PDFS.map((name, i) => {
-          const start = 700 + i * 2600;
-          const k = ease((t - start) / 2200);
-          const appear = ease((t - start + 500) / 600);
-          const sink = ease((t - start - 1500) / 700);
-          if (appear <= 0.01 || sink >= 0.99) return null;
-          const from: Vec3 = [-6.3, 2.4, 0];
-          const land: Vec3 = [dbTop[0], dbTop[1], 0];
-          // an arc: it drifts right and rises a little before it comes down onto the database
-          const base = lerp(from, land, k);
-          const arc = Math.sin(k * Math.PI) * 0.7;
-          const pos: Vec3 = [base[0] + Math.sin(k * Math.PI) * 0.5, base[1] + arc, 0];
-          const s = (1 - 0.45 * k) * (1 - 0.5 * sink);
+          const start = 600 + i * 2200;
+          const k = ease((t - start) / 1800);
+          const appear = ease((t - start + 400) / 700);
+          if (appear <= 0.01) return null;
+          const from: Vec3 = [-6.6, 4.4, 0];
+          const slot = SLOT(i);
+          const pos: Vec3 = [slot[0] + (1 - k) * 0.3, from[1] + (slot[1] - from[1]) * k, 0];
           return (
-            <group key={name} scale={appear * (1 - sink)}>
-              <Book3D at={pos} s={s} lay={k} />
-              <Card at={[pos[0], pos[1] + 0.95 * s + 0.15]} show={appear * (1 - ease(k * 1.6))}>
-                <div style={{ fontSize: 20, fontWeight: 600, color: '#1d2733', background: 'rgba(255,255,255,0.94)', padding: '3px 10px', borderRadius: 6 }}>{name}</div>
+            <group key={name}>
+              <group scale={appear}>
+                <Book3D at={pos} s={0.8} lay={0} />
+              </group>
+              <Card at={[-4.9, slot[1]]} show={ease((t - start - 1500) / 600)}>
+                <div style={{ fontSize: 22, fontWeight: 600, color: '#1d2733', background: 'rgba(255,255,255,0.94)', padding: '3px 12px', borderRadius: 8, textAlign: 'left' }}>{name}</div>
               </Card>
             </group>
           );
         })}
-      {/* click 2: each PDF becomes a long row of numbers, then the points appear */}
+      {act === 'vector' && <Arrow k={ease((t - 6900) / 800)} pts={[[-6.0, -0.3, 0], [-5.6, -0.8, 0], [DB_AT[0] - 0.3, DB_AT[1] + 1.1, 0]]} />}
+      {/* click 2: each PDF stays where it stood, and a long row of numbers comes out beside it; then the points appear */}
       {act === 'vector2' &&
         PDFS.map((name, i) => {
-          const op = win(t, 300 + i * 800, 3600);
+          const s = SLOT(i);
+          const rowShow = win(t, 500 + i * 900, 4000);
           return (
-            <Card key={name} at={[-4.9, 3.0 - i * 1.2]} show={op}>
-              <Strip t={t} seed={i + 3} tone="teal" icon={<PdfBook size={0.62} />} width={560} />
-            </Card>
+            <group key={name}>
+              <Book3D at={s} s={0.8} lay={0} />
+              <Arrow k={ease((t - 500 - i * 900) / 500)} pts={[[s[0] + 0.55, s[1], 0], [s[0] + 0.8, s[1], 0]]} />
+              <Card at={[-3.9, s[1]]} show={rowShow}>
+                <NumRow t={t} seed={i + 3} tone="teal" width={420} />
+              </Card>
+              <Arrow k={win(t, 1800 + i * 300, 3400)} pts={[[-2.1, s[1], 0], [-1.8, 2.4 - i * 0.9, 0], place(CL[i][0] === -13 ? [-13, 7, -8] : i === 1 ? [14, -3, 7] : [-1, -11, 15])]} />
+            </group>
           );
         })}
-      {act === 'vector2' && PDFS.map((n, i) => <Arrow key={n} k={win(t, 1500 + i * 300, 3200)} pts={[[-2.45, 3.0 - i * 1.2, 0], [-1.9, 2.8 - i * 0.9, 0], place(CL[i][0] === -13 ? [-13, 7, -8] : i === 1 ? [14, -3, 7] : [-1, -11, 15])]} />)}
-      {/* click 3: the question turns into numbers the same way */}
+      {/* click 3: the question turns into numbers the same way: the question, an arrow, its row of numbers */}
       {act === 'vector3' && (
-        <Card at={[-4.8, 3.4]} show={win(t, 200, 3000)}>
-          <Strip t={t} seed={11} tone="red" width={600} icon={<div style={{ fontSize: 24, fontWeight: 700, color: '#1d2733', maxWidth: 200, lineHeight: 1.2 }}>“Which supplier is ready?”</div>} />
-        </Card>
+        <>
+          <Card at={[-5.3, 3.4]} show={win(t, 200, 3200)}>
+            <div style={{ width: 340, padding: '12px 18px', background: '#fff', border: '3px solid #c74634', borderRadius: 12, fontSize: 26, fontWeight: 600, color: '#1d2733', boxShadow: '0 6px 16px rgba(20,40,60,0.25)', whiteSpace: 'normal', lineHeight: 1.25 }}>“Which supplier is ready?”</div>
+          </Card>
+          <Arrow color="#c74634" dashed={false} k={win(t, 800, 3200)} pts={[[-3.8, 3.4, 0], [-3.55, 3.4, 0]]} />
+          <Card at={[-1.8, 3.4]} show={win(t, 1000, 3200)}>
+            <NumRow t={t} seed={11} tone="red" width={420} />
+          </Card>
+        </>
       )}
-      {act === 'vector3' && <Arrow color="#c74634" dashed={false} k={win(t, 2000, 12000, 500)} pts={[[-1.8, 3.4, 0], [-1.0, 3.0, 0], place(QUERY_STEEL)]} />}
+      {act === 'vector3' && <Arrow color="#c74634" dashed={false} k={win(t, 2000, 12000, 500)} pts={[[0.1, 3.3, 0], [0.5, 3.0, 0], place(QUERY_STEEL)]} />}
       {act === 'retrieve' && (
         <Card at={[-4.4, 3.4]} show={ease((t - 200) / 500)}>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#c74634', background: 'rgba(255,255,255,0.94)', padding: '4px 14px', borderRadius: 8, whiteSpace: 'nowrap' }}>the five nearest points = the retrieved passages</div>
