@@ -1,7 +1,6 @@
 import { act, render } from '@testing-library/react';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import { L1Capture, L1Crack, L1Plan } from '../../src/overlay/concepts/lab1/Lab1Story';
-import { BEAT_MS } from '../../src/world/Lab1Story';
+import { BEAT_MS, L1Capture, L1Crack, L1Plan } from '../../src/overlay/concepts/lab1/Lab1Story';
 import { expectNoRed } from './lab1Helpers';
 
 beforeEach(() => vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout', 'performance', 'Date'] }));
@@ -12,7 +11,7 @@ const at = (s: number) => act(() => void vi.advanceTimersByTime(s * 1000));
 const step = (c: HTMLElement, n: number) => c.querySelector(`[data-step="${n}"]`) as HTMLElement;
 const pillOn = (c: HTMLElement) => (c.querySelector('[data-pill]') as HTMLElement).style.opacity === '1';
 
-test('the world clock is four beats of 2.3 s', () => {
+test('a beat is 2.3 s', () => {
   expect(BEAT_MS).toBe(2300);
 });
 
@@ -56,15 +55,13 @@ test('the capture page starts with steps 1 and 2 ticked, ticks the photo, then t
   expect(pillOn(container)).toBe(true);
 });
 
-test('the team card names the three people, no red here, no banned words', () => {
+test('one panel on the right like Lab 3, no team card, no red, no banned words', () => {
   for (const C of [L1Crack, L1Plan, L1Capture]) {
     const { container, unmount } = render(<C {...props} />);
-    const team = container.querySelector('[data-team]') as HTMLElement;
-    expect(team.textContent).toContain('Project manager');
-    expect(team.textContent).toContain('Engineer');
-    expect(team.textContent).toContain('Technician');
+    expect(container.querySelectorAll('.beat__panel')).toHaveLength(1);
+    expect(container.querySelector('[data-team]')).toBeNull();
     expectNoRed(container);
-    expect(container.textContent).not.toMatch(/Lab [23]\b|pier \d|Kirkland|\bMEA\b|\bMWA\b|\bBMA\b|fictional|copilot|GPT|Llama|Claude|Gemini/i);
+    expect(container.textContent).not.toMatch(/Lab [23]\b|pier \d|Kirkland|\bMEA\b|\bMWA\b|\bBMA\b|fictional|copilot|GPT|Llama|Claude|Gemini|team/i);
     unmount();
   }
 });

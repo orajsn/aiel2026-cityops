@@ -16,7 +16,7 @@ export function KitCity() {
   // Traffic mode: no people or incident markers at the bridge, just the city and its traffic
   const traffic = useTrafficStore((s) => s.editing);
   const bhumibol = useGraphicsStore((s) => s.bridge === 'bhumibol');
-  const world = (traffic ? {} : (sceneWorld ?? {})) as { inspect?: { pier: 'pier3' | 'pier2'; who: Who; leave?: boolean }; markers?: boolean | 'pier2'; core?: string; lab1?: 'crack' | 'plan' | 'capture' };
+  const world = (traffic ? {} : (sceneWorld ?? {})) as { inspect?: { pier: 'pier3' | 'pier2'; who: Who; leave?: boolean }; markers?: boolean | 'pier2'; core?: string };
   return (
     <group name="city">
       <SkyAndHorizon ground={!world.core} />
@@ -24,7 +24,7 @@ export function KitCity() {
       <Boats />
       <Cars />
       <TrafficDraw />
-      <HarborBridge inspect={world.inspect} markers={world.markers} lab1={world.lab1} />
+      <HarborBridge inspect={world.inspect} markers={world.markers} />
       {/* Settings › Bridge: the Bhumibol Bridge model on preview */}
       {bhumibol && <BhumibolBridge />}
     </group>

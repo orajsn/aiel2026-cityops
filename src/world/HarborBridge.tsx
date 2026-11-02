@@ -7,7 +7,6 @@ import { useGraphicsStore } from '../engine/graphics';
 import { BRIDGE, BRIDGE_S, DECK_T, DECK_W, DECK_Y, harborBridgeFrame } from './bridgeFrame';
 import { Person, type Who } from './Person';
 import type { Vec3 } from './shots';
-import { Lab1Story, type Lab1Kind } from './Lab1Story';
 
 /** structure scale: the map is real scale (1 unit ~ 108 m); the bridge is drawn a few times larger than life so it reads */
 const S = BRIDGE_S;
@@ -29,7 +28,7 @@ const STEEL = '#e9e2d2';
  * inspection platforms on Pier 3 and Pier 2 with the damage on the pier faces, the inspector, and
  * the two incident markers. Always part of the city; `inspect` and `markers` only add the story props.
  */
-export function HarborBridge({ inspect, markers = false, lab1 }: { inspect?: { pier: 'pier3' | 'pier2'; who: Who; leave?: boolean }; markers?: boolean | 'pier2'; lab1?: Lab1Kind }) {
+export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: 'pier3' | 'pier2'; who: Who; leave?: boolean }; markers?: boolean | 'pier2' }) {
   const f0 = useMemo(() => harborBridgeFrame(), []);
   // work in structure units inside a group scaled by S, so spans still match the world
   const f = useMemo(() => ({ ...f0, water: f0.water / S, ramp: f0.ramp / S }), [f0]);
@@ -198,9 +197,8 @@ export function HarborBridge({ inspect, markers = false, lab1 }: { inspect?: { p
         </group>
       ))}
       {/* the damage is always there; it glows when the story is about it */}
-      <Crack alert={markers === true || inspect?.pier === 'pier3' || lab1 === 'crack'} />
+      <Crack alert={markers === true || inspect?.pier === 'pier3'} />
       <Corrosion alert={!!markers || inspect?.pier === 'pier2'} />
-      {lab1 && <Lab1Story kind={lab1} pier3={pier3} />}
       {inspect && <Inspection key={`${inspect.pier}-${inspect.who}${inspect.leave ? '-leave' : ''}`} pier={inspect.pier} who={inspect.who} leave={!!inspect.leave} />}
       {markers === true && (
         <>

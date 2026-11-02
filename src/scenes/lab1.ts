@@ -14,21 +14,36 @@ import '../overlay/concepts/lab1/register';
 export const WITH_LAB1 = true;
 
 /** the camera holds on the whole bridge, where the Introduction ends: the story stays at Harbor Bridge, no move */
-const atBridge = (id: string, title: string, overlay: string, props: object, world: SceneDef['world'] = { bridge: true }): SceneDef => ({
+const atBridge = (id: string, title: string, overlay: string, props: object): SceneDef => ({
   id,
   chapter: 3,
   title,
   shot: 'bridge',
-  world,
+  world: { bridge: true },
   heldView: true,
   overlay,
   overlayProps: props as Record<string, unknown>,
 });
 
+/**
+ * 1.0 to 1.2 work like Lab 3's opening pages (owner, 2 Nov): the camera closes in on the crack, a real character stands
+ * there with the label, and one panel on the right carries the message and steps. One camera for the three pages.
+ */
+const atCrack = (id: string, title: string, props: object, who: string): SceneDef => ({
+  id,
+  ...(id === '1.0' ? {} : { sameAngleAs: '1.0' }),
+  chapter: 3,
+  title,
+  shot: 'pier3',
+  world: { bridge: true, inspect: { pier: 'pier3', who } },
+  overlay: id === '1.0' ? 'L1Crack' : id === '1.1' ? 'L1Plan' : 'L1Capture',
+  overlayProps: props as Record<string, unknown>,
+});
+
 export const lab1: SceneDef[] = [
-  atBridge('1.0', 'A crack starts a project', 'L1Crack', { kicker: 'Lab 1 · The bridge needs repair', message: 'A crack. A question. **A repair project.**' }, { bridge: true, lab1: 'crack' }),
-  atBridge('1.1', 'Plan the repair', 'L1Plan', { kicker: 'Lab 1 · Plan the repair', message: 'Turn the observation **into a project.**' }, { bridge: true, lab1: 'plan' }),
-  atBridge('1.2', 'Capture the steel delivery', 'L1Capture', { kicker: 'Lab 1 · Capture the delivery', message: 'The technician adds **evidence from the site.**' }, { bridge: true, lab1: 'capture' }),
+  atCrack('1.0', 'A crack starts a project', { kicker: 'Lab 1 · The bridge needs repair', message: 'A crack. A question. **A repair project.**' }, 'character-male-b'),
+  atCrack('1.1', 'Plan the repair', { kicker: 'Lab 1 · Plan the repair', message: 'Turn the observation **into a project.**' }, 'character-male-b'),
+  atCrack('1.2', 'Capture the steel delivery', { kicker: 'Lab 1 · Capture the delivery', message: 'The technician adds **evidence from the site.**' }, 'character-male-e'),
   atBridge('1.3', 'One assistant', 'L1Assistant', { kicker: 'One assistant', message: 'One question goes in through **OCI Enterprise AI** and comes back with its sources.' }),
   atBridge('1.3a', 'Meet the app', 'L1App', { kicker: 'Meet the app', message: 'You will run **Seer Construction Intelligence**. Each switch is one hands-on step.' }),
   atBridge('1.4', 'What the specifications require', 'L1Specs', { kicker: 'Hands-on 1 · Unstructured RAG', message: 'Put the specification in a vector store, and the answers **cite it**.' }),
