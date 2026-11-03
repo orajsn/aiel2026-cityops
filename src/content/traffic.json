@@ -83,7 +83,7 @@
     "count": 150,
     "speedMin": 8.5,
     "speedMax": 10,
-    "size": 5,
+    "size": 2,
     "routes": [
       {
         "points": [
@@ -231,7 +231,7 @@
         "count": 12,
         "speedMin": 5,
         "speedMax": 8,
-        "size": 1.5
+        "size": 2
       },
       {
         "points": [
