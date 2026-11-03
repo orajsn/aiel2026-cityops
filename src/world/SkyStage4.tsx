@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react';
 import * as THREE from 'three';
+import { useFrame } from '@react-three/fiber';
 import { Billboard, Line } from '@react-three/drei';
 import { ReadyHtml as Html } from './ReadyHtml';
 import { layoutCloud, nearestK } from './vectorLayout';
@@ -25,10 +26,69 @@ const lerp = (a: Vec3, b: Vec3, k: number): Vec3 => [a[0] + (b[0] - a[0]) * k, a
 /** 1 while t is inside [from, to], easing in and out over `fade` ms */
 const win = (t: number, from: number, to: number, fade = 350) => Math.min(ease((t - from) / fade), 1 - ease((t - to) / fade));
 
-function StageFrame({ children }: { children: ReactNode }) {
+/** where the content of a click stands in frame units (cards and labels included): the camera is fitted to it, see StageFrame */
+type Box = { x0: number; x1: number; y0: number; y1: number };
+const BOX_V: Record<string, Box> = {
+  vector: { x0: -7.5, x1: -3.6, y0: -3.5, y1: 3.7 },
+  vector2: { x0: -7.5, x1: 1.9, y0: -3.5, y1: 3.8 },
+  vector3: { x0: -7.7, x1: 1.9, y0: -3.5, y1: 4.0 },
+  retrieve: { x0: -7.5, x1: 1.9, y0: -3.5, y1: 3.6 },
+};
+const BOX_S: Box = { x0: -7.5, x1: 1.7, y0: -4.4, y1: 4.0 };
+/** the part of the screen the page's panel leaves free, in normalised device coordinates (the panel starts at about x 0.28) */
+const FREE = { x0: -0.95, x1: 0.2, y0: -0.9, y1: 0.76 };
+const base = new THREE.Matrix4();
+const tmpV = new THREE.Vector3();
+
+/**
+ * The stage frame: fixed in the sky over the Ops Center. Whatever angle the camera has (the owner saves their own in Camera mode), the
+ * frame slides and, if it has to, shrinks a little in its own plane until the click's content sits in the free left of the screen:
+ * the graphic follows the camera instead of the other way round (owner, 3 Nov).
+ */
+function StageFrame({ children, box }: { children: ReactNode; box: Box }) {
+  const inner = useRef<THREE.Group>(null);
+  const cur = useRef({ s: 1, ox: 0, oy: 0, set: false });
+  useFrame(({ camera }) => {
+    const g = inner.current;
+    if (!g) return;
+    camera.updateMatrixWorld();
+    base.compose(new THREE.Vector3(...STAGE4.center), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), (-STAGE4.heading * Math.PI) / 180), new THREE.Vector3(STAGE4.unit, STAGE4.unit, STAGE4.unit));
+    const ndc = (x: number, y: number, s: number, ox: number, oy: number) => {
+      tmpV.set(s * x + ox, s * y + oy, 0).applyMatrix4(base).project(camera);
+      return [tmpV.x, tmpV.y] as const;
+    };
+    const corners = [[box.x0, box.y0], [box.x1, box.y0], [box.x1, box.y1], [box.x0, box.y1]] as const;
+    const bounds = (s: number, ox: number, oy: number) => {
+      let x0 = 9, x1 = -9, y0 = 9, y1 = -9;
+      for (const [x, y] of corners) {
+        const [nx, ny] = ndc(x, y, s, ox, oy);
+        x0 = Math.min(x0, nx); x1 = Math.max(x1, nx); y0 = Math.min(y0, ny); y1 = Math.max(y1, ny);
+      }
+      return { x0, x1, y0, y1 };
+    };
+    const b0 = bounds(1, 0, 0);
+    // shrink only if the content is bigger than the free area (never below 0.8)
+    const s = Math.max(0.8, Math.min(1, (FREE.x1 - FREE.x0) / Math.max(1e-3, b0.x1 - b0.x0), (FREE.y1 - FREE.y0) / Math.max(1e-3, b0.y1 - b0.y0)));
+    const b1 = bounds(s, 0, 0);
+    // how the screen moves when the frame slides one unit sideways or up
+    const o = ndc(0, 0, 1, 0, 0);
+    const ex = ndc(0, 0, 1, 1, 0);
+    const ey = ndc(0, 0, 1, 0, 1);
+    const a = ex[0] - o[0], c = ex[1] - o[1], bb = ey[0] - o[0], d = ey[1] - o[1];
+    const det = a * d - bb * c;
+    if (Math.abs(det) < 1e-6) return;
+    const dx = (FREE.x0 + FREE.x1) / 2 - (b1.x0 + b1.x1) / 2;
+    const dy = (FREE.y0 + FREE.y1) / 2 - (b1.y0 + b1.y1) / 2;
+    const ox = (d * dx - bb * dy) / det;
+    const oy = (-c * dx + a * dy) / det;
+    const k = cur.current.set ? 0.14 : 1;
+    cur.current = { s: cur.current.s + (s - cur.current.s) * k, ox: cur.current.ox + (ox - cur.current.ox) * k, oy: cur.current.oy + (oy - cur.current.oy) * k, set: true };
+    g.position.set(cur.current.ox, cur.current.oy, 0);
+    g.scale.setScalar(cur.current.s);
+  });
   return (
     <group position={STAGE4.center} rotation={[0, (-STAGE4.heading * Math.PI) / 180, 0]} scale={STAGE4.unit}>
-      {children}
+      <group ref={inner}>{children}</group>
     </group>
   );
 }
@@ -273,7 +333,7 @@ export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'r
     fly = ease((t - 1500) / 1400);
   }
   return (
-    <StageFrame>
+    <StageFrame box={BOX_V[act]}>
       <DB3D at={DB_AT} pulse={act === 'vector' ? Math.sin(Math.PI * Math.max(0, Math.min(1, (t - 7500) / 900))) : 0} />
       <DBLabel at={DB_AT} />
       {/* click 1: three PDFs arrive one after another and stay; then an arrow takes them into the database, which glows once */}
@@ -407,7 +467,7 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
   const rise = (i: number) => (stage > 1 ? 1 : ease((t - 300 - i * 300) / 700));
   const hot = (i: number) => (stage === 2 ? (i === 0 ? [0, 1] : i === 1 ? [1] : [0]) : stage === 3 ? (i === 0 ? [0, 1, 2, 3] : i === 2 ? [0] : []) : []);
   return (
-    <StageFrame>
+    <StageFrame box={BOX_S}>
       <Backdrop show={ease(t / 800)} />
       <DB3D at={DB_SEM} />
       <DBLabel at={DB_SEM} />
@@ -428,7 +488,7 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
       {/* click 2: the question rises from the Ops Center; its words match the views */}
       {stage >= 2 && stage <= 3 && (
         <>
-          <Glyph at={[-3.4, -1.6]} g="↑" text="from the Ops Center" show={stage === 2 ? ease((t - 200) / 600) : 1} />
+          <Glyph at={[-0.5, -0.75]} g="↑" text="from the Ops Center" show={stage === 2 ? ease((t - 200) / 600) : 1} />
           <Card at={[-0.5, -1.6]} show={stage === 2 ? ease((t - 900) / 500) : 1}>
             <div style={{ width: 520, padding: '14px 22px', background: '#fff', border: '3px solid #1b8a9c', borderRadius: 14, fontSize: 28, fontWeight: 600, color: '#1d2733', boxShadow: '0 6px 14px rgba(20,40,60,.25)' }}>
               “Which <span style={{ color: '#146f7f', fontWeight: 700 }}>supplier</span> is <span style={{ color: '#146f7f', fontWeight: 700 }}>ready</span>?”
@@ -479,8 +539,8 @@ export function Semantic4({ act, t }: { act: 'semantic' | 'semantic2' | 'semanti
               ))}
             </div>
           </Card>
-          <Glyph at={[-3.0, -1.0]} g="↓" text="back to the Ops Center" show={ease((t - 900) / 600)} />
-          <Card at={[-0.3, -1.9]} show={ease((t - 1500) / 500)}>
+          <Glyph at={[-0.5, -1.5]} g="↓" text="back to the Ops Center" show={ease((t - 900) / 600)} />
+          <Card at={[-0.3, -2.3]} show={ease((t - 1500) / 500)}>
             <div style={{ ...pillStyle, background: '#1b8a9c', color: '#fff' }}>governed data · this project only</div>
           </Card>
         </>
