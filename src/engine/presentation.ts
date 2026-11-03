@@ -66,7 +66,9 @@ function runsHere(): number {
 /* ---------- Lab 2's notebook focus (src/content/lab2Focus.ts): the same line for every Next and Back ---------- */
 
 /** how many focus steps a page has (0: none, the page behaves as before). A notebook page (lab2Notebook.ts) shows its first step at once, so Next has one fewer */
-export const focusStepCount = (id: string): number => (NB_PAGES[id] ? NB_PAGES[id].steps.length - 1 : LAB2_FOCUS[id]?.length ?? 0);
+/** pages whose notebook data stays but whose panel no longer steps through it (2.2c became the dimensions page on 3 Nov) */
+const NO_STEPS = new Set(['2.2c']);
+export const focusStepCount = (id: string): number => (NO_STEPS.has(id) ? 0 : NB_PAGES[id] ? NB_PAGES[id].steps.length - 1 : LAB2_FOCUS[id]?.length ?? 0);
 
 /** the focus page on screen now, once its camera has arrived */
 function focusHere(): number {

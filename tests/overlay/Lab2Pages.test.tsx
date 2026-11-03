@@ -5,6 +5,9 @@ import { LAB2_FOCUS } from '../../src/content/lab2Focus';
 import { NB_PAGES } from '../../src/content/lab2Notebook';
 import { useDrawerStore } from '../../src/engine/presentation';
 
+/** a page drawn by the notebook panel (2.2c became its own page on 3 Nov: its notebook data stays but the panel is L2Dims) */
+const isNb = (id: string) => !!NB_PAGES[id] && chapter1.find((s) => s.id === id)?.overlay === 'L2Notebook';
+
 /** Lab 2's own pages, the hidden ones too (their code stays while they are out of the selected deck; the recap is another panel's) */
 const PAGES = chapter1.filter((s) => s.overlay?.startsWith('L2'));
 const renderPage = (id: string) => {
@@ -31,7 +34,7 @@ test('every Lab 2 page renders its panel, headline, takeaway (chapter ends only)
     const p = s.overlayProps as { takeaway?: string; terms?: unknown[]; next?: string; step?: number };
     expect(c.querySelector('.beat__panel'), s.id).not.toBeNull();
     // a notebook page (the blue pages) has its own three columns and no bands under them
-    if (NB_PAGES[s.id]) { expect(c.querySelector('[data-notebook-page], [data-testid="notebook-page"]'), s.id).not.toBeNull(); continue; }
+    if (isNb(s.id)) { expect(c.querySelector('[data-notebook-page], [data-testid="notebook-page"]'), s.id).not.toBeNull(); continue; }
     // the takeaway is only on the chapter's last page, the one with the Next band (owner, 29 Oct)
     if (p.next && p.takeaway) expect(c.querySelector('[data-takeaway]'), s.id).not.toBeNull();
     else expect(c.querySelector('[data-takeaway]'), s.id).toBeNull();
@@ -44,7 +47,7 @@ test('every Lab 2 page renders its panel, headline, takeaway (chapter ends only)
 test('at most one red element on every page; when the picture has one, the kicker steps down to teal', () => {
   for (const s of PAGES) {
     const c = renderPage(s.id);
-    if (NB_PAGES[s.id]) { expect(redRoots(c).length, s.id).toBe(0); continue; }
+    if (isNb(s.id)) { expect(redRoots(c).length, s.id).toBe(0); continue; }
     const roots = redRoots(c);
     expect(roots.length, `${s.id}: ${roots.map((r) => r.outerHTML.slice(0, 80)).join(' | ')}`).toBeLessThanOrEqual(1);
     const kicker = c.querySelector('.beat__kicker') as HTMLElement;
@@ -110,7 +113,7 @@ test('the cast: Mercer reports the crack, Vance asks; the agent is the chief ins
 });
 
 test('a notebook page shows step 1 at once; each Next lights the next step and its lines, and the drawer stays away', () => {
-  for (const id of Object.keys(NB_PAGES)) {
+  for (const id of Object.keys(NB_PAGES).filter(isNb)) {
     const c = renderPage(id);
     const n = NB_PAGES[id].steps.length;
     const on = () => [...c.querySelectorAll('[data-step-card]')].filter((e) => e.hasAttribute('data-on')).map((e) => Number(e.getAttribute('data-step-card')));

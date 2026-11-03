@@ -4,6 +4,7 @@ import { Checkable, Embed, Nearest, NotAJob, Plumbing, RagIdea, Rule } from './L
 import { Chief, Conveyor, Order, Station1, Station3, ThreeWays, WhoPicks } from './Lab2Workflow';
 import { Allowlist, FirstRun, Instruments, MainInstrument, Manual, OneBrief, OneQuery, StateGraph, StoreSaver, ThreeLayers, Toolkit, TwoMemories, Wipe, WrongDrawer } from './Lab2Agent';
 import { LabNotebook } from './LabNotebook';
+import { Dims } from './Lab2Dims';
 import { Dashboard, Observability, PickTool, ThreeRisks } from './Lab2Trust';
 
 /** Lab 2's panels (src/scenes/chapter1.ts registers them by importing this file) */
@@ -47,6 +48,7 @@ export const LAB2_OVERLAYS = {
   L2Dashboard: Dashboard,
   L2Pick: PickTool,
   L2Notebook: LabNotebook,
+  L2Dims: Dims,
 } as const;
 
 for (const [k, c] of Object.entries(LAB2_OVERLAYS)) registerOverlay(k, c);
