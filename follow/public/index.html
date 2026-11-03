@@ -150,13 +150,15 @@ h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
     render();
   }
   async function loadScripts() {
-    try { const r = await fetch('scripts.json', { cache: 'no-cache' }); const j = await r.json(); pages = j.pages; byId = new Map(pages.map((p) => [p.id, p])); order = pages.map((p) => p.id); } catch {}
+    try { const r = await fetch('api/pages', { cache: 'no-store' }); const j = await r.json(); pages = j.pages; byId = new Map(pages.map((p) => [p.id, p])); order = pages.map((p) => p.id); } catch {}
   }
   function follow() {
     if (es) es.close();
     es = new EventSource('api/s/' + code + '/events');
     es.onopen = () => { $('live').classList.remove('off'); $('liveTxt').textContent = T[lang].live; };
     es.onmessage = (e) => { try { const s = JSON.parse(e.data); liveId = s.id || ''; if (!peeking) shownId = liveId; render(); } catch {} };
+    // a colleague saved a script: the phone takes it at once, and redraws if it is the page on screen
+    es.addEventListener('script', (e) => { try { const u = JSON.parse(e.data); const p = byId.get(u.id); if (p) { p[u.lang] = u.text; if (u.id === shownId) render(); } } catch {} });
     es.addEventListener('end', () => { es.close(); alert(T[lang].ended); store.set('code', ''); location.reload(); });
     es.onerror = () => { $('live').classList.add('off'); $('liveTxt').textContent = T[lang].off; };
   }

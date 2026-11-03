@@ -108,6 +108,10 @@ export function SettingsPanel({ onClose }: { onClose(): void }) {
         </button>
       </div>
       <PhoneFollow />
+      <div className="settings__label">Scripts</div>
+      <a className="settings__tool" href={`${location.pathname}?mode=scripts`} target="_blank" rel="noreferrer">
+        Script manager (edit, versions, comments) ↗
+      </a>
     </div>
   );
 }
@@ -141,7 +145,7 @@ function PhoneFollow() {
             <button type="button" className="settings__tool" disabled={status === 'starting'} onClick={() => void start()}>
               {status === 'starting' ? 'Starting…' : 'Start sharing'}
             </button>
-            <small>{status === 'error' ? 'Could not start: the follow server is not reachable from here.' : 'Phones show the script of the page on screen, live.'}</small>
+            <small>{status === 'error' ? 'Could not start: the follow server is not reachable from here.' : 'Phones show the script of the page on screen, live. Ends by itself after 90 minutes without a page change.'}</small>
           </>
         )}
       </div>

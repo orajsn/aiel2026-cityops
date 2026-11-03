@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
@@ -28,10 +27,22 @@ async function keepMapOnDevice() {
   }
 }
 
-void keepMapOnDevice().finally(() =>
-  ReactDOM.createRoot(document.getElementById('root')!).render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>,
-  ),
-);
+/** ?mode=scripts is the colleagues' script manager (no 3D, no stage); everything else is the presenter app */
+const scriptsMode = new URLSearchParams(location.search).get('mode') === 'scripts';
+if (scriptsMode) {
+  void import('./scripts/ScriptManager').then(({ ScriptManager }) =>
+    ReactDOM.createRoot(document.getElementById('root')!).render(
+      <React.StrictMode>
+        <ScriptManager />
+      </React.StrictMode>,
+    ),
+  );
+} else {
+  void Promise.all([import('./App'), keepMapOnDevice()]).then(([{ default: App }]) =>
+    ReactDOM.createRoot(document.getElementById('root')!).render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>,
+    ),
+  );
+}

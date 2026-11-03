@@ -59,6 +59,34 @@ test('a session ends by itself when the presenter goes quiet, and its phones are
   }
 });
 
+test('the script manager: a login name is needed, every save is a version that goes live, a stale save is refused, comments thread', async () => {
+  const dir = `/tmp/follow-test-${PORT}`;
+  const mp = spawn(process.execPath, ['follow/server.mjs'], { env: { ...process.env, FOLLOW_PORT: String(PORT + 2), FOLLOW_BASE: '/f/', FOLLOW_DATA: dir }, stdio: 'ignore' });
+  try {
+    const m = `http://127.0.0.1:${PORT + 2}/f/`;
+    for (let i = 0; i < 50; i++) { try { await fetch(m + 'api/pages'); break; } catch { await new Promise((r) => setTimeout(r, 100)); } }
+    const as = (u: string) => ({ 'x-remote-user': u });
+    expect((await fetch(m + 'api/m/me')).status).toBe(401);
+    expect((await (await fetch(m + 'api/m/me', { headers: as('Mali') })).json()).user).toBe('Mali');
+    const put = (u: string, text: string, base: number) => fetch(m + 'api/m/script/3.2a', { method: 'PUT', headers: as(u), body: JSON.stringify({ lang: 'th', text, base }) });
+    const a = await put('Mali', 'แก้ครั้งแรก', 0);
+    expect((await a.json()).version).toBe(1);
+    expect((await put('Nok', 'แก้ซ้อน', 0)).status).toBe(409); // Nok started from the default, Mali saved first
+    expect((await put('Nok', 'แก้ต่อ', 1)).status).toBe(200);
+    const pages = (await (await fetch(m + 'api/pages')).json()).pages; // public: phones read the latest
+    expect(pages.find((p: { id: string }) => p.id === '3.2a').th).toBe('แก้ต่อ');
+    const vs = (await (await fetch(m + 'api/m/versions/3.2a?lang=th', { headers: as('Mali') })).json()).versions;
+    expect(vs.map((v: { by: string }) => v.by)).toEqual(['Nok', 'Mali']);
+    const c = await (await fetch(m + 'api/m/comments/3.2a', { method: 'POST', headers: as('Mali'), body: JSON.stringify({ text: 'ช้าไป' }) })).json();
+    await fetch(m + 'api/m/comments/3.2a', { method: 'POST', headers: as('Nok'), body: JSON.stringify({ text: 'ok', parent: c.cid }) });
+    expect((await fetch(m + 'api/m/comments/3.2a', { method: 'PATCH', headers: as('Nok'), body: JSON.stringify({ op: 'delete', cid: c.cid }) })).status).toBe(403); // only the author deletes
+    const list = (await (await fetch(m + 'api/m/comments/3.2a', { headers: as('Mali') })).json()).comments;
+    expect(list.filter((x: { parent: string | null }) => x.parent === c.cid)).toHaveLength(1);
+  } finally {
+    mp.kill();
+  }
+});
+
 test('the phone page and its scripts are served, and nothing outside the public folder is', async () => {
   expect((await fetch(base)).status).toBe(200);
   expect((await fetch(base + 'scripts.json')).status).toBe(200);

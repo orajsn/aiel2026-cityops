@@ -793,3 +793,4 @@ body.is-idle, body.is-idle * { cursor: none !important; }
 .settings__follow { display: grid; gap: 8px; }
 .settings__follow .code { font: 700 30px/1 var(--font-mono); letter-spacing: 0.08em; color: var(--ink); }
 .settings__follow small { color: var(--ink-dim); font: 400 13px/1.35 var(--font-body); }
+a.settings__tool { text-decoration: none; }
