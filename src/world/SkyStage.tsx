@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { Html, Line } from '@react-three/drei';
+import { Line } from '@react-three/drei';
+import { ReadyHtml as Html } from './ReadyHtml';
 import { ASSETS, project } from '../content/geo';
 import { useUiStore } from '../engine/ui';
 import { useSceneStore } from '../engine/store';
@@ -76,7 +77,9 @@ const ACT_MS = 12000;
 function useActClock(act: SkyAct | null) {
   const start = useRef(performance.now());
   const last = useRef(0);
-  const [t, setT] = useState(0);
+  // the clock remembers which act it belongs to: on the render where the act changes it reads 0, not the old act's last time (the
+  // old way showed the new page at its end state for one frame, a flash)
+  const [clock, setClock] = useState<{ act: SkyAct | null; t: number }>({ act, t: 0 });
   // Lab 1's 4a and 4b play after the camera has arrived (a click from the bridge flies for about 3 s first); the older acts keep
   // their clock from the page change
   const settled = useSceneStore((s) => s.settled);
@@ -85,7 +88,7 @@ function useActClock(act: SkyAct | null) {
   useEffect(() => {
     start.current = performance.now();
     last.current = 0;
-    setT(0);
+    setClock({ act, t: 0 });
   }, [act, running]);
   useFrame(() => {
     if (!running) return;
@@ -93,9 +96,9 @@ function useActClock(act: SkyAct | null) {
     const elapsed = now - start.current;
     if (elapsed > ACT_MS + 100 || now - last.current < 33) return;
     last.current = now;
-    setT(Math.min(elapsed, ACT_MS + 100));
+    setClock({ act, t: Math.min(elapsed, ACT_MS + 100) });
   });
-  return t;
+  return clock.act === act ? clock.t : 0;
 }
 
 export function SkyStage({ act }: { act: SkyAct | null }) {

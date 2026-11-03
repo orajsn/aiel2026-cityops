@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { WidePanel } from '../WidePanel';
 import { Avatar, CARD, Clip, Chip, DbIcon, DIM, Flow, FlowDown, GREY, HandsOn, MONO, PdfIcon, SOFT, Shield, Spark, SteelPhoto, Switch, TEAL, TEAL_D, TINT, cap, capTeal, card, fade, fadeUp, mono, Fill } from './parts';
@@ -185,20 +186,54 @@ export const SWITCHES = [
 
 const tag = (bold = false): CSSProperties => ({ padding: '4px 10px', borderRadius: 6, background: CARD, fontSize: 15, fontWeight: bold ? 700 : 600, color: bold ? TEAL_D : 'var(--ink)', whiteSpace: 'nowrap' });
 
+/**
+ * What the recording shows, in its own time (seconds into the trimmed video): the photo test, the supplier recommendation, the
+ * guardrail challenge. The page lights the matching switch and prompt while that part plays (owner, 3 Nov: they were not in step).
+ */
+export const APP_SEGMENTS: { id: 'photo' | 'supplier' | 'guardrail'; from: number; to: number; switchHo: number; prompt?: string }[] = [
+  { id: 'photo', from: 0, to: 8.4, switchHo: 4 },
+  { id: 'supplier', from: 8.4, to: 11.4, switchHo: 2, prompt: 'Supplier recommendation' },
+  { id: 'guardrail', from: 11.4, to: 99, switchHo: 5, prompt: 'Guardrail challenge' },
+];
+
 export function L1App({ kicker, message, notebook }: Lab1Props) {
+  const video = useRef<HTMLVideoElement>(null);
+  const [seg, setSeg] = useState<(typeof APP_SEGMENTS)[number] | null>(APP_SEGMENTS[0]);
+  const [fade, setFade] = useState(1);
+  // follow the video's own clock; fade out and back in at the loop so the cut from the last frame to the first does not blink
+  useEffect(() => {
+    const v = video.current;
+    if (!v) return;
+    let looping = false;
+    const id = window.setInterval(() => {
+      const t = v.currentTime;
+      setSeg(APP_SEGMENTS.find((x) => t >= x.from && t < x.to) ?? null);
+      if (!looping && v.duration && v.duration - t < 0.35) {
+        looping = true;
+        setFade(0);
+        window.setTimeout(() => {
+          v.currentTime = 0;
+          void v.play().catch(() => undefined);
+          setFade(1);
+          looping = false;
+        }, 380);
+      }
+    }, 100);
+    return () => window.clearInterval(id);
+  }, []);
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-app" kickerColor="var(--teal)">
       <Fill>
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.12fr) minmax(0, 1fr)', gap: 24, marginTop: 8, flex: 1, alignItems: 'start' }}>
         {/* the real app, as the participants will see it (owner's screen recording, 2 Nov) */}
-        <motion.div data-window="app" {...fadeUp(0.2)} style={{ borderRadius: 12, border: '2px solid var(--line)', overflow: 'hidden', background: CARD }}>
+        <motion.div data-window="app" data-segment={seg?.id} {...fadeUp(0.2)} style={{ borderRadius: 12, border: '2px solid var(--line)', overflow: 'hidden', background: CARD }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px', background: 'rgba(138,151,163,0.18)' }}>
             {[0, 1, 2].map((i) => (
               <i key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: GREY, opacity: 0.6 }} />
             ))}
             <span style={{ marginLeft: 14, padding: '3px 12px', borderRadius: 6, background: CARD, ...mono(13, 'var(--ink)') }}>http://&lt;application-url&gt;:8080/</span>
           </div>
-          <video data-app-video src={seerAppVideo} poster={seerAppPoster} autoPlay muted loop playsInline preload="auto" style={{ display: 'block', width: '100%', height: 'auto', aspectRatio: '1288 / 1106', background: '#fff' }} />
+          <video ref={video} data-app-video src={seerAppVideo} poster={seerAppPoster} autoPlay muted playsInline preload="auto" style={{ display: 'block', width: '100%', height: 'auto', aspectRatio: '1288 / 1106', background: '#fff', opacity: fade, transition: 'opacity 350ms ease' }} />
         </motion.div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
@@ -226,28 +261,29 @@ export function L1App({ kicker, message, notebook }: Lab1Props) {
               <span style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink)' }}>Runtime configuration</span>
               <span style={{ fontSize: 15, color: DIM }}>one switch per hands-on step</span>
             </div>
-            {SWITCHES.map((s, i) => (
-              <motion.div
-                key={s.name}
-                data-config-switch={s.ho}
-                initial={{ backgroundColor: 'rgba(27,138,156,0)' }}
-                animate={{ backgroundColor: ['rgba(27,138,156,0)', 'rgba(27,138,156,0.12)', 'rgba(27,138,156,0)'] }}
-                transition={{ delay: 2 + i * 1.6, duration: 1.6, repeat: Infinity, repeatDelay: SWITCHES.length * 1.6 - 1.6 + 2, ease: 'easeInOut' }}
-                style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '11px 6px', borderBottom: '1px solid var(--line)' }}
-              >
-                <Switch on delay={1.2 + i * 0.6} w={50} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 21, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.15 }}>{s.name}</div>
-                  <div style={{ fontSize: 16, color: DIM }}>{s.sub}</div>
+            {SWITCHES.map((sw, i) => {
+              const lit = seg?.switchHo === sw.ho;
+              return (
+                <div
+                  key={sw.name}
+                  data-config-switch={sw.ho}
+                  data-lit={lit || undefined}
+                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '11px 6px', borderBottom: '1px solid var(--line)', background: lit ? 'rgba(27,138,156,0.16)' : 'transparent', boxShadow: lit ? 'inset 4px 0 0 var(--teal)' : 'none', transition: 'background 400ms, box-shadow 400ms' }}
+                >
+                  <Switch on delay={0.3 + i * 0.15} w={50} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 21, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.15 }}>{sw.name}</div>
+                    <div style={{ fontSize: 16, color: DIM }}>{sw.sub}</div>
+                  </div>
+                  <HandsOn n={sw.ho} solid />
                 </div>
-                <HandsOn n={s.ho} solid />
-              </motion.div>
-            ))}
+              );
+            })}
           </div>
           <div data-try style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 16, fontWeight: 600, color: DIM }}>Try a prompt</span>
             {TRY_A_PROMPT.map((t, i) => (
-              <span key={t} data-prompt={t} style={{ padding: '7px 14px', borderRadius: 6, border: `1.5px solid ${i === 2 ? 'var(--red)' : 'var(--line)'}`, color: i === 2 ? 'var(--red)' : 'var(--ink)', fontSize: 16, fontWeight: 600 }}>
+              <span key={t} data-prompt={t} data-lit={seg?.prompt === t || undefined} style={{ padding: '7px 14px', borderRadius: 6, border: `1.5px solid ${i === 2 ? 'var(--red)' : seg?.prompt === t ? 'var(--teal)' : 'var(--line)'}`, background: seg?.prompt === t ? 'rgba(27,138,156,0.16)' : 'transparent', color: i === 2 ? 'var(--red)' : 'var(--ink)', fontSize: 16, fontWeight: 600, transition: 'background 400ms, border-color 400ms' }}>
                 {t}
               </span>
             ))}

@@ -1,4 +1,4 @@
-import { Html } from '@react-three/drei';
+import { ReadyHtml as Html } from './ReadyHtml';
 import type { Asset } from '../content/geo';
 
 export function PinCardBody({ asset }: { asset: Asset }) {

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Html, Line } from '@react-three/drei';
+import { Line } from '@react-three/drei';
+import { ReadyHtml as Html } from './ReadyHtml';
 import { DataShape, Label, type DataKind } from './DataShapes';
 import { screenPoint } from './frame';
 import { fitShapeIn } from './answerBoard';

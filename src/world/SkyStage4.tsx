@@ -1,6 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react';
 import * as THREE from 'three';
-import { Billboard, Html, Line } from '@react-three/drei';
+import { Billboard, Line } from '@react-three/drei';
+import { ReadyHtml as Html } from './ReadyHtml';
 import { layoutCloud, nearestK } from './vectorLayout';
 import { NeuralNet } from './NeuralNet';
 import { ReferenceFolder } from './ReferenceFolder';

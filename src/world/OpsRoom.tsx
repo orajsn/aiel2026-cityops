@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { Html, Line, useGLTF } from '@react-three/drei';
+import { Line, useGLTF } from '@react-three/drei';
+import { ReadyHtml as Html } from './ReadyHtml';
 import { ASSETS, assetPosition, project } from '../content/geo';
 import riverJson from '../content/river.json';
 import { Person, type Who } from './Person';

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
+import { ReadyHtml as Html } from './ReadyHtml';
 import { ASSETS, project, type Asset, type AssetType } from '../content/geo';
 import { TYPE_ORDER } from './pinColors';
 import { useUiStore } from '../engine/ui';

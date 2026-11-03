@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { Html, Line } from '@react-three/drei';
+import { Line } from '@react-three/drei';
+import { ReadyHtml as Html } from './ReadyHtml';
 import { useUiStore } from '../engine/ui';
 import { ASSETS } from '../content/geo';
 import { PinCardBody } from './PinCard';

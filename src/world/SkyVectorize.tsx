@@ -1,4 +1,4 @@
-import { Html } from '@react-three/drei';
+import { ReadyHtml as Html } from './ReadyHtml';
 import type { ReactNode } from 'react';
 import { useThree } from '@react-three/fiber';
 import { DB } from './skyPlaces';
