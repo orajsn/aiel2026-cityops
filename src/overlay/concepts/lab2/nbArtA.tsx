@@ -123,6 +123,50 @@ function NearMap() {
   );
 }
 
+/**
+ * 2.2d · similar meaning, different words (owner, 3 Nov, handoff page 13): the query, the five documents the search returns (ticked), and
+ * one it leaves out. An illustration to teach with, not a real search result: there are no scores.
+ */
+function SimilarMeaning() {
+  const picked = ['rust on bridge supports', 'bearing inspection report', 'corroded steel bearing', 'bridge repair record', 'support maintenance note'];
+  const doc = (color: string) => (
+    <svg width="26" height="30" viewBox="0 0 26 30" fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true" style={{ flex: 'none' }}>
+      <path d="M4 2h12l7 7v19H4z" />
+      <path d="M16 2v7h7M8 15h10M8 20h10M8 25h6" />
+    </svg>
+  );
+  const row = { display: 'flex', alignItems: 'center', gap: 12, padding: '0 14px', height: 44, borderRadius: 10, fontSize: 21, fontWeight: 600 as const, color: 'var(--ink)' };
+  return (
+    <div data-art="similar-meaning" style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8 }}>
+      <div style={{ fontSize: 24, fontWeight: 700, color: TEAL, lineHeight: 1.2, marginBottom: 2 }}>Similar meaning, different words</div>
+      <div data-query style={{ ...row, height: 54, background: 'rgba(27,138,156,0.16)', border: '2.5px solid var(--teal)', fontSize: 23 }}>
+        {doc('var(--teal)')}
+        bridge bearing corrosion
+      </div>
+      <svg width="100%" height="26" viewBox="0 0 40 26" preserveAspectRatio="xMidYMid meet" aria-hidden="true" style={{ display: 'block' }}>
+        <path d="M20 2v17M12 13l8 9 8-9" fill="none" stroke="var(--teal)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      {picked.map((d, i) => (
+        <motion.div key={d} data-picked={i + 1} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 + i * 0.12, duration: 0.35, ease: EASE }} style={{ ...row, background: 'var(--panel-strong)', border: '2px solid var(--teal)' }}>
+          {doc('var(--teal)')}
+          <span style={{ flex: 1, minWidth: 0 }}>{d}</span>
+          <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true" style={{ flex: 'none' }}>
+            <circle cx="15" cy="15" r="14" fill="var(--teal)" />
+            <path d="M8.5 15.5l4.5 4.5 8.5-9.5" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </motion.div>
+      ))}
+      <motion.div data-left-out initial={{ opacity: 0 }} animate={{ opacity: 0.7 }} transition={{ delay: 1, duration: 0.4 }} style={{ ...row, marginTop: 4, background: 'rgba(138,145,156,0.16)', border: '2px solid rgba(138,145,156,0.5)', color: 'var(--ink-dim)' }}>
+        {doc('#8a919c')}
+        <span style={{ flex: 1, minWidth: 0 }}>office lunch menu</span>
+        <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true" style={{ flex: 'none' }}>
+          <path d="M5 5l16 16M21 5L5 21" stroke="#8a919c" strokeWidth="3.4" strokeLinecap="round" />
+        </svg>
+      </motion.div>
+    </div>
+  );
+}
+
 /** 2.3 · an open-book exam: the answer comes from the book on the desk; the book's words are material, not orders */
 function OpenBook() {
   return (
@@ -218,8 +262,8 @@ export const NB_ART_A: Record<string, { art: ReactNode; caption: ReactNode }> = 
     caption: <>Like a librarian stamping a <b>numeric label</b> on your question card, the database turns the question into <b>384 numbers</b>.</>,
   },
   '2.2d': {
-    art: <NearMap />,
-    caption: <>Like pins on a map, the five folders <b>closest in meaning</b> to the question come back, even two from other bridges.</>,
+    art: <SimilarMeaning />,
+    caption: <>Illustrative ranking: return the five <b>closest meanings</b>, even when wording differs.</>,
   },
   '2.3': {
     art: <OpenBook />,

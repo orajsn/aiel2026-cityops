@@ -127,7 +127,22 @@ export function NotebookPage({ id, kicker, message, step, notebook, everyday }: 
                         style={{ padding: on ? '12px 16px' : '2px 0', margin: on ? '-12px -16px 0' : 0, borderRadius: 14, border: on ? '2.5px solid var(--teal)' : '2.5px solid transparent', background: on ? 'rgba(27,138,156,0.12)' : 'transparent' }}
                       >
                         <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.25 }}>{s.label}</div>
-                        <div style={{ fontSize: 22, color: on ? 'var(--ink)' : 'var(--ink-dim)', lineHeight: 1.4, marginTop: 8 }}><Rich text={s.say} /></div>
+                        {s.example ? (
+                          <div data-example style={{ fontSize: 22, color: on ? 'var(--ink)' : 'var(--ink-dim)', lineHeight: 1.35, marginTop: 8 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true" style={{ flex: 'none' }}>
+                                <path d="M13 3L24 22H2z" />
+                                <path d="M13 10v6M13 19v.5" />
+                              </svg>
+                              <span style={{ fontWeight: 600 }}>{s.example.lead}</span>
+                            </div>
+                            <div lang="th" data-injection style={{ fontSize: 28, fontWeight: 700, color: TEAL, margin: '4px 0 4px 36px', fontFamily: 'var(--font-thai, "Noto Sans Thai", Inter, sans-serif)' }}>{s.example.quote}</div>
+                            <div style={{ fontWeight: 700 }}>{s.example.then}</div>
+                            <div style={{ fontSize: 20, marginTop: 2, color: on ? 'var(--ink)' : 'var(--ink-dim)' }}>{s.example.note}</div>
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: 22, color: on ? 'var(--ink)' : 'var(--ink-dim)', lineHeight: 1.4, marginTop: 8 }}><Rich text={s.say} /></div>
+                        )}
                       </motion.div>
                     </div>
                   </div>
