@@ -42,6 +42,23 @@ test('a session has a 6-digit code; only the presenter token can move the page; 
   expect((await fetch(`${base}api/s/${code}`)).status).toBe(404);
 });
 
+test('a session ends by itself when the presenter goes quiet, and its phones are told; an open phone does not keep it alive', async () => {
+  const quiet = spawn(process.execPath, ['follow/server.mjs'], { env: { ...process.env, FOLLOW_PORT: String(PORT + 1), FOLLOW_BASE: '/f/', FOLLOW_IDLE_MS: '600', FOLLOW_SWEEP_MS: '200' }, stdio: 'ignore' });
+  try {
+    const q = `http://127.0.0.1:${PORT + 1}/f/`;
+    for (let i = 0; i < 50; i++) { try { await fetch(q + 'api/s/000000'); break; } catch { await new Promise((r) => setTimeout(r, 100)); } }
+    const { code } = await (await fetch(q + 'api/create', { method: 'POST' })).json();
+    const feed = await fetch(`${q}api/s/${code}/events`);
+    const reader = feed.body!.getReader();
+    let seen = '';
+    for (let i = 0; i < 20 && !seen.includes('event: end'); i++) seen += new TextDecoder().decode((await reader.read()).value ?? new Uint8Array());
+    expect(seen).toContain('event: end');
+    expect((await fetch(`${q}api/s/${code}`)).status).toBe(404);
+  } finally {
+    quiet.kill();
+  }
+});
+
 test('the phone page and its scripts are served, and nothing outside the public folder is', async () => {
   expect((await fetch(base)).status).toBe(200);
   expect((await fetch(base + 'scripts.json')).status).toBe(200);
