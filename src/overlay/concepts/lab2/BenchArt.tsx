@@ -11,111 +11,130 @@ import { CARD, ChiefInspector, DIM, Db, INK, MONO, Net, Num, TEAL, TEAL_D, TINT,
  * 0.5a · Check the site first: the readiness probe's 25 checks tick one by one while a gauge counts them up.
  */
 
-const T = 'var(--teal)';
 const G = '#8a97a3';
 
-/* ---------------- 0.5 · the bench ---------------- */
+/* ---------------- 0.5 · the workbench ---------------- */
 
-/** the clipboard of settings: the one configuration cell, as lines on a clipboard */
-function Clipboard() {
-  const lines = [
-    ['DB_USER', '"prism"'],
-    ['ONNX_MODEL', '"ALL_MINILM_L12_V2"'],
-    ['THREAD_ID', '"prism-agent-demo-001"'],
-    ['ACTIVE_SCENARIO', 'SCENARIOS[0]'],
-    ['DEMO_ASSET', 'Harbor Bridge'],
-  ];
-  return (
-    <div style={{ position: 'relative', width: 390, padding: '34px 18px 16px', borderRadius: 12, background: CARD, border: `3px solid ${TEAL}`, boxShadow: '0 6px 16px rgba(0,0,0,0.12)', display: 'flex', flexDirection: 'column', gap: 9 }}>
-      <span style={{ position: 'absolute', left: '50%', top: -14, transform: 'translateX(-50%)', width: 110, height: 30, borderRadius: 8, background: TEAL }} />
-      {lines.map(([k, v], i) => (
-        <motion.div key={k} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.6 + i * 0.18, duration: 0.3 }} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, fontFamily: MONO, fontSize: 15, borderBottom: '1.5px dashed rgba(127,127,127,0.3)', paddingBottom: 6 }}>
-          <span style={{ color: DIM }}>{k}</span>
-          <span style={{ color: k === 'DEMO_ASSET' ? TEAL_D : INK, fontWeight: k === 'DEMO_ASSET' ? 700 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v}</span>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
+const T = 'var(--teal)';
 
-/** the records room: a big database cylinder with filing drawers on its front */
-function RecordsRoom() {
-  return (
-    <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingRight: 30 }}>
-      <Db size={220} />
-      <svg width={84} height={84} viewBox="0 0 84 84" aria-hidden style={{ position: 'absolute', right: 0, bottom: 8 }}>
-        <circle cx="42" cy="42" r="38" fill={CARD} stroke={T} strokeWidth={3} />
-        {/* the embedding model that lives inside the database: a small net */}
-        <g transform="translate(14 22) scale(0.52)">
-          {[[10, 30], [10, 60], [55, 15], [55, 45], [55, 75], [100, 30], [100, 60]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="8" fill={TINT} stroke={T} strokeWidth="4" />)}
-          <path d="M18 30l29-15M18 30l29 15M18 60l29-15M18 60l29 15M63 15l29 15M63 45l29-15M63 45l29 15M63 75l29-15" stroke={T} strokeWidth="2.5" opacity="0.6" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-/** the engineer on call: the grey engineer with the language model working beside it */
-function OnCall() {
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6 }}>
-      <ChiefInspector size={170} grey label="the language model" />
-      <div style={{ marginBottom: 20, padding: '10px 12px', borderRadius: 14, background: CARD, border: `2px solid ${TEAL}` }}>
-        <Net w={110} live />
-      </div>
-    </div>
-  );
-}
-
-const BENCH: { n: number; pic: string; title: string; art: ReactNode; lines: string[]; code: string }[] = [
-  { n: 1, pic: 'The records room', title: 'Oracle AI Database 26ai', art: <RecordsRoom />, lines: ['the PRISM data', 'and the embedding model inside it'], code: 'Oracle AI Database 26ai Free Release 23.26.2.0.0' },
-  { n: 2, pic: 'The engineer on call', title: 'The language model', art: <OnCall />, lines: ['a 3B model, chosen for small size', 'a GPU or hosted model is faster'], code: 'Reply: ’READY’' },
-  { n: 3, pic: 'The clipboard of settings', title: 'Jupyter notebook', art: <Clipboard />, lines: ['all settings in one cell', 'active case: Harbor Bridge'], code: 'THREAD_ID = "prism-agent-demo-001"' },
+/**
+ * 0.5 · The workbench (owner, 3 Nov, handoff page 6): the database with its embedding model | the Jupyter notebook that runs it all, with
+ * its settings | the language model. Three labelled arrows say what travels: the query, the retrieved context, the prompt with context.
+ * The embedding model sits inside the database; the language model is a different thing that only writes the answer.
+ */
+const SETTINGS: [string, string][] = [
+  ['DB_USER', 'prism'],
+  ['ONNX_MODEL', 'ALL_MINILM_L12_V2'],
+  ['THREAD_ID', 'prism-agent-demo-001'],
+  ['DEMO_ASSET', 'Harbor Bridge'],
 ];
 
-/** when each object is set on the bench */
-const putAt = (i: number) => 0.8 + i * 0.7;
+/** a labelled arrow between two cards: `dir` is where it points */
+function Flow({ dir, label, sub, delay }: { dir: 'left' | 'right'; label: string; sub?: string; delay: number }) {
+  return (
+    <motion.div data-flow={label} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay, duration: 0.5 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+      <div style={{ fontSize: 20, fontWeight: 700, color: INK, lineHeight: 1.15 }}>{label}</div>
+      {sub && <div style={{ fontSize: 17, color: DIM, lineHeight: 1.15 }}>{sub}</div>}
+      <svg width="130" height="26" viewBox="0 0 130 26" aria-hidden="true" style={{ display: 'block' }}>
+        <path d={dir === 'right' ? 'M4 13H118' : 'M126 13H12'} stroke={TEAL} strokeWidth="5" strokeLinecap="round" />
+        <path d={dir === 'right' ? 'M104 3l20 10-20 10z' : 'M26 3L6 13l20 10z'} fill={TEAL} />
+      </svg>
+    </motion.div>
+  );
+}
+
+const roleCap = (text: string, dark = false) => (
+  <span style={{ alignSelf: 'center', padding: '6px 20px', borderRadius: 999, background: dark ? TEAL : TINT2_, color: dark ? '#fff' : INK, fontSize: 16, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', textAlign: 'center', maxWidth: '100%' }}>{text}</span>
+);
+const TINT2_ = 'rgba(27, 138, 156, 0.18)';
 
 export function Bench({ focusN }: { focusN: number | null }) {
+  const on = (n: number) => focusN === null || focusN === n;
+  const card = (n: number): React.CSSProperties => ({ borderRadius: 22, border: `3px solid ${TEAL}`, background: 'rgba(27,138,156,0.07)', opacity: on(n) ? 1 : 0.4, transition: 'opacity 300ms' });
   return (
-    <Fill gap={14}>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1, duration: 0.5 }} style={{ flex: 'none', fontSize: 24, color: DIM, lineHeight: 1.35 }}>
-        Like a site office before the shift: <b style={{ color: INK }}>the records, the engineer on call, one clipboard</b>.
-      </motion.div>
-      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gridTemplateRows: 'minmax(250px, 1fr) auto auto', columnGap: 24 }}>
-        {BENCH.map((b, i) => {
-          const on = focusN === null || focusN === b.n;
-          return (
-            <motion.div key={b.n} data-bench={b.n} initial={{ opacity: 0, y: -40 }} animate={{ opacity: on ? 1 : 0.35, y: 0 }} transition={{ delay: putAt(i), duration: 0.6, ease: EASE }} style={{ gridColumn: i + 1, gridRow: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 2 }}>
-              {b.art}
-            </motion.div>
-          );
-        })}
-        {/* the bench: a long top and two legs, under all three */}
-        <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 0.3, duration: 0.7, ease: EASE }} style={{ gridColumn: '1 / 4', gridRow: 2, transformOrigin: 'left center', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ height: 20, borderRadius: '8px 8px 2px 2px', background: '#7f8a95' }} />
-          <div style={{ height: 8, background: '#5c6b78' }} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 60px' }}>
-            <div style={{ width: 20, height: 26, background: '#5c6b78' }} />
-            <div style={{ width: 20, height: 26, background: '#5c6b78' }} />
+    <Fill gap={18}>
+      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1.12fr) 150px minmax(0, 1.8fr) 150px minmax(0, 1fr)', alignItems: 'center', columnGap: 6 }}>
+        {/* 1 · the database, with the embedding model inside it */}
+        <motion.div data-bench={1} initial={{ opacity: 0, y: 14 }} animate={{ opacity: on(1) ? 1 : 0.4, y: 0 }} transition={{ delay: 0.2, duration: 0.5, ease: EASE }} style={{ ...card(1), padding: '20px 18px 18px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+          <div style={{ position: 'relative', paddingRight: 36 }}>
+            <Db size={150} />
+            <svg width={64} height={64} viewBox="0 0 84 84" aria-hidden style={{ position: 'absolute', right: -6, bottom: 0 }}>
+              <circle cx="42" cy="42" r="38" fill={CARD} stroke={T} strokeWidth={3} />
+              <g transform="translate(14 22) scale(0.52)">
+                {[[10, 30], [10, 60], [55, 15], [55, 45], [55, 75], [100, 30], [100, 60]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="8" fill={TINT} stroke={T} strokeWidth="4" />)}
+                <path d="M18 30l29-15M18 30l29 15M18 60l29-15M18 60l29 15M63 15l29 15M63 45l29-15M63 45l29 15M63 75l29-15" stroke={T} strokeWidth="2.5" opacity="0.6" />
+              </g>
+            </svg>
+          </div>
+          <div style={{ fontSize: 30, fontWeight: 700, color: INK, textAlign: 'center', lineHeight: 1.15 }}>Oracle AI Database 26ai</div>
+          <div style={{ alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 14, background: CARD, border: `2px solid ${TEAL}` }}>
+            <Net w={64} />
+            <div>
+              <div style={{ fontSize: 23, fontWeight: 700, color: TEAL_D }}>Embedding model</div>
+              <div style={{ fontSize: 19, color: DIM, lineHeight: 1.2 }}>PRISM data + embedding model</div>
+            </div>
           </div>
         </motion.div>
-        {BENCH.map((b, i) => {
-          const on = focusN === null || focusN === b.n;
-          return (
-            <motion.div key={b.n} initial={{ opacity: 0 }} animate={{ opacity: on ? 1 : 0.35 }} transition={{ delay: putAt(i) + 0.4, duration: 0.5 }} style={{ gridColumn: i + 1, gridRow: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 4, paddingTop: 6 }}>
-              <div style={{ ...cap, fontSize: 17, color: TEAL_D }}>{b.pic}</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Num n={b.n} size={36} on={on} />
-                <span style={{ fontSize: 28, fontWeight: 700, color: INK }}>{b.title}</span>
-              </div>
-              {b.lines.map((l) => (
-                <div key={l} style={{ fontSize: 22, color: DIM, lineHeight: 1.3 }}>{l}</div>
+        {/* the two arrows between the database and the notebook */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 40, alignItems: 'center', justifyContent: 'center' }}>
+          <Flow dir="left" label="Query" sub="(SQL + similarity)" delay={1.2} />
+          <Flow dir="right" label="Context" sub="(retrieved records)" delay={1.6} />
+        </div>
+        {/* 2 · the notebook: the orchestration hub, with the settings */}
+        <motion.div data-bench={3} initial={{ opacity: 0, y: 14 }} animate={{ opacity: on(3) ? 1 : 0.4, y: 0 }} transition={{ delay: 0.5, duration: 0.5, ease: EASE }} style={{ ...card(3), background: CARD, overflow: 'hidden' }}>
+          <div style={{ background: TEAL, color: '#fff', padding: '14px 22px', display: 'flex', alignItems: 'center', gap: 18 }}>
+            <svg width="74" height="62" viewBox="0 0 74 62" aria-hidden="true" style={{ flex: 'none' }}>
+              <circle cx="37" cy="31" r="18" fill="none" stroke="#fff" strokeWidth="3" strokeDasharray="70 30" />
+              <circle cx="12" cy="10" r="4" fill="#fff" />
+              <circle cx="62" cy="52" r="4" fill="#fff" />
+              <circle cx="64" cy="12" r="2.6" fill="#fff" />
+            </svg>
+            <div>
+              <div style={{ fontSize: 31, fontWeight: 700, lineHeight: 1.1 }}>Jupyter notebook</div>
+              <div style={{ fontSize: 24, opacity: 0.92 }}>Orchestration hub</div>
+            </div>
+          </div>
+          <div style={{ padding: '14px 22px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ padding: '8px 14px', borderRadius: 10, background: 'rgba(27,138,156,0.16)', color: TEAL_D, fontSize: 24, fontWeight: 600, textAlign: 'center' }}>Configuration + SQL + Python</div>
+            <div data-settings style={{ border: '1.5px solid var(--line)', borderRadius: 10, overflow: 'hidden' }}>
+              <div style={{ padding: '6px 14px', background: 'rgba(27,138,156,0.12)', fontSize: 20, fontWeight: 700, color: INK }}>Settings</div>
+              {SETTINGS.map(([k, v], i) => (
+                <motion.div key={k} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 + i * 0.2, duration: 0.3 }} style={{ display: 'grid', gridTemplateColumns: '150px 24px 1fr', alignItems: 'center', padding: '6px 14px', borderTop: '1px solid var(--line)', fontFamily: MONO, fontSize: 20, whiteSpace: 'nowrap' }}>
+                  <span style={{ color: INK }}>{k}</span>
+                  <span style={{ color: DIM }}>=</span>
+                  <span style={{ color: TEAL_D, fontWeight: 700 }}>{v}</span>
+                </motion.div>
               ))}
-              <div style={{ fontFamily: MONO, fontSize: 15, color: TEAL_D, marginTop: 4, whiteSpace: 'nowrap' }}>{b.code}</div>
-            </motion.div>
-          );
-        })}
+            </div>
+          </div>
+        </motion.div>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Flow dir="right" label="Prompt +" sub="context" delay={2.1} />
+        </div>
+        {/* 3 · the language model, a different thing from the embedding model: it only writes the answer */}
+        <motion.div data-bench={2} initial={{ opacity: 0, y: 14 }} animate={{ opacity: on(2) ? 1 : 0.4, y: 0 }} transition={{ delay: 0.8, duration: 0.5, ease: EASE }} style={{ ...card(2), padding: '20px 18px 18px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6 }}>
+            <ChiefInspector size={140} grey label="the language model" />
+            <div style={{ marginBottom: 14, padding: '8px 10px', borderRadius: 12, background: CARD, border: `2px solid ${TEAL}` }}>
+              <Net w={78} live />
+            </div>
+          </div>
+          <div style={{ fontSize: 30, fontWeight: 700, color: INK, textAlign: 'center', lineHeight: 1.15 }}>Language model</div>
+          <div style={{ fontSize: 22, color: DIM, textAlign: 'center', lineHeight: 1.25 }}>A local 3B model<br />for this lab</div>
+        </motion.div>
+      </div>
+      {/* what each one does */}
+      <div style={{ flex: 'none', display: 'grid', gridTemplateColumns: 'minmax(0, 1.12fr) 150px minmax(0, 1.8fr) 150px minmax(0, 1fr)', columnGap: 6 }}>
+        {[
+          { c: 1, cap: 'Database (with embedding model)', dark: false, text: 'Stores PRISM data and the embedding model (vector search)' },
+          { c: 3, cap: 'Jupyter notebook (orchestration)', dark: true, text: 'Runs the workflow: query data, retrieve context, and call the language model' },
+          { c: 5, cap: 'Language model', dark: false, text: 'Generates the response from the provided context' },
+        ].map((r) => (
+          <motion.div key={r.c} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.4, duration: 0.5 }} style={{ gridColumn: r.c, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {roleCap(r.cap, r.dark)}
+            <div style={{ fontSize: 22, color: INK, textAlign: 'center', lineHeight: 1.3 }}>{r.text}</div>
+          </motion.div>
+        ))}
       </div>
     </Fill>
   );
