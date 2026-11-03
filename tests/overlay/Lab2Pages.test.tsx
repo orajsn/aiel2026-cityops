@@ -1,11 +1,11 @@
 import { act, render } from '@testing-library/react';
-import { chapter1 } from '../../src/scenes/chapter1';
+import { LAB2_ALL as chapter1 } from '../../src/scenes/chapter1';
 import { OVERLAYS } from '../../src/overlay/registry';
 import { LAB2_FOCUS } from '../../src/content/lab2Focus';
 import { NB_PAGES } from '../../src/content/lab2Notebook';
 import { useDrawerStore } from '../../src/engine/presentation';
 
-/** Lab 2's own pages (the recap is another panel's) */
+/** Lab 2's own pages, the hidden ones too (their code stays while they are out of the selected deck; the recap is another panel's) */
 const PAGES = chapter1.filter((s) => s.overlay?.startsWith('L2'));
 const renderPage = (id: string) => {
   const s = chapter1.find((x) => x.id === id)!;

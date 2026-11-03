@@ -15,7 +15,8 @@ test('Lab 2 opens on the crack (the deck’s Story), and its old 0.x pages keep 
   const ids = SCENES.map((s) => s.id);
   const first = ids.indexOf('0.4');
   expect(SCENES[first - 1].chapter).not.toBe(1);
-  expect(ids.slice(first, first + 3)).toEqual(['0.4', '0.4a', '0.4b']);
+  // (3 Nov: 0.4b, the route for today, is out of the selected deck, so the Story is two pages and Why follows)
+  expect(ids.slice(first, first + 3)).toEqual(['0.4', '0.4a', '2.0']);
   for (const id of ['0.3', '0.5', '0.6']) expect(chapter1.find((s) => s.id === id)?.chapter).toBe(1);
 });
 
@@ -72,9 +73,12 @@ test('pages are numbered 1, 2, 3 inside each part (Introduction, Lab 2, Lab 3), 
   expect(pageNumber('0.7')).toBe(3);
   expect(pageNumber('0.7c')).toBe(6);
   expect(pageNumber('0.4')).toBe(1);
-  expect(pageNumber('2.1')).toBe(6);
-  expect(pageNumber('0.3')).toBe(10);
-  expect(pageNumber('0.6')).toBe(12);
+  // Lab 2 runs 1 to 42 (the selected deck): the workbench is 6, what the agent can see 8, is the model awake 10
+  expect(pageNumber('2.1a')).toBe(5);
+  expect(pageNumber('0.5')).toBe(6);
+  expect(pageNumber('0.3')).toBe(8);
+  expect(pageNumber('0.6')).toBe(10);
+  expect(pageNumber('2.9')).toBe(42);
   expect(pageNumber('2.9')).toBe(SCENES.filter((s) => s.chapter === 1).length);
 });
 

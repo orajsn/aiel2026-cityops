@@ -217,23 +217,51 @@ const recap: SceneDef = {
   } satisfies RecapProps as unknown as Record<string, unknown>,
 };
 
+/**
+ * The 17 pages the owner's selected deck leaves out (3 Nov, "Lab 2 · Revised selected deck": 59 pages down to 42). They are hidden, not
+ * deleted: their code, scripts and notebook data stay, and taking an id out of this set brings the page back. The git tag
+ * `lab2-59-pages` is the whole 59-page state. The original numbers (the handoff's 03, 06, 14, 15, 21, 22, 26 to 31, 39, 45 to 47, 52):
+ */
+export const LAB2_CUT = new Set([
+  '0.4b', // 03 The route for today
+  '2.1', // 06 A well-read engineer
+  '2.2a', // 14 Not every file
+  '2.2b', // 15 Retrieval quality is everything
+  '2.4', // 21 A question is not a job
+  '2.4a', // 22 A job hides three jobs
+  '2.4e', // 26 A four-station conveyor belt
+  '2.4f', // 27 Station one: rate the severity
+  '2.4g', // 28 Station three: draft the plan
+  '2.4h', // 29 The order lives in the code
+  '2.4i', // 30 When the problem keeps changing
+  '2.4j', // 31 The loop it runs
+  '2.6', // 39 Why one query
+  '2.7b', // 45 Memory needs a lifecycle
+  '2.7c', // 46 Wipe only this lab's notes
+  '2.7d', // 47 Two memories, one connection
+  '2.8', // 52 The key you save under
+]);
+const shown = (pages: SceneDef[]) => pages.filter((p) => !LAB2_CUT.has(p.id));
+
 /** Lab 2's chapters in show order (the jump menu's sections, sections.ts) */
 export const LAB2_CHAPTERS: { name: string; pages: SceneDef[] }[] = [
-  { name: 'Story · one crack', pages: story },
-  { name: 'Why AI needs your data', pages: why },
-  { name: 'The workbench', pages: setup },
-  { name: 'RAG: the filing cabinet', pages: rag },
-  { name: 'Workflow: the fixed checklist', pages: flow },
-  { name: 'Agent: the chief inspector', pages: agent },
-  { name: 'Tools, skills, MCP', pages: tools },
-  { name: 'One query, four lenses', pages: query },
-  { name: 'Build the agent', pages: build },
-  { name: 'Trust: security and observability', pages: trust },
-  { name: 'Wrap-up', pages: wrap },
+  { name: 'Story · one crack', pages: shown(story) },
+  { name: 'Why AI needs your data', pages: shown(why) },
+  { name: 'The workbench', pages: shown(setup) },
+  { name: 'RAG: the filing cabinet', pages: shown(rag) },
+  { name: 'Workflow: the fixed checklist', pages: shown(flow) },
+  { name: 'Agent: the chief inspector', pages: shown(agent) },
+  { name: 'Tools, skills, MCP', pages: shown(tools) },
+  { name: 'One query, four lenses', pages: shown(query) },
+  { name: 'Build the agent', pages: shown(build) },
+  { name: 'Trust: security and observability', pages: shown(trust) },
+  { name: 'Wrap-up', pages: shown(wrap) },
   { name: 'Closing Lab 2', pages: [recap] },
 ];
 
 export const chapter1: SceneDef[] = LAB2_CHAPTERS.flatMap((c) => c.pages);
+/** all 59 pages, hidden ones included (their panels stay tested while they are out of the show) */
+export const LAB2_ALL: SceneDef[] = [...story, ...why, ...setup, ...rag, ...flow, ...agent, ...tools, ...query, ...build, ...trust, ...wrap, recap];
 
 /**
  * The pages of one group (the clicks of one picture) keep one footer height: the picture above never moves or rescales

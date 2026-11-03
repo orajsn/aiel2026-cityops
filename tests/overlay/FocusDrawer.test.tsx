@@ -1,5 +1,6 @@
 import { act, fireEvent, render } from '@testing-library/react';
 import { LAB2_FOCUS } from '../../src/content/lab2Focus';
+import { LAB2_CUT } from '../../src/scenes/chapter1';
 import { LAB2, LAB_STOPS } from '../../src/content/labStops';
 import { JupyterDrawer } from '../../src/overlay/jupyter/JupyterDrawer';
 import { savedOutput, stepLines } from '../../src/overlay/jupyter/FocusDrawer';
@@ -25,7 +26,7 @@ beforeEach(() => {
 test('every focus page is a real page, every step a real code cell, its lines inside the cell, labelled', () => {
   const ids = new Set(SCENES.map((s) => s.id));
   for (const [id, steps] of Object.entries(LAB2_FOCUS)) {
-    expect(ids.has(id), id).toBe(true);
+    expect(ids.has(id) || LAB2_CUT.has(id), id).toBe(true); // a hidden page keeps its data
     steps.forEach((s, i) => {
       expect(LAB2.cells[s.cell]?.type, `${id} step ${i + 1}`).toBe('code');
       for (const [a, b] of s.lines ?? []) {

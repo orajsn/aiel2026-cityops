@@ -1,4 +1,4 @@
-import { chapter1, LAB2_CHAPTERS } from '../../src/scenes/chapter1';
+import { chapter1, LAB2_CHAPTERS, LAB2_CUT } from '../../src/scenes/chapter1';
 import { LAB2_FOCUS } from '../../src/content/lab2Focus';
 import { SECTIONS } from '../../src/scenes/sections';
 import { chapter2 } from '../../src/scenes/chapter2';
@@ -8,17 +8,18 @@ import { WITH_LAB1, lab1 } from '../../src/scenes/lab1';
 import { SHOTS } from '../../src/world/shots';
 import { OVERLAYS } from '../../src/overlay/registry';
 
-// Lab 2 follows the Harbor Bridge deck (owner, 29 Oct): eleven chapters, then the recap
+// Lab 2 follows the Harbor Bridge deck (owner, 29 Oct): eleven chapters, then the recap. 3 Nov: the selected deck leaves out 17 pages
+// (LAB2_CUT in chapter1.ts), so it is 42 pages
 const CH1_BEATS = [
-  '0.4', '0.4a', '0.4b', // Story
-  '2.0', '2.0a', '2.1', '2.1a', // Why
+  '0.4', '0.4a', // Story
+  '2.0', '2.0a', '2.1a', // Why
   '0.5', '0.5a', '0.3', '0.3a', '0.6', // §0 Setup
-  '2.2', '2.2a', '2.2b', '2.2c', '2.2d', '2.3', '2.3a', '2.3b', '2.4', '2.4a', '2.4b', // §1 RAG
-  '2.4c', '2.4d', '2.4e', '2.4f', '2.4g', '2.4h', // §2 Workflow
-  '2.4i', '2.4j', '2.4k', '2.4l', // Agent
+  '2.2', '2.2c', '2.2d', '2.3', '2.3a', '2.3b', '2.4b', // §1 RAG
+  '2.4c', '2.4d', // §2 Workflow
+  '2.4k', '2.4l', // Agent
   '2.5', '2.5a', '2.5b', '2.5c', '2.5d', // §3 Tools
-  '2.6', '2.6a', '2.6b', '2.6c', // §4 Query
-  '2.7', '2.7a', '2.7b', '2.7c', '2.7d', '2.7e', '2.7f', '2.7g', '2.7h', '2.8', // §5 Agent
+  '2.6a', '2.6b', '2.6c', // §4 Query
+  '2.7', '2.7a', '2.7e', '2.7f', '2.7g', '2.7h', // §5 Agent
   '2.8a', '2.8b', '2.8c', '2.8d', '2.8e', // Trust
   '2.8f', // §6 Wrap
   '2.9', // the recap
@@ -52,7 +53,7 @@ test('SCENES runs the parts in show order: Introduction, Lab 1 (when in the show
   expect(SCENES.map((s) => s.id)).toEqual(order);
   // Introduction 7 (the city, then the bridge's four clicks); Lab 2 the deck's 58 pages and the recap
   expect(SCENES.length).toBe(7 + (WITH_LAB1 ? lab1.length : 0) + CH1_BEATS.length + 38);
-  expect(CH1_BEATS).toHaveLength(59);
+  expect(CH1_BEATS).toHaveLength(42);
 });
 
 test('no banned names anywhere in the copy', () => {
@@ -76,7 +77,9 @@ test('Lab 2: the jump menu has the deck’s chapters in order, and one panel per
     expect(new Set(pages.map((p) => p.shot)).size, g).toBe(1);
     expect(new Set(pages.map((p) => p.overlay)).size, g).toBe(1);
     // the steps build in order, 1, 2, 3
-    expect(pages.map((p) => (p.overlayProps as { step: number }).step), g).toEqual(pages.map((_, i) => i + 1));
+    // (a click whose earlier clicks are hidden keeps its own step number, so the picture builds to the same state as the deck's)
+    const steps = pages.map((p) => (p.overlayProps as { step: number }).step);
+    expect(steps, g).toEqual([...steps].sort((a, b) => a - b));
     // in a row in the show
     const at = chapter1.indexOf(pages[0]);
     expect(chapter1.slice(at, at + pages.length), g).toEqual(pages);
@@ -86,7 +89,8 @@ test('Lab 2: the jump menu has the deck’s chapters in order, and one panel per
 test('Lab 2: every page has a takeaway, each chapter ends on a "Next in the notebook" band (but the recap)', () => {
   // 2.6a is the sky stage's own small caption (UnifiedQuery), not a Lab 2 panel
   for (const s of chapter1.filter((x) => x.id !== '2.9' && x.id !== '2.6a')) expect((s.overlayProps as { takeaway?: string }).takeaway?.length, s.id).toBeGreaterThan(20);
-  for (const c of LAB2_CHAPTERS.slice(0, -1)) {
+  // (the Story and Build chapters ended on pages the selected deck leaves out, 0.4b and 2.8: they end without a band now)
+  for (const c of LAB2_CHAPTERS.slice(0, -1).filter((x) => !/^(Story|Build)/.test(x.name))) {
     const last = c.pages[c.pages.length - 1];
     expect((last.overlayProps as { next?: string }).next, last.id).toMatch(/^\S/);
   }
@@ -97,7 +101,7 @@ test('Lab 2: notebook pages name their cells, and each has its focus steps in th
     const nb = (s.overlayProps as { notebook?: string }).notebook;
     if (nb && /cells? \d/.test(nb) && !['2.4e', '2.7g'].includes(s.id)) expect(LAB2_FOCUS[s.id]?.length, s.id).toBeGreaterThan(0);
   }
-  for (const id of Object.keys(LAB2_FOCUS)) expect(chapter1.some((s) => s.id === id), id).toBe(true);
+  for (const id of Object.keys(LAB2_FOCUS)) expect(chapter1.some((s) => s.id === id) || LAB2_CUT.has(id), id).toBe(true);
 });
 
 test('Lab 2: no pier numbers, no model names, no "Ollama" on screen or in the script', async () => {

@@ -45,6 +45,10 @@ A deterministic, offline, click-through 3D web experience for two Oracle LiveLab
 - **If you are a session running on the VM:** you are editing the live site the audience sees, so every saved file shows at once. Commit your own work and `git push origin main`, so the PC gets it on its next sync. Do not run `tools/sync-vm.sh` there (it is for the PC). Page previews (`tools/capture-thumbs.mjs`) need the PC's headless browser.
 - **The PC copy** (`C:\Users\UsEr\claude\cityops-live`, port 5174) is the development copy; its Cloudflare quick tunnel is the old way to share and no longer needed.
 
+## Lab 2 selected deck (owner, 3 Nov)
+
+Lab 2 is 42 pages, not 59: 17 pages are out of the show (`LAB2_CUT` in `src/scenes/chapter1.ts`: 0.4b, 2.1, 2.2a, 2.2b, 2.4, 2.4a, 2.4e to 2.4j, 2.6, 2.7b to 2.7d, 2.8). They are hidden, not deleted: their code, scripts and notebook data stay, `LAB2_ALL` still has them for the tests, and taking an id out of the set brings the page back. The git tag `lab2-59-pages` is the whole 59-page state. Running numbers follow the show order, so they run 1 to 42 by themselves. Next: four pages get new content (original 08, 16, 17, 18; the handoff in the owner's `Lab-2-AI-Handoff.zip`).
+
 ## Lab 2 notebook pages (owner, 30 Oct)
 
 The 18 blue pages of the Harbor Bridge deck (0.6, 2.2c, 2.2d, 2.3, 2.3a, 2.4f-h, 2.5c, 2.5d, 2.6b, 2.6c, 2.7, 2.7c-f, 2.8) use overlay `L2Notebook` (`lab2/NotebookPage.tsx`): everyday picture | numbered steps | only the key notebook lines, with an animated line from the step to its lines. Steps and lines are data in `src/content/lab2Notebook.ts` (`NB_PAGES`); pictures in `nbArtA.tsx`/`nbArtB.tsx`. Step 1 shows at once, each Next lights the next step (`focusStepCount` = steps - 1), and the Jupyter drawer does not open on these pages.

@@ -1,13 +1,13 @@
 import lab2 from '../../src/content/notebooks/lab2_rag_to_agents.json';
 import { LAB2_FOCUS } from '../../src/content/lab2Focus';
-import { chapter1 } from '../../src/scenes/chapter1';
+import { chapter1, LAB2_CUT } from '../../src/scenes/chapter1';
 
 const cells = (lab2 as { cells: { type: string; source: string }[] }).cells;
 const lines = (cell: number) => cells[cell].source.replace(/\n$/, '').split('\n');
 
 test('every focus step points at a real code cell and real lines of it, in the notebook as it is', () => {
   for (const [id, steps] of Object.entries(LAB2_FOCUS)) {
-    expect(chapter1.some((s) => s.id === id), id).toBe(true);
+    expect(chapter1.some((s) => s.id === id) || LAB2_CUT.has(id), id).toBe(true); // a hidden page keeps its data
     for (const s of steps) {
       expect(cells[s.cell]?.type, `${id} cell ${s.cell}`).toBe('code');
       for (const [a, b] of s.lines ?? []) {

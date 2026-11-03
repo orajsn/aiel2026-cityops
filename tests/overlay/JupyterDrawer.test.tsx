@@ -4,7 +4,7 @@ import { highlightPython } from '../../src/overlay/jupyter/highlight';
 import { LAB_STOPS, stopCells, todoLines } from '../../src/content/labStops';
 import { JupyterDrawer } from '../../src/overlay/jupyter/JupyterDrawer';
 import { NotebookMarkdown } from '../../src/overlay/jupyter/NotebookMarkdown';
-import { chapter1 } from '../../src/scenes/chapter1';
+import { chapter1, LAB2_CUT } from '../../src/scenes/chapter1';
 import { chapter2 } from '../../src/scenes/chapter2';
 import { useDrawerStore } from '../../src/engine/presentation';
 
@@ -55,7 +55,7 @@ test('every stop points at real code cells, and each success line is one the cel
 
 test('every stop sits on a real page, and every TODO in the Lab 3 notebook has a stop', () => {
   const ids = new Set([...chapter1, ...chapter2].map((s) => s.id));
-  for (const id of Object.keys(LAB_STOPS)) expect(ids.has(id), id).toBe(true);
+  for (const id of Object.keys(LAB_STOPS)) expect(ids.has(id) || LAB2_CUT.has(id), id).toBe(true); // a hidden page keeps its stop
   const todos = new Set(Object.values(LAB_STOPS).flatMap((s) => s.marks.filter((m) => m.role === 'todo').map((m) => m.todo)));
   expect([...todos].sort()).toEqual([1, 2, 3, 4, 5, 6]);
 });
