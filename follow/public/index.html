@@ -103,7 +103,8 @@ h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
     en: { jt: 'Follow the talk on your phone', jp: "Enter the 6-digit code shown on the presenter's screen.", join: 'Join', live: 'Live', off: 'Reconnecting…', bad: 'That code is not running. Check the screen and try again.', wait: 'Waiting for the presenter…', none: 'No script for this page.', noth: 'No Thai script for this page yet: showing English.', back: (l) => `Presenter is on ${l} · go live`, ended: 'The presenter ended this session.', busy: 'Too many tries. Wait a minute.' },
     th: { jt: 'ติดตามการบรรยายบนมือถือ', jp: 'ใส่รหัส 6 หลักที่แสดงบนหน้าจอของผู้บรรยาย', join: 'เข้าร่วม', live: 'สด', off: 'กำลังเชื่อมต่อใหม่…', bad: 'ไม่พบรหัสนี้ ตรวจสอบบนหน้าจอแล้วลองอีกครั้ง', wait: 'รอผู้บรรยาย…', none: 'หน้านี้ไม่มีสคริปต์', noth: 'หน้านี้ยังไม่มีสคริปต์ภาษาไทย: แสดงภาษาอังกฤษ', back: (l) => `ผู้บรรยายอยู่หน้า ${l} · กลับไปหน้าสด`, ended: 'ผู้บรรยายจบเซสชันแล้ว', busy: 'ลองหลายครั้งเกินไป รอสักครู่' },
   };
-  let lang = store.get('lang') || ((navigator.language || '').startsWith('th') ? 'th' : 'en');
+  // Thai first: the room is Thai (the toggle remembers a change for this visit)
+  let lang = store.get('lang') || 'th';
   let size = Number(store.get('size')) || 20;
   let pages = [], byId = new Map(), order = [];
   let liveId = '', shownId = '', peeking = false, code = '', es = null;
