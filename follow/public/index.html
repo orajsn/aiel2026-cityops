@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b1016">
+<title>Follow the talk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Inter:wght@400;600;700&display=swap">
+<style>
+/* layout: one column made for a phone held in a dim room: a slim top bar, the page title, then the script in large, calm text */
+:root{--bg:#f4f6f7;--ink:#1d2733;--dim:#5a6875;--line:#d5dde2;--teal:#146f7f;--tint:#e3eff1;--card:#fff;--red:#c74634;--ok:#2f8a5b;
+  --font:"Inter","Noto Sans Thai",system-ui,sans-serif;--size:20px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0b1016;--ink:#e9eef2;--dim:#9aa8b5;--line:#243040;--teal:#6cc3d0;--tint:#122a33;--card:#141c26;--ok:#5fc08a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b1016;--ink:#e9eef2;--dim:#9aa8b5;--line:#243040;--teal:#6cc3d0;--tint:#122a33;--card:#141c26;--ok:#5fc08a;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-text-size-adjust:100%;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body[data-lang="th"]{font-family:"Noto Sans Thai","Inter",system-ui,sans-serif}
+[hidden]{display:none!important}
+main{max-width:640px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding-block:max(14px,env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-bottom,0px))}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--teal);outline-offset:3px;border-radius:8px}
+
+/* join */
+.join{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.join h1{font-size:30px;line-height:1.15;margin:0}
+.join p{color:var(--dim);margin:0;line-height:1.5}
+.otp{display:flex;gap:8px}
+.otp input{flex:1;min-width:0;height:64px;text-align:center;font-size:30px;font-weight:700;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-family:inherit}
+.otp input:focus{border-color:var(--teal);outline:none}
+.go{width:100%;height:54px;border-radius:12px;border:0;background:var(--teal);color:#fff;font-weight:700;font-size:18px}
+:root:not([data-theme="light"]) .go{color:#06222a}
+.go[disabled]{opacity:.45}
+.err{color:var(--red);min-height:1.4em;font-size:15px}
+
+/* follow */
+.bar{display:flex;align-items:center;gap:8px;position:sticky;top:0;background:var(--bg);padding-block:6px 10px;z-index:2}
+.live{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ok)}
+.live i{width:9px;height:9px;border-radius:50%;background:currentColor;animation:pulse 1.8s ease-in-out infinite}
+.live.off{color:var(--red)} .live.off i{animation:none}
+@keyframes pulse{50%{opacity:.35}}
+@media (prefers-reduced-motion: reduce){.live i{animation:none}}
+.sp{flex:1}
+.chip{min-width:44px;height:38px;padding:0 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);font-weight:700;font-size:15px}
+.chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+:root:not([data-theme="light"]) .chip[aria-pressed="true"]{color:#06222a}
+.meta{color:var(--teal);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:10px 0 2px}
+.title{display:flex;gap:12px;align-items:baseline;margin:0 0 14px}
+.num{background:var(--teal);color:#fff;font-weight:700;border-radius:8px;padding:0 10px;font-size:18px;line-height:1.5}
+:root:not([data-theme="light"]) .num{color:#06222a}
+h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
+.script{font-size:var(--size);line-height:1.7;flex:1}
+.script p{margin:0 0 1em}
+.note{color:var(--dim);font-size:14px;margin:0 0 10px}
+.empty{color:var(--dim)}
+.peek{position:sticky;bottom:0;background:var(--bg);padding-top:10px;display:flex;gap:8px;align-items:center}
+.peek .chip{flex:none}
+.back{flex:1;height:44px;border-radius:12px;border:2px solid var(--teal);background:var(--tint);color:var(--ink);font-weight:700}
+.back[hidden]{display:none}
+.fade{animation:in .35s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.fade{animation:none}}
+</style>
+</head>
+<body data-lang="en">
+<main>
+  <section class="join" id="join">
+    <h1 id="jt">Follow the talk on your phone</h1>
+    <p id="jp">Enter the 6-digit code shown on the presenter's screen.</p>
+    <form id="form" autocomplete="off">
+      <div class="otp" id="otp" role="group" aria-label="6-digit code"></div>
+      <div class="err" id="err" role="alert"></div>
+      <button class="go" id="goBtn" type="submit" disabled>Join</button>
+    </form>
+  </section>
+
+  <section id="view" hidden>
+    <div class="bar">
+      <span class="live" id="live"><i></i><span id="liveTxt">Live</span></span>
+      <span class="sp"></span>
+      <button class="chip" id="small" aria-label="Smaller text">A−</button>
+      <button class="chip" id="big" aria-label="Larger text">A+</button>
+      <button class="chip" id="lang" aria-pressed="false" aria-label="Language">EN</button>
+    </div>
+    <div class="meta" id="part"></div>
+    <div class="title"><span class="num" id="num"></span><h2 id="ttl"></h2></div>
+    <div class="script" id="script"></div>
+    <div class="peek">
+      <button class="chip" id="prev" aria-label="Previous page">‹</button>
+      <button class="back" id="back" hidden></button>
+      <button class="chip" id="next" aria-label="Next page">›</button>
+    </div>
+  </section>
+</main>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const store = { get(k) { try { return sessionStorage.getItem(k); } catch { return null; } }, set(k, v) { try { sessionStorage.setItem(k, v); } catch {} } };
+  const T = {
+    en: { jt: 'Follow the talk on your phone', jp: "Enter the 6-digit code shown on the presenter's screen.", join: 'Join', live: 'Live', off: 'Reconnecting…', bad: 'That code is not running. Check the screen and try again.', wait: 'Waiting for the presenter…', none: 'No script for this page.', noth: 'No Thai script for this page yet: showing English.', back: (l) => `Presenter is on ${l} · go live`, ended: 'The presenter ended this session.', busy: 'Too many tries. Wait a minute.' },
+    th: { jt: 'ติดตามการบรรยายบนมือถือ', jp: 'ใส่รหัส 6 หลักที่แสดงบนหน้าจอของผู้บรรยาย', join: 'เข้าร่วม', live: 'สด', off: 'กำลังเชื่อมต่อใหม่…', bad: 'ไม่พบรหัสนี้ ตรวจสอบบนหน้าจอแล้วลองอีกครั้ง', wait: 'รอผู้บรรยาย…', none: 'หน้านี้ไม่มีสคริปต์', noth: 'หน้านี้ยังไม่มีสคริปต์ภาษาไทย: แสดงภาษาอังกฤษ', back: (l) => `ผู้บรรยายอยู่หน้า ${l} · กลับไปหน้าสด`, ended: 'ผู้บรรยายจบเซสชันแล้ว', busy: 'ลองหลายครั้งเกินไป รอสักครู่' },
+  };
+  let lang = store.get('lang') || ((navigator.language || '').startsWith('th') ? 'th' : 'en');
+  let size = Number(store.get('size')) || 20;
+  let pages = [], byId = new Map(), order = [];
+  let liveId = '', shownId = '', peeking = false, code = '', es = null;
+
+  const setLang = (l) => {
+    lang = l; store.set('lang', l);
+    document.body.dataset.lang = l; document.documentElement.lang = l;
+    const t = T[l];
+    $('jt').textContent = t.jt; $('jp').textContent = t.jp; $('goBtn').textContent = t.join;
+    $('lang').textContent = l === 'th' ? 'ไทย' : 'EN'; $('lang').setAttribute('aria-pressed', String(l === 'th'));
+    $('liveTxt').textContent = $('live').classList.contains('off') ? t.off : t.live;
+    render();
+  };
+  const setSize = (n) => { size = Math.max(15, Math.min(34, n)); store.set('size', String(size)); document.documentElement.style.setProperty('--size', size + 'px'); };
+
+  // ---- the code boxes
+  const boxes = [];
+  for (let i = 0; i < 6; i++) {
+    const b = document.createElement('input');
+    b.inputMode = 'numeric'; b.maxLength = 1; b.setAttribute('aria-label', 'digit ' + (i + 1)); b.autocomplete = 'one-time-code';
+    b.addEventListener('input', () => { b.value = b.value.replace(/\D/g, '').slice(-1); if (b.value && i < 5) boxes[i + 1].focus(); sync(); });
+    b.addEventListener('keydown', (e) => { if (e.key === 'Backspace' && !b.value && i > 0) { boxes[i - 1].focus(); boxes[i - 1].value = ''; sync(); } });
+    b.addEventListener('paste', (e) => { const d = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6); if (!d) return; e.preventDefault(); d.split('').forEach((c, k) => (boxes[k].value = c)); boxes[Math.min(d.length, 5)].focus(); sync(); });
+    boxes.push(b); $('otp').appendChild(b);
+  }
+  const typed = () => boxes.map((b) => b.value).join('');
+  const sync = () => { $('goBtn').disabled = typed().length !== 6; $('err').textContent = ''; };
+  $('form').addEventListener('submit', (e) => { e.preventDefault(); if (typed().length === 6) join(typed()); });
+
+  // ---- join, then follow
+  async function join(c) {
+    $('goBtn').disabled = true; $('err').textContent = '';
+    try {
+      const r = await fetch('api/s/' + c, { cache: 'no-store' });
+      if (r.status === 429) { $('err').textContent = T[lang].busy; $('goBtn').disabled = false; return; }
+      if (!r.ok) { $('err').textContent = T[lang].bad; $('goBtn').disabled = false; return; }
+    } catch { $('err').textContent = T[lang].bad; $('goBtn').disabled = false; return; }
+    code = c; store.set('code', c);
+    if (!pages.length) await loadScripts();
+    $('join').hidden = true; $('view').hidden = false;
+    history.replaceState(null, '', location.pathname);
+    follow();
+    render();
+  }
+  async function loadScripts() {
+    try { const r = await fetch('scripts.json', { cache: 'no-cache' }); const j = await r.json(); pages = j.pages; byId = new Map(pages.map((p) => [p.id, p])); order = pages.map((p) => p.id); } catch {}
+  }
+  function follow() {
+    if (es) es.close();
+    es = new EventSource('api/s/' + code + '/events');
+    es.onopen = () => { $('live').classList.remove('off'); $('liveTxt').textContent = T[lang].live; };
+    es.onmessage = (e) => { try { const s = JSON.parse(e.data); liveId = s.id || ''; if (!peeking) shownId = liveId; render(); } catch {} };
+    es.addEventListener('end', () => { es.close(); alert(T[lang].ended); store.set('code', ''); location.reload(); });
+    es.onerror = () => { $('live').classList.add('off'); $('liveTxt').textContent = T[lang].off; };
+  }
+
+  // ---- the page on screen
+  function render() {
+    if (!$('view') || $('view').hidden) return;
+    const p = byId.get(shownId);
+    const t = T[lang];
+    $('part').textContent = p ? p.part : '';
+    $('num').textContent = p ? p.label : '…'; $('num').hidden = !p;
+    $('ttl').textContent = p ? p.title : t.wait;
+    const box = $('script'); box.className = 'script fade'; box.replaceChildren();
+    if (p) {
+      const th = lang === 'th' ? p.th : '';
+      const text = th || p.en;
+      if (lang === 'th' && !th && p.en) { const n = document.createElement('p'); n.className = 'note'; n.textContent = t.noth; box.appendChild(n); }
+      if (!text) { const n = document.createElement('p'); n.className = 'empty'; n.textContent = t.none; box.appendChild(n); }
+      for (const para of text.split(/\n\n+/).filter(Boolean)) { const e = document.createElement('p'); e.textContent = para; box.appendChild(e); }
+    }
+    window.scrollTo({ top: 0 });
+    const back = $('back');
+    back.hidden = !peeking || liveId === shownId;
+    const lp = byId.get(liveId);
+    if (!back.hidden) back.textContent = t.back(lp ? lp.label : '');
+    const i = order.indexOf(shownId);
+    $('prev').disabled = i <= 0; $('next').disabled = i < 0 || i >= order.length - 1;
+  }
+  const peek = (d) => { const i = order.indexOf(shownId); const j = i + d; if (j < 0 || j >= order.length) return; shownId = order[j]; peeking = shownId !== liveId; render(); };
+  $('prev').onclick = () => peek(-1); $('next').onclick = () => peek(1);
+  $('back').onclick = () => { peeking = false; shownId = liveId; render(); };
+  $('lang').onclick = () => setLang(lang === 'th' ? 'en' : 'th');
+  $('big').onclick = () => setSize(size + 2); $('small').onclick = () => setSize(size - 2);
+
+  // ---- start
+  setSize(size); setLang(lang);
+  loadScripts();
+  const q = new URLSearchParams(location.search).get('c');
+  const first = (q && /^\d{6}$/.test(q) ? q : '') || store.get('code') || '';
+  if (/^\d{6}$/.test(first)) { first.split('').forEach((c, i) => (boxes[i].value = c)); join(first); } else boxes[0].focus();
+})();
+</script>
+</body>
+</html>

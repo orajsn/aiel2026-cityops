@@ -15,6 +15,7 @@ import { useTrafficStore } from '../engine/traffic';
 import { Rich } from './Rich';
 import { SettingsPanel } from './SettingsPanel';
 import { pageLabel } from '../scenes';
+import { FollowCard } from './FollowCard';
 import { focusNext, focusPrev, pagePrev, useDrawerStore, usePresentationStore } from '../engine/presentation';
 import { FRAME, useGraphicsStore } from '../engine/graphics';
 
@@ -145,6 +146,7 @@ export function Overlay() {
         </div>
       )}
 
+      <FollowCard />
       {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} />}
 
       {/* touch navigation: the iPad has no arrow keys */}

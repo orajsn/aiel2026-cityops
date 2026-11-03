@@ -8,6 +8,7 @@ import { setTrafficMode } from './TrafficEditor';
 import { usePresentationStore } from '../engine/presentation';
 import { PERF_STEPS, usePerfStore, verdict } from '../engine/perfCheck';
 import { SKIES, THEMES } from '../world/theme';
+import { useFollowStore } from '../engine/follow';
 
 const RESOLUTIONS: { id: Resolution; label: string }[] = [
   { id: 'auto', label: 'Auto' },
@@ -106,7 +107,45 @@ export function SettingsPanel({ onClose }: { onClose(): void }) {
           {trafficEditing ? 'Leave Traffic mode' : 'Traffic mode'}
         </button>
       </div>
+      <PhoneFollow />
     </div>
+  );
+}
+
+/** Phone follow: the audience reads the page's script on their phones, with a 6-digit code (src/engine/follow.ts) */
+function PhoneFollow() {
+  const status = useFollowStore((s) => s.status);
+  const code = useFollowStore((s) => s.code);
+  const listeners = useFollowStore((s) => s.listeners);
+  const { start, stop, showCard } = useFollowStore.getState();
+  const on = status === 'on' || (status === 'error' && !!code);
+  return (
+    <>
+      <div className="settings__label" id="settings-follow">
+        Phone follow
+      </div>
+      <div className="settings__follow" role="group" aria-labelledby="settings-follow">
+        {on ? (
+          <>
+            <div className="code" data-follow-settings-code>{`${code.slice(0, 3)} ${code.slice(3)}`}</div>
+            <small>{status === 'error' ? 'Cannot reach the follow server. Retrying on the next page.' : listeners > 0 ? `${listeners} phone${listeners === 1 ? '' : 's'} watching` : 'Waiting for phones'}</small>
+            <button type="button" className="settings__tool" onClick={() => showCard(true)}>
+              Show code on screen
+            </button>
+            <button type="button" className="settings__tool" onClick={() => void stop()}>
+              Stop sharing
+            </button>
+          </>
+        ) : (
+          <>
+            <button type="button" className="settings__tool" disabled={status === 'starting'} onClick={() => void start()}>
+              {status === 'starting' ? 'Starting…' : 'Start sharing'}
+            </button>
+            <small>{status === 'error' ? 'Could not start: the follow server is not reachable from here.' : 'Phones show the script of the page on screen, live.'}</small>
+          </>
+        )}
+      </div>
+    </>
   );
 }
 

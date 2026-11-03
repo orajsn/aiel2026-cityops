@@ -781,3 +781,15 @@ body.is-idle, body.is-idle * { cursor: none !important; }
 .hd__lbfig img { max-width: 1700px; max-height: 930px; border-radius: 8px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); background: #fff; }
 .hd__lbfig figcaption { font-size: 18px; color: #d7dee5; }
 .hd__lbclose { right: 28px; top: 28px; }
+
+/* Phone follow (src/engine/follow.ts): the join card over the stage */
+.follow-card { position: absolute; inset: 0; z-index: 58; display: flex; align-items: center; justify-content: center; background: rgba(11, 16, 22, 0.72); cursor: pointer; }
+.follow-card__box { background: var(--panel-strong); border: 1px solid var(--line); border-radius: 18px; padding: 30px 44px 28px; display: flex; flex-direction: column; align-items: center; gap: 12px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45); }
+.follow-card__kicker { font: 700 17px/1 var(--font-body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); }
+.follow-card__qr { width: 380px; height: 380px; border-radius: 10px; display: block; }
+.follow-card__code { font: 700 84px/1 var(--font-mono); letter-spacing: 0.08em; color: var(--ink); }
+.follow-card__url { font: 500 22px/1.2 var(--font-mono); color: var(--ink-dim); }
+.follow-card__n { font: 600 20px/1 var(--font-body); color: var(--ink-dim); }
+.settings__follow { display: grid; gap: 8px; }
+.settings__follow .code { font: 700 30px/1 var(--font-mono); letter-spacing: 0.08em; color: var(--ink); }
+.settings__follow small { color: var(--ink-dim); font: 400 13px/1.35 var(--font-body); }

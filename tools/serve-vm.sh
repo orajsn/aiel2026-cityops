@@ -4,6 +4,9 @@
 # and starts by itself at boot. Logs: journalctl -u cityops-dev -n 50
 #   bash tools/serve-vm.sh
 set -eu
+# the phone follow app's script file, from the pages' own scripts (follow/public/scripts.json), and its relay (service cityops-follow)
+npx vite-node tools/export-follow-scripts.ts > /dev/null 2>&1 || echo "(could not refresh follow/public/scripts.json)"
+if [ -f /etc/systemd/system/cityops-follow.service ]; then sudo systemctl restart cityops-follow.service; fi
 if systemctl list-unit-files cityops-dev.service > /dev/null 2>&1 && [ -f /etc/systemd/system/cityops-dev.service ]; then
   sudo systemctl restart cityops-dev.service
   sleep 5
