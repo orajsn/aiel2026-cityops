@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { DoorsAndHall, CopilotTurn, TURN_STEPS } from '../../src/overlay/concepts/HandsOn2';
 import { WithWithout, FailuresSolved, BothLabs, QuizCard } from '../../src/overlay/concepts/Ending';
-import { chapter2 } from '../../src/scenes/chapter2';
+import { LAB3_ALL as chapter2 } from '../../src/scenes/chapter2';
 
 test('page 21: Vance bounces off the private room and finds the shared hall', () => {
   const c = render(<DoorsAndHall kicker="k" message="m" />).container;

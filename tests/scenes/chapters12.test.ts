@@ -24,7 +24,7 @@ const CH1_BEATS = [
   '2.8f', // §6 Wrap
   '2.9', // the recap
 ];
-const CH2_BEATS = ['3.0', '3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.3a', '3.3b', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b', '3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a', '3.15', '3.15b', '3.15c', '3.16', '3.16a', '3.17', '3.18'];
+const CH2_BEATS = ['3.0', '3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.3a', '3.3b', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b', '3.6m', '3.15', '3.15b', '3.15c', '3.16', '3.16a', '3.17', '3.18'];
 
 const beats = (ch: typeof chapter1) => ch.map((s) => s.id);
 
@@ -52,7 +52,7 @@ test('SCENES runs the parts in show order: Introduction, Lab 1 (when in the show
   const order = PARTS.map((c) => SCENES.filter((s) => s.chapter === c).map((s) => s.id)).flat();
   expect(SCENES.map((s) => s.id)).toEqual(order);
   // Introduction 7 (the city, then the bridge's four clicks); Lab 2 the deck's 58 pages and the recap
-  expect(SCENES.length).toBe(7 + (WITH_LAB1 ? lab1.length : 0) + CH1_BEATS.length + 38 + 2 + (WITH_LAB1 ? 1 : 0)); // + the 'Open the lab' pages (0.4g, 3.0g and, with Lab 1, 1.0g)
+  expect(SCENES.length).toBe(7 + (WITH_LAB1 ? lab1.length : 0) + CH1_BEATS.length + 26 + 2 + (WITH_LAB1 ? 1 : 0)); // + the 'Open the lab' pages (0.4g, 3.0g and, with Lab 1, 1.0g)
   expect(CH1_BEATS).toHaveLength(42);
 });
 

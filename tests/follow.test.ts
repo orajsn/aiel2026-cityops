@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { qrPath } from '../src/engine/follow';
 import { SCRIPT_TH } from '../src/content/scriptTh';
 import { SCENES } from '../src/scenes/index';
+import { LAB3_CUT } from '../src/scenes/chapter2';
 
 // the phone follow relay (follow/server.mjs): create a session, join it, follow it live, and keep strangers out
 let proc: ChildProcess;
@@ -100,8 +101,8 @@ test('the QR for a join address is a real code, and every Thai script page is a 
   expect(q.n).toBeGreaterThanOrEqual(21);
   expect(q.d.startsWith('M')).toBe(true);
   const ids = new Set(SCENES.map((s) => s.id));
-  for (const id of Object.keys(SCRIPT_TH)) expect(ids.has(id), id).toBe(true);
-  expect(Object.keys(SCRIPT_TH)).toHaveLength(39);
+  for (const id of Object.keys(SCRIPT_TH)) expect(ids.has(id) || LAB3_CUT.has(id), id).toBe(true); // a hidden page keeps its script
+  expect(Object.keys(SCRIPT_TH)).toHaveLength(40);
   for (const s of SCENES.filter((x) => x.chapter === 2)) expect(SCRIPT_TH[s.id], s.id).toBeTruthy(); // all of Lab 3 has Thai
 });
 

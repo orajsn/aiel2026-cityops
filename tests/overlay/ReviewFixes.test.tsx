@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import { LAB_STOPS, stopCells } from '../../src/content/labStops';
 import { OneConnection, WritePath, type HandsOnProps } from '../../src/overlay/concepts/HandsOn';
 import { TURN_STEPS } from '../../src/overlay/concepts/HandsOn2';
-import { chapter2 } from '../../src/scenes/chapter2';
+import { LAB3_ALL as chapter2 } from '../../src/scenes/chapter2';
 
 const props = <T,>(id: string) => chapter2.find((s) => s.id === id)!.overlayProps as T;
 

@@ -125,3 +125,9 @@ export const SCRIPT: Record<string, string> = {
   '3.17': 'That is Lab 3: memory is **the foundation**, not a feature; the context window is **a curation problem**; and **one converged store** beats four services. Before the quiz, let us look at the whole day.',
   '3.18': 'Three labs, one bridge. In Lab 1 we built **an assistant**, in Lab 2 it became **an agent**, in Lab 3 it learned to **remember**. Under all three, **one Oracle AI Database**. Now scan the code for the quiz: five minutes, 80 percent to pass, and a badge.',
 };
+
+// The map page says what the pages it replaced said, step by step (3.6 to 3.14a stay above for when a page comes back)
+SCRIPT['3.6m'] = [
+  'This one map is everything you build today. One turn of the AI agent runs along the top, and everything it remembers sits in one database underneath. We walk it in the order the code runs.',
+  ...['3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a'].map((id) => SCRIPT[id]),
+].join('\n\n');

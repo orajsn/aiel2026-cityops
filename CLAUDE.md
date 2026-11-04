@@ -59,6 +59,10 @@ Lab 2 is 42 pages, not 59: 17 pages are out of the show (`LAB2_CUT` in `src/scen
 
 The 18 blue pages of the Harbor Bridge deck (0.6, 2.2c, 2.2d, 2.3, 2.3a, 2.4f-h, 2.5c, 2.5d, 2.6b, 2.6c, 2.7, 2.7c-f, 2.8) use overlay `L2Notebook` (`lab2/NotebookPage.tsx`): everyday picture | numbered steps | only the key notebook lines, with an animated line from the step to its lines. Steps and lines are data in `src/content/lab2Notebook.ts` (`NB_PAGES`); pictures in `nbArtA.tsx`/`nbArtB.tsx`. Step 1 shows at once, each Next lights the next step (`focusStepCount` = steps - 1), and the Jupyter drawer does not open on these pages.
 
+## Lab 3 code map (owner, 4 Nov)
+
+Lab 3's coding part is one page, `3.6m` (overlay `CodeMap`, data in `src/content/lab3Map.ts`, drafted on the canvas "Lab 3 Code Map"): eleven steps by Next (`PAGE_STEPS`), the order the code runs. Each Next flies the map to the node while a real notebook window glides to that part of the code; its lines stay, key lines light up, the rest fades to 22%. The window shows the student notebook with each TODO's answer filled in and the screen's naming rules applied (for the screen only; the notebook file is never changed). The pages it replaces, 3.6 to 3.14a, are hidden, not deleted: `LAB3_CUT` in `src/scenes/chapter2.ts`. After the map come 3.15 onward (Back on the bridge), the Lab 3 recap and the final recap.
+
 ## Open items (26 Oct)
 
 - Page 0's script line ("Good afternoon. Below us is Bangkok, from above. Let us fly down.") is a draft for the owner to reword.

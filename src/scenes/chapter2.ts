@@ -239,7 +239,14 @@ const b218: SceneDef = {
   } satisfies AllLabsProps as unknown as Record<string, unknown>,
 };
 
-export const chapter2: SceneDef[] = [
+/**
+ * The coding part as one page (owner, 4 Nov): the map of src/content/lab3Map.ts, eleven steps by Next inside the page, in the Ops room. It
+ * replaces 3.6 to 3.14a, which stay here hidden (LAB3_CUT): taking an id out of the set brings that page back.
+ */
+const bMap = atOps('3.6m', 'The code, on one map', 'CodeMap', {});
+export const LAB3_CUT = new Set(['3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a']);
+
+export const LAB3_ALL: SceneDef[] = [
   b20,
   b21a,
   b21b,
@@ -279,3 +286,5 @@ export const chapter2: SceneDef[] = [
   b217,
   b218,
 ];
+
+export const chapter2: SceneDef[] = LAB3_ALL.flatMap((s) => (s.id === '3.6' ? [bMap] : LAB3_CUT.has(s.id) ? [] : [s]));

@@ -31,8 +31,8 @@ test('pages are grouped into chapters and story sections, in story order', () =>
 
 test('clicking a preview jumps to that page and closes the overview', () => {
   render(<JumpMenu />);
-  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^Lab 3 · Agent Memory ${pageLabel('3.13')} `) }));
-  expect(useSceneStore.getState().current().id).toBe('3.13');
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^Lab 3 · Agent Memory ${pageLabel('3.15')} `) }));
+  expect(useSceneStore.getState().current().id).toBe('3.15');
   expect(useUiStore.getState().jumpOpen).toBe(false);
 });
 
