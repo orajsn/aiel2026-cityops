@@ -55,64 +55,104 @@ interface NodeDef {
   mono?: boolean;
   teal?: boolean;
   step?: string;
+  /** what it is: a table (cylinder), a step that computes (hexagon), a page of text (folded corner), or a plain card */
+  shape: 'store' | 'process' | 'doc' | 'card';
 }
 const NODES: NodeDef[] = [
-  { id: 'inspector', x: 96, y: 220, w: 220, h: 100, name: 'Inspector', sub: 'Mercer, Vance', step: 'DAY 1, N' },
-  { id: 'copilot', x: 510, y: 220, w: 300, h: 100, icon: 'chat', name: 'call_copilot', sub: 'runs one turn', mono: true, teal: true, step: 'PART 6' },
-  { id: 'prompt', x: 906, y: 220, w: 260, h: 100, icon: 'doc', name: 'The prompt', sub: 'everything it found' },
-  { id: 'model', x: 1262, y: 220, w: 240, h: 100, name: 'Language model', sub: 'reasons over it' },
-  { id: 'answer', x: 1598, y: 220, w: 226, h: 100, icon: 'ok', name: 'The answer', sub: 'back to the inspector' },
-  { id: 'embedder', x: 130, y: 760, w: 280, h: 120, icon: 'bars', name: 'Embedder', sub: 'text to 384 numbers', teal: true, step: 'PART 2' },
-  { id: 'message', x: 500, y: 540, w: 320, h: 120, icon: 'table', name: 'CITY_MESSAGE', sub: 'every message, word for word', mono: true, teal: true, step: 'PART 3b' },
-  { id: 'extractor', x: 916, y: 540, w: 240, h: 120, icon: 'filter', name: 'Extractor', sub: 'keeps what matters', teal: true, step: 'PART 3b' },
-  { id: 'memory', x: 1252, y: 540, w: 320, h: 120, icon: 'layers', name: 'CITY_MEMORY', sub: 'what it learned', mono: true, teal: true, step: 'PART 3c' },
-  { id: 'finding', x: 500, y: 760, w: 440, h: 120, icon: 'clip', name: 'CITY_INSPECTION_FINDING', sub: 'the official record', mono: true, teal: true, step: 'PART 4' },
-  { id: 'asset', x: 130, y: 540, w: 260, h: 120, icon: 'city', name: 'CITY_ASSET', sub: 'the 26 city assets', mono: true, teal: true, step: 'PART 3a' },
+  { id: 'inspector', x: 96, y: 220, w: 220, h: 100, name: 'Inspector', sub: 'Mercer, Vance', step: 'DAY 1, N', shape: 'card' },
+  { id: 'copilot', x: 510, y: 220, w: 300, h: 100, icon: 'chat', name: 'call_copilot', sub: 'runs one turn', mono: true, teal: true, step: 'PART 6', shape: 'process' },
+  { id: 'prompt', x: 906, y: 220, w: 260, h: 100, icon: 'doc', name: 'The prompt', sub: 'everything it found', shape: 'doc' },
+  { id: 'model', x: 1250, y: 220, w: 280, h: 100, name: 'Language model', sub: 'reasons over it', shape: 'process' },
+  { id: 'answer', x: 1598, y: 220, w: 226, h: 100, icon: 'ok', name: 'The answer', sub: 'back to the inspector', shape: 'card' },
+  // the database lane reads left to right by Part: the embedder (2), then the assets (3a) with the findings (4) in one column, then Part 3's chain
+  { id: 'embedder', x: 140, y: 650, w: 250, h: 120, icon: 'bars', name: 'Embedder', sub: 'text to 384 numbers', teal: true, step: 'PART 2', shape: 'process' },
+  { id: 'asset', x: 442, y: 540, w: 380, h: 120, icon: 'city', name: 'CITY_ASSET', sub: 'the 26 city assets', mono: true, teal: true, step: 'PART 3a', shape: 'store' },
+  { id: 'message', x: 874, y: 540, w: 280, h: 120, icon: 'table', name: 'CITY_MESSAGE', sub: 'every message, word for word', mono: true, teal: true, step: 'PART 3b', shape: 'store' },
+  { id: 'extractor', x: 1206, y: 540, w: 240, h: 120, icon: 'filter', name: 'Extractor', sub: 'keeps what matters', teal: true, step: 'PART 3b', shape: 'process' },
+  { id: 'memory', x: 1498, y: 540, w: 280, h: 120, icon: 'layers', name: 'CITY_MEMORY', sub: 'what it learned', mono: true, teal: true, step: 'PART 3c', shape: 'store' },
+  { id: 'finding', x: 442, y: 760, w: 380, h: 120, icon: 'clip', name: 'CITY_INSPECTION_FINDING', sub: 'the official record', mono: true, teal: true, step: 'PART 4', shape: 'store' },
 ];
 
 const LINES: { id: MapLine; d: string; head?: boolean; teal?: boolean }[] = [
   { id: 'a', d: 'M316 270 H502', head: true },
   { id: 'b', d: 'M810 270 H898', head: true },
-  { id: 'c', d: 'M1166 270 H1254', head: true },
-  { id: 'd', d: 'M1502 270 H1590', head: true },
+  { id: 'c', d: 'M1166 270 H1242', head: true },
+  { id: 'd', d: 'M1530 270 H1590', head: true },
   { id: 'e', d: 'M660 320 V366', head: true },
-  { id: 'f', d: 'M660 428 V532', head: true },
-  { id: 'read', d: 'M1412 540 V430 H1036 V326', head: true },
-  { id: 'l', d: 'M940 820 H1204' },
-  { id: 'n', d: 'M1204 820 V430' },
-  { id: 'g', d: 'M820 600 H908', head: true, teal: true },
-  { id: 'h', d: 'M1156 600 H1244', head: true, teal: true },
+  // Scope guards the database as a whole
+  { id: 'f', d: 'M660 428 V464', head: true },
+  { id: 'read', d: 'M1638 540 V430 H1036 V326', head: true },
+  // the findings feed the prompt too: along the bottom, up the right side, into the same road
+  { id: 'l', d: 'M822 820 H1800' },
+  { id: 'n', d: 'M1800 820 V430 H1638' },
   // Part 3 in one row, in order: the assets, the messages, the extractor, the memory
-  { id: 'r', d: 'M390 600 H492', head: true, teal: true },
-  { id: 'q', d: 'M410 820 H492', head: true, teal: true },
-  // the embedder (Part 2) serves the assets (Part 3a) and the findings (Part 4)
-  { id: 'u', d: 'M260 760 V668', head: true, teal: true },
+  { id: 'r', d: 'M822 600 H866', head: true, teal: true },
+  { id: 'g', d: 'M1154 600 H1198', head: true, teal: true },
+  { id: 'h', d: 'M1446 600 H1490', head: true, teal: true },
+  // the embedder (Part 2) sits between the assets (3a) and the findings (4) and serves both
+  { id: 'o', d: 'M390 710 H416', teal: true },
+  { id: 'u', d: 'M416 710 V600 H436', head: true, teal: true },
+  { id: 'q', d: 'M416 710 V820 H436', head: true, teal: true },
 ];
 
 const nodeState = (step: MapStep, id: MapNode) => (!step.nodes ? '' : step.nodes.includes(id) ? ' is-on' : ' is-off');
+
+/** the outline of a shaped node: a table is a cylinder, a step that computes a hexagon (as in the notebook's own diagram), a page of text has a folded corner */
+function NodeShape({ shape, w, h }: { shape: NodeDef['shape']; w: number; h: number }) {
+  const s = 1.25;
+  if (shape === 'store') {
+    const ry = 14;
+    const rx = w / 2 - s;
+    return (
+      <svg className="cm__shape" width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden="true">
+        <path d={`M ${s} ${ry} A ${rx} ${ry - s} 0 0 1 ${w - s} ${ry} V ${h - ry} A ${rx} ${ry - s} 0 0 1 ${s} ${h - ry} Z`} />
+        <path className="cm__shape-line" d={`M ${s} ${ry} A ${rx} ${ry - s} 0 0 0 ${w - s} ${ry}`} />
+      </svg>
+    );
+  }
+  if (shape === 'process') {
+    const d = 26;
+    return (
+      <svg className="cm__shape" width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden="true">
+        <path d={`M ${d} ${s} H ${w - d} L ${w - s} ${h / 2} L ${w - d} ${h - s} H ${d} L ${s} ${h / 2} Z`} />
+      </svg>
+    );
+  }
+  const f = 30;
+  return (
+    <svg className="cm__shape" width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden="true">
+      <path d={`M ${s} ${s} H ${w - f} L ${w - s} ${f} V ${h - s} H ${s} Z`} />
+      <path className="cm__shape-line" d={`M ${w - f} ${s} V ${f} H ${w - s}`} />
+    </svg>
+  );
+}
 
 function MapNodeCard({ n, step }: { n: NodeDef; step: MapStep }) {
   const on = !!step.nodes?.includes(n.id);
   const name = n.id === 'inspector' && step.who ? (step.who === 'mercer' ? 'Mercer' : 'Vance') : n.name;
   const sub = n.id === 'inspector' && step.who ? 'Inspector' : n.sub;
+  const shaped = n.shape !== 'card';
   return (
-    <div className={`cm__node${n.teal ? ' is-teal' : ''}${n.w < 250 && n.id !== 'extractor' ? ' cm__node--tight' : ''}${nodeState(step, n.id)}`} data-node={n.id} data-on={on || undefined} style={{ left: n.x, top: n.y, width: n.w, height: n.h }}>
-      {n.id === 'inspector' ? (
-        <div className="cm__people" data-who={step.who ?? 'both'}>
-          {step.who !== 'vance' && <img src={mercerPortrait} alt="" />}
-          {step.who !== 'mercer' && <img src={vancePortrait} alt="" />}
+    <div className={`cm__node${shaped ? ` cm__node--shaped cm__node--${n.shape}` : ''}${n.teal ? ' is-teal' : ''}${!shaped && n.w < 250 ? ' cm__node--tight' : ''}${nodeState(step, n.id)}`} data-node={n.id} data-shape={n.shape} data-on={on || undefined} style={{ left: n.x, top: n.y, width: n.w, height: n.h }}>
+      {shaped && <NodeShape shape={n.shape} w={n.w} h={n.h} />}
+      <div className={shaped ? 'cm__nodein' : 'cm__nodeflat'}>
+        {n.id === 'inspector' ? (
+          <div className="cm__people" data-who={step.who ?? 'both'}>
+            {step.who !== 'vance' && <img src={mercerPortrait} alt="" />}
+            {step.who !== 'mercer' && <img src={vancePortrait} alt="" />}
+          </div>
+        ) : n.id === 'model' ? (
+          // the language model is a neural network; a wave of light runs through its layers while it produces
+          <div className="cm__tile" style={{ background: 'transparent' }}>{on ? <ModelNet w={44} shape="small" who="language-model" period={2.6} start={0} /> : <Net w={44} who="language-model" />}</div>
+        ) : (
+          <div className={`cm__tile${n.teal ? ' is-teal' : ''}`}>
+            <Ic name={n.icon!} />
+          </div>
+        )}
+        <div className="cm__name">
+          <b className={n.mono ? `mono${n.name.length > 20 ? ' long' : ''}` : undefined}>{name}</b>
+          <span>{sub}</span>
         </div>
-      ) : n.id === 'model' ? (
-        // the language model is a neural network; a wave of light runs through its layers while it produces
-        <div className="cm__tile" style={{ background: 'transparent' }}>{on ? <ModelNet w={44} shape="small" who="language-model" period={2.6} start={0} /> : <Net w={44} who="language-model" />}</div>
-      ) : (
-        <div className={`cm__tile${n.teal ? ' is-teal' : ''}`}>
-          <Ic name={n.icon!} />
-        </div>
-      )}
-      <div className="cm__name">
-        <b className={n.mono ? `mono${n.name.length > 20 ? ' long' : ''}` : undefined}>{name}</b>
-        <span>{sub}</span>
       </div>
       {n.step && <span className="cm__tag">{n.step}</span>}
     </div>
@@ -137,7 +177,7 @@ function TheMap({ step }: { step: MapStep }) {
           const lit = step.lines.includes(l.id);
           return <path key={l.id} data-line={l.id} data-lit={lit || undefined} className={`cm-l${l.teal ? ' cm-l--teal' : ''}${lit ? ' cm-l--on' : dim ? ' cm-l--dim' : ''}`} d={l.d} markerEnd={l.head ? `url(#cm-${lit || l.teal ? 'teal' : dim ? 'dim' : 'grey'})` : undefined} />;
         })}
-        <path data-line="confirm" data-lit={step.lines.includes('confirm') || undefined} className={`cm-l${step.lines.includes('confirm') ? ' cm-l--on' : ` cm-l--dash${dim ? ' cm-l--dim' : ''}`}`} d="M110 322 V912 H720 V888" markerEnd="url(#cm-teal)" />
+        <path data-line="confirm" data-lit={step.lines.includes('confirm') || undefined} className={`cm-l${step.lines.includes('confirm') ? ' cm-l--on' : ` cm-l--dash${dim ? ' cm-l--dim' : ''}`}`} d="M110 322 V912 H632 V888" markerEnd="url(#cm-teal)" />
       </svg>
       <div className="cm__lane" style={{ left: 96, top: 146, color: '#5B6773' }}>
         <Ic name="chip" size={26} />

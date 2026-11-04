@@ -7,12 +7,11 @@
 .cm__node.is-teal { border-color: #1b8a9c; }
 .cm__node.is-on { background: #ddf1f4; border-color: #1b8a9c; box-shadow: 0 0 0 6px rgba(27, 138, 156, 0.16); }
 .cm__node.is-off { opacity: 0.28; }
-.cm__node--pill { padding: 0 14px; justify-content: center; gap: 10px; border-radius: 28px; font-size: 18px; white-space: nowrap; }
-/* the short cards: a smaller picture so their names stay on one line */
 .cm__node--tight { padding: 0 12px; gap: 10px; }
 .cm__node--tight .cm__tile { width: 44px; height: 44px; }
 .cm__node--tight .cm__name b { font-size: 20px; white-space: nowrap; }
 .cm__node--tight .cm__name span { line-height: 20px; }
+.cm__node--pill { padding: 0 14px; justify-content: center; gap: 10px; border-radius: 28px; font-size: 18px; white-space: nowrap; }
 .cm__tile { flex: none; width: 52px; height: 52px; border-radius: 12px; background: #eef1f5; display: flex; align-items: center; justify-content: center; color: #3f4c58; }
 .cm__tile.is-teal { background: #d5ecef; color: #14707f; }
 .cm__tile svg.cm__ic { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -26,6 +25,25 @@
 .cm__name span { font-size: 16px; color: #5b6773; }
 .cm__tag { display: inline-flex; align-items: center; height: 26px; padding: 0 11px; border-radius: 13px; color: #fff; font-size: 14px; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; background: #1f2a33; }
 .cm__node > .cm__tag { position: absolute; top: -15px; left: 16px; }
+.cm__node--process > .cm__tag { left: 44px; }
+
+/* shaped nodes (owner, 4 Nov: each kind of node looks like what it is): tables are cylinders, steps that compute are hexagons, text is a page */
+.cm__nodeflat { display: contents; }
+.cm__node--shaped { padding: 0; background: none; border: 0; box-shadow: none; display: block; }
+.cm__shape { position: absolute; left: 0; top: 0; overflow: visible; transition: filter 0.6s ease; }
+.cm__shape path { fill: #fff; stroke: #c9d2da; stroke-width: 2.5; stroke-linejoin: round; transition: fill 0.6s ease, stroke 0.6s ease; }
+.cm__shape path.cm__shape-line { fill: none; }
+.cm__node--shaped.is-teal .cm__shape path { stroke: #1b8a9c; }
+.cm__node--shaped.is-on .cm__shape path { stroke: #1b8a9c; fill: #ddf1f4; }
+.cm__node--shaped.is-on .cm__shape path.cm__shape-line { fill: none; }
+.cm__node--shaped.is-on .cm__shape { filter: drop-shadow(0 0 7px rgba(27, 138, 156, 0.45)); }
+.cm__nodein { position: absolute; inset: 0; display: flex; align-items: center; gap: 14px; padding: 0 16px; }
+.cm__node--store .cm__nodein { padding: 26px 16px 6px; }
+.cm__node--doc .cm__nodein { padding: 0 16px 0 18px; }
+.cm__node--process .cm__nodein { padding: 0 32px; gap: 10px; }
+.cm__node--process .cm__tile { width: 44px; height: 44px; }
+.cm__node--process .cm__name b { font-size: 21px; white-space: nowrap; }
+.cm__node--process .cm__name span { line-height: 20px; }
 .cm__chip { position: absolute; left: 150px; top: 898px; height: 28px; padding: 0 12px; display: flex; align-items: center; background: #fff; border: 1px dashed #14707f; border-radius: 14px; box-sizing: border-box; font-size: 16px; font-weight: 600; color: #14707f; transition: opacity 0.6s ease; }
 .cm__chip.is-off { opacity: 0.25; }
 .cm__lines { position: absolute; left: 0; top: 0; fill: none; }

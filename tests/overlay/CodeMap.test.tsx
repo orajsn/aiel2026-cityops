@@ -194,24 +194,45 @@ test('Part 3 sits in one row, in order: CITY_ASSET, CITY_MESSAGE, the Extractor,
   const row = ['asset', 'message', 'extractor', 'memory'].map(at);
   expect(new Set(row.map((r) => r.top)).size).toBe(1);
   expect(row.map((r) => r.left)).toEqual([...row.map((r) => r.left)].sort((a, b) => a - b));
-  // the embedder and the findings keep their own row below it
-  expect(at('embedder').top).toBeGreaterThan(row[0].top);
-  expect(at('finding').top).toBe(at('embedder').top);
   expect(container.querySelector('[data-line="r"]')).toBeTruthy();
   expect(container.querySelector('[data-line="m"]')).toBeNull();
 });
 
-// owner, 4 Nov: the Part 2 node, the embedder, is connected to Part 3a (the assets) and to Part 4 (the findings)
-test('the embedder is connected to CITY_ASSET above it and to CITY_INSPECTION_FINDING beside it', () => {
+// owner, 4 Nov: the database lane reads left to right by Part, with meaningful places and shapes
+test('the embedder (Part 2) is left of Part 3 and 4, and in the middle between CITY_ASSET and the findings, which share a column', () => {
   const { container } = render(<CodeMap />);
-  expect(container.querySelector('[data-line="u"]')!.getAttribute('d')).toBe('M260 760 V668');
-  expect(container.querySelector('[data-line="q"]')).toBeTruthy();
-  const el = (id: string) => container.querySelector<HTMLElement>(`[data-node="${id}"]`)!;
-  const embedder = el('embedder');
-  const asset = el('asset');
-  // the line runs from the embedder's top edge to the asset's bottom edge, inside both
-  expect(parseInt(embedder.style.top)).toBe(760);
-  expect(parseInt(asset.style.top) + parseInt(asset.style.height)).toBeLessThan(668);
-  for (const x of [260]) for (const n of [embedder, asset]) expect(x).toBeGreaterThan(parseInt(n.style.left)), expect(x).toBeLessThan(parseInt(n.style.left) + parseInt(n.style.width));
+  const box = (id: string) => {
+    const el = container.querySelector<HTMLElement>(`[data-node="${id}"]`)!;
+    return { left: parseInt(el.style.left), top: parseInt(el.style.top), w: parseInt(el.style.width), h: parseInt(el.style.height) };
+  };
+  const [emb, asset, finding] = ['embedder', 'asset', 'finding'].map(box);
+  expect(asset.left).toBe(finding.left);
+  expect(asset.w).toBe(finding.w);
+  expect(finding.top).toBeGreaterThan(asset.top);
+  expect(emb.left + emb.w).toBeLessThan(asset.left);
+  expect(emb.top + emb.h / 2).toBe((asset.top + asset.h / 2 + finding.top + finding.h / 2) / 2);
+  // its arrows leave its right edge and enter the left edges of both
+  const d = (id: string) => container.querySelector(`[data-line="${id}"]`)!.getAttribute('d')!;
+  expect(d('o')).toBe(`M${emb.left + emb.w} ${emb.top + emb.h / 2} H416`);
+  expect(d('u')).toBe(`M416 ${emb.top + emb.h / 2} V${asset.top + asset.h / 2} H436`);
+  expect(d('q')).toBe(`M416 ${emb.top + emb.h / 2} V${finding.top + finding.h / 2} H436`);
+  expect(emb.left + emb.w).toBeLessThan(416);
+  expect(436).toBeLessThan(asset.left);
+  // the dashed path of a signed finding ends under the findings table
+  expect(d('confirm')).toBe(`M110 322 V912 H${finding.left + finding.w / 2} V888`);
+  // nodes in one lane never overlap
+  const lane = ['embedder', 'asset', 'message', 'extractor', 'memory', 'finding'].map(box);
+  for (const a of lane) for (const b of lane) if (a !== b) expect(a.left < b.left + b.w && b.left < a.left + a.w && a.top < b.top + b.h && b.top < a.top + a.h).toBe(false);
+  for (const n of lane) expect(n.left + n.w).toBeLessThan(1800);
 });
 
+test('each kind of node looks like what it is: tables are cylinders, steps that compute are hexagons, the prompt is a page', () => {
+  const { container } = render(<CodeMap />);
+  const shape = (id: string) => container.querySelector(`[data-node="${id}"]`)!.getAttribute('data-shape');
+  for (const id of ['asset', 'message', 'memory', 'finding']) expect(shape(id), id).toBe('store');
+  for (const id of ['embedder', 'extractor', 'copilot', 'model']) expect(shape(id), id).toBe('process');
+  expect(shape('prompt')).toBe('doc');
+  expect(shape('inspector')).toBe('card');
+  expect(shape('answer')).toBe('card');
+  for (const id of ['asset', 'message', 'embedder']) expect(container.querySelector(`[data-node="${id}"] svg.cm__shape path`)).toBeTruthy();
+});
