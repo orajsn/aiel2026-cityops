@@ -173,13 +173,13 @@ export function Net({ w = 120, live = false, dim = false, who = 'model' }: { w?:
 }
 
 /**
- * A model drawn at its own size (owner, 2 Nov): `small` is the lower-cost model (3 layers, a few nodes), `large` the expensive
- * multimodal one (7 layers, many nodes). When data reaches it a wave of light runs through its layers, once per `period`
+ * A model drawn at its own size (owner, 2 Nov): `small` is the lower-cost model (3 layers, 7 nodes), `large` the expensive
+ * multimodal one (5 layers, 19 nodes: clearly more, not a thicket). When data reaches it a wave of light runs through its layers, once per `period`
  * seconds starting at `start`; `netWaveEnd` says when the wave has left, so the coins can breathe right after it.
  */
 const NET_SHAPES = {
   small: { layers: [2, 3, 2], w: 110, h: 66 },
-  large: { layers: [3, 5, 6, 6, 6, 5, 3], w: 220, h: 100 },
+  large: { layers: [3, 4, 5, 4, 3], w: 200, h: 100 },
 } as const;
 export type NetShape = keyof typeof NET_SHAPES;
 const WAVE_STEP = 0.32;
