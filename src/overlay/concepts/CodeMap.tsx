@@ -57,16 +57,16 @@ interface NodeDef {
   step?: string;
 }
 const NODES: NodeDef[] = [
-  { id: 'inspector', x: 96, y: 220, w: 220, h: 100, name: 'Inspector', sub: 'Mercer, Vance' },
-  { id: 'copilot', x: 510, y: 220, w: 300, h: 100, icon: 'chat', name: 'call_copilot', sub: 'runs one turn', mono: true, teal: true, write: true, step: 'STEP 9' },
+  { id: 'inspector', x: 96, y: 220, w: 220, h: 100, name: 'Inspector', sub: 'Mercer, Vance', step: 'STEP 9, 10' },
+  { id: 'copilot', x: 510, y: 220, w: 300, h: 100, icon: 'chat', name: 'call_copilot', sub: 'runs one turn', mono: true, teal: true, write: true, step: 'STEP 8' },
   { id: 'prompt', x: 906, y: 220, w: 260, h: 100, icon: 'doc', name: 'The prompt', sub: 'everything it found' },
   { id: 'model', x: 1262, y: 220, w: 240, h: 100, name: 'Language model', sub: 'reasons over it' },
   { id: 'answer', x: 1598, y: 220, w: 226, h: 100, icon: 'ok', name: 'The answer', sub: 'back to the inspector' },
-  { id: 'embedder', x: 130, y: 650, w: 280, h: 120, icon: 'bars', name: 'Embedder', sub: 'text to 384 numbers', teal: true, write: true, step: 'STEP 3' },
-  { id: 'message', x: 500, y: 540, w: 320, h: 120, icon: 'table', name: 'CITY_MESSAGE', sub: 'every message, word for word', mono: true, teal: true, write: true, step: 'STEP 4' },
-  { id: 'extractor', x: 916, y: 540, w: 240, h: 120, icon: 'filter', name: 'Extractor', sub: 'keeps what matters', teal: true, step: 'STEP 4' },
-  { id: 'memory', x: 1252, y: 540, w: 320, h: 120, icon: 'layers', name: 'CITY_MEMORY', sub: 'what it learned', mono: true, teal: true, write: true, step: 'STEP 4, 5' },
-  { id: 'finding', x: 500, y: 760, w: 440, h: 120, icon: 'clip', name: 'CITY_INSPECTION_FINDING', sub: 'the official record', mono: true, teal: true, write: true, step: 'STEP 6, 7' },
+  { id: 'embedder', x: 130, y: 650, w: 280, h: 120, icon: 'bars', name: 'Embedder', sub: 'text to 384 numbers', teal: true, write: true, step: 'STEP 2' },
+  { id: 'message', x: 500, y: 540, w: 320, h: 120, icon: 'table', name: 'CITY_MESSAGE', sub: 'every message, word for word', mono: true, teal: true, write: true, step: 'STEP 3' },
+  { id: 'extractor', x: 916, y: 540, w: 240, h: 120, icon: 'filter', name: 'Extractor', sub: 'keeps what matters', teal: true, step: 'STEP 3' },
+  { id: 'memory', x: 1252, y: 540, w: 320, h: 120, icon: 'layers', name: 'CITY_MEMORY', sub: 'what it learned', mono: true, teal: true, write: true, step: 'STEP 3, 4' },
+  { id: 'finding', x: 500, y: 760, w: 440, h: 120, icon: 'clip', name: 'CITY_INSPECTION_FINDING', sub: 'the official record', mono: true, teal: true, write: true, step: 'STEP 5, 6' },
   { id: 'asset', x: 1252, y: 760, w: 320, h: 120, icon: 'city', name: 'CITY_ASSET', sub: 'the 26 city assets', mono: true, teal: true },
 ];
 
@@ -146,6 +146,7 @@ function TheMap({ step }: { step: MapStep }) {
       <div className="cm__lane" style={{ left: 124, top: 486, color: '#14707F' }}>
         <Ic name="db" size={26} />
         <span>ORACLE AI DATABASE · ONE CONNECTION</span>
+        <span className="cm__tag">STEP 1</span>
       </div>
       {NODES.map((n) => (
         <MapNodeCard key={n.id} n={n} step={step} />
@@ -157,7 +158,7 @@ function TheMap({ step }: { step: MapStep }) {
         <span>
           <b>Scope</b> · who may see what
         </span>
-        <span className="cm__tag">STEP 8</span>
+        <span className="cm__tag">STEP 7</span>
       </div>
       <div className={`cm__chip${dim && !step.lines.includes('confirm') ? ' is-off' : ''}`}>log_finding · a person confirms</div>
     </div>
@@ -247,7 +248,7 @@ export function CodeMap() {
   const jump = (i: number) => useDrawerStore.setState(i === 0 ? { open: false, focus: 0, done: false } : { open: true, focus: i, done: false });
 
   return (
-    <div className="beat" data-testid="code-map" data-step={n + 1}>
+    <div className="beat" data-testid="code-map" data-step={n}>
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(11, 14, 20, 0.38)' }} />
       <div ref={frame} style={{ position: 'absolute', left: 48, right: 48, top: 104, bottom: scriptOpen ? 124 : 88, display: 'flex', justifyContent: 'center', zIndex: 35 }}>
         <div className="cm" style={{ transform: `scale(${k})`, flex: 'none' }}>
@@ -256,7 +257,7 @@ export function CodeMap() {
           <div className={`cm__side${step.wide ? ' is-away' : ''}`}>
             <div className="cm__say cm__fade" style={{ opacity: lit ? 1 : 0 }}>
               <div className="cm__tags">
-                <span className="cm__tag">STEP {n + 1}</span>
+                <span className="cm__tag">STEP {n}</span>
                 {step.write && <span className="cm__tag cm__tag--write">YOU WRITE {step.write.toUpperCase()}</span>}
                 {step.kicker && <span className="cm__kicker">{step.kicker}</span>}
               </div>
@@ -293,8 +294,8 @@ export function CodeMap() {
 
           <div className="cm__rail" role="group" aria-label="Steps of the map">
             {MAP_STEPS.map((s, i) => (
-              <button key={s.title} type="button" aria-label={`Step ${i + 1}: ${s.title}`} aria-current={i === n ? 'step' : undefined} className={i === n ? 'is-now' : i < n ? 'is-done' : ''} onClick={() => jump(i)}>
-                {i + 1}
+              <button key={s.title} type="button" aria-label={i === 0 ? s.title : `Step ${i}: ${s.title}`} aria-current={i === n ? 'step' : undefined} className={i === n ? 'is-now' : i < n ? 'is-done' : ''} onClick={() => jump(i)}>
+                {i === 0 ? 'Map' : i}
               </button>
             ))}
           </div>

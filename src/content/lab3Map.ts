@@ -2,8 +2,8 @@ import { LAB3_STUDENT } from './labStops';
 import { highlightPython, type TokenKind } from '../overlay/jupyter/highlight';
 
 /**
- * Lab 3's coding part as one map (owner, 4 Nov; drafted on the canvas "Lab 3 Code Map"): one page, eleven steps, in the order the code
- * runs. Each Next flies the map to a node while a real notebook window scrolls to that part of the code: its lines stay, the key lines
+ * Lab 3's coding part as one map (owner, 4 Nov; drafted on the canvas "Lab 3 Code Map"): one page, the map and then ten steps, in the order the code
+ * runs. The first view is the whole map and has no number; the steps that follow are 1 to 10, so the map's tags start at 1. Each Next flies the map to a node while a real notebook window scrolls to that part of the code: its lines stay, the key lines
  * light up, the rest fades. The window shows the student notebook (notebook_student_ollama.ipynb) with each TODO's answer filled in.
  * The notebook file itself is never changed: answers and names are put in here, for the screen only.
  */

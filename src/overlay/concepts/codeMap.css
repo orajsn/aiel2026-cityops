@@ -83,3 +83,4 @@
 .cm__rail button.is-done { background: #d5ecef; border-color: #d5ecef; color: #14707f; }
 .cm__rail button.is-now { background: #1f2a33; border-color: #1f2a33; color: #fff; }
 @media (prefers-reduced-motion: reduce) { .cm__world, .cm__node, .cm-l, .cm__fade, .cm__side, .nr.is-near { transition: none; } .cm-l--on { animation: none; } }
+.cm__rail button:first-child { width: 64px; }

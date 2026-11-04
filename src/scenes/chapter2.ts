@@ -240,7 +240,7 @@ const b218: SceneDef = {
 };
 
 /**
- * The coding part as one page (owner, 4 Nov): the map of src/content/lab3Map.ts, eleven steps by Next inside the page, in the Ops room. It
+ * The coding part as one page (owner, 4 Nov): the map of src/content/lab3Map.ts, then ten steps by Next inside the page, in the Ops room. It
  * replaces 3.6 to 3.14a, which stay here hidden (LAB3_CUT): taking an id out of the set brings that page back.
  */
 const bMap = atOps('3.6m', 'The code, on one map', 'CodeMap', {});

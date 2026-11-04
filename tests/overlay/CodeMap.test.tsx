@@ -6,7 +6,7 @@ import { focusStepCount, useDrawerStore } from '../../src/engine/presentation';
 const go = (n: number) => act(() => useDrawerStore.setState(n === 0 ? { open: false, focus: 0 } : { open: true, focus: n }));
 afterEach(() => act(() => useDrawerStore.setState({ open: false, focus: 0 })));
 
-test('the page has eleven steps by Next, the first at once', () => {
+test('the page opens on the whole map, then ten steps by Next', () => {
   expect(MAP_STEPS).toHaveLength(11);
   expect(focusStepCount('3.6m')).toBe(10);
 });
@@ -39,10 +39,10 @@ test('the screen keeps the rules: Mercer and Vance only, no pier numbers, the mo
 
 test('the first step is the whole map with nothing dimmed; Next lights the node and its lines', () => {
   const { container } = render(<CodeMap />);
-  expect(screen.getByTestId('code-map').dataset.step).toBe('1');
+  expect(screen.getByTestId('code-map').dataset.step).toBe('0');
   expect(container.querySelectorAll('.cm__node.is-off')).toHaveLength(0);
   go(2);
-  expect(screen.getByTestId('code-map').dataset.step).toBe('3');
+  expect(screen.getByTestId('code-map').dataset.step).toBe('2');
   expect(container.querySelector('[data-node="embedder"]')!.classList.contains('is-on')).toBe(true);
   expect(container.querySelector('[data-node="asset"]')!.classList.contains('is-off')).toBe(true);
   expect(container.querySelector('[data-line="o"]')!.getAttribute('data-lit')).toBe('true');
@@ -79,9 +79,16 @@ test('the map and the panel number only the steps', () => {
   expect(container.querySelectorAll('.cm__world .cm__tag--write')).toHaveLength(5);
   go(2);
   const tags = container.querySelector('.cm__tags')!.textContent!;
-  expect(tags).toContain('STEP 3');
+  expect(tags).toContain('STEP 2');
   expect(tags).toContain('YOU WRITE 2 LINES');
   expect(tags).not.toMatch(/TODO|PART/);
   go(7);
   expect(container.querySelector('.cm__tags')!.textContent).not.toMatch(/TODO|PART|YOU WRITE/);
+});
+
+// owner, 4 Nov: "why it start with STEP 3": every step has its tag on the map and the tags start at 1
+test('the tags on the map cover steps 1 to 10, starting at 1', () => {
+  const { container } = render(<CodeMap />);
+  const shown = new Set([...container.querySelectorAll('.cm__world .cm__tag')].flatMap((e) => (e.textContent!.match(/\d+/g) ?? []).map(Number)));
+  expect([...shown].sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 });
