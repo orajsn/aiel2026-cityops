@@ -61,8 +61,8 @@ export const CAPTURE: StoryConfig = {
     { title: 'Supplier records', sub: 'Database', icon: 'database' },
     { title: 'Delivery photo', sub: 'Image', icon: 'camera' },
   ],
-  on: [0, 0, 2.3],
-  tick: [0, 0, 5.9],
+  on: [0, 2.3, 4.6],
+  tick: [2.3, 4.6, 6.9],
   pill: 'Documents + database records + a delivery photo',
   pillAt: 6.9,
 };

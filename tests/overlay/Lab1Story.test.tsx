@@ -41,17 +41,23 @@ test.each([[L1Crack], [L1Plan]])('steps tick in turn and the pill arrives at 6.9
   expect(step(container, 4).dataset.done).toBeUndefined();
 });
 
-test('the capture page starts with steps 1 and 2 ticked, ticks the photo, then the pill', () => {
+// owner, 4 Nov: the three kinds of evidence build 1, 2, 3, none of them ticked when the page opens
+test('the capture page builds step by step, then the pill', () => {
   const { container } = render(<L1Capture {...props} />);
-  expect(step(container, 1).dataset.done).toBeDefined();
-  expect(step(container, 2).dataset.done).toBeDefined();
-  expect(step(container, 3).dataset.done).toBeUndefined();
+  expect(step(container, 1).dataset.on).toBeDefined();
+  expect(step(container, 1).dataset.done).toBeUndefined();
+  expect(step(container, 2).dataset.on).toBeUndefined();
+  expect(step(container, 3).dataset.on).toBeUndefined();
   at(2.4);
+  expect(step(container, 1).dataset.done).toBeDefined();
+  expect(step(container, 2).dataset.on).toBeDefined();
+  expect(step(container, 3).dataset.on).toBeUndefined();
+  at(2.3);
+  expect(step(container, 2).dataset.done).toBeDefined();
   expect(step(container, 3).dataset.on).toBeDefined();
-  at(3.6);
-  expect(step(container, 3).dataset.done).toBeDefined();
   expect(pillOn(container)).toBe(false);
-  at(1);
+  at(2.3);
+  expect(step(container, 3).dataset.done).toBeDefined();
   expect(pillOn(container)).toBe(true);
 });
 
