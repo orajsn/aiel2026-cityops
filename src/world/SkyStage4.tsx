@@ -39,6 +39,10 @@ const BOX_S: Box = { x0: -7.5, x1: 1.7, y0: -4.4, y1: 4.0 };
 const FREE = { x0: -0.95, x1: 0.2, y0: -0.9, y1: 0.76 };
 const base = new THREE.Matrix4();
 const tmpV = new THREE.Vector3();
+const baseP = new THREE.Vector3();
+const baseQ = new THREE.Quaternion();
+const baseS = new THREE.Vector3();
+const Y_AXIS = new THREE.Vector3(0, 1, 0);
 
 /**
  * The stage frame: fixed in the sky over the Ops Center. Whatever angle the camera has (the owner saves their own in Camera mode), the
@@ -52,7 +56,7 @@ function StageFrame({ children, box }: { children: ReactNode; box: Box }) {
     const g = inner.current;
     if (!g) return;
     camera.updateMatrixWorld();
-    base.compose(new THREE.Vector3(...STAGE4.center), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), (-STAGE4.heading * Math.PI) / 180), new THREE.Vector3(STAGE4.unit, STAGE4.unit, STAGE4.unit));
+    base.compose(baseP.set(...STAGE4.center), baseQ.setFromAxisAngle(Y_AXIS, (-STAGE4.heading * Math.PI) / 180), baseS.setScalar(STAGE4.unit));
     const ndc = (x: number, y: number, s: number, ox: number, oy: number) => {
       tmpV.set(s * x + ox, s * y + oy, 0).applyMatrix4(base).project(camera);
       return [tmpV.x, tmpV.y] as const;

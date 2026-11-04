@@ -4,6 +4,7 @@ import { EASE, WidePanel } from './WidePanel';
 import { LineIcon, type IconName } from './icons';
 import { Fill, FitBox } from './Fill';
 import vancePortrait from '../../assets/portraits/vance.png';
+import { useDrawerStore } from '../../engine/presentation';
 
 export interface GlassProps {
   kicker: string;
@@ -349,15 +350,13 @@ const DRAW = [VolumeGlass, RelevanceGlass, AccuracyGlass, TimingGlass];
 function useTick(from: number, to: number, delay: number, secs: number): number {
   const [n, setN] = useState(from);
   useEffect(() => {
-    let id = 0;
     const start = performance.now() + delay * 1000;
-    const step = () => {
+    const id = window.setInterval(() => {
       const k = Math.max(0, Math.min(1, (performance.now() - start) / (secs * 1000)));
       setN(Math.round(from + (to - from) * k));
-      if (k < 1) id = requestAnimationFrame(step);
-    };
-    id = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(id);
+      if (k >= 1) window.clearInterval(id);
+    }, 120);
+    return () => window.clearInterval(id);
   }, [from, to, delay, secs]);
   return n;
 }
@@ -409,43 +408,29 @@ export const TimingStory = (t0: number) => (
  * presenter can talk to one at a time). Each glass starts at its own time; the one playing is lit, the ones before it stay as they ended,
  * the ones after it wait as empty tumblers. Timing needs the longest slot: it is a small story of its own.
  */
-export const GLASS_STARTS = [0.5, 7, 13.5, 20];
-
-function useSeconds(max: number): number {
-  const [t, setT] = useState(0);
-  useEffect(() => {
-    const t0 = performance.now();
-    const id = window.setInterval(() => {
-      const s = (performance.now() - t0) / 1000;
-      setT(s);
-      if (s > max) window.clearInterval(id);
-    }, 100);
-    return () => window.clearInterval(id);
-  }, [max]);
-  return t;
-}
+/** how many glasses are showing: the drawer store's step (Next adds the next glass; presentation.ts PAGE_STEPS) */
+const useGlassStep = () => useDrawerStore((s) => (s.open ? s.focus : 0));
 
 function FourGlasses() {
-  const now = useSeconds(GLASS_STARTS[3] + 1);
-  const active = GLASS_STARTS.reduce((a, s, i) => (now >= s ? i : a), -1);
+  const step = useGlassStep();
   return (
     <Fill>
       <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, alignContent: 'center', paddingTop: 12 }}>
         {WRONG.map((w, i) => {
-          const started = i <= active;
-          const lit = i === active;
+          const started = i <= step;
+          const lit = i === step;
           return (
-            <motion.div key={w.word} data-problem={w.word} data-active={lit || undefined} animate={{ opacity: started ? 1 : 0.35 }} transition={{ duration: 0.5 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '14px 8px 18px', borderRadius: 22, background: lit ? 'rgba(27,138,156,0.10)' : 'transparent', boxShadow: lit ? 'inset 0 0 0 2.5px var(--teal)' : 'none', transition: 'background 500ms, box-shadow 500ms' }}>
-              <MiniGlass word={w.word} t0={GLASS_STARTS[i]}>
-                {i === 3 ? TimingStory : DRAW[i]}
+            <div key={w.word} data-problem={w.word} data-shown={started || undefined} data-active={lit || undefined} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '14px 8px 18px', borderRadius: 22, background: lit ? 'rgba(27,138,156,0.10)' : 'transparent', boxShadow: lit ? 'inset 0 0 0 2.5px var(--teal)' : 'none', opacity: started ? 1 : 0.35, transition: 'background 400ms, box-shadow 400ms, opacity 400ms' }}>
+              <MiniGlass word={w.word} t0={0.3}>
+                {started ? (i === 3 ? TimingStory : DRAW[i]) : () => null}
               </MiniGlass>
               {/* the same icon comes back when the problem is solved (Ending.tsx, 3.15b) */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 33, fontWeight: 700, color: 'var(--ink)', marginTop: 14 }}>
                 <LineIcon name={CURATION[i].icon} size={40} />
                 {w.word}
               </div>
-              <div style={{ fontSize: 23, lineHeight: 1.4, color: 'var(--ink-dim)', marginTop: 8, maxWidth: 320, opacity: started ? 1 : 0, transition: 'opacity 600ms' }}>{w.text}</div>
-            </motion.div>
+              <div style={{ fontSize: 23, lineHeight: 1.4, color: 'var(--ink-dim)', marginTop: 8, maxWidth: 320, opacity: started ? 1 : 0, transition: 'opacity 500ms 300ms' }}>{w.text}</div>
+            </div>
           );
         })}
       </div>

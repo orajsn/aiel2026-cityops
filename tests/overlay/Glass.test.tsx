@@ -1,4 +1,5 @@
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
+import { useDrawerStore } from '../../src/engine/presentation';
 import { Glass, GLASS_LAYERS, GLASS_FACTS, CURATION } from '../../src/overlay/concepts/Glass';
 
 test('step 1: the glass fills bottom to top, Vance last with his portrait, the model reads only that, the rest is outside', () => {
@@ -21,6 +22,7 @@ test('step 1: the glass fills bottom to top, Vance last with his portrait, the m
 });
 
 test('step 2: four small glasses, each failing its own way, with the legend', () => {
+  act(() => useDrawerStore.setState({ open: true, focus: 3 })); // all four showing: Next has added each glass
   {
     const c = render(<Glass kicker="k" message="m" step={2} />).container;
     expect([...c.querySelectorAll('[data-problem]')].map((e) => e.getAttribute('data-problem'))).toEqual(['Volume', 'Relevance', 'Accuracy', 'Timing']);
@@ -36,4 +38,18 @@ test('step 2: four small glasses, each failing its own way, with the legend', ()
 
 test('CURATION keeps its four problems and icons for Ending and the new pages', () => {
   expect(CURATION.map((x) => [x.word, x.icon])).toEqual([['Volume', 'overflow'], ['Relevance', 'target'], ['Accuracy', 'inspect'], ['Timing', 'clock']]);
+});
+
+test('step 2 builds inside the page: Volume at once, then one glass for each Next (owner, 4 Nov)', () => {
+  const shown = (c: HTMLElement) => [...c.querySelectorAll('[data-problem][data-shown]')].map((e) => e.getAttribute('data-problem'));
+  act(() => useDrawerStore.setState({ open: false, focus: 0 }));
+  const c = render(<Glass kicker="k" message="m" step={2} />).container;
+  expect(shown(c)).toEqual(['Volume']);
+  expect(c.querySelectorAll('[data-glass="Volume"] [data-piece="turn"]').length).toBeGreaterThan(0);
+  expect(c.querySelectorAll('[data-glass="Relevance"] [data-piece]')).toHaveLength(0);
+  act(() => useDrawerStore.setState({ open: true, focus: 1 }));
+  expect(shown(c)).toEqual(['Volume', 'Relevance']);
+  act(() => useDrawerStore.setState({ open: true, focus: 3 }));
+  expect(shown(c)).toEqual(['Volume', 'Relevance', 'Accuracy', 'Timing']);
+  expect(c.querySelector('[data-problem][data-active]')!.getAttribute('data-problem')).toBe('Timing');
 });
