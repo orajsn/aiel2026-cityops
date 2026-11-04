@@ -138,3 +138,17 @@ test('our own words keep the rules, and the cell number is the real one', () => 
   for (const s of MAP_STEPS) expect(`${s.ask} ${s.plain}`.replace(/call_copilot/g, '')).not.toMatch(/Evelyn|Jordan|[Pp]ier \d|llama3|copilot|Kirkland/);
   expect(NB_ROWS.find((x) => x.prompt)!.prompt).toBe('[1]:');
 });
+
+// owner, 4 Nov: the code section looks like JupyterLab: its colours, a frame round each cell, and the selected cell in blue
+test('the window draws cells the way JupyterLab does, without changing their text', () => {
+  const { container } = render(<CodeMap />);
+  go(5);
+  const hl = stepLines(MAP_STEPS[5])!;
+  const row = container.querySelector(`[data-r="${hl.to}"]`)!;
+  expect(row.classList.contains('is-sel')).toBe(true);
+  expect(container.querySelector('.nr--first.is-sel .nr__g')!.textContent).toBe('[1]:');
+  expect(container.querySelector('.py-kw')).toBeTruthy();
+  expect(container.querySelector('.py-op')).toBeTruthy();
+  expect(NB_ROWS.filter((r) => r.kind === 'code').every((r) => r.spans.map((s) => s.t).join('') === r.text)).toBe(true);
+});
+

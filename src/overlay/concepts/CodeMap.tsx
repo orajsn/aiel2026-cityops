@@ -166,15 +166,19 @@ function TheMap({ step }: { step: MapStep }) {
 /** one notebook line; only rows whose class changes draw again, so a step change stays light over the 3D */
 const Row = memo(function Row({ row, i, cls }: { row: NbRow; i: number; cls: string }) {
   return (
-    <div className={`nr nr--${row.kind}${cls}`} data-r={i}>
+    <div className={`nr nr--${row.kind}${row.first ? ' nr--first' : ''}${row.last ? ' nr--last' : ''}${cls}`} data-r={i}>
       <span className="nr__g">{row.prompt}</span>
-      <span className="nr__n">{row.line}</span>
+      <span className="nr__n">
+        <span className="nr__t">{row.line}</span>
+      </span>
       <span className="nr__c">
-        {row.spans.map((s, k) => (
-          <span key={k} className={s.k === 'plain' ? undefined : `nt-${s.k}`}>
-            {s.t}
-          </span>
-        ))}
+        <span className="nr__t">
+          {row.spans.map((s, k) => (
+            <span key={k} className={s.k === 'plain' ? undefined : s.k.startsWith('md') ? `nt-${s.k}` : `py-${s.k}`}>
+              {s.t}
+            </span>
+          ))}
+        </span>
       </span>
     </div>
   );
@@ -189,7 +193,9 @@ function Notebook({ step, lit, scroller }: { step: MapStep; lit: boolean; scroll
           // only the rows near the section fade, so the browser is not animating 900 lines over the 3D
           const near = hl ? Math.abs(i - hl.to) < 45 : false;
           const state = !lit ? ' is-fly' : hl?.key.has(i) ? ' is-key' : hl?.section.has(i) ? '' : ' is-dim';
-          return <Row key={i} row={r} i={i} cls={`${state}${near ? ' is-near' : ''}`} />;
+          // the selected cell gets Jupyter's blue frame and bar
+          const sel = step.code && r.cell === step.code.cell ? ' is-sel' : '';
+          return <Row key={i} row={r} i={i} cls={`${state}${near ? ' is-near' : ''}${sel}`} />;
         })}
       </div>
     </div>

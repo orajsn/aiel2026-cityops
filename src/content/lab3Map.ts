@@ -72,7 +72,7 @@ export const NB_FILE = completeNotebook.file;
 
 export interface NbSpan {
   t: string;
-  k: TokenKind | 'md-code' | 'md-b';
+  k: TokenKind | 'op' | 'md-code' | 'md-b';
 }
 export interface NbRow {
   kind: 'code' | 'out' | 'md' | 'gap' | 'h1' | 'h2' | 'h3';
@@ -80,6 +80,10 @@ export interface NbRow {
   prompt?: string;
   /** the line's number in its cell */
   line?: number;
+  /** which notebook cell, and whether this row starts or ends its box */
+  cell?: number;
+  first?: boolean;
+  last?: boolean;
   spans: NbSpan[];
   text: string;
 }
@@ -120,13 +124,16 @@ function build() {
     for (const tok of highlightPython(cell.source)) {
       tok.text.split('\n').forEach((part, p) => {
         if (p > 0) lines.push([]);
-        if (part) lines[lines.length - 1].push({ t: part, k: tok.kind });
+        if (!part) return;
+        // JupyterLab colours the operators too; the text stays exactly the same
+        if (tok.kind !== 'plain') lines[lines.length - 1].push({ t: part, k: tok.kind });
+        else for (const piece of part.split(/([=+\-*/%<>!&|~^]+)/).filter(Boolean)) lines[lines.length - 1].push({ t: piece, k: /^[=+\-*/%<>!&|~^]+$/.test(piece) ? 'op' : 'plain' });
       });
     }
     const at: number[] = [];
     lines.forEach((spans, q) => {
       at.push(rows.length);
-      rows.push({ kind: 'code', prompt: q === 0 ? `[${cell.count ?? ' '}]:` : undefined, line: q + 1, spans, text: spans.map((s) => s.t).join('') });
+      rows.push({ kind: 'code', prompt: q === 0 ? `[${cell.count ?? ' '}]:` : undefined, line: q + 1, cell: i, first: q === 0, last: q === lines.length - 1, spans, text: spans.map((s) => s.t).join('') });
     });
     where.set(i, at);
     const printed: number[] = [];

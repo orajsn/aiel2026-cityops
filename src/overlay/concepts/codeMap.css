@@ -53,37 +53,50 @@
 .cm__file { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 15px; font-weight: 600; background: #fff; border: 1px solid #dce2e8; border-radius: 4px; padding: 3px 10px; }
 .cm__kernel { margin-left: auto; font-size: 14px; color: #5b6773; }
 .cm__scroll { flex: 1; min-height: 0; overflow-y: auto; position: relative; scrollbar-width: thin; }
-.cm__nb { position: relative; font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 18px; line-height: 27px; padding: 14px 16px 280px 0; }
+.cm__nb { position: relative; font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace; font-size: 18px; line-height: 27px; color: #000; padding: 14px 20px 280px 0; }
+/* the code as JupyterLab draws it: prompt, grey line-number gutter, grey cell in a thin frame; the selected cell in blue with a blue bar */
 .nr { display: flex; }
-.nr.is-near { transition: opacity 0.35s ease; }
-.nr__g { flex: none; width: 58px; text-align: right; padding-right: 8px; box-sizing: border-box; color: #6f8fa0; font-size: 15px; }
-/* the line number, as in Jupyter: inside the cell's grey, and lit with its line */
-.nr__n { flex: none; width: 40px; box-sizing: border-box; padding-right: 8px; text-align: right; color: #5b6773; font-size: 15px; background: #eceef0; user-select: none; }
-.nr--gap .nr__n, .nr--h1 .nr__n, .nr--h2 .nr__n, .nr--h3 .nr__n { background: transparent; width: 0; padding: 0; }
-.nr.is-key .nr__n { background: #a9dbe3; color: #0e4f5a; font-weight: 700; }
-.nr__c { flex: 1; min-width: 0; min-height: 27px; white-space: pre-wrap; overflow-wrap: anywhere; background: #f5f6f7; padding: 0 12px 0 calc(12px + 4ch); text-indent: -4ch; }
-.nr--gap { height: 14px; }
-.nr--gap .nr__c { background: transparent; min-height: 0; }
-.nr--h1, .nr--h2, .nr--h3 { font-family: var(--font-sans, Inter, system-ui, sans-serif); font-weight: 700; }
-.nr--h1 { font-size: 26px; line-height: 36px; padding: 14px 0 10px; }
-.nr--h2 { font-size: 22px; line-height: 30px; padding: 10px 0 8px; }
-.nr--h3 { font-size: 19px; line-height: 27px; padding: 6px 0; }
-.nr--h1 .nr__c, .nr--h2 .nr__c, .nr--h3 .nr__c { background: transparent; padding: 0; text-indent: 0; }
-.nr.is-dim { opacity: 0.22; }
-.nr.is-fly { opacity: 0.5; }
-.nr.is-key .nr__c { background: #c7e8ee; font-weight: 700; }
-.nt-comment { color: #6b7782; font-style: italic; }
-.nt-str, .nt-num { color: #3f5a9e; }
-.nt-kw, .nt-def, .nt-builtin, .nt-deco { color: #14707f; font-weight: 700; }
+.nr__t { transition: none; }
+.nr.is-near .nr__t { transition: opacity 0.35s ease; }
+.nr__g { flex: none; width: 70px; text-align: right; padding-right: 8px; box-sizing: border-box; color: #303f9f; font-size: 16px; }
+.nr__n { flex: none; width: 46px; box-sizing: border-box; padding-right: 8px; text-align: right; color: #616161; font-size: 16px; background: #eeeeee; user-select: none; border-left: 1px solid #e0e0e0; }
+.nr__c { flex: 1; min-width: 0; min-height: 27px; white-space: pre-wrap; overflow-wrap: anywhere; background: #f5f5f5; padding: 0 12px 0 calc(8px + 4ch); text-indent: -4ch; border-right: 1px solid #e0e0e0; }
+.nr--first .nr__n, .nr--first .nr__c { border-top: 1px solid #e0e0e0; padding-top: 4px; }
+.nr--first .nr__n { border-top-left-radius: 3px; }
+.nr--first .nr__c { border-top-right-radius: 3px; }
+.nr--last .nr__n, .nr--last .nr__c { border-bottom: 1px solid #e0e0e0; padding-bottom: 4px; }
+.nr--last .nr__n { border-bottom-left-radius: 3px; }
+.nr--last .nr__c { border-bottom-right-radius: 3px; }
+.nr.is-sel .nr__n, .nr.is-sel .nr__c { border-color: #1976d2; }
+.nr.is-sel .nr__g { box-shadow: inset 8px 0 0 #1976d2; }
+.nr--gap { height: 18px; }
+.nr--gap .nr__n, .nr--gap .nr__c { background: transparent; min-height: 0; border: 0; }
+/* what a cell prints sits under it on the white page */
+.nr--out .nr__n, .nr--md .nr__n, .nr--h1 .nr__n, .nr--h2 .nr__n, .nr--h3 .nr__n { background: transparent; border: 0; width: 0; padding: 0; }
+.nr--out .nr__g { width: 70px; }
+.nr--out .nr__c { background: transparent; border: 0; padding: 0 12px 0 calc(8px + 2ch); text-indent: -2ch; }
+.nr--md, .nr--h1, .nr--h2, .nr--h3 { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #000; }
+.nr--md .nr__c, .nr--h1 .nr__c, .nr--h2 .nr__c, .nr--h3 .nr__c { background: transparent; border: 0; padding: 0; text-indent: 0; }
+.nr--md { font-size: 18px; line-height: 27px; padding: 2px 0; }
+.nr--h1 { font-size: 28px; line-height: 36px; font-weight: 700; padding: 16px 0 10px; }
+.nr--h2 { font-size: 23px; line-height: 30px; font-weight: 700; padding: 12px 0 8px; }
+.nr--h3 { font-size: 19px; line-height: 27px; font-weight: 700; padding: 8px 0 6px; }
+.nr.is-dim .nr__t { opacity: 0.22; }
+.nr.is-fly .nr__t { opacity: 0.5; }
+.nr.is-key .nr__c { background: #c7e8ee; }
+.nr.is-key .nr__n { background: #a9dbe3; color: #0e4f5a; }
+.py-op { color: #aa22ff; font-weight: 700; }
+.nt-md-code { font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace; font-size: 0.9em; background: #eeeeee; border-radius: 3px; padding: 1px 4px; }
+.nt-md-b { font-weight: 700; }
 .cm__see { flex: none; min-height: 48px; box-sizing: border-box; padding: 8px 14px; display: flex; gap: 12px; align-items: center; border-top: 1px solid #dce2e8; background: #f2fafb; font-size: 15px; line-height: 21px; color: #14707f; }
-.cm__see .mono { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-weight: 600; }
+.cm__see .mono { font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace; font-weight: 600; }
 .cm__see small { margin-left: auto; flex: none; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #5b6773; }
 
 .cm__rail { position: absolute; left: 14px; bottom: 16px; display: flex; gap: 4px; padding: 6px; border-radius: 26px; background: rgba(255, 255, 255, 0.92); box-shadow: 0 1px 6px rgba(31, 42, 51, 0.12); }
 .cm__rail button { width: 44px; height: 44px; border-radius: 22px; border: 1px solid #d5dce3; background: #fff; color: #5b6773; font: 600 16px var(--font-sans, Inter, system-ui, sans-serif); cursor: pointer; padding: 0; transition: background-color 0.3s ease, color 0.3s ease; }
 .cm__rail button.is-done { background: #d5ecef; border-color: #d5ecef; color: #14707f; }
 .cm__rail button.is-now { background: #1f2a33; border-color: #1f2a33; color: #fff; }
-@media (prefers-reduced-motion: reduce) { .cm__world, .cm__node, .cm-l, .cm__fade, .cm__side, .nr.is-near { transition: none; } .cm-l--on { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .cm__world, .cm__node, .cm-l, .cm__fade, .cm__side, .nr.is-near .nr__t { transition: none; } .cm-l--on { animation: none; } }
 .cm__rail button:first-child, .cm__rail button:nth-last-child(-n + 2) { width: 60px; }
 
 /* Part 0: the JupyterLab screenshot, over the map */
@@ -94,16 +107,3 @@
 .cm__spot { position: absolute; border: 3px solid #1b8a9c; border-radius: 8px; box-shadow: 0 0 0 4000px rgba(11, 14, 20, 0.5); transition: left 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .cm__spotlabel { position: absolute; left: 0; padding: 4px 12px; border-radius: 8px; background: #14707f; color: #fff; font: 700 18px/26px var(--font-mono, 'JetBrains Mono', monospace); white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .cm__spot { transition: none; } }
-
-/* what a cell prints, under it as in Jupyter */
-.nr--out { margin-top: 2px; }
-.nr--out .nr__n { background: transparent; }
-.nr--out .nr__c { background: transparent; padding-left: calc(12px + 2ch); text-indent: -2ch; }
-
-/* the notebook's own text between the cells */
-.nr--md { font-family: var(--font-sans, Inter, system-ui, sans-serif); font-size: 17px; line-height: 25px; color: #3b4752; }
-.nr--md .nr__n { width: 0; padding: 0; background: transparent; }
-.nr--md .nr__c { background: transparent; padding: 2px 0; text-indent: 0; }
-.nt-md-code { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 15px; background: #eef1f3; border-radius: 4px; padding: 0 4px; }
-.nt-md-b { font-weight: 700; }
-
