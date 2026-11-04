@@ -21,16 +21,16 @@ interface CodeSection {
   from: string;
   to: string;
   keys: string[];
-  /** the line of the cell's printed result that stays lit with it */
-  out?: string;
+  /** the lines of the cell's printed result that stay lit with it */
+  out?: string | string[];
 }
 export interface MapStep {
   title: string;
   /** the whole map, full width, no notebook (the first step) */
   wide?: boolean;
   cam: MapCam;
-  /** a guide stop: the JupyterLab screenshot with this part lit, instead of the map and the notebook window */
-  guide?: 'file' | 'code' | 'run';
+  /** a guide stop: a picture (the JupyterLab screen with this part lit, or the notebook's extraction diagram) instead of the map and the notebook window */
+  guide?: 'file' | 'code' | 'run' | 'extract';
   /** the numbering (owner, 4 Nov): the notebook's own Part, or the story's day; a part with two clicks is 3a, 3b on the buttons */
   tag?: string;
   rail: string;
@@ -58,8 +58,11 @@ export const MAP_STEPS: MapStep[] = [
   { title: 'Oracle setup', rail: '1b', tag: 'PART 1', cam: { s: 0.6, cx: 620, cy: 690 }, ask: 'Did it connect to the database?', plain: 'One connection opens the database. If you see this line, you are in, and everything after this uses the same connection.', see: 'Connected - using user prism', nodes: ['embedder', 'message', 'extractor', 'memory', 'finding', 'asset'], lines: [], code: { cell: 6, from: 'def connect_to_oracle', to: 'ok(f"Connected', keys: ['return oracledb.connect', 'vector_conn = connect_to_oracle', 'ok(f"Connected'], out: 'Connected - using user' } },
   { title: 'The embedder', rail: '2a', tag: 'PART 2', cam: { s: 1.25, cx: 330, cy: 710 }, ask: 'How do you search by meaning?', plain: 'Text becomes 384 numbers, like an address on a map of meaning. Reports that mean the same thing land close together.', see: 'TODO 1 passed - embedder returns float32 ((1, 384)) arrays', nodes: ['embedder'], lines: ['o', 'p', 'q'], code: { cell: 12, from: 'def embed(self', to: 'return np.asarray', keys: ['vectors = self.provider', 'return np.asarray'], out: 'TODO 1 passed' } },
   { title: 'The memory SDK', rail: '2b', tag: 'PART 2', cam: { s: 0.72, cx: 1036, cy: 600 }, ask: 'Who keeps the memory?', plain: 'The memory SDK sits on that same connection and sets up its own tables, with the embedder doing the numbers.', see: 'OracleAgentMemory ready. Tables under prefix CITY_*', nodes: ['message', 'extractor', 'memory'], lines: [], code: { cell: 14, from: 'memory = OracleAgentMemory(', to: 'table_name_prefix', keys: ['connection=vector_conn', 'extract_memories=True', 'table_name_prefix'], out: 'OracleAgentMemory ready' } },
-  { title: 'A report goes in', rail: '3a', tag: 'PART 3', cam: { s: 0.72, cx: 1036, cy: 600 }, ask: 'What happens when an inspector reports?', plain: 'Two things. The report is filed word for word. Then the extractor writes small cards of what is worth keeping.', see: "TODO 2 passed - added message(s): ['b9dc2ca1-f704-4756-9c42-c3d59bea58f4']", nodes: ['message', 'extractor', 'memory'], lines: ['g', 'h'], code: { cell: 20, from: 'content = f"[Asset', to: 'add_messages_async([Message(role="user", content=content)', keys: ['content = f"[Asset', 'add_messages_async([Message(role="user", content=content)'], out: 'TODO 2 passed' } },
-  { title: 'Finding a memory', rail: '3b', tag: 'PART 3', cam: { s: 1.2, cx: 1412, cy: 600 }, ask: 'Why did the search come back empty?', plain: 'A memory belongs to whoever wrote it. Search with no name and you get nothing. Give the right name and the cards light up.', see: 'TODO 3 passed - 14 memories extracted from 4 narratives', nodes: ['memory'], lines: [], code: { cell: 28, from: 'results = await', to: 'max_results', keys: ['user_id="inspector_demo"'], out: 'TODO 3 passed' } },
+  // Part 3 is three clicks (owner, 4 Nov): the asset table, the extraction (its picture first, then the code), the memory it writes
+  { title: 'City assets', rail: '3a', tag: 'PART 3a', cam: { s: 1.1, cx: 1412, cy: 820 }, ask: 'Which assets are we talking about?', plain: 'Before any memory, the AI agent needs to know what exists. The code reads two data files and finds 26 city assets, Harbor Bridge among them.', see: 'Loaded 308 maintenance logs, 60 inspection reports. Discovered 26 unique assets.', nodes: ['asset'], lines: [], code: { cell: 17, from: '_data_dir = Path(', to: 'print(f"Discovered', keys: ['_asset_names = sorted(', 'print(f"Loaded', 'print(f"Discovered'], out: ['Loaded', 'Discovered'] } },
+  { title: 'Auto-extraction', rail: '3b', tag: 'PART 3b', guide: 'extract', cam: { s: 0.82, cx: 960, cy: 545 }, ask: 'What happens to a new message?', plain: 'It is filed word for word in CITY_MESSAGE. The extractor reads it, with the running thread summary and the past memories, and writes 2 to 8 small typed records into CITY_MEMORY.', lines: [] },
+  { title: 'Auto-extraction', rail: '3b', tag: 'PART 3b', cam: { s: 0.72, cx: 1036, cy: 600 }, ask: 'How does a report get filed?', plain: 'Two lines do it: build the content string, then add_messages_async. Saving the message is also what starts the extractor.', see: "TODO 2 passed - added message(s): ['b9dc2ca1-f704-4756-9c42-c3d59bea58f4']", nodes: ['message', 'extractor', 'memory'], lines: ['g', 'h'], code: { cell: 20, from: 'content = f"[Asset', to: 'add_messages_async([Message(role="user", content=content)', keys: ['content = f"[Asset', 'add_messages_async([Message(role="user", content=content)'], out: 'TODO 2 passed' } },
+  { title: 'Finding a memory', rail: '3c', tag: 'PART 3c', cam: { s: 1.2, cx: 1412, cy: 600 }, ask: 'Why did the search come back empty?', plain: 'A memory belongs to whoever wrote it. Search with no name and you get nothing. Give the right name and the cards light up.', see: 'TODO 3 passed - 14 memories extracted from 4 narratives', nodes: ['memory'], lines: [], code: { cell: 28, from: 'results = await', to: 'max_results', keys: ['user_id="inspector_demo"'], out: 'TODO 3 passed' } },
   { title: 'The official record', rail: '4a', tag: 'PART 4', cam: { s: 0.88, cx: 560, cy: 780 }, ask: 'What is a finding, if it is not a memory?', plain: 'A memory is what the AI agent noticed. A finding is what a person signed. It gets its own table, and its description becomes numbers too.', see: 'TODO 4 passed - finding_id=2e80d8fa-551', nodes: ['finding', 'embedder'], lines: ['o', 'q'], code: { cell: 37, from: 'finding_id = str(uuid', to: 'vec = array', keys: ['vec = array'] } },
   { title: 'Search with walls', rail: '4b', tag: 'PART 4', cam: { s: 1.05, cx: 720, cy: 820 }, ask: 'Nearest in meaning, but only this bridge?', plain: 'One SQL statement does both: the closest in meaning, inside the walls of this asset and this category.', see: 'TODO 5 passed - broad=5, asset-filtered=5, category-filtered=4', nodes: ['finding'], lines: [], code: { cell: 41, from: 'SELECT finding_id', to: 'FETCH FIRST', keys: ['VECTOR_DISTANCE', 'WHERE (:asset_id', 'AND (:category'] } },
   { title: 'Who sees what', rail: '5', tag: 'PART 5', cam: { s: 0.76, cx: 800, cy: 460 }, ask: 'Why can Vance not read Mercer’s private note?', plain: 'Each inspector has a private thread. What the extractor learns goes on a shelf for the asset. The database enforces this, not the AI agent.', see: "Multi-tenancy verified: Vance sees city-wide guidelines but NOT Mercer's personal notes.", nodes: ['scope', 'copilot', 'message', 'memory'], lines: ['e', 'f'], code: { cell: 54, extra: 'thread_id = f"', from: 'pooled = await', to: 'max_results=3', keys: ['thread_id = f"', 'user_id=asset_id', 'exact_thread_match'] } },
@@ -180,9 +183,9 @@ export function stepLines(step: MapStep): StepLines | null {
   const x = extra === undefined ? undefined : find(extra);
   if (x !== undefined) section.add(x);
   for (const k of keys) key.add(x !== undefined && NB.rows[x].text.includes(k) ? x : find(k, a - 1));
-  if (out) {
-    const r = (NB.outs.get(cell) ?? []).find((row) => NB.rows[row].text.includes(out));
-    if (r === undefined) throw new Error(`Lab 3 map: cell ${cell} printed no "${out}"`);
+  for (const o of [out ?? []].flat()) {
+    const r = (NB.outs.get(cell) ?? []).find((row) => NB.rows[row].text.includes(o));
+    if (r === undefined) throw new Error(`Lab 3 map: cell ${cell} printed no "${o}"`);
     section.add(r);
   }
   return { section, key, to: a };

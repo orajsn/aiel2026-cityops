@@ -107,3 +107,6 @@
 .cm__spot { position: absolute; border: 3px solid #1b8a9c; border-radius: 8px; box-shadow: 0 0 0 4000px rgba(11, 14, 20, 0.5); transition: left 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .cm__spotlabel { position: absolute; left: 0; padding: 4px 12px; border-radius: 8px; background: #14707f; color: #fff; font: 700 18px/26px var(--font-mono, 'JetBrains Mono', monospace); white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .cm__spot { transition: none; } }
+.cm__shot--fig { align-self: center; width: auto; }
+.cm__shot--fig img { width: auto; max-width: 100%; max-height: 588px; }
+

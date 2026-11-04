@@ -10,8 +10,8 @@ const go = (n: number) => act(() => useDrawerStore.setState(n === 0 ? { open: fa
 afterEach(() => act(() => useDrawerStore.setState({ open: false, focus: 0 })));
 
 test('the page opens on the whole map, then one click per stop', () => {
-  expect(MAP_STEPS).toHaveLength(16);
-  expect(focusStepCount('3.6m')).toBe(15);
+  expect(MAP_STEPS).toHaveLength(18);
+  expect(focusStepCount('3.6m')).toBe(17);
 });
 
 test('every step after the map finds its lines in the notebook, and its key lines sit in its section', () => {
@@ -39,7 +39,7 @@ test('the first step is the whole map with nothing dimmed; Next lights the node 
 test('once the camera arrives only the section stays: key lines lit, the rest faded', () => {
   vi.useFakeTimers();
   const { container } = render(<CodeMap />);
-  go(9);
+  go(11);
   act(() => vi.advanceTimersByTime(1400));
   const key = [...container.querySelectorAll('.nr.is-key')].map((e) => e.textContent);
   expect(key.join('')).toContain('user_id="inspector_demo"');
@@ -49,11 +49,11 @@ test('once the camera arrives only the section stays: key lines lit, the rest fa
 
 test('the two days show their own inspector and only their own path', () => {
   const { container } = render(<CodeMap />);
-  go(14);
+  go(16);
   expect(container.querySelector('[data-who]')!.getAttribute('data-who')).toBe('mercer');
   expect(container.querySelector('[data-line="confirm"]')!.getAttribute('data-lit')).toBe('true');
   expect(container.querySelector('[data-line="read"]')!.getAttribute('data-lit')).toBeNull();
-  go(15);
+  go(17);
   expect(container.querySelector('[data-who]')!.getAttribute('data-who')).toBe('vance');
   expect(container.querySelector('[data-line="read"]')!.getAttribute('data-lit')).toBe('true');
   expect(container.querySelector('[data-line="confirm"]')!.getAttribute('data-lit')).toBeNull();
@@ -70,7 +70,7 @@ test('the map and the panel number by Part, and never by TODO', () => {
   const tags = container.querySelector('.cm__tags')!.textContent!;
   expect(tags).toContain('PART 2');
   expect(tags).not.toMatch(/TODO|STEP/);
-  go(12);
+  go(14);
   expect(container.querySelector('.cm__tags')!.textContent).toBe('PART 5');
 });
 
@@ -127,7 +127,7 @@ test('the window is the run notebook: exact code, its line numbers, its counts a
 });
 
 test('every step finds its real lines and result, and says what was really printed', () => {
-  const printed = NB_ROWS.filter((x) => x.kind === 'out').map((x) => x.text).join('\n');
+  const printed = NB_ROWS.filter((x) => x.kind === 'out').map((x) => x.text).join(' ');
   for (const s of MAP_STEPS.slice(1).filter((x) => !x.guide)) expect(printed, s.title).toContain(s.see!);
   const out = NB_ROWS.findIndex((x) => x.kind === 'out' && x.text.includes('Connected - using user prism'));
   expect(stepLines(MAP_STEPS[5])!.section.has(out)).toBe(true);
@@ -150,5 +150,30 @@ test('the window draws cells the way JupyterLab does, without changing their tex
   expect(container.querySelector('.py-kw')).toBeTruthy();
   expect(container.querySelector('.py-op')).toBeTruthy();
   expect(NB_ROWS.filter((r) => r.kind === 'code').every((r) => r.spans.map((s) => s.t).join('') === r.text)).toBe(true);
+});
+
+// owner, 4 Nov: Part 3 is 3a CITY_ASSET (the code loads the asset registry), 3b the extraction (its picture first), 3c CITY_MEMORY
+test('Part 3 is three parts: the assets, then the extraction with its picture first, then the memory', () => {
+  expect(MAP_STEPS.slice(8, 12).map((s) => s.rail)).toEqual(['3a', '3b', '3b', '3c']);
+  expect(MAP_STEPS.slice(8, 12).map((s) => s.tag)).toEqual(['PART 3a', 'PART 3b', 'PART 3b', 'PART 3c']);
+  expect(MAP_STEPS[8].nodes).toEqual(['asset']);
+  expect(MAP_STEPS[9].guide).toBe('extract');
+  expect(MAP_STEPS[10].guide).toBeUndefined();
+  const asset = stepLines(MAP_STEPS[8])!;
+  const text = (rows: Set<number>) => [...rows].map((r) => NB_ROWS[r].text);
+  expect(text(asset.section)[0]).toContain('_data_dir = Path(');
+  expect(text(asset.section).join('\n')).toContain('print(f"Discovered');
+  expect(text(asset.key)).toEqual(expect.arrayContaining([expect.stringContaining('_asset_names = sorted(')]));
+  expect(NB_ROWS.filter((r) => r.kind === 'out' && /^(Loaded|Discovered)/.test(r.text) && asset.section.has(NB_ROWS.indexOf(r)))).toHaveLength(2);
+  const { container } = render(<CodeMap />);
+  const world = container.querySelector('.cm__world')!.textContent!;
+  for (const p of ['PART 3a', 'PART 3b', 'PART 3c']) expect(world).toContain(p);
+  go(9);
+  expect(screen.getByTestId('code-map-guide').dataset.spot).toBe('extract');
+  expect(container.querySelector('.cm__shot img')!.getAttribute('alt')).toContain('CITY_MESSAGE');
+  expect(container.querySelector('.cm__rail .is-now')!.textContent).toBe('3b');
+  go(10);
+  expect(container.querySelector('.cm__rail .is-now')!.textContent).toBe('3b');
+  expect([...container.querySelectorAll('.cm__rail button')].map((b) => b.textContent).filter((x) => x!.startsWith('3'))).toEqual(['3a', '3b', '3c']);
 });
 

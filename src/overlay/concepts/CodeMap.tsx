@@ -6,6 +6,7 @@ import { ModelNet, Net } from './lab1/parts';
 import mercerPortrait from '../../assets/portraits/mercer.png';
 import vancePortrait from '../../assets/portraits/vance.png';
 import jupyterOpen from '../../assets/lab3/jupyter-open.webp';
+import extractionFigure from '../../assets/lab3/auto-extraction.png';
 import './codeMap.css';
 
 /**
@@ -62,11 +63,11 @@ const NODES: NodeDef[] = [
   { id: 'model', x: 1262, y: 220, w: 240, h: 100, name: 'Language model', sub: 'reasons over it' },
   { id: 'answer', x: 1598, y: 220, w: 226, h: 100, icon: 'ok', name: 'The answer', sub: 'back to the inspector' },
   { id: 'embedder', x: 130, y: 650, w: 280, h: 120, icon: 'bars', name: 'Embedder', sub: 'text to 384 numbers', teal: true, step: 'PART 2' },
-  { id: 'message', x: 500, y: 540, w: 320, h: 120, icon: 'table', name: 'CITY_MESSAGE', sub: 'every message, word for word', mono: true, teal: true, step: 'PART 3' },
-  { id: 'extractor', x: 916, y: 540, w: 240, h: 120, icon: 'filter', name: 'Extractor', sub: 'keeps what matters', teal: true, step: 'PART 3' },
-  { id: 'memory', x: 1252, y: 540, w: 320, h: 120, icon: 'layers', name: 'CITY_MEMORY', sub: 'what it learned', mono: true, teal: true, step: 'PART 3' },
+  { id: 'message', x: 500, y: 540, w: 320, h: 120, icon: 'table', name: 'CITY_MESSAGE', sub: 'every message, word for word', mono: true, teal: true, step: 'PART 3b' },
+  { id: 'extractor', x: 916, y: 540, w: 240, h: 120, icon: 'filter', name: 'Extractor', sub: 'keeps what matters', teal: true, step: 'PART 3b' },
+  { id: 'memory', x: 1252, y: 540, w: 320, h: 120, icon: 'layers', name: 'CITY_MEMORY', sub: 'what it learned', mono: true, teal: true, step: 'PART 3c' },
   { id: 'finding', x: 500, y: 760, w: 440, h: 120, icon: 'clip', name: 'CITY_INSPECTION_FINDING', sub: 'the official record', mono: true, teal: true, step: 'PART 4' },
-  { id: 'asset', x: 1252, y: 760, w: 320, h: 120, icon: 'city', name: 'CITY_ASSET', sub: 'the 26 city assets', mono: true, teal: true, step: 'PART 3' },
+  { id: 'asset', x: 1252, y: 760, w: 320, h: 120, icon: 'city', name: 'CITY_ASSET', sub: 'the 26 city assets', mono: true, teal: true, step: 'PART 3a' },
 ];
 
 const LINES: { id: MapLine; d: string; head?: boolean; teal?: boolean }[] = [
@@ -211,7 +212,8 @@ const SPOTS = {
 
 /** Part 0: the real JupyterLab screen, dimmed but for the one thing this click is about */
 function Guide({ step, lit }: { step: MapStep; lit: boolean }) {
-  const spot = SPOTS[step.guide!];
+  const figure = step.guide === 'extract';
+  const spot = figure ? null : SPOTS[step.guide as keyof typeof SPOTS];
   return (
     <div className="cm__guide" data-testid="code-map-guide" data-spot={step.guide}>
       <div className="cm__say cm__fade" style={{ opacity: lit ? 1 : 0 }}>
@@ -221,13 +223,15 @@ function Guide({ step, lit }: { step: MapStep; lit: boolean }) {
         <div className="cm__ask">{step.ask}</div>
         <div className="cm__plain">{step.plain}</div>
       </div>
-      <div className="cm__shot">
-        <img src={jupyterOpen} alt="JupyterLab, with the notebooks in the file list on the left" />
-        <div className="cm__spot" style={{ left: `${spot.x * 100}%`, top: `${spot.y * 100}%`, width: `${spot.w * 100}%`, height: `${spot.h * 100}%` }}>
-          <span className="cm__spotlabel" style={step.guide === 'file' ? { left: 'calc(100% + 8px)', top: 0 } : spot.y > 0.45 ? { bottom: 'calc(100% + 8px)' } : { top: 'calc(100% + 8px)' }}>
-            {spot.label}
-          </span>
-        </div>
+      <div className={`cm__shot${figure ? ' cm__shot--fig' : ''}`}>
+        <img src={figure ? extractionFigure : jupyterOpen} alt={figure ? 'The notebook’s diagram: a new message goes to CITY_MESSAGE and to the extractor, which writes typed records into CITY_MEMORY' : 'JupyterLab, with the notebooks in the file list on the left'} />
+        {spot && (
+          <div className="cm__spot" style={{ left: `${spot.x * 100}%`, top: `${spot.y * 100}%`, width: `${spot.w * 100}%`, height: `${spot.h * 100}%` }}>
+            <span className="cm__spotlabel" style={step.guide === 'file' ? { left: 'calc(100% + 8px)', top: 0 } : spot.y > 0.45 ? { bottom: 'calc(100% + 8px)' } : { top: 'calc(100% + 8px)' }}>
+              {spot.label}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
