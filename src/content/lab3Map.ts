@@ -73,6 +73,9 @@ export const MAP_STEPS: MapStep[] = [
   { title: 'Later: Vance', rail: 'Day N', tag: 'DAY N', cam: ALL, ask: 'Vance asks, and Mercer’s work reaches him.', plain: 'He only calls call_copilot. His own thread is empty, but the asset’s memory and her finding come up the same road. No human handoff.', see: 'DAY N: Inspector Vance on Harbor Bridge (never met Mercer)', who: 'vance', nodes: ['inspector', 'copilot', 'scope', 'prompt', 'model', 'answer', 'memory', 'finding', 'asset'], lines: ['a', 'e', 'read', 'l', 'n', 'b', 'c', 'd'], code: { cell: 64, from: 'VANCE_DIAGNOSIS = await', to: 'asset_id="Harbor Bridge"', keys: ['VANCE_DIAGNOSIS = await', 'inspector_id="Jordan_Vance"', 'asset_id="Harbor Bridge"'], out: 'DAY N:' } },
 ];
 
+/** a step's name in the page overview: its button and what it is about; the picture steps are told apart by their question */
+export const stepName = (m: MapStep): string => (m.guide ? `${m.rail} · ${m.ask}` : m.title.startsWith(m.rail) ? m.title : `${m.rail} · ${m.title}`);
+
 export const NB_FILE = completeNotebook.file;
 
 export interface NbSpan {

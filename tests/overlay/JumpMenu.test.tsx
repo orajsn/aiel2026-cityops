@@ -4,6 +4,8 @@ import { useSceneStore } from '../../src/engine/store';
 import { useUiStore } from '../../src/engine/ui';
 import { SCENES, pageLabel } from '../../src/scenes/index';
 import { CHAPTER_NAME, SECTIONS } from '../../src/scenes/sections';
+import { MAP_STEPS, stepName } from '../../src/content/lab3Map';
+import { useDrawerStore } from '../../src/engine/presentation';
 
 beforeEach(() => {
   useSceneStore.getState().setScenes(SCENES);
@@ -45,3 +47,44 @@ test('opening and closing the overview does not crash where scrollIntoView retur
   expect(() => unmount()).not.toThrow();
   Element.prototype.scrollIntoView = orig;
 });
+
+// owner, 4 Nov: in All pages each step of the code map is a page of its own, shown as a sub-page: 19, 19a, 19b ...
+test('the code map shows each of its steps as a sub-page with its own preview', () => {
+  render(<JumpMenu />);
+  const n = pageLabel('3.6m');
+  const tile = (label: string) => screen.getByRole('button', { name: new RegExp(`^Lab 3 · Agent Memory ${label} `) });
+  // the page itself first, then one tile per step, lettered in order
+  expect(within(tile(n)).getByRole('img').getAttribute('src')).toBe('./thumbs/3.6m.jpg');
+  MAP_STEPS.slice(1).forEach((m, k) => {
+    const label = `${n}${String.fromCharCode(97 + k)}`;
+    const card = tile(label);
+    expect(within(card).getByRole('img').getAttribute('src')).toBe(`./thumbs/3.6m_${k + 1}.jpg`);
+    expect(within(card).getByText(stepName(m))).toBeInTheDocument();
+  });
+  expect(screen.getAllByRole('button', { name: /^Lab 3 · Agent Memory 19[a-q]? /i }).length).toBe(MAP_STEPS.length);
+});
+
+test('clicking a step of the code map opens that step; the open step is the current one', () => {
+  render(<JumpMenu />);
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^Lab 3 · Agent Memory ${pageLabel('3.6m')}i `) }));
+  expect(useSceneStore.getState().current().id).toBe('3.6m');
+  expect(useDrawerStore.getState()).toMatchObject({ open: true, focus: 9 });
+  expect(useUiStore.getState().jumpOpen).toBe(false);
+  // reopened, the overview marks that step as the current one
+  useUiStore.setState({ jumpOpen: true });
+  const { container } = render(<JumpMenu />);
+  const current = container.querySelectorAll('.jump__card.current');
+  expect(current).toHaveLength(1);
+  expect(current[0].textContent).toContain(MAP_STEPS[9].title);
+  // the first tile goes back to the whole map
+  fireEvent.click(within(container).getByRole('button', { name: new RegExp(`^Lab 3 · Agent Memory ${pageLabel('3.6m')} The code`) }));
+  expect(useDrawerStore.getState()).toMatchObject({ open: false, focus: 0 });
+});
+
+test('the sub-page names are all different, so each step can be told apart', () => {
+  const names = MAP_STEPS.slice(1).map(stepName);
+  expect(new Set(names).size).toBe(names.length);
+  expect(names).toContain('Day 1: Mercer');
+  expect(names).toContain('0 · Run the cell.');
+});
+

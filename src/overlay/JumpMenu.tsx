@@ -3,11 +3,18 @@ import { useSceneStore } from '../engine/store';
 import { useUiStore } from '../engine/ui';
 import { CHAPTER_NAME, PARTS, SECTIONS } from '../scenes/sections';
 import { pageLabel } from '../scenes';
+import { MAP_STEPS, stepName } from '../content/lab3Map';
+import { useDrawerStore } from '../engine/presentation';
+
+/** Lab 3's code map is one page with many steps; the overview shows each step as its own sub-page, 19, 19a, 19b… (owner, 4 Nov) */
+const MAP_PAGE = '3.6m';
+const stepLetter = (i: number) => (i === 0 ? '' : String.fromCharCode(96 + i));
 
 /**
  * Page overview (Pages button or J): every page as a preview with its name under it, grouped by
  * chapter and story section. Click one to jump there. Previews are pictures of the real pages
- * (public/thumbs/<id>.jpg, refreshed by tools/capture-thumbs.mjs).
+ * (public/thumbs/<id>.jpg, refreshed by tools/capture-thumbs.mjs). The code map's steps are sub-pages with pictures of their own
+ * (public/thumbs/3.6m_<step>.jpg, tools/capture-code-map-thumbs.mjs).
  */
 export function JumpMenu() {
   const scenes = useSceneStore((s) => s.scenes);
@@ -20,6 +27,7 @@ export function JumpMenu() {
     current.current?.scrollIntoView?.({ block: 'center' });
   }, []);
   const byId = new Map(scenes.map((s) => [s.id, s]));
+  const mapStep = useDrawerStore((s) => (s.open ? Math.min(s.focus, MAP_STEPS.length - 1) : 0));
 
   return (
     <div className="jump" onClick={close} role="dialog" aria-label="All pages">
@@ -37,34 +45,42 @@ export function JumpMenu() {
               <div key={sec.name} className="jump__section">
                 <h3 className="jump__section-name">{sec.name}</h3>
                 <div className="jump__grid">
-                  {sec.pages.map((id) => {
+                  {sec.pages.flatMap((id) => {
                     const s = byId.get(id);
-                    if (!s) return null;
-                    const here = scenes[index]?.id === id;
-                    return (
+                    if (!s) return [];
+                    const onPage = scenes[index]?.id === id;
+                    // the code map: one tile per step, on the page's own number plus a letter
+                    const tiles = id === MAP_PAGE ? MAP_STEPS.map((m, k) => ({ key: `${id}-${k}`, label: `${pageLabel(id)}${stepLetter(k)}`, name: k === 0 ? s.title : stepName(m), thumb: k === 0 ? `./thumbs/${id}.jpg` : `./thumbs/${id}_${k}.jpg`, step: k, here: onPage && mapStep === k })) : [{ key: id, label: pageLabel(id), name: s.title, thumb: `./thumbs/${id}.jpg`, step: -1, here: onPage }];
+                    return tiles.map((t) => (
                       <button
-                        key={id}
-                        ref={here ? current : undefined}
+                        key={t.key}
+                        ref={t.here ? current : undefined}
                         type="button"
-                        className={`jump__card${here ? ' current' : ''}`}
-                        aria-label={`${CHAPTER_NAME[s.chapter]} ${pageLabel(id)} ${s.title}`}
+                        className={`jump__card${t.here ? ' current' : ''}`}
+                        aria-label={`${CHAPTER_NAME[s.chapter]} ${t.label} ${t.name}`}
                         onClick={() => {
                           jumpTo(id);
+                          if (t.step >= 0) {
+                            const d = useDrawerStore.getState();
+                            d.setOpen(t.step > 0);
+                            d.setFocus(t.step);
+                            useDrawerStore.setState({ done: false });
+                          }
                           close();
                         }}
                       >
                         <span className="jump__thumb">
                           <img
-                            src={`./thumbs/${id}.jpg`}
-                            alt={`Preview of ${CHAPTER_NAME[s.chapter]} page ${pageLabel(id)}`}
+                            src={t.thumb}
+                            alt={`Preview of ${CHAPTER_NAME[s.chapter]} page ${t.label}`}
                             loading="lazy"
                             onError={(e) => ((e.currentTarget as HTMLImageElement).style.visibility = 'hidden')}
                           />
-                          <span className="jump__id mono">{pageLabel(id)}</span>
+                          <span className="jump__id mono">{t.label}</span>
                         </span>
-                        <span className="jump__name">{s.title}</span>
+                        <span className="jump__name">{t.name}</span>
                       </button>
-                    );
+                    ));
                   })}
                 </div>
               </div>
