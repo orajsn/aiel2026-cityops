@@ -1,7 +1,10 @@
-import { render, waitFor } from '@testing-library/react';
+import { act, render, waitFor } from '@testing-library/react';
+import { useDrawerStore } from '../../src/engine/presentation';
 import { DeskCabinet, SharedShelf, ThreeKinds, MERCER_NOTES } from '../../src/overlay/concepts/MemoryKinds';
 
 const noRed = (c: HTMLElement) => expect(c.innerHTML).not.toMatch(/--red|#c74634/i);
+
+beforeEach(() => useDrawerStore.getState().reset());
 
 test('desk: Mercer’s three notes in order, the copilot card, then the chat closes and the desk is wiped', async () => {
   const c = render(<DeskCabinet kicker="k" message="m" step={1} />).container;
@@ -15,6 +18,10 @@ test('desk: Mercer’s three notes in order, the copilot card, then the chat clo
   expect(c.textContent).toContain('the context window · the session');
   expect(c.querySelector('[data-portrait="mercer"]')).not.toBeNull();
   expect(c.querySelector('[data-desk="wiped"]')?.getAttribute('data-wiped')).toBe('false');
+  // nothing wipes the desk by itself: it waits for the next Next (PAGE_STEPS)
+  await new Promise((r) => setTimeout(r, 1500));
+  expect(c.querySelector('[data-desk="wiped"]')?.getAttribute('data-wiped')).toBe('false');
+  act(() => useDrawerStore.setState({ open: true, focus: 1 }));
   await waitFor(() => expect(c.querySelector('[data-desk="wiped"]')?.getAttribute('data-wiped')).toBe('true'), { timeout: 5000 });
   expect(c.textContent).toContain('the chat closes: the desk is swept clean');
   noRed(c);

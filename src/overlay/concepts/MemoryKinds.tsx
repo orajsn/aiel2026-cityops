@@ -5,6 +5,7 @@ import vancePortrait from '../../assets/portraits/vance.png';
 import { EASE, WidePanel } from './WidePanel';
 import { LineIcon } from './icons';
 import { Fill, FitBox } from './Fill';
+import { useDrawerStore } from '../../engine/presentation';
 
 /** Mercer's three notes, exactly as the notebook has them */
 export const MERCER_NOTES = [
@@ -119,13 +120,14 @@ function Table({ width, children, label, top }: { width: number; children: React
 const CARD: CSSProperties = { background: 'var(--panel-strong)', border: '1px solid rgba(0,0,0,0.12)', boxShadow: '0 3px 8px rgba(0,0,0,0.18)', borderRadius: 10 };
 
 function Desk() {
-  const [wiped, setWiped] = useState(false);
+  // the desk is wiped by the next Next, not by a timer (owner, 4 Nov: one click before the whole desk is swept clean)
+  const wiped = useDrawerStore((s) => s.open && s.focus >= 1);
   const [swept, setSwept] = useState(false);
   useEffect(() => {
-    const t = setTimeout(() => setWiped(true), WIPE_DELAY);
-    const u = setTimeout(() => setSwept(true), WIPE_DELAY + SWEEP_MS);
-    return () => (clearTimeout(t), clearTimeout(u));
-  }, []);
+    if (!wiped) return setSwept(false);
+    const u = setTimeout(() => setSwept(true), SWEEP_MS);
+    return () => clearTimeout(u);
+  }, [wiped]);
   const tilt = [-1.6, 1.1, 0.8, -0.9];
   const cards: { text: string; who: 'mercer' | 'copilot' }[] = [...MERCER_NOTES.map((text) => ({ text, who: 'mercer' as const })), { text: 'Noted.', who: 'copilot' }];
   return (

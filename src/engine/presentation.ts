@@ -73,7 +73,8 @@ const NO_STEPS = new Set(['2.2c']);
  * (the four glasses of 3.3b: Volume at once, then Relevance, Accuracy, Timing). The step is the drawer store's `focus` while `open`;
  * these pages have no drawer on screen, the store only counts the presses.
  */
-export const PAGE_STEPS: Record<string, number> = { '3.3b': 3 };
+export const PAGE_STEPS: Record<string, number> = { '3.2a': 1, '3.3b': 3 };
+// 3.2a: the desk holds Mercer's notes until Next; the next press closes the chat and wipes the desk (owner, 4 Nov)
 export const focusStepCount = (id: string): number => (PAGE_STEPS[id] ?? (NO_STEPS.has(id) ? 0 : NB_PAGES[id] ? NB_PAGES[id].steps.length - 1 : LAB2_FOCUS[id]?.length ?? 0));
 
 /** the focus page on screen now, once its camera has arrived */
