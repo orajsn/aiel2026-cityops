@@ -16,7 +16,6 @@ import { Rich } from './Rich';
 import { SettingsPanel } from './SettingsPanel';
 import { pageLabel } from '../scenes';
 import { FollowCard } from './FollowCard';
-import { LabLink } from './LabLink';
 import { PAGE_STEPS, focusNext, focusPrev, pagePrev, useDrawerStore, usePresentationStore } from '../engine/presentation';
 import { FRAME, useGraphicsStore } from '../engine/graphics';
 
@@ -148,7 +147,6 @@ export function Overlay() {
         </div>
       )}
 
-      {settled && !trafficEditing && <LabLink key={scene.id} sceneId={scene.id} />}
       <FollowCard />
       {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} />}
 

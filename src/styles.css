@@ -794,9 +794,3 @@ body.is-idle, body.is-idle * { cursor: none !important; }
 .settings__follow .code { font: 700 30px/1 var(--font-mono); letter-spacing: 0.08em; color: var(--ink); }
 .settings__follow small { color: var(--ink-dim); font: 400 13px/1.35 var(--font-body); }
 a.settings__tool { text-decoration: none; }
-
-/* the lab's link and QR on its first page (src/overlay/LabLink.tsx) */
-.lab-link { position: absolute; top: 8px; right: 190px; z-index: 36; display: flex; align-items: center; gap: 14px; padding: 8px 20px 8px 8px; border-radius: 14px; background: var(--panel-strong); border: 1px solid var(--line); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18); }
-.lab-link__qr { width: 66px; height: 66px; border-radius: 8px; display: block; }
-.lab-link__kicker { font: 700 15px/1 var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); margin-bottom: 6px; }
-.lab-link__url { font: 600 24px/1.1 var(--font-mono); color: var(--ink); }
