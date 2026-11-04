@@ -85,6 +85,8 @@ const LINES: { id: MapLine; d: string; head?: boolean; teal?: boolean }[] = [
   // Part 3 in one row, in order: the assets, the messages, the extractor, the memory
   { id: 'r', d: 'M390 600 H492', head: true, teal: true },
   { id: 'q', d: 'M410 820 H492', head: true, teal: true },
+  // the embedder (Part 2) serves the assets (Part 3a) and the findings (Part 4)
+  { id: 'u', d: 'M260 760 V668', head: true, teal: true },
 ];
 
 const nodeState = (step: MapStep, id: MapNode) => (!step.nodes ? '' : step.nodes.includes(id) ? ' is-on' : ' is-off');

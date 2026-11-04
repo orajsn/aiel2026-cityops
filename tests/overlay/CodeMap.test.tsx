@@ -33,6 +33,7 @@ test('the first step is the whole map with nothing dimmed; Next lights the node 
   expect(container.querySelector('[data-node="embedder"]')!.classList.contains('is-on')).toBe(true);
   expect(container.querySelector('[data-node="asset"]')!.classList.contains('is-off')).toBe(true);
   expect(container.querySelector('[data-line="q"]')!.getAttribute('data-lit')).toBe('true');
+  expect(container.querySelector('[data-line="u"]')!.getAttribute('data-lit')).toBe('true');
   expect(screen.getByTestId('code-map-see').textContent).toContain('TODO 1 passed');
 });
 
@@ -198,5 +199,19 @@ test('Part 3 sits in one row, in order: CITY_ASSET, CITY_MESSAGE, the Extractor,
   expect(at('finding').top).toBe(at('embedder').top);
   expect(container.querySelector('[data-line="r"]')).toBeTruthy();
   expect(container.querySelector('[data-line="m"]')).toBeNull();
+});
+
+// owner, 4 Nov: the Part 2 node, the embedder, is connected to Part 3a (the assets) and to Part 4 (the findings)
+test('the embedder is connected to CITY_ASSET above it and to CITY_INSPECTION_FINDING beside it', () => {
+  const { container } = render(<CodeMap />);
+  expect(container.querySelector('[data-line="u"]')!.getAttribute('d')).toBe('M260 760 V668');
+  expect(container.querySelector('[data-line="q"]')).toBeTruthy();
+  const el = (id: string) => container.querySelector<HTMLElement>(`[data-node="${id}"]`)!;
+  const embedder = el('embedder');
+  const asset = el('asset');
+  // the line runs from the embedder's top edge to the asset's bottom edge, inside both
+  expect(parseInt(embedder.style.top)).toBe(760);
+  expect(parseInt(asset.style.top) + parseInt(asset.style.height)).toBeLessThan(668);
+  for (const x of [260]) for (const n of [embedder, asset]) expect(x).toBeGreaterThan(parseInt(n.style.left)), expect(x).toBeLessThan(parseInt(n.style.left) + parseInt(n.style.width));
 });
 
