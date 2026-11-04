@@ -140,10 +140,14 @@ const b22e = atRust('3.2e', 'Private drawer, shared shelf', 'SharedShelf', { kic
  * Bridge story in three steps, then the recap grid; this afternoon's loop now lives in the harness page.
  */
 const b23a = atRust('3.3a', 'The glass', 'Glass', { kicker: 'The context window, “the glass”', step: 1, message: 'The language model reads **only what is in the glass**, this turn.' } satisfies GlassProps, 'glass');
-const b23b = atRust('3.3b', 'Four things go wrong', 'Glass', { kicker: 'The context window', step: 2, message: 'The glass is all the model sees, and **four things go wrong** when we fill it.' } satisfies GlassProps, 'glass');
+const GLASS_K = 'The context window';
+const b23b = atRust('3.3b', 'Volume: the window fills up', 'Glass', { kicker: GLASS_K, step: 2, message: 'Volume: **the window fills up.**' } satisfies GlassProps, 'glass');
+const b23c = atRust('3.3c', 'Relevance: wrong data is in it', 'Glass', { kicker: GLASS_K, step: 3, message: 'Relevance: **the wrong data is in it.**' } satisfies GlassProps, 'glass');
+const b23d = atRust('3.3d', 'Accuracy: summaries lose details', 'Glass', { kicker: GLASS_K, step: 4, message: 'Accuracy: **summaries lose details.**' } satisfies GlassProps, 'glass');
+const b23e = atRust('3.3e', 'Timing: the right memory, at the wrong moment', 'Glass', { kicker: GLASS_K, step: 5, message: 'Timing: **the right memory, at the wrong moment.**' } satisfies GlassProps, 'glass');
 const b24a = atRust('3.4a', 'Memory engineering', 'Discipline', { kicker: '① Memory engineering', which: 'memory', message: 'Decide what to keep, and **file it where it won’t get lost**.' } satisfies DisciplineProps);
 const b24b = atRust('3.4b', 'Context engineering', 'Discipline', { kicker: '② Context engineering', which: 'context', message: 'For each question, **pour in only what this question needs**.' } satisfies DisciplineProps);
-const b24c = atRust('3.4c', 'Harness engineering', 'Discipline', { kicker: '③ Harness engineering', which: 'harness', message: 'Make it happen **every turn, automatically**.', notebook: `${NB} · Part 1, TODO 1` } satisfies DisciplineProps);
+const b24c = atRust('3.4c', 'Harness engineering', 'Discipline', { kicker: '③ Harness engineering', which: 'harness', message: 'Make it happen **every turn, automatically**.' } satisfies DisciplineProps);
 const b24d = atRust('3.4d', 'Who fixes what', 'WhoFixesWhat', { kicker: 'Three disciplines, four problems', message: 'That is why **Vance gets Mercer’s finding**.' } satisfies WhoFixesWhatProps);
 const b25b = atRust('3.5b', 'One store, any harness', 'MemoryLoop', { kicker: 'The agent loop, with memory wired in', message: 'One store, one memory manager, **any harness**.' } satisfies MemoryLoopProps);
 
@@ -253,6 +257,9 @@ export const chapter2: SceneDef[] = [
   b22e,
   b23a,
   b23b,
+  b23c,
+  b23d,
+  b23e,
   b24a,
   b24b,
   b24c,

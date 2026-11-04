@@ -6,7 +6,8 @@ const icons = (c: HTMLElement) => [...c.querySelectorAll('svg[data-icon]')].map(
 
 test('the four failures carry the same icons on the glass and when solved', () => {
   const four = ['overflow', 'target', 'inspect', 'clock'];
-  expect(icons(render(<Glass kicker="k" message="m" step={2} />).container)).toEqual(four);
+  // one problem per click: each click shows its own icon (the same one that comes back when solved)
+  expect([2, 3, 4, 5].map((s) => icons(render(<Glass kicker="k" message="m" step={s as 2 | 3 | 4 | 5} />).container)[0])).toEqual(four);
   expect(icons(render(<FailuresSolved kicker="k" message="m" />).container)).toEqual(four);
 });
 
