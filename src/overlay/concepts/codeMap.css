@@ -25,9 +25,9 @@
 .cm__name b.mono.long { font-size: 20px; }
 .cm__name span { font-size: 16px; color: #5b6773; }
 .cm__tag { display: inline-flex; align-items: center; height: 26px; padding: 0 11px; border-radius: 13px; color: #fff; font-size: 14px; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; background: #1f2a33; }
-.cm__tag--todo { background: #14707f; }
+.cm__tag--write { background: #14707f; }
 .cm__node > .cm__tag { position: absolute; top: -15px; left: 16px; }
-.cm__node > .cm__tag--todo { left: auto; right: 16px; }
+.cm__node > .cm__tag--write { left: auto; right: 16px; }
 .cm__chip { position: absolute; left: 150px; top: 898px; height: 28px; padding: 0 12px; display: flex; align-items: center; background: #fff; border: 1px dashed #14707f; border-radius: 14px; box-sizing: border-box; font-size: 16px; font-weight: 600; color: #14707f; transition: opacity 0.6s ease; }
 .cm__chip.is-off { opacity: 0.25; }
 .cm__lines { position: absolute; left: 0; top: 0; fill: none; }

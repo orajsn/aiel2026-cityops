@@ -71,3 +71,17 @@ test('the two days show their own inspector and only their own path', () => {
   expect(container.querySelector('[data-line="read"]')!.getAttribute('data-lit')).toBe('true');
   expect(container.querySelector('[data-line="confirm"]')!.getAttribute('data-lit')).toBeNull();
 });
+
+// owner, 4 Nov: "there should be one numbering rule": the steps are the only numbers; an exercise says "you write", with no number of its own
+test('the map and the panel number only the steps', () => {
+  const { container } = render(<CodeMap />);
+  expect(container.querySelector('.cm__world')!.textContent).not.toMatch(/TODO|PART/);
+  expect(container.querySelectorAll('.cm__world .cm__tag--write')).toHaveLength(5);
+  go(2);
+  const tags = container.querySelector('.cm__tags')!.textContent!;
+  expect(tags).toContain('STEP 3');
+  expect(tags).toContain('YOU WRITE 2 LINES');
+  expect(tags).not.toMatch(/TODO|PART/);
+  go(7);
+  expect(container.querySelector('.cm__tags')!.textContent).not.toMatch(/TODO|PART|YOU WRITE/);
+});

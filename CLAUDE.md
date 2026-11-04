@@ -61,7 +61,7 @@ The 18 blue pages of the Harbor Bridge deck (0.6, 2.2c, 2.2d, 2.3, 2.3a, 2.4f-h,
 
 ## Lab 3 code map (owner, 4 Nov)
 
-Lab 3's coding part is one page, `3.6m` (overlay `CodeMap`, data in `src/content/lab3Map.ts`, drafted on the canvas "Lab 3 Code Map"): eleven steps by Next (`PAGE_STEPS`), the order the code runs. Each Next flies the map to the node while a real notebook window glides to that part of the code; its lines stay, key lines light up, the rest fades to 22%. The window shows the student notebook with each TODO's answer filled in and the screen's naming rules applied (for the screen only; the notebook file is never changed). The pages it replaces, 3.6 to 3.14a, are hidden, not deleted: `LAB3_CUT` in `src/scenes/chapter2.ts`. After the map come 3.15 onward (Back on the bridge), the Lab 3 recap and the final recap.
+Lab 3's coding part is one page, `3.6m` (overlay `CodeMap`, data in `src/content/lab3Map.ts`, drafted on the canvas "Lab 3 Code Map"): eleven steps by Next (`PAGE_STEPS`), the order the code runs.  One numbering rule on the page: the steps; an exercise says "YOU WRITE", never a TODO or Part number (the notebook window keeps its own text). Each Next flies the map to the node while a real notebook window glides to that part of the code; its lines stay, key lines light up, the rest fades to 22%. The window shows the student notebook with each TODO's answer filled in and the screen's naming rules applied (for the screen only; the notebook file is never changed). The pages it replaces, 3.6 to 3.14a, are hidden, not deleted: `LAB3_CUT` in `src/scenes/chapter2.ts`. After the map come 3.15 onward (Back on the bridge), the Lab 3 recap and the final recap.
 
 ## Open items (26 Oct)
 
