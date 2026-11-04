@@ -140,7 +140,7 @@ const b22e = atRust('3.2e', 'Private drawer, shared shelf', 'SharedShelf', { kic
  * Bridge story in three steps, then the recap grid; this afternoon's loop now lives in the harness page.
  */
 const b23a = atRust('3.3a', 'The glass', 'Glass', { kicker: 'The context window, “the glass”', step: 1, message: 'The language model reads **only what is in the glass**, this turn.' } satisfies GlassProps, 'glass');
-const b23b = atRust('3.3b', 'Four things go wrong', 'Glass', { kicker: 'The context window', step: 2, message: 'The glass is all the model sees, and **four things go wrong** when we fill it.', notebook: 'the Part 6 context card is the cure' } satisfies GlassProps, 'glass');
+const b23b = atRust('3.3b', 'Four things go wrong', 'Glass', { kicker: 'The context window', step: 2, message: 'The glass is all the model sees, and **four things go wrong** when we fill it.' } satisfies GlassProps, 'glass');
 const b24a = atRust('3.4a', 'Memory engineering', 'Discipline', { kicker: '① Memory engineering', which: 'memory', message: 'Decide what to keep, and **file it where it won’t get lost**.' } satisfies DisciplineProps);
 const b24b = atRust('3.4b', 'Context engineering', 'Discipline', { kicker: '② Context engineering', which: 'context', message: 'For each question, **pour in only what this question needs**.' } satisfies DisciplineProps);
 const b24c = atRust('3.4c', 'Harness engineering', 'Discipline', { kicker: '③ Harness engineering', which: 'harness', message: 'Make it happen **every turn, automatically**.', notebook: `${NB} · Part 1, TODO 1` } satisfies DisciplineProps);
