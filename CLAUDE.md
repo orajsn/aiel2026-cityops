@@ -53,7 +53,7 @@ The audience follows the talk on their phones: Settings › Phone follow › Sta
 
 ## Lab 2 selected deck (owner, 3 Nov)
 
-Lab 2 is 42 pages, not 59: 17 pages are out of the show (`LAB2_CUT` in `src/scenes/chapter1.ts`: 0.4b, 2.1, 2.2a, 2.2b, 2.4, 2.4a, 2.4e to 2.4j, 2.6, 2.7b to 2.7d, 2.8). They are hidden, not deleted: their code, scripts and notebook data stay, `LAB2_ALL` still has them for the tests, and taking an id out of the set brings the page back. The git tag `lab2-59-pages` is the whole 59-page state. Running numbers follow the show order, so they run 1 to 42 by themselves. Next: four pages get new content (original 08, 16, 17, 18; the handoff in the owner's `Lab-2-AI-Handoff.zip`).
+Lab 2 is 37 pages, not 59: 22 pages are out of the show (`LAB2_CUT` in `src/scenes/chapter1.ts`: 0.4b, 2.1, 2.2a, 2.2b, 2.4, 2.4a, 2.4e to 2.4j, 2.6, 2.7b to 2.7d, 2.8, and on 4 Nov, after a colleague's comments in the script manager, the whole Trust chapter 2.8a to 2.8e; the chapter then drops out of the jump menu). They are hidden, not deleted: their code, scripts and notebook data stay, `LAB2_ALL` still has them for the tests, and taking an id out of the set brings the page back. The git tag `lab2-59-pages` is the whole 59-page state. Running numbers follow the show order, so they run 1 to 37 by themselves. Next: four pages get new content (original 08, 16, 17, 18; the handoff in the owner's `Lab-2-AI-Handoff.zip`).
 
 ## Lab 2 notebook pages (owner, 30 Oct)
 

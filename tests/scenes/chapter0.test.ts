@@ -76,12 +76,12 @@ test('pages are numbered 1, 2, 3 inside each part (Introduction, Lab 2, Lab 3), 
   expect(pageNumber('0.7c')).toBe(6);
   expect(pageNumber('0.4g')).toBe(0);
   expect(pageNumber('0.4')).toBe(1);
-  // Lab 2 runs 1 to 42 (the selected deck): the workbench is 6, what the agent can see 8, is the model awake 10
+  // Lab 2 runs 1 to 37 (the selected deck): the workbench is 6, what the agent can see 8, is the model awake 10
   expect(pageNumber('2.1a')).toBe(5);
   expect(pageNumber('0.5')).toBe(6);
   expect(pageNumber('0.3')).toBe(8);
   expect(pageNumber('0.6')).toBe(10);
-  expect(pageNumber('2.9')).toBe(42);
+  expect(pageNumber('2.9')).toBe(37);
   expect(pageNumber('2.9')).toBe(SCENES.filter((s) => s.chapter === 1 && !s.pageZero).length);
 });
 

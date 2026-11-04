@@ -8,8 +8,8 @@ import { WITH_LAB1, lab1 } from '../../src/scenes/lab1';
 import { SHOTS } from '../../src/world/shots';
 import { OVERLAYS } from '../../src/overlay/registry';
 
-// Lab 2 follows the Harbor Bridge deck (owner, 29 Oct): eleven chapters, then the recap. 3 Nov: the selected deck leaves out 17 pages
-// (LAB2_CUT in chapter1.ts), so it is 42 pages
+// Lab 2 follows the Harbor Bridge deck (owner, 29 Oct): eleven chapters, then the recap. 3 Nov: the selected deck leaves out 22 pages
+// (LAB2_CUT in chapter1.ts), so it is 37 pages
 const CH1_BEATS = [
   '0.4', '0.4a', // Story
   '2.0', '2.0a', '2.1a', // Why
@@ -20,7 +20,6 @@ const CH1_BEATS = [
   '2.5', '2.5a', '2.5b', '2.5c', '2.5d', // §3 Tools
   '2.6a', '2.6b', '2.6c', // §4 Query
   '2.7', '2.7a', '2.7e', '2.7f', '2.7g', '2.7h', // §5 Agent
-  '2.8a', '2.8b', '2.8c', '2.8d', '2.8e', // Trust
   '2.8f', // §6 Wrap
   '2.9', // the recap
 ];
@@ -53,7 +52,7 @@ test('SCENES runs the parts in show order: Introduction, Lab 1 (when in the show
   expect(SCENES.map((s) => s.id)).toEqual(order);
   // Introduction 7 (the city, then the bridge's four clicks); Lab 2 the deck's 58 pages and the recap
   expect(SCENES.length).toBe(7 + (WITH_LAB1 ? lab1.length : 0) + CH1_BEATS.length + 26 + 2 + (WITH_LAB1 ? 1 : 0)); // + the 'Open the lab' pages (0.4g, 3.0g and, with Lab 1, 1.0g)
-  expect(CH1_BEATS).toHaveLength(42);
+  expect(CH1_BEATS).toHaveLength(37);
 });
 
 test('no banned names anywhere in the copy', () => {
@@ -68,7 +67,7 @@ test('every scene has a presenter script', () => {
 test('Lab 2: the jump menu has the deck’s chapters in order, and one panel per group stays at one place', () => {
   expect(LAB2_CHAPTERS.map((c) => c.name)).toEqual([
     'Story · one crack', 'Why AI needs your data', 'The workbench', 'RAG: the filing cabinet', 'Workflow: the fixed checklist',
-    'Agent: the chief inspector', 'Tools, skills, MCP', 'One query, four lenses', 'Build the agent', 'Trust: security and observability', 'Wrap-up', 'Closing Lab 2',
+    'Agent: the chief inspector', 'Tools, skills, MCP', 'One query, four lenses', 'Build the agent', 'Wrap-up', 'Closing Lab 2',
   ]);
   expect(SECTIONS.filter((s) => s.chapter === 1).flatMap((s) => s.pages)).toEqual(['0.4g', ...CH1_BEATS]);
   const groups = new Map<string, typeof chapter1>();
@@ -87,6 +86,7 @@ test('Lab 2: the jump menu has the deck’s chapters in order, and one panel per
 });
 
 test('Lab 2: every page has a takeaway, each chapter ends on a "Next in the notebook" band (but the recap)', () => {
+  // (Trust is out of the selected deck: its chapter drops out of LAB2_CHAPTERS)
   // 2.6a is the sky stage's own small caption (UnifiedQuery), not a Lab 2 panel
   for (const s of chapter1.filter((x) => x.id !== '2.9' && x.id !== '2.6a')) expect((s.overlayProps as { takeaway?: string }).takeaway?.length, s.id).toBeGreaterThan(20);
   // (the Story and Build chapters ended on pages the selected deck leaves out, 0.4b and 2.8: they end without a band now)

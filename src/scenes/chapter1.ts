@@ -218,7 +218,7 @@ const recap: SceneDef = {
 };
 
 /**
- * The 17 pages the owner's selected deck leaves out (3 Nov, "Lab 2 · Revised selected deck": 59 pages down to 42). They are hidden, not
+ * The 22 pages the owner's selected deck leaves out (3 Nov, "Lab 2 · Revised selected deck": 59 pages down to 42). They are hidden, not
  * deleted: their code, scripts and notebook data stay, and taking an id out of this set brings the page back. The git tag
  * `lab2-59-pages` is the whole 59-page state. The original numbers (the handoff's 03, 06, 14, 15, 21, 22, 26 to 31, 39, 45 to 47, 52):
  */
@@ -240,11 +240,17 @@ export const LAB2_CUT = new Set([
   '2.7c', // 46 Wipe only this lab's notes
   '2.7d', // 47 Two memories, one connection
   '2.8', // 52 The key you save under
+  '2.8a', // Trust, cut on 4 Nov (a colleague's comment: "ตัดทิ้ง"): A fake warning sign
+  '2.8b', // Keys to every gate
+  '2.8c', // An unverified tool
+  '2.8d', // Observability
+  '2.8e', // A dashboard for this crack
 ]);
 const shown = (pages: SceneDef[]) => pages.filter((p) => !LAB2_CUT.has(p.id));
 
 /** Lab 2's chapters in show order (the jump menu's sections, sections.ts) */
-export const LAB2_CHAPTERS: { name: string; pages: SceneDef[] }[] = [
+/** (a chapter whose pages are all cut, like Trust since 4 Nov, drops out of the jump menu: it comes back with its pages) */
+export const LAB2_CHAPTERS: { name: string; pages: SceneDef[] }[] = ([
   { name: 'Story · one crack', pages: shown(story) },
   { name: 'Why AI needs your data', pages: shown(why) },
   { name: 'The workbench', pages: shown(setup) },
@@ -257,7 +263,7 @@ export const LAB2_CHAPTERS: { name: string; pages: SceneDef[] }[] = [
   { name: 'Trust: security and observability', pages: shown(trust) },
   { name: 'Wrap-up', pages: shown(wrap) },
   { name: 'Closing Lab 2', pages: [recap] },
-];
+]).filter((c) => c.pages.length > 0);
 
 export const chapter1: SceneDef[] = LAB2_CHAPTERS.flatMap((c) => c.pages);
 /** all 59 pages, hidden ones included (their panels stay tested while they are out of the show) */
