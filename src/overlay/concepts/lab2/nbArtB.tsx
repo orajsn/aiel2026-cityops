@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { EASE } from '../WidePanel';
 import { AgentAvatar } from './AgentAvatar';
 import { Figure } from './everyday';
+import { StateGraphArt } from './nbArtGraph';
 
 /**
  * Notebook pages 2.5d to 2.8: the everyday picture of what each page's code does (owner, 30 Oct), in the flat style of
@@ -429,11 +430,11 @@ function Filed() {
   );
 }
 
-export const NB_ART_B: Record<string, { art: ReactNode; caption: ReactNode }> = {
+export const NB_ART_B: Record<string, { art: ReactNode | ((step: number) => ReactNode); caption: ReactNode }> = {
   '2.5d': { art: <Manual />, caption: <>The inspector keeps the <b>manual</b> open in the truck: the checks in order, write down the decision, and call for help when unsure.</> },
   '2.6b': { art: <Tray />, caption: <>Like one lunch tray, <b>one statement</b> carries the asset row, its neighbours and the closest reports together.</> },
   '2.6c': { art: <Coffee />, caption: <>The AI agent sees <b>one button</b> and its label; the recipe behind it stays hidden in the machine.</> },
-  '2.7': { art: <Cook />, caption: <>Like a cook who <b>tastes, adds and tastes again</b>, the agent keeps looping until it needs no more tools.</> },
+  '2.7': { art: (step: number) => <StateGraphArt step={step} />, caption: <>The agent is a <b>loop of two nodes</b>: the model thinks, the tools act, and one decision says whether to go round again or finish.</> },
   '2.7c': { art: <Lockers />, caption: <>Clearing <b>only this lab&apos;s locker</b> leaves everyone else&apos;s belongings alone.</> },
   '2.7d': { art: <Records />, caption: <>The <b>logbook</b> keeps what lasts and the <b>notebook</b> what is happening now, both handled at one counter.</> },
   '2.7e': { art: <Toolbox />, caption: <>The agent gets <b>eight tools</b>, each in its own cut-out, and nothing else fits in the box.</> },
