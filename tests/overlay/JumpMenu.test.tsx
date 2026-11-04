@@ -75,7 +75,7 @@ test('clicking a step of the code map opens that step; the open step is the curr
   const { container } = render(<JumpMenu />);
   const current = container.querySelectorAll('.jump__card.current');
   expect(current).toHaveLength(1);
-  expect(current[0].textContent).toContain(MAP_STEPS[9].title);
+  expect(current[0].textContent).toContain(stepName(MAP_STEPS[9]));
   // the first tile goes back to the whole map
   fireEvent.click(within(container).getByRole('button', { name: new RegExp(`^Lab 3 · Agent Memory ${pageLabel('3.6m')} The code`) }));
   expect(useDrawerStore.getState()).toMatchObject({ open: false, focus: 0 });
