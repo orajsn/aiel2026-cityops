@@ -20,29 +20,18 @@ test('step 1: the glass fills bottom to top, Vance last with his portrait, the m
   expect(c.innerHTML).not.toMatch(/--red|#c74634/i);
 });
 
-test('steps 2 to 5: one problem per click, a big glass, its explanation, what Vance gets, and a tracker of the four', () => {
-  const words = ['Volume', 'Relevance', 'Accuracy', 'Timing'];
-  words.forEach((w, i) => {
-    const c = render(<Glass kicker="k" message="m" step={(i + 2) as 2 | 3 | 4 | 5} />).container;
-    expect([...c.querySelectorAll('[data-problem]')].map((e) => e.getAttribute('data-problem'))).toEqual([w]);
-    expect(c.querySelectorAll('[data-glass]')).toHaveLength(1);
-    expect(c.querySelector('[data-glass]')!.getAttribute('data-glass')).toBe(w);
-    expect(c.textContent).toContain(CURATION[i].title);
-    expect(c.querySelector('[data-outcome]')?.textContent).toContain('Vance gets');
-    expect([...c.querySelectorAll('[data-track]')].map((e) => e.getAttribute('data-track'))).toEqual(words);
-    expect(c.querySelector('[data-track][data-on]')!.getAttribute('data-track')).toBe(w);
+test('step 2: four small glasses, each failing its own way, with the legend', () => {
+  {
+    const c = render(<Glass kicker="k" message="m" step={2} />).container;
+    expect([...c.querySelectorAll('[data-problem]')].map((e) => e.getAttribute('data-problem'))).toEqual(['Volume', 'Relevance', 'Accuracy', 'Timing']);
+    for (const w of ['every tool result piles in; by turn 15 it overflows', 'Mercer’s finding spills out', 'the 25% falls out', 'by turn 15, when Vance asks, it is gone', 'grey = noise and old turns', 'teal = what Vance needs']) expect(c.textContent).toContain(w);
+    // Mercer's finding is the one teal cell among the grey results
+    expect(c.querySelectorAll('[data-piece="finding"]').length).toBeGreaterThanOrEqual(1);
+    expect(c.querySelectorAll('[data-glass="Relevance"] [data-piece="finding"]')).toHaveLength(1);
+    expect(c.querySelector('[data-glass="Accuracy"] [data-piece="lost"]')?.textContent).toBe('25%');
     expect(c.querySelectorAll('[data-layer]')).toHaveLength(0);
     expect(c.innerHTML).not.toMatch(/--red|#c74634/i);
-  });
-  const r = render(<Glass kicker="k" message="m" step={3} />).container;
-  expect(r.querySelectorAll('[data-glass="Relevance"] [data-piece="finding"]')).toHaveLength(1);
-  const a = render(<Glass kicker="k" message="m" step={4} />).container;
-  expect(a.querySelector('[data-glass="Accuracy"] [data-piece="lost"]')?.textContent).toBe('25%');
-  const t = render(<Glass kicker="k" message="m" step={5} />).container;
-  expect(t.querySelector('[data-glass="Timing"] [data-piece="finding"]')).not.toBeNull();
-  expect(t.querySelector('[data-glass="Timing"] [data-piece="gone"]')).not.toBeNull();
-  expect(t.querySelector('[data-glass="Timing"] [data-piece="ask"]')?.textContent).toContain('Vance asks');
-  expect(t.querySelectorAll('[data-glass="Timing"] [data-piece="turn"]')).toHaveLength(5);
+  }
 });
 
 test('CURATION keeps its four problems and icons for Ending and the new pages', () => {

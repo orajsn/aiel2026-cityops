@@ -9,8 +9,8 @@ export interface GlassProps {
   kicker: string;
   /** the one line the presenter lands; **teal** and !!red!! marks as in Rich.tsx */
   message: string;
-  /** 1: the glass fills with what goes into the context window; 2 to 5: the four ways that goes wrong, one click each (Volume, Relevance, Accuracy, Timing; owner, 4 Nov) */
-  step: 1 | 2 | 3 | 4 | 5;
+  /** 1: the glass fills with what goes into the context window; 2: the four ways that goes wrong */
+  step: 1 | 2;
   notebook?: string;
 }
 
@@ -51,7 +51,7 @@ export function Glass({ kicker, message, step, notebook }: GlassProps) {
           </motion.div>
         ) : (
           <motion.div key="wrong" exit={{ opacity: 0 }} transition={{ duration: 0.3 }} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-            <OneProblem i={step - 2} />
+            <FourGlasses />
           </motion.div>
         )}
       </AnimatePresence>
@@ -209,9 +209,9 @@ export const WRONG: { word: string; text: string }[] = [
 /** a tumbler 200 wide, rim at y=40, base at y=230; pieces are drawn inside it */
 const TUMBLER = 'M22 40L44 228Q100 238 156 228L178 40';
 
-export function MiniGlass({ word, t0, children, max = 290 }: { word: string; t0: number; children: (t0: number) => ReactNode; max?: number }) {
+export function MiniGlass({ word, t0, children }: { word: string; t0: number; children: (t0: number) => ReactNode }) {
   return (
-    <svg data-glass={word} width={max} height={(max * 270) / 200} viewBox="0 0 200 270" style={{ overflow: 'visible', width: '100%', maxWidth: max, height: 'auto' }} aria-hidden="true">
+    <svg data-glass={word} width={290} height={392} viewBox="0 0 200 270" style={{ overflow: 'visible', width: '100%', maxWidth: 290, height: 'auto' }} aria-hidden="true">
       {children(t0)}
       <path d={TUMBLER} fill="none" stroke={GREY_LINE} strokeWidth={3} strokeLinejoin="round" />
       <line x1={14} y1={40} x2={186} y2={40} stroke={GREY_LINE} strokeWidth={3} strokeLinecap="round" />
@@ -304,7 +304,7 @@ const AccuracyGlass = (t0: number) => (
     <motion.g data-piece="summary" initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: t0 + 1.3, duration: 0.45, ease: EASE }} style={{ transformOrigin: '100px 205px' }}>
       <rect x={44} y={184} width={112} height={40} rx={4} fill={GREY_FILL} stroke={GREY_LINE} strokeWidth={1.5} />
       <text x={100} y={200} textAnchor="middle" fontSize={13} fill="var(--ink-dim)">summary:</text>
-      <text x={100} y={217} textAnchor="middle" fontSize={12} fontWeight={600} fill="var(--ink)">rust on the pier</text>
+      <text x={100} y={217} textAnchor="middle" fontSize={14} fontWeight={600} fill="var(--ink)">rust on the pier</text>
     </motion.g>
     {/* the number falls out over the rim, struck through */}
     <motion.g data-piece="lost" initial={{ opacity: 0, x: 0, y: 0 }} animate={{ opacity: [0, 1, 1], x: [0, 0, 92], y: [0, -40, 60] }} transition={{ delay: t0 + 1.2, duration: 1.1, times: [0, 0.35, 1], ease: EASE }}>
@@ -366,7 +366,7 @@ function useTick(from: number, to: number, delay: number, secs: number): number 
 function TurnCounter({ t0 }: { t0: number }) {
   const n = useTick(1, 15, t0 + 1.2, 2.6);
   return (
-    <text x={100} y={282} textAnchor="middle" fontSize={15} fontWeight={700} fill="var(--ink)">
+    <text x={100} y={268} textAnchor="middle" fontSize={13} fontWeight={700} fill="var(--ink)">
       turn {n}
     </text>
   );
@@ -394,86 +394,60 @@ export const TimingStory = (t0: number) => (
       <text x={100} y={62} textAnchor="middle" fontSize={13} fontWeight={600} fill="var(--ink)">Vance asks</text>
     </motion.g>
     <g fontSize={13} fill="var(--ink-dim)">
-      <line x1={30} y1={256} x2={170} y2={256} stroke={GREY_LINE} strokeWidth={2} />
-      <circle cx={30} cy={256} r={5} fill="var(--teal)" />
-      <motion.circle data-piece="clock" cy={256} r={6} fill="var(--ink)" initial={{ cx: 30, opacity: 0 }} animate={{ cx: [30, 30, 170], opacity: [0, 1, 1] }} transition={{ delay: t0 + 1.2, duration: 2.6, times: [0, 0.01, 1], ease: 'linear' }} />
-      <text x={30} y={273} textAnchor="middle">1</text>
-      <text x={170} y={273} textAnchor="middle">15</text>
+      <line x1={30} y1={250} x2={170} y2={250} stroke={GREY_LINE} strokeWidth={2} />
+      <circle cx={30} cy={250} r={5} fill="var(--teal)" />
+      <motion.circle data-piece="clock" cy={250} r={6} fill="var(--ink)" initial={{ cx: 30, opacity: 0 }} animate={{ cx: [30, 30, 170], opacity: [0, 1, 1] }} transition={{ delay: t0 + 1.2, duration: 2.6, times: [0, 0.01, 1], ease: 'linear' }} />
+      <text x={30} y={268} textAnchor="middle">1</text>
+      <text x={170} y={268} textAnchor="middle">15</text>
     </g>
     <TurnCounter t0={t0} />
   </>
 );
 
-/** what Vance gets, for each problem (one short line under its explanation) */
-const OUTCOME = [
-  'The window is full. One more tool call and it breaks.',
-  'Her finding is buried, then pushed out by the rest.',
-  '“Rust on the pier”, and no 25%.',
-  'A blank, where her finding should be.',
-];
+/**
+ * The four glasses play one after another (owner, 4 Nov: one page, the four glasses in one picture, each appearing in turn so the
+ * presenter can talk to one at a time). Each glass starts at its own time; the one playing is lit, the ones before it stay as they ended,
+ * the ones after it wait as empty tumblers. Timing needs the longest slot: it is a small story of its own.
+ */
+export const GLASS_STARTS = [0.5, 7, 13.5, 20];
 
-/** one click, one glass (owner, 4 Nov): a big drawing playing on its own, its explanation beside it, and the four problems as a tracker below */
-function OneProblem({ i }: { i: number }) {
-  const w = WRONG[i];
-  const c = CURATION[i];
-  const draw = i === 3 ? TimingStory : DRAW[i];
-  return (
-    <Fill>
-      <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 110, alignItems: 'center', padding: '4px 20px 0' }}>
-        <div data-problem={w.word} style={{ display: 'flex', justifyContent: 'center' }}>
-          <MiniGlass key={i} word={w.word} t0={0.5} max={400}>
-            {draw}
-          </MiniGlass>
-        </div>
-        <motion.div key={`t${i}`} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15, duration: 0.5, ease: EASE }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 52, fontWeight: 700, color: 'var(--ink)' }}>
-            <LineIcon name={c.icon} size={60} />
-            {w.word}
-          </div>
-          <div style={{ fontSize: 32, fontWeight: 600, color: 'var(--teal)', marginTop: 14, lineHeight: 1.25 }}>{c.title}</div>
-          <div style={{ fontSize: 28, lineHeight: 1.4, color: 'var(--ink)', marginTop: 12 }}>{w.text}</div>
-          <motion.div data-outcome initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.6, duration: 0.5 }} style={{ marginTop: 22, padding: '12px 18px', borderRadius: 12, border: '2px solid var(--teal)', background: 'rgba(27,138,156,0.08)', fontSize: 26, fontWeight: 600, color: 'var(--ink)' }}>
-            <span style={{ color: 'var(--teal)' }}>Vance gets </span>
-            {OUTCOME[i]}
-          </motion.div>
-        </motion.div>
-      </div>
-      <div data-legend="glass" style={{ flex: 'none', display: 'flex', gap: 14, justifyContent: 'center', marginTop: 18, alignItems: 'center', flexWrap: 'wrap' }}>
-        {WRONG.map((x, k) => (
-          <span key={x.word} data-track={x.word} data-on={k === i || undefined} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 999, fontSize: 22, fontWeight: 700, border: `2px solid ${k === i ? 'var(--teal)' : 'var(--line)'}`, background: k === i ? 'rgba(27,138,156,0.14)' : 'transparent', color: k <= i ? 'var(--ink)' : 'var(--ink-dim)', opacity: k > i ? 0.6 : 1 }}>
-            {k < i ? '✓' : k + 1} {x.word}
-          </span>
-        ))}
-        <span style={{ display: 'inline-flex', gap: 22, marginLeft: 24, fontSize: 19, color: 'var(--ink-dim)' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            <i style={{ width: 22, height: 16, borderRadius: 3, background: GREY_FILL, border: `1.5px solid ${GREY_LINE}` }} /> noise and old turns
-          </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            <i style={{ width: 22, height: 16, borderRadius: 3, background: TEAL_FILL, border: '2px solid var(--teal)' }} /> what Vance needs
-          </span>
-        </span>
-      </div>
-    </Fill>
-  );
+function useSeconds(max: number): number {
+  const [t, setT] = useState(0);
+  useEffect(() => {
+    const t0 = performance.now();
+    const id = window.setInterval(() => {
+      const s = (performance.now() - t0) / 1000;
+      setT(s);
+      if (s > max) window.clearInterval(id);
+    }, 100);
+    return () => window.clearInterval(id);
+  }, [max]);
+  return t;
 }
 
 function FourGlasses() {
+  const now = useSeconds(GLASS_STARTS[3] + 1);
+  const active = GLASS_STARTS.reduce((a, s, i) => (now >= s ? i : a), -1);
   return (
     <Fill>
       <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, alignContent: 'center', paddingTop: 12 }}>
-        {WRONG.map((w, i) => (
-          <motion.div key={w.word} data-problem={w.word} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 + i * 0.1, duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <MiniGlass word={w.word} t0={START + i * SLOT}>
-              {DRAW[i]}
-            </MiniGlass>
-            {/* the same icon comes back when the problem is solved (Ending.tsx, 3.15b) */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 33, fontWeight: 700, color: 'var(--ink)', marginTop: 14 }}>
-              <LineIcon name={CURATION[i].icon} size={40} />
-              {w.word}
-            </div>
-            <div style={{ fontSize: 23, lineHeight: 1.4, color: 'var(--ink-dim)', marginTop: 8, maxWidth: 320 }}>{w.text}</div>
-          </motion.div>
-        ))}
+        {WRONG.map((w, i) => {
+          const started = i <= active;
+          const lit = i === active;
+          return (
+            <motion.div key={w.word} data-problem={w.word} data-active={lit || undefined} animate={{ opacity: started ? 1 : 0.35 }} transition={{ duration: 0.5 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '14px 8px 18px', borderRadius: 22, background: lit ? 'rgba(27,138,156,0.10)' : 'transparent', boxShadow: lit ? 'inset 0 0 0 2.5px var(--teal)' : 'none', transition: 'background 500ms, box-shadow 500ms' }}>
+              <MiniGlass word={w.word} t0={GLASS_STARTS[i]}>
+                {i === 3 ? TimingStory : DRAW[i]}
+              </MiniGlass>
+              {/* the same icon comes back when the problem is solved (Ending.tsx, 3.15b) */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 33, fontWeight: 700, color: 'var(--ink)', marginTop: 14 }}>
+                <LineIcon name={CURATION[i].icon} size={40} />
+                {w.word}
+              </div>
+              <div style={{ fontSize: 23, lineHeight: 1.4, color: 'var(--ink-dim)', marginTop: 8, maxWidth: 320, opacity: started ? 1 : 0, transition: 'opacity 600ms' }}>{w.text}</div>
+            </motion.div>
+          );
+        })}
       </div>
       <div data-legend="glass" style={{ flex: 'none', display: 'flex', gap: 48, marginTop: 20, fontSize: 21, color: 'var(--ink-dim)' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
