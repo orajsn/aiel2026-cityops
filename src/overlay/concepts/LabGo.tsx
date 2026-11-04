@@ -14,9 +14,13 @@ export interface LabGoProps {
   url: string;
   /** one line under the address, what they will do there */
   line: string;
+  /** the title LiveLabs shows for this address, which differs from our lab names */
+  listed: string;
+  /** the lab(s) on our slides that the LiveLabs title covers */
+  covers: string;
 }
 
-export function LabGo({ kicker, lab, url, line }: LabGoProps) {
+export function LabGo({ kicker, lab, url, line, listed, covers }: LabGoProps) {
   const qr = useMemo(() => qrPath(url), [url]);
   const shown = url.replace(/^https?:\/\//, '');
   return (
@@ -33,6 +37,11 @@ export function LabGo({ kicker, lab, url, line }: LabGoProps) {
           <div style={{ fontSize: 96, fontWeight: 700, lineHeight: 1.05, color: 'var(--ink)', margin: '8px 0 26px' }}>Open {lab}</div>
           <div data-lab-url style={{ fontFamily: 'var(--font-mono)', fontSize: 58, fontWeight: 600, color: 'var(--teal)', lineHeight: 1.15, wordBreak: 'break-all' }}>{shown}</div>
           <div style={{ fontSize: 34, lineHeight: 1.4, color: 'var(--ink-dim)', marginTop: 28, maxWidth: 820 }}>{line}</div>
+          <div data-lab-listed style={{ marginTop: 30, padding: '16px 22px', borderRadius: 14, border: '1.5px solid var(--line, rgba(0,0,0,0.14))', maxWidth: 820 }}>
+            <div style={{ fontSize: 22, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-dim)' }}>On LiveLabs it is called</div>
+            <div style={{ fontSize: 32, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.25, margin: '4px 0' }}>{listed}</div>
+            <div style={{ fontSize: 24, color: 'var(--teal)' }}>That is {covers}</div>
+          </div>
         </div>
         <svg viewBox={`-2 -2 ${qr.n + 4} ${qr.n + 4}`} shapeRendering="crispEdges" role="img" aria-label={`QR code for ${shown}`} style={{ width: 520, height: 520, borderRadius: 18, boxShadow: '0 10px 40px rgba(0,0,0,0.2)', display: 'block' }}>
           <rect x="-2" y="-2" width={qr.n + 4} height={qr.n + 4} fill="#fff" />
