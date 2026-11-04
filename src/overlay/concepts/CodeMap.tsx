@@ -170,6 +170,7 @@ const Row = memo(function Row({ row, i, cls }: { row: NbRow; i: number; cls: str
   return (
     <div className={`nr nr--${row.kind}${cls}`} data-r={i}>
       <span className="nr__g">{row.prompt}</span>
+      <span className="nr__n">{row.line}</span>
       <span className="nr__c">
         {row.spans.map((s, k) => (
           <span key={k} className={s.k === 'plain' ? undefined : `nt-${s.k}`}>

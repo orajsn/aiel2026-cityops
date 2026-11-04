@@ -189,11 +189,10 @@ const b215 = atRust('3.15', 'With and without memory', 'WithWithout', {
   question: 'What happened at this pier?',
   without: 'I have no earlier information. What do you see?',
   withMemory: 'Mercer logged corrosion on Day 1: ~25% section loss, grade C, repair within 60 days.',
-  notebook: `${NB} · the comparison cell`,
 } satisfies WithWithoutProps);
 const b215b = atRust('3.15b', 'The four failures, solved', 'FailuresSolved', { kicker: 'Back to the glass', message: 'The four failures from the glass, **solved**.' } satisfies EndingProps);
 // 3.15c · the full memory map, moved from the start of the lab (owner, 28 Oct): after the hands-on its layers mean something (notebook cell 90)
-const b215c = atRust('3.15c', 'What you built', 'MemoryMap', { kicker: 'Kinds of memory', step: 5, built: true, message: 'The full memory map: **what you actually built** today.', notebook: `${NB} · Memory types - what you actually built` } satisfies MemoryMapProps);
+const b215c = atRust('3.15c', 'What you built', 'MemoryMap', { kicker: 'Kinds of memory', step: 5, built: true, message: 'The full memory map: **what you actually built** today.' } satisfies MemoryMapProps);
 
 const b216 = atRust('3.16', 'Where both labs meet', 'LabsMeet', { kicker: 'Where both labs meet', step: 1, message: 'This afternoon the agent had **the rule**. Now it has **the history**.' }, 'meet');
 const b216a = atRust('3.16a', 'Together they make the call', 'LabsMeet', { kicker: 'Where both labs meet', step: 2, message: 'Together they **make the call**.' }, 'meet');

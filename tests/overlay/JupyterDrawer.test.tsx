@@ -1,7 +1,7 @@
 import { NB_PAGES } from '../../src/content/lab2Notebook';
 import { fireEvent, render } from '@testing-library/react';
 import { highlightPython } from '../../src/overlay/jupyter/highlight';
-import { LAB_STOPS, stopCells, todoLines } from '../../src/content/labStops';
+import { LAB_STOPS, stopCells, todoLines, ALL_STOPS } from '../../src/content/labStops';
 import { JupyterDrawer } from '../../src/overlay/jupyter/JupyterDrawer';
 import { NotebookMarkdown } from '../../src/overlay/jupyter/NotebookMarkdown';
 import { chapter1, LAB2_CUT } from '../../src/scenes/chapter1';
@@ -62,7 +62,7 @@ test('every stop sits on a real page, and every TODO in the Lab 3 notebook has a
 
 test('every code cell of both notebooks is in a stop', () => {
   const seen = new Map<object, Set<number>>();
-  for (const stop of Object.values(LAB_STOPS)) {
+  for (const stop of Object.values(ALL_STOPS)) {
     const s = seen.get(stop.notebook) ?? new Set<number>();
     stop.marks.forEach((m) => s.add(m.cell));
     seen.set(stop.notebook, s);

@@ -59,7 +59,11 @@
 .cm__nb { position: relative; font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 18px; line-height: 27px; padding: 14px 16px 280px 0; }
 .nr { display: flex; }
 .nr.is-near { transition: opacity 0.35s ease; }
-.nr__g { flex: none; width: 68px; text-align: right; padding-right: 12px; box-sizing: border-box; color: #6f8fa0; font-size: 15px; }
+.nr__g { flex: none; width: 58px; text-align: right; padding-right: 8px; box-sizing: border-box; color: #6f8fa0; font-size: 15px; }
+/* the line number, as in Jupyter: inside the cell's grey, and lit with its line */
+.nr__n { flex: none; width: 40px; box-sizing: border-box; padding-right: 8px; text-align: right; color: #5b6773; font-size: 15px; background: #eceef0; user-select: none; }
+.nr--gap .nr__n, .nr--h1 .nr__n, .nr--h2 .nr__n, .nr--h3 .nr__n { background: transparent; width: 0; padding: 0; }
+.nr.is-key .nr__n { background: #a9dbe3; color: #0e4f5a; font-weight: 700; }
 .nr__c { flex: 1; min-width: 0; min-height: 27px; white-space: pre-wrap; overflow-wrap: anywhere; background: #f5f6f7; padding: 0 12px 0 calc(12px + 4ch); text-indent: -4ch; }
 .nr--gap { height: 14px; }
 .nr--gap .nr__c { background: transparent; min-height: 0; }

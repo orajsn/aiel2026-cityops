@@ -2,6 +2,8 @@ import { act, render, screen } from '@testing-library/react';
 import { CodeMap } from '../../src/overlay/concepts/CodeMap';
 import { MAP_STEPS, NB_ROWS, forScreen, stepLines } from '../../src/content/lab3Map';
 import { focusStepCount, useDrawerStore } from '../../src/engine/presentation';
+import { LAB_STOPS } from '../../src/content/labStops';
+import { chapter2 } from '../../src/scenes/chapter2';
 
 const go = (n: number) => act(() => useDrawerStore.setState(n === 0 ? { open: false, focus: 0 } : { open: true, focus: n }));
 afterEach(() => act(() => useDrawerStore.setState({ open: false, focus: 0 })));
@@ -91,4 +93,20 @@ test('the tags on the map cover steps 1 to 10, starting at 1', () => {
   const { container } = render(<CodeMap />);
   const shown = new Set([...container.querySelectorAll('.cm__world .cm__tag')].flatMap((e) => (e.textContent!.match(/\d+/g) ?? []).map(Number)));
   expect([...shown].sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+});
+
+// owner, 4 Nov: real line numbers, so we know which line it is
+test('every code line shows its line number inside its cell, and the numbers restart with each cell', () => {
+  const code = NB_ROWS.filter((r) => r.kind === 'code');
+  expect(code.every((r) => typeof r.line === 'number' && r.line > 0)).toBe(true);
+  for (const r of code) if (r.prompt) expect(r.line).toBe(1);
+  const { container } = render(<CodeMap />);
+  const hl = stepLines(MAP_STEPS[2])!;
+  const row = container.querySelector(`[data-r="${[...hl.key][0]}"]`)!;
+  expect(row.querySelector('.nr__n')!.textContent).toBe(String(NB_ROWS[[...hl.key][0]].line));
+});
+
+// owner, 4 Nov: "we remove old code panel": no page of Lab 3 still opens the notebook drawer
+test('no Lab 3 page in the show has the old notebook drawer', () => {
+  for (const s of chapter2) expect(LAB_STOPS[s.id], s.id).toBeUndefined();
 });

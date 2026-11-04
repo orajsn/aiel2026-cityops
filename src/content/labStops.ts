@@ -332,7 +332,11 @@ const L3: Record<string, LabStop> = {
   },
 };
 
-export const LAB_STOPS: Record<string, LabStop> = { ...L2, ...L3 };
+/** stops that stay here but no longer show: Lab 3's notebook drawer went with the code map (owner, 4 Nov); take an id out to bring its drawer back */
+export const STOPS_OFF = new Set(['3.15']);
+
+export const ALL_STOPS: Record<string, LabStop> = { ...L2, ...L3 };
+export const LAB_STOPS: Record<string, LabStop> = Object.fromEntries(Object.entries(ALL_STOPS).filter(([id]) => !STOPS_OFF.has(id)));
 
 export interface StopCell {
   index: number;

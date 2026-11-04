@@ -97,6 +97,8 @@ export interface NbRow {
   kind: 'code' | 'gap' | 'h1' | 'h2' | 'h3';
   /** the [n]: prompt on a cell's first line */
   prompt?: string;
+  /** the line's number inside its cell, as Jupyter's line numbers show it (with the TODO answered) */
+  line?: number;
   spans: NbSpan[];
   text: string;
 }
@@ -131,7 +133,7 @@ function build() {
     const at: number[] = [];
     lines.forEach((spans, q) => {
       at.push(rows.length);
-      rows.push({ kind: 'code', prompt: q === 0 ? `[${n}]:` : undefined, spans, text: spans.map((s) => s.t).join('') });
+      rows.push({ kind: 'code', prompt: q === 0 ? `[${n}]:` : undefined, line: q + 1, spans, text: spans.map((s) => s.t).join('') });
     });
     where.set(i, at);
     rows.push({ kind: 'gap', spans: [], text: '' });

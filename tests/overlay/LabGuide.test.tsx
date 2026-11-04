@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 import { act, render } from '@testing-library/react';
-import { LAB_STOPS } from '../../src/content/labStops';
+import { LAB_STOPS, ALL_STOPS } from '../../src/content/labStops';
 import { LAB_GUIDE, guideSteps, partLines } from '../../src/content/labGuide';
 import { JupyterDrawer } from '../../src/overlay/jupyter/JupyterDrawer';
 import { useDrawerStore, stopStepCount } from '../../src/engine/presentation';
@@ -10,7 +10,7 @@ beforeEach(() => useDrawerStore.getState().reset());
 
 test('every guide block is a cell of its page’s stop, and every long cell’s parts start on real lines, in order', () => {
   for (const [id, blocks] of Object.entries(LAB_GUIDE)) {
-    const stop = LAB_STOPS[id];
+    const stop = ALL_STOPS[id];
     expect(stop, id).toBeDefined();
     for (const b of blocks) {
       expect(b.cell, `${id} ${b.title}`).toBeGreaterThanOrEqual(stop.from);
