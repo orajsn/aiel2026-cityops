@@ -113,3 +113,25 @@ test('the phone viewer has a slide-picture switch, and the pictures reach the op
   expect(html).toContain('thumbs/${encodeURIComponent(p.id)}.jpg');
   expect(existsSync('follow/public/thumbs/3.7.jpg')).toBe(true);
 });
+
+// owner, 4 Nov: the viewer renders the scripts' markdown, and never as HTML, because colleagues write them
+test('the phone viewer renders markdown safely, and leaves names with underscores alone', () => {
+  new Function(readFileSync('follow/public/md.js', 'utf8'))();
+  const box = document.createElement('div');
+  (window as any).renderMarkdown(box, '# Title\n\nThis is **the foundation** and *a key* in `CITY_MEMORY` or CITY_MEMORY_call_copilot.\nNext line\n\n- one\n- two\n\n1. first\n\n> quote\n\n[site](https://example.com) [bad](javascript:alert(1))\n\n<img src=x onerror=alert(1)>');
+  expect(box.querySelector('h3')!.textContent).toBe('Title');
+  expect(box.querySelector('strong')!.textContent).toBe('the foundation');
+  expect(box.querySelector('em')!.textContent).toBe('a key');
+  expect(box.querySelector('code')!.textContent).toBe('CITY_MEMORY');
+  expect(box.textContent).toContain('CITY_MEMORY_call_copilot');
+  expect(box.querySelector('br')).toBeTruthy();
+  expect(box.querySelectorAll('ul li')).toHaveLength(2);
+  expect(box.querySelectorAll('ol li')).toHaveLength(1);
+  expect(box.querySelector('blockquote')!.textContent).toBe('quote');
+  const links = box.querySelectorAll('a');
+  expect(links).toHaveLength(1);
+  expect(links[0].getAttribute('href')).toBe('https://example.com');
+  expect(box.querySelector('img')).toBeNull();
+  expect(box.textContent).toContain('<img src=x onerror=alert(1)>');
+  expect(box.textContent).toContain('[bad](javascript:alert(1))');
+});

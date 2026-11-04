@@ -10,7 +10,7 @@ const pages = SCENES.map((s) => ({
   label: pageLabel(s.id),
   part: partName[s.chapter] ?? '',
   title: s.title,
-  en: (s.script ?? '').replace(/\*\*/g, '').replace(/!!/g, ''),
+  en: (s.script ?? '').replace(/!!/g, ''),
   th: SCRIPT_TH[s.id]?.join('\n\n') ?? '',
 }));
 writeFileSync(new URL('../follow/public/scripts.json', import.meta.url), JSON.stringify({ made: new Date().toISOString(), pages }));

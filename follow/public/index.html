@@ -56,7 +56,16 @@ h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
 .thumb[hidden]{display:none}
 .chip svg{display:block}
 .script{font-size:var(--size);line-height:1.7;flex:1}
-.script p{margin:0 0 1em}
+.script p,.script ul,.script ol,.script blockquote{margin:0 0 1em}
+.script h3,.script h4,.script h5,.script h6{margin:1.1em 0 .5em;line-height:1.3;text-wrap:balance}
+.script h3{font-size:1.25em}.script h4{font-size:1.12em}.script h5,.script h6{font-size:1em}
+.script>:first-child{margin-top:0}
+.script ul,.script ol{padding-left:1.4em}
+.script li{margin-bottom:.35em}
+.script strong{font-weight:700}
+.script code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.88em;background:var(--tint);border-radius:5px;padding:.08em .35em;overflow-wrap:anywhere}
+.script blockquote{padding-left:.9em;border-inline-start:3px solid var(--teal);color:var(--dim)}
+.script a{color:var(--teal);text-decoration:underline;text-underline-offset:2px}
 .note{color:var(--dim);font-size:14px;margin:0 0 10px}
 .empty{color:var(--dim)}
 .peek{position:sticky;bottom:0;background:var(--bg);padding-top:10px;display:flex;gap:8px;align-items:center}
@@ -100,6 +109,7 @@ h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
     </div>
   </section>
 </main>
+<script src="md.js"></script>
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
@@ -189,7 +199,7 @@ h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
       const text = th || p.en;
       if (lang === 'th' && !th && p.en) { const n = document.createElement('p'); n.className = 'note'; n.textContent = t.noth; box.appendChild(n); }
       if (!text) { const n = document.createElement('p'); n.className = 'empty'; n.textContent = t.none; box.appendChild(n); }
-      for (const para of text.split(/\n\n+/).filter(Boolean)) { const e = document.createElement('p'); e.textContent = para; box.appendChild(e); }
+      if (text) window.renderMarkdown(box, text);
     }
     window.scrollTo({ top: 0 });
     const back = $('back');
