@@ -44,7 +44,7 @@ export interface NotebookPageProps {
   /** which step is being explained (1-based) */
   step: number;
   notebook?: string;
-  everyday: { art: ReactNode; caption: ReactNode };
+  everyday: { art: ReactNode | ((step: number) => ReactNode); caption: ReactNode };
 }
 
 export function NotebookPage({ id, kicker, message, step, notebook, everyday }: NotebookPageProps) {
@@ -95,7 +95,7 @@ export function NotebookPage({ id, kicker, message, step, notebook, everyday }: 
             <div style={label}>In everyday life</div>
             <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1, duration: 0.3 }} style={{ flex: '1 1 0', minHeight: 0, display: 'flex' }}>
-                <div style={{ flex: 1, minHeight: 0 }}>{everyday.art}</div>
+                <div style={{ flex: 1, minHeight: 0 }}>{typeof everyday.art === 'function' ? everyday.art(k) : everyday.art}</div>
               </motion.div>
               <div data-caption style={{ fontSize: 22, lineHeight: 1.4, color: 'var(--ink)', marginTop: 14 }}>{everyday.caption}</div>
             </div>
@@ -151,7 +151,14 @@ export function NotebookPage({ id, kicker, message, step, notebook, everyday }: 
             </div>
           </div>
           {/* 3 · the notebook: only the key lines */}
-          <div data-code-focus data-step={k} style={{ marginLeft: 70, display: 'flex', flexDirection: 'column', minHeight: 0, borderRadius: 16, background: '#0f1720', overflow: 'hidden', boxShadow: '0 6px 24px rgba(0,0,0,0.3)' }}>
+          <div style={{ marginLeft: 70, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          {page.question && (
+            <div data-question style={{ flex: 'none', marginBottom: 12, padding: '10px 16px', borderRadius: 12, border: '2px solid var(--teal)', background: 'rgba(27,138,156,0.12)', color: 'var(--ink)', fontSize: 22, fontWeight: 600, lineHeight: 1.3 }}>
+              <span style={{ display: 'block', fontSize: 13, fontWeight: 700, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--ink-dim)', marginBottom: 2 }}>The question</span>
+              {page.question}
+            </div>
+          )}
+          <div data-code-focus data-step={k} style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, borderRadius: 16, background: '#0f1720', overflow: 'hidden', boxShadow: '0 6px 24px rgba(0,0,0,0.3)' }}>
             <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 18px', background: '#18222d', fontSize: 16, color: '#9fb0bd' }}>
               <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#e06c5f' }} />
               <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#e0b04f' }} />
@@ -192,6 +199,7 @@ export function NotebookPage({ id, kicker, message, step, notebook, everyday }: 
                 <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{out}</div>
               </motion.div>
             )}
+          </div>
           </div>
           {/* the line from the step to its lines: drawn when the step changes, a light running along it */}
           {path && (

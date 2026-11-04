@@ -32,6 +32,8 @@ export interface NbPage {
   steps: NbStep[];
   /** what the code printed, shown only once the last step has run */
   output?: string;
+  /** a question shown above the notebook box (a colleague's comment, 4 Nov: page 2.3 shows the question the prompt answers) */
+  question?: string;
 }
 
 export const NB_PAGES: Record<string, NbPage> = {
@@ -149,6 +151,7 @@ export const NB_PAGES: Record<string, NbPage> = {
   },
   "2.3": {
     "cell": 30,
+    "question": "What recent issues have been reported on Harbor Bridge ?",
     "excerpt": [
       [30, 4, 0],
       [30, 5, 0, 62],
