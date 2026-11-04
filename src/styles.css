@@ -788,7 +788,7 @@ body.is-idle, body.is-idle * { cursor: none !important; }
 .follow-card__kicker { font: 700 17px/1 var(--font-body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); }
 .follow-card__qr { width: 380px; height: 380px; border-radius: 10px; display: block; }
 .follow-card__code { font: 700 84px/1 var(--font-mono); letter-spacing: 0.08em; color: var(--ink); }
-.follow-card__url { font: 500 22px/1.2 var(--font-mono); color: var(--ink-dim); }
+.follow-card__url { font: 500 22px/1.2 var(--font-mono); color: var(--teal); text-decoration: underline; text-underline-offset: 3px; }
 .follow-card__n { font: 600 20px/1 var(--font-body); color: var(--ink-dim); }
 .settings__follow { display: grid; gap: 8px; }
 .settings__follow .code { font: 700 30px/1 var(--font-mono); letter-spacing: 0.08em; color: var(--ink); }

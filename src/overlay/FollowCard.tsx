@@ -34,7 +34,10 @@ export function FollowCard() {
           <path d={qr.d} fill="#0b1016" />
         </svg>
         <div className="follow-card__code" data-follow-code>{pretty}</div>
-        <div className="follow-card__url">{url.replace(/^https?:\/\//, '').replace(/\?c=\d+$/, '')}</div>
+        {/* a real link with the code in it (owner, 4 Nov); the click opens it and leaves the card up */}
+        <a className="follow-card__url" href={url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+          {url.replace(/^https?:\/\//, '').replace(/\?c=\d+$/, '')}
+        </a>
         <div className="follow-card__n">{listeners > 0 ? `${listeners} watching` : 'Scan, or type the code'}</div>
       </div>
     </div>
