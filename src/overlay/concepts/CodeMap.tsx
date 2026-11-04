@@ -53,21 +53,19 @@ interface NodeDef {
   sub: string;
   mono?: boolean;
   teal?: boolean;
-  /** the attendee writes code here */
-  write?: boolean;
   step?: string;
 }
 const NODES: NodeDef[] = [
   { id: 'inspector', x: 96, y: 220, w: 220, h: 100, name: 'Inspector', sub: 'Mercer, Vance', step: 'DAY 1, N' },
-  { id: 'copilot', x: 510, y: 220, w: 300, h: 100, icon: 'chat', name: 'call_copilot', sub: 'runs one turn', mono: true, teal: true, write: true, step: 'PART 6' },
+  { id: 'copilot', x: 510, y: 220, w: 300, h: 100, icon: 'chat', name: 'call_copilot', sub: 'runs one turn', mono: true, teal: true, step: 'PART 6' },
   { id: 'prompt', x: 906, y: 220, w: 260, h: 100, icon: 'doc', name: 'The prompt', sub: 'everything it found' },
   { id: 'model', x: 1262, y: 220, w: 240, h: 100, name: 'Language model', sub: 'reasons over it' },
   { id: 'answer', x: 1598, y: 220, w: 226, h: 100, icon: 'ok', name: 'The answer', sub: 'back to the inspector' },
-  { id: 'embedder', x: 130, y: 650, w: 280, h: 120, icon: 'bars', name: 'Embedder', sub: 'text to 384 numbers', teal: true, write: true, step: 'PART 2' },
-  { id: 'message', x: 500, y: 540, w: 320, h: 120, icon: 'table', name: 'CITY_MESSAGE', sub: 'every message, word for word', mono: true, teal: true, write: true, step: 'PART 3' },
+  { id: 'embedder', x: 130, y: 650, w: 280, h: 120, icon: 'bars', name: 'Embedder', sub: 'text to 384 numbers', teal: true, step: 'PART 2' },
+  { id: 'message', x: 500, y: 540, w: 320, h: 120, icon: 'table', name: 'CITY_MESSAGE', sub: 'every message, word for word', mono: true, teal: true, step: 'PART 3' },
   { id: 'extractor', x: 916, y: 540, w: 240, h: 120, icon: 'filter', name: 'Extractor', sub: 'keeps what matters', teal: true, step: 'PART 3' },
-  { id: 'memory', x: 1252, y: 540, w: 320, h: 120, icon: 'layers', name: 'CITY_MEMORY', sub: 'what it learned', mono: true, teal: true, write: true, step: 'PART 3' },
-  { id: 'finding', x: 500, y: 760, w: 440, h: 120, icon: 'clip', name: 'CITY_INSPECTION_FINDING', sub: 'the official record', mono: true, teal: true, write: true, step: 'PART 4' },
+  { id: 'memory', x: 1252, y: 540, w: 320, h: 120, icon: 'layers', name: 'CITY_MEMORY', sub: 'what it learned', mono: true, teal: true, step: 'PART 3' },
+  { id: 'finding', x: 500, y: 760, w: 440, h: 120, icon: 'clip', name: 'CITY_INSPECTION_FINDING', sub: 'the official record', mono: true, teal: true, step: 'PART 4' },
   { id: 'asset', x: 1252, y: 760, w: 320, h: 120, icon: 'city', name: 'CITY_ASSET', sub: 'the 26 city assets', mono: true, teal: true, step: 'PART 3' },
 ];
 
@@ -115,7 +113,6 @@ function MapNodeCard({ n, step }: { n: NodeDef; step: MapStep }) {
         <span>{sub}</span>
       </div>
       {n.step && <span className="cm__tag">{n.step}</span>}
-      {n.write && <span className="cm__tag cm__tag--write">YOU WRITE</span>}
     </div>
   );
 }
@@ -201,7 +198,7 @@ function Notebook({ step, lit, scroller }: { step: MapStep; lit: boolean; scroll
 
 /** the lit part of the JupyterLab screenshot, as fractions of the picture */
 const SPOTS = {
-  file: { x: 0.052, y: 0.408, w: 0.171, h: 0.072, label: 'notebook_student_ollama.ipynb' },
+  file: { x: 0.052, y: 0.346, w: 0.171, h: 0.072, label: 'notebook_complete_ollama.ipynb' },
   code: { x: 0.238, y: 0.482, w: 0.718, h: 0.518, label: 'A code cell' },
   run: { x: 0.345, y: 0.145, w: 0.022, h: 0.068, label: 'Run' },
 } as const;
@@ -219,7 +216,7 @@ function Guide({ step, lit }: { step: MapStep; lit: boolean }) {
         <div className="cm__plain">{step.plain}</div>
       </div>
       <div className="cm__shot">
-        <img src={jupyterOpen} alt="JupyterLab with notebook_student_ollama.ipynb open" />
+        <img src={jupyterOpen} alt="JupyterLab, with the notebooks in the file list on the left" />
         <div className="cm__spot" style={{ left: `${spot.x * 100}%`, top: `${spot.y * 100}%`, width: `${spot.w * 100}%`, height: `${spot.h * 100}%` }}>
           <span className="cm__spotlabel" style={step.guide === 'file' ? { left: 'calc(100% + 8px)', top: 0 } : spot.y > 0.45 ? { bottom: 'calc(100% + 8px)' } : { top: 'calc(100% + 8px)' }}>
             {spot.label}
@@ -291,7 +288,6 @@ export function CodeMap() {
             <div className="cm__say cm__fade" style={{ opacity: lit ? 1 : 0 }}>
               <div className="cm__tags">
                 {step.tag && <span className="cm__tag">{step.tag}</span>}
-                {step.write && <span className="cm__tag cm__tag--write">YOU WRITE {step.write.toUpperCase()}</span>}
               </div>
               <div className="cm__ask" data-testid="code-map-ask">{step.ask}</div>
               <div className="cm__plain">{step.plain}</div>

@@ -59,17 +59,16 @@ test('the two days show their own inspector and only their own path', () => {
   expect(container.querySelector('[data-line="confirm"]')!.getAttribute('data-lit')).toBeNull();
 });
 
-// owner, 4 Nov: one numbering rule, and it is the notebook's Parts: Oracle is Part 1, the embedder Part 2, and an exercise says "you write"
+// owner, 4 Nov: one numbering rule, and it is the notebook's Parts: Oracle is Part 1, the embedder Part 2, and attendees run the complete notebook, so nothing says they write code
 test('the map and the panel number by Part, and never by TODO', () => {
   const { container } = render(<CodeMap />);
   const world = container.querySelector('.cm__world')!.textContent!;
   expect(world).not.toMatch(/TODO|STEP/);
   for (const p of [1, 2, 3, 4, 5, 6]) expect(world).toContain(`PART ${p}`);
-  expect(container.querySelectorAll('.cm__world .cm__tag--write')).toHaveLength(5);
+  expect(container.textContent).not.toContain('YOU WRITE');
   go(6);
   const tags = container.querySelector('.cm__tags')!.textContent!;
   expect(tags).toContain('PART 2');
-  expect(tags).toContain('YOU WRITE 2 LINES');
   expect(tags).not.toMatch(/TODO|STEP/);
   go(12);
   expect(container.querySelector('.cm__tags')!.textContent).toBe('PART 5');
@@ -95,7 +94,8 @@ test('Part 0 walks the JupyterLab screen one thing per click, on one button', ()
   expect(MAP_STEPS.slice(1, 4).map((s) => s.guide)).toEqual(['file', 'code', 'run']);
   go(1);
   expect(screen.getByTestId('code-map-guide').dataset.spot).toBe('file');
-  expect(container.querySelector('.cm__spotlabel')!.textContent).toBe('notebook_student_ollama.ipynb');
+  expect(container.querySelector('.cm__spotlabel')!.textContent).toBe('notebook_complete_ollama.ipynb');
+  expect(JSON.stringify(MAP_STEPS)).not.toContain('notebook_student');
   go(3);
   expect(screen.getByTestId('code-map-guide').dataset.spot).toBe('run');
   const labels = [...container.querySelectorAll('.cm__rail button')].map((b) => b.textContent);
