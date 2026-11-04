@@ -105,7 +105,6 @@ const b21c = chat('3.1c', 'The agent that forgets · Day 2', 'pier2-close', {
     { from: 'person', text: 'What happened at this pier?' },
     { from: 'copilot', text: 'I have no earlier information. What do you see?' },
   ],
-  notebook: `${NB} · motivation for Part 3 and the Day N cell`,
 }, { who: 'character-male-d' });
 
 /**

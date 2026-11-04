@@ -68,6 +68,7 @@ function useIdle(active: boolean, ms = 3000): boolean {
 export function Overlay() {
   const scene = useSceneStore((s) => s.scenes[s.index]);
   const index = useSceneStore((s) => s.index);
+  const closeIn = useSceneStore((s) => s.closeIn); // true while the camera's slow close-in runs: the panel waits for it
   const total = useSceneStore((s) => s.scenes.length);
   const settled = useSceneStore((s) => s.settled);
   const jumpOpen = useUiStore((s) => s.jumpOpen);
@@ -90,8 +91,8 @@ export function Overlay() {
 
   const panelKey = scene.overlayGroup ?? scene.id;
   // Traffic mode clears the page away: only the map, the traffic and its bar stay
-  const showPanel = !trafficEditing && !!scene.overlay && (settled || (!!scene.overlayGroup && shownKey.current === panelKey));
-  shownKey.current = showPanel ? panelKey : settled ? null : shownKey.current;
+  const showPanel = !trafficEditing && !!scene.overlay && ((settled && !closeIn) || (!!scene.overlayGroup && shownKey.current === panelKey));
+  shownKey.current = showPanel ? panelKey : settled && !closeIn ? null : shownKey.current;
 
   const Comp = scene.overlay ? OVERLAYS[scene.overlay] : null;
 

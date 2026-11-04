@@ -17,6 +17,7 @@ export function CameraRig() {
   const camera = useThree((s) => s.camera);
   const scene = useSceneStore((s) => s.scenes[s.index]);
   const setSettled = useSceneStore((s) => s.setSettled);
+  const setCloseIn = useSceneStore((s) => s.setCloseIn);
   const editing = useCameraStore((s) => s.editing);
   const saved = useCameraStore((s) => (scene ? s.overrides[scene.id] : undefined));
 
@@ -44,6 +45,7 @@ export function CameraRig() {
       tween.current = null;
       wasEditing.current = true;
       setSettled(true);
+      setCloseIn(false);
       return;
     }
     const to = shotForScene(scene);
@@ -75,6 +77,7 @@ export function CameraRig() {
     // the same place as the page before (a story's pages): the camera stays where it is, pushed in or not, and the panel changes
     if (held && !cut && !wasEditing.current) {
       setSettled(true);
+      setCloseIn(false);
       return;
     }
     wasEditing.current = false;
@@ -83,9 +86,13 @@ export function CameraRig() {
     if (!cut && near(from.position, to.position) && near(here, to.target)) {
       tween.current = null;
       setSettled(true);
+      setCloseIn(false);
       return;
     }
     setSettled(false);
+    // a page with a slow close-in (the pier shots) shows its panel only when the camera is all the way in (owner, 4 Nov)
+    const ov0 = useCameraStore.getState().overrides;
+    setCloseIn(!!to.push && !ov0[scene.id] && !(scene.sameAngleAs && ov0[scene.sameAngleAs]));
     // as long as the move needs to stay calm (shots.ts CALM), never shorter than the page's own time
     tween.current = { from, to: { ...to, durationMs: moveDuration(from, to) }, start: performance.now() + (cut ? 400 : 0) };
   }, [scene, camera, setSettled, editing, saved]);
@@ -105,7 +112,9 @@ export function CameraRig() {
       const push = tw.to.push;
       const here = useSceneStore.getState().current();
       const ov = useCameraStore.getState().overrides;
-      if (push && !ov[here.id] && !(here.sameAngleAs && ov[here.sameAngleAs])) {
+      const startsPush = !!push && !ov[here.id] && !(here.sameAngleAs && ov[here.sameAngleAs]);
+      if (!startsPush) setCloseIn(false);
+      if (startsPush && push) {
         tween.current = {
           from: { position: pose.position, target: pose.target, durationMs: 0 },
           to: { position: push.position, target: push.target, durationMs: push.durationMs, ease: 'inOut' },

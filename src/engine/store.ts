@@ -16,6 +16,9 @@ export interface SceneState {
   /** True once the camera has reached the current shot. Overlays fade in on this. */
   settled: boolean;
   setSettled(v: boolean): void;
+  /** the camera has arrived but its slow close-in (shots.ts `push`) has not finished: the page's panel waits for it (owner, 4 Nov) */
+  closeIn: boolean;
+  setCloseIn(v: boolean): void;
   setScenes(s: SceneDef[]): void;
   next(): void;
   prev(): void;
@@ -33,6 +36,8 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   counters: { logs: 0, reports: 0, findings: 0 },
   settled: false,
   setSettled: (settled) => set({ settled }),
+  closeIn: false,
+  setCloseIn: (closeIn) => set({ closeIn }),
   setScenes: (scenes) => set({ scenes, index: 0 }),
   next: () => {
     const { index, scenes } = get();

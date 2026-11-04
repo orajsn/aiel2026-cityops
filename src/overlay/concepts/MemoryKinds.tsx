@@ -135,7 +135,17 @@ function Desk() {
         label={
           <span data-desk="wiped" data-wiped={swept} style={{ display: 'inline-flex', alignItems: 'center', gap: 14 }}>
             <Portrait who="mercer" size={60} />
-            {swept ? 'the chat closes: the desk is swept clean' : 'the context window · the session'}
+            {/* the two captions cross-fade in one place (owner, 4 Nov: the words changed abruptly) */}
+            <span style={{ display: 'inline-grid' }}>
+              {[
+                [false, 'the context window · the session'],
+                [true, 'the chat closes: the desk is swept clean'],
+              ].map(([on, text]) => (
+                <span key={String(on)} style={{ gridArea: '1 / 1', opacity: swept === on ? 1 : 0, transition: 'opacity 600ms ease' }} aria-hidden={swept !== on}>
+                  {text}
+                </span>
+              ))}
+            </span>
           </span>
         }
       >
