@@ -52,7 +52,7 @@ test('SCENES runs the parts in show order: Introduction, Lab 1 (when in the show
   const order = PARTS.map((c) => SCENES.filter((s) => s.chapter === c).map((s) => s.id)).flat();
   expect(SCENES.map((s) => s.id)).toEqual(order);
   // Introduction 7 (the city, then the bridge's four clicks); Lab 2 the deck's 58 pages and the recap
-  expect(SCENES.length).toBe(7 + (WITH_LAB1 ? lab1.length : 0) + CH1_BEATS.length + 38);
+  expect(SCENES.length).toBe(7 + (WITH_LAB1 ? lab1.length : 0) + CH1_BEATS.length + 38 + 2 + (WITH_LAB1 ? 1 : 0)); // + the 'Open the lab' pages (0.4g, 3.0g and, with Lab 1, 1.0g)
   expect(CH1_BEATS).toHaveLength(42);
 });
 
@@ -70,7 +70,7 @@ test('Lab 2: the jump menu has the deck’s chapters in order, and one panel per
     'Story · one crack', 'Why AI needs your data', 'The workbench', 'RAG: the filing cabinet', 'Workflow: the fixed checklist',
     'Agent: the chief inspector', 'Tools, skills, MCP', 'One query, four lenses', 'Build the agent', 'Trust: security and observability', 'Wrap-up', 'Closing Lab 2',
   ]);
-  expect(SECTIONS.filter((s) => s.chapter === 1).flatMap((s) => s.pages)).toEqual(CH1_BEATS);
+  expect(SECTIONS.filter((s) => s.chapter === 1).flatMap((s) => s.pages)).toEqual(['0.4g', ...CH1_BEATS]);
   const groups = new Map<string, typeof chapter1>();
   for (const s of chapter1) if (s.overlayGroup) groups.set(s.overlayGroup, [...(groups.get(s.overlayGroup) ?? []), s]);
   for (const [g, pages] of groups) {

@@ -1,5 +1,6 @@
 import { buildScenes } from '../../src/scenes/index';
 import { lab1, LAB1_SCRIPT, LAB1_SECTIONS } from '../../src/scenes/lab1';
+import { GO_LAB1, GO_LAB2, GO_LAB3 } from '../../src/scenes/labGo';
 import { chapter0 } from '../../src/scenes/chapter0';
 import { chapter1 } from '../../src/scenes/chapter1';
 import { chapter2 } from '../../src/scenes/chapter2';
@@ -9,9 +10,9 @@ import { OVERLAYS } from '../../src/overlay/registry';
 // owner, 29 Oct: Lab 1 goes in before Lab 2, and must be easy to take out again with Lab 2 and Lab 3 untouched
 test('without Lab 1 the show is exactly the Introduction, Lab 2 (opening on the crack) and Lab 3', () => {
   const ids = buildScenes(false).map((s) => s.id);
-  expect(ids).toEqual([...chapter0, ...chapter1, ...chapter2].map((s) => s.id));
+  expect(ids).toEqual([...chapter0, GO_LAB2, ...chapter1, GO_LAB3, ...chapter2].map((s) => s.id));
   // the Introduction ends on the bridge, then Lab 2 starts with the crack
-  expect(ids.slice(chapter0.length - 1, chapter0.length + 1)).toEqual(['0.7c', '0.4']);
+  expect(ids.slice(chapter0.length - 1, chapter0.length + 1)).toEqual(['0.7c', '0.4g']);
   expect(ids.some((id) => id.startsWith('1.'))).toBe(false);
 });
 
@@ -19,8 +20,8 @@ test('with Lab 1, its pages sit between the Introduction and Lab 2, and nothing 
   const ids = buildScenes(true).map((s) => s.id);
   const without = buildScenes(false).map((s) => s.id);
   expect(ids.slice(0, chapter0.length)).toEqual(without.slice(0, chapter0.length));
-  expect(ids.slice(chapter0.length, chapter0.length + lab1.length)).toEqual(lab1.map((s) => s.id));
-  expect(ids.slice(chapter0.length + lab1.length)).toEqual(without.slice(chapter0.length));
+  expect(ids.slice(chapter0.length, chapter0.length + lab1.length + 1)).toEqual([GO_LAB1, ...lab1].map((s) => s.id));
+  expect(ids.slice(chapter0.length + lab1.length + 1)).toEqual(without.slice(chapter0.length));
 });
 
 test('Lab 1 pages: ids 1.x, part 3, at the whole-bridge view where the Introduction ends, each with a script line', () => {

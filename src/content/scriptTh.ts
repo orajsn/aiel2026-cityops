@@ -3,6 +3,9 @@
  * array item. Written 3 Nov for the owner; the English script stays in script.ts. Pages without an entry show the English line.
  */
 export const SCRIPT_TH: Record<string, string[]> = {
+  "3.0g": [
+      "Lab 3 ใช้สภาพแวดล้อมเดียวกับ Lab 2 ครับ ถ้าปิดไปแล้ว ให้เปิดใหม่ด้วยลิงก์บนหน้าจอ หรือสแกน QR ได้เลย",
+  ],
   "3.0": [
       "กลับมาที่ Harbor Bridge กันอีกครั้งครับ เพราะปัญหายังไม่หายไปไหน สนิมที่เสายังอยู่ตรงนี้เหมือนเดิม",
       "คราวนี้มีผู้ตรวจสอบสองคนที่จะมาดูจุดเดียวกันนี้ คนละวัน Mercer ไปก่อน แล้ว Vance ตามมาทีหลัง",
