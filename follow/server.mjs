@@ -25,7 +25,7 @@ const sessions = new Map();
 const feeds = new Map(); // ip -> open live feeds
 const tries = new Map(); // ip -> [window start, count]: slows down guessing of codes
 
-const MIME = { '.html': 'text/html; charset=utf-8', '.json': 'application/json', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.webmanifest': 'application/manifest+json' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.json': 'application/json', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webmanifest': 'application/manifest+json' };
 
 // ---- the script store (owner, 3 Nov): colleagues edit scripts and comment on pages from the CityOps "Scripts" mode.
 // Every save is a version, appended to data/versions.jsonl, and goes live to phones at once. Comments are appended to data/comments.jsonl

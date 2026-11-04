@@ -1,5 +1,6 @@
 // @ts-nocheck (spawns Node; the project has no @types/node)
 import { spawn, type ChildProcess } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
 import { qrPath } from '../src/engine/follow';
 import { SCRIPT_TH } from '../src/content/scriptTh';
 import { SCENES } from '../src/scenes/index';
@@ -102,4 +103,12 @@ test('the QR for a join address is a real code, and every Thai script page is a 
   for (const id of Object.keys(SCRIPT_TH)) expect(ids.has(id), id).toBe(true);
   expect(Object.keys(SCRIPT_TH)).toHaveLength(39);
   for (const s of SCENES.filter((x) => x.chapter === 2)) expect(SCRIPT_TH[s.id], s.id).toBeTruthy(); // all of Lab 3 has Thai
+});
+
+// owner, 4 Nov: the viewer can show the slide's plain preview picture, or not
+test('the phone viewer has a slide-picture switch, and the pictures reach the open phone page', () => {
+  const html = readFileSync('follow/public/index.html', 'utf8');
+  expect(html).toContain('id="thumbBtn"');
+  expect(html).toContain('thumbs/${encodeURIComponent(p.id)}.jpg');
+  expect(existsSync('follow/public/thumbs/3.7.jpg')).toBe(true);
 });

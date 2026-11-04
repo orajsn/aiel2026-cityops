@@ -80,3 +80,5 @@ html:has(.sm), body:has(.sm) { height: auto; overflow: auto; background: #f4f6f7
   .sm__head img { width: 120px; }
   .sm__cols.two { grid-template-columns: 1fr; }
 }
+
+.sm__thumb-toggle { margin-left: auto; align-self: flex-start; flex: none; min-height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(0, 0, 0, 0.18); background: transparent; color: inherit; font: inherit; font-size: 13px; cursor: pointer; }

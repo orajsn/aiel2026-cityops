@@ -52,6 +52,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .num{background:var(--teal);color:#fff;font-weight:700;border-radius:8px;padding:0 10px;font-size:18px;line-height:1.5}
 :root:not([data-theme="light"]) .num{color:#06222a}
 h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
+.thumb{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;border:1.5px solid var(--line);background:var(--card);margin:0 0 14px}
+.thumb[hidden]{display:none}
+.chip svg{display:block}
 .script{font-size:var(--size);line-height:1.7;flex:1}
 .script p{margin:0 0 1em}
 .note{color:var(--dim);font-size:14px;margin:0 0 10px}
@@ -81,12 +84,14 @@ h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
     <div class="bar">
       <span class="live" id="live"><i></i><span id="liveTxt">Live</span></span>
       <span class="sp"></span>
+      <button class="chip" id="thumbBtn" aria-pressed="true" aria-label="Show the slide picture"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="m21 16-5-5-9 8"/></svg></button>
       <button class="chip" id="small" aria-label="Smaller text">A−</button>
       <button class="chip" id="big" aria-label="Larger text">A+</button>
       <button class="chip" id="lang" aria-pressed="false" aria-label="Language">EN</button>
     </div>
     <div class="meta" id="part"></div>
     <div class="title"><span class="num" id="num"></span><h2 id="ttl"></h2></div>
+    <img class="thumb" id="thumb" alt="" hidden>
     <div class="script" id="script"></div>
     <div class="peek">
       <button class="chip" id="prev" aria-label="Previous page">‹</button>
@@ -106,6 +111,8 @@ h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
   // Thai first: the room is Thai (the toggle remembers a change for this visit)
   let lang = store.get('lang') || 'th';
   let size = Number(store.get('size')) || 20;
+  // the slide's plain preview picture above the script: on unless they turn it off; nothing is loaded while it is off
+  let showThumb = store.get('thumb') !== '0';
   let pages = [], byId = new Map(), order = [];
   let liveId = '', shownId = '', peeking = false, code = '', es = null;
 
@@ -171,6 +178,11 @@ h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
     $('part').textContent = p ? p.part : '';
     $('num').textContent = p ? p.label : '…'; $('num').hidden = !p;
     $('ttl').textContent = p ? p.title : t.wait;
+    const pic = $('thumb');
+    $('thumbBtn').setAttribute('aria-pressed', String(showThumb));
+    pic.onerror = () => { pic.hidden = true; };
+    pic.hidden = !(p && showThumb);
+    if (pic.hidden) pic.removeAttribute('src'); else pic.src = `thumbs/${encodeURIComponent(p.id)}.jpg`;
     const box = $('script'); box.className = 'script fade'; box.replaceChildren();
     if (p) {
       const th = lang === 'th' ? p.th : '';
@@ -191,6 +203,7 @@ h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
   $('prev').onclick = () => peek(-1); $('next').onclick = () => peek(1);
   $('back').onclick = () => { peeking = false; shownId = liveId; render(); };
   $('lang').onclick = () => setLang(lang === 'th' ? 'en' : 'th');
+  $('thumbBtn').onclick = () => { showThumb = !showThumb; store.set('thumb', showThumb ? '1' : '0'); render(); };
   $('big').onclick = () => setSize(size + 2); $('small').onclick = () => setSize(size - 2);
 
   // ---- start

@@ -101,6 +101,23 @@ export function ScriptManager() {
   const [draft, setDraft] = useState('');
   const [note, setNote] = useState('');
   const [compare, setCompare] = useState(true);
+  const [showThumb, setShowThumb] = useState(() => {
+    try {
+      return localStorage.getItem('sm-thumb') !== '0';
+    } catch {
+      return true;
+    }
+  });
+  const toggleThumb = () => {
+    setShowThumb((v) => {
+      try {
+        localStorage.setItem('sm-thumb', v ? '0' : '1');
+      } catch {
+        /* the choice just lasts this visit */
+      }
+      return !v;
+    });
+  };
   const [busy, setBusy] = useState(false);
   const [banner, setBanner] = useState<{ kind: 'err' | 'ok'; text: string } | null>(null);
   const [versions, setVersions] = useState<{ versions: Version[]; default: string } | null>(null);
@@ -277,7 +294,7 @@ export function ScriptManager() {
           ) : (
             <>
               <div className="sm__head">
-                <img src={`${at('thumbs/')}${page.id}.jpg`} alt="" onError={(e) => ((e.currentTarget as HTMLImageElement).style.visibility = 'hidden')} />
+                {showThumb && <img src={`${at('thumbs/')}${page.id}.jpg`} alt="" onError={(e) => ((e.currentTarget as HTMLImageElement).style.visibility = 'hidden')} />}
                 <div>
                   <div className="part">{page.part}</div>
                   <h2>
@@ -285,6 +302,9 @@ export function ScriptManager() {
                   </h2>
                   <div className="meta">id {page.id}</div>
                 </div>
+                <button type="button" className="sm__thumb-toggle" aria-pressed={showThumb} onClick={toggleThumb}>
+                  {showThumb ? 'Hide slide picture' : 'Show slide picture'}
+                </button>
               </div>
               <div className="sm__tabs" role="tablist">
                 {(['script', 'versions', 'comments'] as Tab[]).map((t) => (
