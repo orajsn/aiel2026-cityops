@@ -2,15 +2,15 @@ import { act, render, screen } from '@testing-library/react';
 import { CodeMap } from '../../src/overlay/concepts/CodeMap';
 import { MAP_STEPS, NB_ROWS, forScreen, stepLines } from '../../src/content/lab3Map';
 import { focusStepCount, useDrawerStore } from '../../src/engine/presentation';
-import { LAB_STOPS } from '../../src/content/labStops';
+import { LAB3_STUDENT, LAB_STOPS } from '../../src/content/labStops';
 import { chapter2 } from '../../src/scenes/chapter2';
 
 const go = (n: number) => act(() => useDrawerStore.setState(n === 0 ? { open: false, focus: 0 } : { open: true, focus: n }));
 afterEach(() => act(() => useDrawerStore.setState({ open: false, focus: 0 })));
 
-test('the page opens on the whole map, then ten steps by Next', () => {
-  expect(MAP_STEPS).toHaveLength(11);
-  expect(focusStepCount('3.6m')).toBe(10);
+test('the page opens on the whole map, then one click per stop', () => {
+  expect(MAP_STEPS).toHaveLength(13);
+  expect(focusStepCount('3.6m')).toBe(12);
 });
 
 test('every step after the map finds its lines in the notebook, and its key lines sit in its section', () => {
@@ -43,8 +43,8 @@ test('the first step is the whole map with nothing dimmed; Next lights the node 
   const { container } = render(<CodeMap />);
   expect(screen.getByTestId('code-map').dataset.step).toBe('0');
   expect(container.querySelectorAll('.cm__node.is-off')).toHaveLength(0);
-  go(2);
-  expect(screen.getByTestId('code-map').dataset.step).toBe('2');
+  go(3);
+  expect(screen.getByTestId('code-map').dataset.step).toBe('3');
   expect(container.querySelector('[data-node="embedder"]')!.classList.contains('is-on')).toBe(true);
   expect(container.querySelector('[data-node="asset"]')!.classList.contains('is-off')).toBe(true);
   expect(container.querySelector('[data-line="o"]')!.getAttribute('data-lit')).toBe('true');
@@ -54,7 +54,7 @@ test('the first step is the whole map with nothing dimmed; Next lights the node 
 test('once the camera arrives only the section stays: key lines lit, the rest faded', () => {
   vi.useFakeTimers();
   const { container } = render(<CodeMap />);
-  go(4);
+  go(6);
   act(() => vi.advanceTimersByTime(1400));
   const key = [...container.querySelectorAll('.nr.is-key')].map((e) => e.textContent);
   expect(key.join('')).toContain('user_id="inspector_demo"');
@@ -64,46 +64,61 @@ test('once the camera arrives only the section stays: key lines lit, the rest fa
 
 test('the two days show their own inspector and only their own path', () => {
   const { container } = render(<CodeMap />);
-  go(9);
+  go(11);
   expect(container.querySelector('[data-who]')!.getAttribute('data-who')).toBe('mercer');
   expect(container.querySelector('[data-line="confirm"]')!.getAttribute('data-lit')).toBe('true');
   expect(container.querySelector('[data-line="read"]')!.getAttribute('data-lit')).toBeNull();
-  go(10);
+  go(12);
   expect(container.querySelector('[data-who]')!.getAttribute('data-who')).toBe('vance');
   expect(container.querySelector('[data-line="read"]')!.getAttribute('data-lit')).toBe('true');
   expect(container.querySelector('[data-line="confirm"]')!.getAttribute('data-lit')).toBeNull();
 });
 
-// owner, 4 Nov: "there should be one numbering rule": the steps are the only numbers; an exercise says "you write", with no number of its own
-test('the map and the panel number only the steps', () => {
+// owner, 4 Nov: one numbering rule, and it is the notebook's Parts: Oracle is Part 1, the embedder Part 2, and an exercise says "you write"
+test('the map and the panel number by Part, and never by TODO', () => {
   const { container } = render(<CodeMap />);
-  expect(container.querySelector('.cm__world')!.textContent).not.toMatch(/TODO|PART/);
+  const world = container.querySelector('.cm__world')!.textContent!;
+  expect(world).not.toMatch(/TODO|STEP/);
+  for (const p of [1, 2, 3, 4, 5, 6]) expect(world).toContain(`PART ${p}`);
   expect(container.querySelectorAll('.cm__world .cm__tag--write')).toHaveLength(5);
-  go(2);
+  go(3);
   const tags = container.querySelector('.cm__tags')!.textContent!;
-  expect(tags).toContain('STEP 2');
+  expect(tags).toContain('PART 2');
   expect(tags).toContain('YOU WRITE 2 LINES');
-  expect(tags).not.toMatch(/TODO|PART/);
-  go(7);
-  expect(container.querySelector('.cm__tags')!.textContent).not.toMatch(/TODO|PART|YOU WRITE/);
+  expect(tags).not.toMatch(/TODO|STEP/);
+  go(9);
+  expect(container.querySelector('.cm__tags')!.textContent).toBe('PART 5');
 });
 
-// owner, 4 Nov: "why it start with STEP 3": every step has its tag on the map and the tags start at 1
-test('the tags on the map cover steps 1 to 10, starting at 1', () => {
-  const { container } = render(<CodeMap />);
-  const shown = new Set([...container.querySelectorAll('.cm__world .cm__tag')].flatMap((e) => (e.textContent!.match(/\d+/g) ?? []).map(Number)));
-  expect([...shown].sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+// owner, 4 Nov: Part 1 highlights the settings, then the connection that proves it worked
+test('Part 1 lights the settings, then the connect lines across their two cells', () => {
+  const lit = (i: number) => [...stepLines(MAP_STEPS[i])!.key].map((r) => NB_ROWS[r].text);
+  expect(lit(1).join('\n')).toMatch(/DB_USER[\s\S]*DB_DSN[\s\S]*ONNX_MODEL[\s\S]*OLLAMA_BASE_URL[\s\S]*OLLAMA_MODEL/);
+  expect(lit(2).join('\n')).toMatch(/oracledb\.connect[\s\S]*vector_conn = connect_to_oracle\(\)[\s\S]*Connected - using user/);
+  expect(MAP_STEPS[1].tag).toBe('PART 1');
+  expect(MAP_STEPS[3].tag).toBe('PART 2');
 });
 
-// owner, 4 Nov: real line numbers, so we know which line it is
-test('every code line shows its line number inside its cell, and the numbers restart with each cell', () => {
-  const code = NB_ROWS.filter((r) => r.kind === 'code');
-  expect(code.every((r) => typeof r.line === 'number' && r.line > 0)).toBe(true);
-  for (const r of code) if (r.prompt) expect(r.line).toBe(1);
+// owner, 4 Nov: the line numbers are the notebook file's own, never counted on screen
+test('each line shows its number from the notebook file, also after a filled-in TODO', () => {
+  const nb = LAB3_STUDENT.cells;
+  const fileLine = (cell: number, sub: string) => nb[cell].source.split('\n').findIndex((l) => l.includes(sub)) + 1;
+  const row = (sub: string) => NB_ROWS.find((r) => r.kind === 'code' && r.text.includes(sub))!;
+  // untouched lines, before and after an answer that is shorter or longer than its placeholder
+  expect(row('def embed(self').line).toBe(fileLine(15, 'def embed(self'));
+  expect(row('async def embed_async').line).toBe(fileLine(15, 'async def embed_async'));
+  expect(row('# Pre-built: INSERT with named binds').line).toBe(fileLine(50, '# Pre-built: INSERT with named binds'));
+  expect(row('FETCH FIRST :k ROWS ONLY').line).toBeUndefined();
+  expect(row('# Pre-built: execute + materialise').line).toBe(fileLine(55, '# Pre-built: execute + materialise'));
+  expect(row('# TODO 6 (b)').line).toBe(fileLine(71, '# TODO 6 (b)'));
+  // an answer sits on its placeholder's lines; the first line of each is on the placeholder's number
+  expect(row("vec = array.array('f', embedder.embed([description])").line).toBe(fileLine(50, '# YOUR CODE HERE'));
+  expect(row('SELECT finding_id').line).toBe(fileLine(55, '-- YOUR SQL HERE'));
+  // the prompt is the file's: nothing has been run
+  expect(NB_ROWS.filter((r) => r.prompt).every((r) => r.prompt === '[ ]:' && r.line === 1)).toBe(true);
   const { container } = render(<CodeMap />);
-  const hl = stepLines(MAP_STEPS[2])!;
-  const row = container.querySelector(`[data-r="${[...hl.key][0]}"]`)!;
-  expect(row.querySelector('.nr__n')!.textContent).toBe(String(NB_ROWS[[...hl.key][0]].line));
+  const key = [...stepLines(MAP_STEPS[3])!.key][0];
+  expect(container.querySelector(`[data-r="${key}"] .nr__n`)!.textContent).toBe(String(NB_ROWS[key].line));
 });
 
 // owner, 4 Nov: "we remove old code panel": no page of Lab 3 still opens the notebook drawer
