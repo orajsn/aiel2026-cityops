@@ -32,7 +32,7 @@ test('the first step is the whole map with nothing dimmed; Next lights the node 
   expect(screen.getByTestId('code-map').dataset.step).toBe('6');
   expect(container.querySelector('[data-node="embedder"]')!.classList.contains('is-on')).toBe(true);
   expect(container.querySelector('[data-node="asset"]')!.classList.contains('is-off')).toBe(true);
-  expect(container.querySelector('[data-line="o"]')!.getAttribute('data-lit')).toBe('true');
+  expect(container.querySelector('[data-line="q"]')!.getAttribute('data-lit')).toBe('true');
   expect(screen.getByTestId('code-map-see').textContent).toContain('TODO 1 passed');
 });
 
@@ -163,7 +163,13 @@ test('Part 3 is three parts: the assets, then the extraction with its picture fi
   const text = (rows: Set<number>) => [...rows].map((r) => NB_ROWS[r].text);
   expect(text(asset.section)[0]).toContain('_data_dir = Path(');
   expect(text(asset.section).join('\n')).toContain('print(f"Discovered');
-  expect(text(asset.key)).toEqual(expect.arrayContaining([expect.stringContaining('_asset_names = sorted(')]));
+  // the whole block is lit, lines 6 to 14 and nothing else of the cell
+  expect(text(asset.key)[0]).toContain('_data_dir = Path(');
+  expect(text(asset.key)[text(asset.key).length - 1]).toContain('print(f"Discovered');
+  expect(asset.key.size).toBe(9);
+  expect([...asset.key].every((r) => asset.section.has(r))).toBe(true);
+  expect(NB_ROWS[[...asset.key][0]].line).toBe(6);
+  expect(NB_ROWS[Math.max(...asset.key)].line).toBe(14);
   expect(NB_ROWS.filter((r) => r.kind === 'out' && /^(Loaded|Discovered)/.test(r.text) && asset.section.has(NB_ROWS.indexOf(r)))).toHaveLength(2);
   const { container } = render(<CodeMap />);
   const world = container.querySelector('.cm__world')!.textContent!;
@@ -175,5 +181,22 @@ test('Part 3 is three parts: the assets, then the extraction with its picture fi
   go(10);
   expect(container.querySelector('.cm__rail .is-now')!.textContent).toBe('3b');
   expect([...container.querySelectorAll('.cm__rail button')].map((b) => b.textContent).filter((x) => x!.startsWith('3'))).toEqual(['3a', '3b', '3c']);
+});
+
+// owner, 4 Nov: 3a's node sits in the same row as 3b and 3c, in order, not at the bottom
+test('Part 3 sits in one row, in order: CITY_ASSET, CITY_MESSAGE, the Extractor, CITY_MEMORY', () => {
+  const { container } = render(<CodeMap />);
+  const at = (id: string) => {
+    const el = container.querySelector<HTMLElement>(`[data-node="${id}"]`)!;
+    return { left: parseInt(el.style.left), top: parseInt(el.style.top) };
+  };
+  const row = ['asset', 'message', 'extractor', 'memory'].map(at);
+  expect(new Set(row.map((r) => r.top)).size).toBe(1);
+  expect(row.map((r) => r.left)).toEqual([...row.map((r) => r.left)].sort((a, b) => a - b));
+  // the embedder and the findings keep their own row below it
+  expect(at('embedder').top).toBeGreaterThan(row[0].top);
+  expect(at('finding').top).toBe(at('embedder').top);
+  expect(container.querySelector('[data-line="r"]')).toBeTruthy();
+  expect(container.querySelector('[data-line="m"]')).toBeNull();
 });
 

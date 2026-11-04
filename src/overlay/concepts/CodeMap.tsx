@@ -62,12 +62,12 @@ const NODES: NodeDef[] = [
   { id: 'prompt', x: 906, y: 220, w: 260, h: 100, icon: 'doc', name: 'The prompt', sub: 'everything it found' },
   { id: 'model', x: 1262, y: 220, w: 240, h: 100, name: 'Language model', sub: 'reasons over it' },
   { id: 'answer', x: 1598, y: 220, w: 226, h: 100, icon: 'ok', name: 'The answer', sub: 'back to the inspector' },
-  { id: 'embedder', x: 130, y: 650, w: 280, h: 120, icon: 'bars', name: 'Embedder', sub: 'text to 384 numbers', teal: true, step: 'PART 2' },
+  { id: 'embedder', x: 130, y: 760, w: 280, h: 120, icon: 'bars', name: 'Embedder', sub: 'text to 384 numbers', teal: true, step: 'PART 2' },
   { id: 'message', x: 500, y: 540, w: 320, h: 120, icon: 'table', name: 'CITY_MESSAGE', sub: 'every message, word for word', mono: true, teal: true, step: 'PART 3b' },
   { id: 'extractor', x: 916, y: 540, w: 240, h: 120, icon: 'filter', name: 'Extractor', sub: 'keeps what matters', teal: true, step: 'PART 3b' },
   { id: 'memory', x: 1252, y: 540, w: 320, h: 120, icon: 'layers', name: 'CITY_MEMORY', sub: 'what it learned', mono: true, teal: true, step: 'PART 3c' },
   { id: 'finding', x: 500, y: 760, w: 440, h: 120, icon: 'clip', name: 'CITY_INSPECTION_FINDING', sub: 'the official record', mono: true, teal: true, step: 'PART 4' },
-  { id: 'asset', x: 1252, y: 760, w: 320, h: 120, icon: 'city', name: 'CITY_ASSET', sub: 'the 26 city assets', mono: true, teal: true, step: 'PART 3a' },
+  { id: 'asset', x: 130, y: 540, w: 260, h: 120, icon: 'city', name: 'CITY_ASSET', sub: 'the 26 city assets', mono: true, teal: true, step: 'PART 3a' },
 ];
 
 const LINES: { id: MapLine; d: string; head?: boolean; teal?: boolean }[] = [
@@ -80,12 +80,11 @@ const LINES: { id: MapLine; d: string; head?: boolean; teal?: boolean }[] = [
   { id: 'read', d: 'M1412 540 V430 H1036 V326', head: true },
   { id: 'l', d: 'M940 820 H1204' },
   { id: 'n', d: 'M1204 820 V430' },
-  { id: 'm', d: 'M1252 820 H1204' },
   { id: 'g', d: 'M820 600 H908', head: true, teal: true },
   { id: 'h', d: 'M1156 600 H1244', head: true, teal: true },
-  { id: 'o', d: 'M410 710 H456', teal: true },
-  { id: 'p', d: 'M456 710 V600 H492', head: true, teal: true },
-  { id: 'q', d: 'M456 710 V820 H492', head: true, teal: true },
+  // Part 3 in one row, in order: the assets, the messages, the extractor, the memory
+  { id: 'r', d: 'M390 600 H492', head: true, teal: true },
+  { id: 'q', d: 'M410 820 H492', head: true, teal: true },
 ];
 
 const nodeState = (step: MapStep, id: MapNode) => (!step.nodes ? '' : step.nodes.includes(id) ? ' is-on' : ' is-off');
