@@ -129,5 +129,6 @@ export const SCRIPT: Record<string, string> = {
 // The map page says what the pages it replaced said, step by step (3.6 to 3.14a stay above for when a page comes back)
 SCRIPT['3.6m'] = [
   'This one map is everything you build today. One turn of the AI agent runs along the top, and everything it remembers sits in one database underneath. We walk it in the order the code runs.',
+  'First, open the notebook. In the file list, open agent_memory and double-click notebook_student_ollama.ipynb. Each box is a cell: click inside one to select it, then click Run or press Shift and Enter.',
   ...['3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a'].map((id) => SCRIPT[id]),
 ].join('\n\n');

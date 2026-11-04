@@ -1,11 +1,11 @@
-import { LAB3_STUDENT } from './labStops';
+import completeNotebook from './notebooks/lab3_complete.json';
 import { highlightPython, type TokenKind } from '../overlay/jupyter/highlight';
 
 /**
- * Lab 3's coding part as one map (owner, 4 Nov; drafted on the canvas "Lab 3 Code Map"): one page, the map and then the notebook's Parts 1 to 6 and the two days, in the order the code
- * runs. Each Next flies the map to a node while a real notebook window scrolls to that part of the code: its lines stay, the key lines
- * light up, the rest fades. The window shows the student notebook (notebook_student_ollama.ipynb) with each TODO's answer filled in.
- * The notebook file itself is never changed: answers and names are put in here, for the screen only.
+ * Lab 3's coding part as one map (owner, 4 Nov; drafted on the canvas "Lab 3 Code Map"): one page, the map and then the notebook's Parts 1 to 6
+ * and the two days, in the order the code runs. Each Next flies the map to a node while a real notebook window scrolls to that part of the
+ * code: its lines stay, the key lines light up, the rest fades. The window IS the owner's run notebook, notebook_complete_ollama.ipynb
+ * (notebooks/lab3_complete.json): its own text, line numbers, execution counts and printed results, nothing changed or added.
  */
 
 export type MapNode = 'inspector' | 'copilot' | 'prompt' | 'model' | 'answer' | 'scope' | 'embedder' | 'message' | 'extractor' | 'memory' | 'finding' | 'asset';
@@ -21,12 +21,16 @@ interface CodeSection {
   from: string;
   to: string;
   keys: string[];
+  /** the line of the cell's printed result that stays lit with it */
+  out?: string;
 }
 export interface MapStep {
   title: string;
   /** the whole map, full width, no notebook (the first step) */
   wide?: boolean;
   cam: MapCam;
+  /** a guide stop: the JupyterLab screenshot with this part lit, instead of the map and the notebook window */
+  guide?: 'file' | 'code' | 'run';
   /** the numbering (owner, 4 Nov): the notebook's own Part, or the story's day; a part with two clicks is 3a, 3b on the buttons */
   tag?: string;
   rail: string;
@@ -41,110 +45,81 @@ export interface MapStep {
   lines: MapLine[];
   /** the person on the Inspector card on this step */
   who?: 'mercer' | 'vance';
-  code?: CodeSection & { extra?: string; more?: CodeSection };
+  code?: CodeSection & { extra?: string };
 }
 
 const ALL: MapCam = { s: 0.44, cx: 960, cy: 545 };
 
 export const MAP_STEPS: MapStep[] = [
   { title: 'The whole map', rail: 'Map', wide: true, cam: { s: 0.82, cx: 960, cy: 545 }, ask: 'Everything you build today is on this one map.', plain: 'One turn of the AI agent runs along the top. Everything it remembers sits in one database underneath. We walk it in the order the code runs.', lines: [] },
-  { title: 'Oracle setup', rail: '1a', tag: 'PART 1', cam: { s: 0.6, cx: 620, cy: 690 }, ask: 'Where does everything live?', plain: 'One filing room, not five. These few settings name the database, the embedding model and the language model.', see: 'Config ready: db=prism@aidbfree:1521/FREEPDB1  |  onnx=ALL_MINILM_L12_V2  |  llm=…  |  narratives=4', nodes: ['embedder', 'message', 'extractor', 'memory', 'finding', 'asset'], lines: [], code: { cell: 7, from: '# Oracle AI Database 26ai', to: 'OLLAMA_MODEL    =', keys: ['DB_USER     =', 'DB_DSN      =', 'ONNX_MODEL  =', 'OLLAMA_BASE_URL =', 'OLLAMA_MODEL    ='] } },
-  { title: 'Oracle setup', rail: '1b', tag: 'PART 1', cam: { s: 0.6, cx: 620, cy: 690 }, ask: 'Did it connect to the database?', plain: 'One connection opens the database. If you see this line, you are in, and everything after this uses the same connection.', see: 'Connected - using user prism', nodes: ['embedder', 'message', 'extractor', 'memory', 'finding', 'asset'], lines: [], code: { cell: 8, from: 'def connect_to_oracle', to: 'return oracledb.connect', keys: ['return oracledb.connect'], more: { cell: 9, from: 'vector_conn = connect_to_oracle', to: 'ok(f"Connected', keys: ['vector_conn = connect_to_oracle', 'ok(f"Connected'] } } },
-  { title: 'The embedder', rail: '2a', tag: 'PART 2', cam: { s: 1.25, cx: 330, cy: 710 }, write: '2 lines', ask: 'How do you search by meaning?', plain: 'Text becomes 384 numbers, like an address on a map of meaning. Reports that mean the same thing land close together.', see: 'TODO 1 passed - embedder returns float32 (n, 384) arrays', nodes: ['embedder'], lines: ['o', 'p', 'q'], code: { cell: 15, from: 'def embed(self', to: 'return np.asarray', keys: ['vectors = self.provider', 'return np.asarray'] } },
-  { title: 'The memory SDK', rail: '2b', tag: 'PART 2', cam: { s: 0.72, cx: 1036, cy: 600 }, ask: 'Who keeps the memory?', plain: 'The memory SDK sits on that same connection and sets up its own tables, with the embedder doing the numbers.', see: 'OracleAgentMemory ready. Tables under prefix CITY_*', nodes: ['message', 'extractor', 'memory'], lines: [], code: { cell: 20, from: 'memory = OracleAgentMemory(', to: 'table_name_prefix', keys: ['connection=vector_conn', 'extract_memories=True', 'table_name_prefix'] } },
-  { title: 'A report goes in', rail: '3a', tag: 'PART 3', cam: { s: 0.72, cx: 1036, cy: 600 }, write: '2 lines', ask: 'What happens when an inspector reports?', plain: 'Two things. The report is filed word for word. Then the extractor writes small cards of what is worth keeping.', see: 'TODO 2 passed - added message(s): …', nodes: ['message', 'extractor', 'memory'], lines: ['g', 'h'], code: { cell: 29, from: '# TODO 2', to: 'return await t.add_messages_async', keys: ['content = f', 'return await t.add_messages_async'] } },
-  { title: 'Finding a memory', rail: '3b', tag: 'PART 3', cam: { s: 1.2, cx: 1412, cy: 600 }, write: '1 line', ask: 'Why did the search come back empty?', plain: 'A memory belongs to whoever wrote it. Search with no name and you get nothing. Give the right name and the cards light up.', see: 'TODO 3 passed - … memories extracted from 4 narratives', nodes: ['memory'], lines: [], code: { cell: 39, from: 'results = await', to: 'max_results=30', keys: ['user_id="inspector_demo"'] } },
-  { title: 'The official record', rail: '4a', tag: 'PART 4', cam: { s: 0.88, cx: 560, cy: 780 }, write: '1 line', ask: 'What is a finding, if it is not a memory?', plain: 'A memory is what the AI agent noticed. A finding is what a person signed. It gets its own table, and its description becomes numbers too.', see: 'TODO 4 passed - finding_id=…', nodes: ['finding', 'embedder'], lines: ['o', 'q'], code: { cell: 50, from: '# TODO 4', to: 'vec = array', keys: ['vec = array'] } },
-  { title: 'Search with walls', rail: '4b', tag: 'PART 4', cam: { s: 1.05, cx: 720, cy: 820 }, write: 'about 7 lines', ask: 'Nearest in meaning, but only this bridge?', plain: 'One SQL statement does both: the closest in meaning, inside the walls of this asset and this category.', see: 'TODO 5 passed - broad=…, asset-filtered=…, category-filtered=…', nodes: ['finding'], lines: [], code: { cell: 55, from: 'SELECT finding_id', to: 'FETCH FIRST', keys: ['VECTOR_DISTANCE', 'WHERE (:asset_id', 'AND (:category'] } },
-  { title: 'Who sees what', rail: '5', tag: 'PART 5', cam: { s: 0.76, cx: 800, cy: 460 }, ask: 'Why can Vance not read Mercer’s private note?', plain: 'Each inspector has a private thread. What the extractor learns goes on a shelf for the asset. The database enforces this, not the AI agent.', see: "Multi-tenancy verified: Vance sees city-wide guidelines but NOT Mercer's personal notes.", nodes: ['scope', 'copilot', 'message', 'memory'], lines: ['e', 'f'], code: { cell: 71, extra: 'thread_id = f"', from: 'pooled = await', to: 'max_results=3', keys: ['thread_id = f"', 'user_id=asset_id', 'exact_thread_match'] } },
-  { title: 'One whole turn', rail: '6', tag: 'PART 6', cam: { s: 0.46, cx: 960, cy: 545 }, write: '2 lines', ask: 'What does the AI agent actually read?', plain: 'You write two lines: its context card and the similar findings. The rest is built: put it all in one prompt, ask, save.', see: 'TODO 6 passed - copilot ran end-to-end', nodes: ['copilot', 'scope', 'prompt', 'model', 'answer', 'memory', 'finding', 'asset'], lines: ['b', 'c', 'd', 'read', 'n', 'l', 'm', 'e'], code: { cell: 71, from: '# TODO 6 (a)', to: 'similar = find_similar', keys: ['card = await', 'similar = find_similar'] } },
-  { title: 'Day 1: Mercer', rail: 'Day 1', tag: 'DAY 1', cam: ALL, ask: 'Mercer leaves two things behind.', plain: 'Her turn is saved and the extractor keeps what matters. Then, once she is sure, she signs the finding herself: a separate path.', see: 'Logged finding … - now searchable by future call_copilot invocations.', who: 'mercer', nodes: ['inspector', 'copilot', 'scope', 'message', 'extractor', 'memory', 'finding'], lines: ['a', 'e', 'f', 'g', 'h', 'confirm'], code: { cell: 79, from: 'MERCER_FINDING_ID = log_finding(', to: 'days_ago=0', keys: ['log_finding(', 'category="corrosion"', 'severity="medium"', 'overall_grade="C"'] } },
-  { title: 'Later: Vance', rail: 'Day N', tag: 'DAY N', cam: ALL, ask: 'Vance asks, and Mercer’s work reaches him.', plain: 'He only calls call_copilot. His own thread is empty, but the asset’s memory and her finding come up the same road. No human handoff.', see: 'DAY N: Inspector Vance on Harbor Bridge (never met Mercer)', who: 'vance', nodes: ['inspector', 'copilot', 'scope', 'prompt', 'model', 'answer', 'memory', 'finding', 'asset'], lines: ['a', 'e', 'read', 'l', 'm', 'n', 'b', 'c', 'd'], code: { cell: 85, from: 'VANCE_DIAGNOSIS = await', to: 'asset_id="Harbor Bridge"', keys: ['VANCE_DIAGNOSIS = await', 'inspector_id="Vance"', 'asset_id="Harbor Bridge"'] } },
+  // Part 0 (colleague's note, 4 Nov): how to open the notebook and run a cell, on a real JupyterLab screenshot; one thing lit per click
+  { title: 'Open the notebook', rail: '0', tag: 'PART 0', guide: 'file', cam: { s: 0.82, cx: 960, cy: 545 }, ask: 'First, open the notebook.', plain: 'In the file list, open agent_memory and double-click notebook_student_ollama.ipynb.', lines: [] },
+  { title: 'Open the notebook', rail: '0', tag: 'PART 0', guide: 'code', cam: { s: 0.82, cx: 960, cy: 545 }, ask: 'This is where the code is.', plain: 'Each box is a cell. Click inside one to select it: the blue bar on its left shows which cell you are on.', lines: [] },
+  { title: 'Open the notebook', rail: '0', tag: 'PART 0', guide: 'run', cam: { s: 0.82, cx: 960, cy: 545 }, ask: 'Run the cell.', plain: 'Click Run, or press Shift + Enter. The cell runs and the next one is selected.', lines: [] },
+  { title: 'Oracle setup', rail: '1a', tag: 'PART 1', cam: { s: 0.6, cx: 620, cy: 690 }, ask: 'Where does everything live?', plain: 'One filing room, not five. These few settings name the database, the embedding model and the language model.', see: 'Config ready: db=prism@aidbfree:1521/FREEPDB1  |  onnx=ALL_MINILM_L12_V2  |  llm=llama3.2  |  narratives=4', nodes: ['embedder', 'message', 'extractor', 'memory', 'finding', 'asset'], lines: [], code: { cell: 6, from: '# Oracle AI Database 26ai', to: 'OLLAMA_MODEL    =', keys: ['DB_USER     =', 'DB_DSN      =', 'ONNX_MODEL  =', 'OLLAMA_BASE_URL =', 'OLLAMA_MODEL    ='], out: 'Config ready' } },
+  { title: 'Oracle setup', rail: '1b', tag: 'PART 1', cam: { s: 0.6, cx: 620, cy: 690 }, ask: 'Did it connect to the database?', plain: 'One connection opens the database. If you see this line, you are in, and everything after this uses the same connection.', see: 'Connected - using user prism', nodes: ['embedder', 'message', 'extractor', 'memory', 'finding', 'asset'], lines: [], code: { cell: 6, from: 'def connect_to_oracle', to: 'ok(f"Connected', keys: ['return oracledb.connect', 'vector_conn = connect_to_oracle', 'ok(f"Connected'], out: 'Connected - using user' } },
+  { title: 'The embedder', rail: '2a', tag: 'PART 2', cam: { s: 1.25, cx: 330, cy: 710 }, write: '2 lines', ask: 'How do you search by meaning?', plain: 'Text becomes 384 numbers, like an address on a map of meaning. Reports that mean the same thing land close together.', see: 'TODO 1 passed - embedder returns float32 ((1, 384)) arrays', nodes: ['embedder'], lines: ['o', 'p', 'q'], code: { cell: 12, from: 'def embed(self', to: 'return np.asarray', keys: ['vectors = self.provider', 'return np.asarray'], out: 'TODO 1 passed' } },
+  { title: 'The memory SDK', rail: '2b', tag: 'PART 2', cam: { s: 0.72, cx: 1036, cy: 600 }, ask: 'Who keeps the memory?', plain: 'The memory SDK sits on that same connection and sets up its own tables, with the embedder doing the numbers.', see: 'OracleAgentMemory ready. Tables under prefix CITY_*', nodes: ['message', 'extractor', 'memory'], lines: [], code: { cell: 14, from: 'memory = OracleAgentMemory(', to: 'table_name_prefix', keys: ['connection=vector_conn', 'extract_memories=True', 'table_name_prefix'], out: 'OracleAgentMemory ready' } },
+  { title: 'A report goes in', rail: '3a', tag: 'PART 3', cam: { s: 0.72, cx: 1036, cy: 600 }, write: '2 lines', ask: 'What happens when an inspector reports?', plain: 'Two things. The report is filed word for word. Then the extractor writes small cards of what is worth keeping.', see: "TODO 2 passed - added message(s): ['b9dc2ca1-f704-4756-9c42-c3d59bea58f4']", nodes: ['message', 'extractor', 'memory'], lines: ['g', 'h'], code: { cell: 20, from: 'content = f"[Asset', to: 'add_messages_async([Message(role="user", content=content)', keys: ['content = f"[Asset', 'add_messages_async([Message(role="user", content=content)'], out: 'TODO 2 passed' } },
+  { title: 'Finding a memory', rail: '3b', tag: 'PART 3', cam: { s: 1.2, cx: 1412, cy: 600 }, write: '1 line', ask: 'Why did the search come back empty?', plain: 'A memory belongs to whoever wrote it. Search with no name and you get nothing. Give the right name and the cards light up.', see: 'TODO 3 passed - 14 memories extracted from 4 narratives', nodes: ['memory'], lines: [], code: { cell: 28, from: 'results = await', to: 'max_results', keys: ['user_id="inspector_demo"'], out: 'TODO 3 passed' } },
+  { title: 'The official record', rail: '4a', tag: 'PART 4', cam: { s: 0.88, cx: 560, cy: 780 }, write: '1 line', ask: 'What is a finding, if it is not a memory?', plain: 'A memory is what the AI agent noticed. A finding is what a person signed. It gets its own table, and its description becomes numbers too.', see: 'TODO 4 passed - finding_id=2e80d8fa-551', nodes: ['finding', 'embedder'], lines: ['o', 'q'], code: { cell: 37, from: 'finding_id = str(uuid', to: 'vec = array', keys: ['vec = array'] } },
+  { title: 'Search with walls', rail: '4b', tag: 'PART 4', cam: { s: 1.05, cx: 720, cy: 820 }, write: 'about 7 lines', ask: 'Nearest in meaning, but only this bridge?', plain: 'One SQL statement does both: the closest in meaning, inside the walls of this asset and this category.', see: 'TODO 5 passed - broad=5, asset-filtered=5, category-filtered=4', nodes: ['finding'], lines: [], code: { cell: 41, from: 'SELECT finding_id', to: 'FETCH FIRST', keys: ['VECTOR_DISTANCE', 'WHERE (:asset_id', 'AND (:category'] } },
+  { title: 'Who sees what', rail: '5', tag: 'PART 5', cam: { s: 0.76, cx: 800, cy: 460 }, ask: 'Why can Vance not read Mercer’s private note?', plain: 'Each inspector has a private thread. What the extractor learns goes on a shelf for the asset. The database enforces this, not the AI agent.', see: "Multi-tenancy verified: Vance sees city-wide guidelines but NOT Mercer's personal notes.", nodes: ['scope', 'copilot', 'message', 'memory'], lines: ['e', 'f'], code: { cell: 54, extra: 'thread_id = f"', from: 'pooled = await', to: 'max_results=3', keys: ['thread_id = f"', 'user_id=asset_id', 'exact_thread_match'] } },
+  { title: 'One whole turn', rail: '6', tag: 'PART 6', cam: { s: 0.46, cx: 960, cy: 545 }, write: '2 lines', ask: 'What does the AI agent actually read?', plain: 'You write two lines: its context card and the similar findings. The rest is built: put it all in one prompt, ask, save.', see: 'TODO 6 passed - copilot ran end-to-end', nodes: ['copilot', 'scope', 'prompt', 'model', 'answer', 'memory', 'finding', 'asset'], lines: ['b', 'c', 'd', 'read', 'n', 'l', 'm', 'e'], code: { cell: 54, from: 'card = await', to: 'similar = find_similar', keys: ['card = await', 'similar = find_similar'], out: 'TODO 6 passed' } },
+  { title: 'Day 1: Mercer', rail: 'Day 1', tag: 'DAY 1', cam: ALL, ask: 'Mercer leaves two things behind.', plain: 'Her turn is saved and the extractor keeps what matters. Then, once she is sure, she signs the finding herself: a separate path.', see: 'Logged finding fcd664d7-d5d - now searchable by future call_copilot invocations.', who: 'mercer', nodes: ['inspector', 'copilot', 'scope', 'message', 'extractor', 'memory', 'finding'], lines: ['a', 'e', 'f', 'g', 'h', 'confirm'], code: { cell: 59, from: 'MERCER_FINDING_ID = log_finding(', to: 'days_ago=0', keys: ['log_finding(', 'category="corrosion"', 'severity="medium"', 'overall_grade="C"'], out: 'Logged finding' } },
+  { title: 'Later: Vance', rail: 'Day N', tag: 'DAY N', cam: ALL, ask: 'Vance asks, and Mercer’s work reaches him.', plain: 'He only calls call_copilot. His own thread is empty, but the asset’s memory and her finding come up the same road. No human handoff.', see: 'DAY N: Inspector Vance on Harbor Bridge (never met Mercer)', who: 'vance', nodes: ['inspector', 'copilot', 'scope', 'prompt', 'model', 'answer', 'memory', 'finding', 'asset'], lines: ['a', 'e', 'read', 'l', 'm', 'n', 'b', 'c', 'd'], code: { cell: 64, from: 'VANCE_DIAGNOSIS = await', to: 'asset_id="Harbor Bridge"', keys: ['VANCE_DIAGNOSIS = await', 'inspector_id="Jordan_Vance"', 'asset_id="Harbor Bridge"'], out: 'DAY N:' } },
 ];
 
-/** the answer block in the markdown cell after a TODO cell */
-function answer(cell: number): string[] {
-  const m = LAB3_STUDENT.cells[cell].source.match(/```\w*\n([\s\S]*?)```/);
-  return m ? m[1].replace(/\n$/, '').split('\n') : [];
-}
-const indent = (lines: string[], n: number) => lines.map((l) => (l ? ' '.repeat(n) + l : l));
-
-/** a line on screen, and its line number in the notebook file; an answer line past the placeholder's lines has none */
-interface ScreenLine {
-  text: string;
-  line?: number;
-}
-
-/**
- * The cell with its TODO answered. Every line keeps its number in the file, so what is on screen can be found in the notebook (owner, 4 Nov).
- * The answer takes the placeholder's line numbers; extra answer lines have no number of their own and a shorter answer leaves a gap.
- */
-function answered(cell: number, lines: string[]): ScreenLine[] {
-  const out: ScreenLine[] = [];
-  const put = (answerLines: string[], at: number, placeholders: number) =>
-    answerLines.forEach((text, k) => out.push({ text, line: k < placeholders ? at + k + 1 : undefined }));
-  for (let j = 0; j < lines.length; j++) {
-    const s = lines[j].trim();
-    if (s.startsWith('# YOUR CODE HERE') && [15, 29, 50].includes(cell)) {
-      put(indent(answer(cell + 1), cell === 15 ? 8 : 4), j, 2);
-      j += 1;
-    } else if (cell === 39 && s.startsWith('user_id=None')) put(['    user_id="inspector_demo",'], j, 1);
-    else if (cell === 55 && s.startsWith('-- YOUR SQL HERE')) put(indent(answer(56), 8), j, 1);
-    else if (cell === 71 && (s.startsWith('# TODO 6 (a)') || s.startsWith('# TODO 6 (b)'))) {
-      const a = answer(72);
-      const split = a.findIndex((l) => l.startsWith('# 6b'));
-      out.push({ text: lines[j], line: j + 1 });
-      put(indent(s.includes('(a)') ? a.slice(1, split) : a.slice(split + 1), 4), j + 1, 2);
-      j += 2;
-    } else out.push({ text: lines[j], line: j + 1 });
-  }
-  return out;
-}
-
-/** the screen's rules, on the notebook's text: Mercer and Vance only, no pier numbers, the model never named */
-export const forScreen = (line: string) =>
-  line
-    .replace(/Evelyn_H_Mercer/g, 'Mercer')
-    .replace(/Jordan_Vance/g, 'Vance')
-    .replace(/Jordan/g, 'Vance')
-    .replace(/\b([Pp])ier \d/g, '$1ier')
-    .replace(/"llama3\.2"/g, '"…"');
+export const NB_FILE = completeNotebook.file;
 
 export interface NbSpan {
   t: string;
-  k: TokenKind;
+  k: TokenKind | 'md-code' | 'md-b';
 }
 export interface NbRow {
-  kind: 'code' | 'gap' | 'h1' | 'h2' | 'h3';
-  /** the [ ]: prompt on a cell's first line, as the file has it: the notebook has not been run */
+  kind: 'code' | 'out' | 'md' | 'gap' | 'h1' | 'h2' | 'h3';
+  /** the [n]: prompt on a cell's first line, the count the notebook was run with */
   prompt?: string;
-  /** the line's number in its cell in the notebook file */
+  /** the line's number in its cell */
   line?: number;
   spans: NbSpan[];
   text: string;
 }
 
-const FIRST_CELL = 4;
-const LAST_CELL = 88;
+interface RunCell {
+  type: string;
+  source: string;
+  count?: number | null;
+  outputs?: string[];
+}
+
+/** a markdown line, with its `code` and **bold** marked */
+const mdSpans = (text: string): NbSpan[] =>
+  text
+    .split(/(`[^`]+`|\*\*.+?\*\*)/g)
+    .filter(Boolean)
+    .map((p) => (p.startsWith('`') && p.length > 1 ? { t: p.slice(1, -1), k: 'md-code' as const } : p.startsWith('**') && p.length > 3 ? { t: p.slice(2, -2), k: 'md-b' as const } : { t: p, k: 'plain' as const }));
 
 function build() {
   const rows: NbRow[] = [];
   const where = new Map<number, number[]>();
-  for (let i = FIRST_CELL; i <= LAST_CELL; i++) {
-    const cell = LAB3_STUDENT.cells[i];
+  const outs = new Map<number, number[]>();
+  (completeNotebook.cells as RunCell[]).forEach((cell, i) => {
     if (cell.type !== 'code') {
-      const m = cell.source.match(/^(#{1,3})\s*(.*)/);
-      if (m) {
-        const text = forScreen(m[2].replace(/`/g, '').replace(/[^\p{L}\p{N}\p{P}\p{Zs}+=<>]/gu, '').trim());
-        rows.push({ kind: `h${m[1].length}` as NbRow['kind'], spans: [{ t: text, k: 'plain' }], text });
+      for (const raw of cell.source.split('\n')) {
+        // pictures and the show-answer tags are not text
+        const line = raw.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/<[^>]+>/g, '');
+        if (!line.trim() || /^-{3,}$/.test(line.trim())) continue;
+        const h = line.match(/^(#{1,3})\s*(.*)/);
+        if (h) rows.push({ kind: `h${h[1].length}` as NbRow['kind'], spans: mdSpans(h[2]), text: h[2] });
+        else rows.push({ kind: 'md', spans: mdSpans(line), text: line });
       }
-      continue;
+      return;
     }
-    const shown = answered(i, cell.source.replace(/\n+$/, '').split('\n'));
-    const text = shown.map((l) => forScreen(l.text)).join('\n');
+    if (!cell.source.trim()) return;
     // one token can run over several lines (a triple-quoted string): cut the tokens at the line ends
     const lines: NbSpan[][] = [[]];
-    for (const tok of highlightPython(text)) {
+    for (const tok of highlightPython(cell.source)) {
       tok.text.split('\n').forEach((part, p) => {
         if (p > 0) lines.push([]);
         if (part) lines[lines.length - 1].push({ t: part, k: tok.kind });
@@ -153,12 +128,19 @@ function build() {
     const at: number[] = [];
     lines.forEach((spans, q) => {
       at.push(rows.length);
-      rows.push({ kind: 'code', prompt: q === 0 ? '[ ]:' : undefined, line: shown[q].line, spans, text: spans.map((s) => s.t).join('') });
+      rows.push({ kind: 'code', prompt: q === 0 ? `[${cell.count ?? ' '}]:` : undefined, line: q + 1, spans, text: spans.map((s) => s.t).join('') });
     });
     where.set(i, at);
+    const printed: number[] = [];
+    for (const text of (cell.outputs ?? []).join('').replace(/\n+$/, '').split('\n')) {
+      if (!(cell.outputs ?? []).length) break;
+      printed.push(rows.length);
+      rows.push({ kind: 'out', spans: [{ t: text, k: 'plain' }], text });
+    }
+    outs.set(i, printed);
     rows.push({ kind: 'gap', spans: [], text: '' });
-  }
-  return { rows, where };
+  });
+  return { rows, where, outs };
 }
 
 const NB = build();
@@ -176,26 +158,27 @@ export interface StepLines {
 /** which notebook rows a step shows; throws if the notebook no longer has the line, which the tests would catch */
 export function stepLines(step: MapStep): StepLines | null {
   if (!step.code) return null;
+  const { cell, from, to: end, keys, extra, out } = step.code;
+  const at = NB.where.get(cell) ?? [];
+  const find = (sub: string, after = -1) => {
+    const r = at.find((row) => row > after && NB.rows[row].text.includes(sub));
+    if (r === undefined) throw new Error(`Lab 3 map: cell ${cell} has no line "${sub}"`);
+    return r;
+  };
+  const a = find(from);
+  let b = find(end, a - 1);
+  // a call's closing bracket belongs to the section
+  if (NB.rows[b + 1]?.text.trim() === ')') b += 1;
   const section = new Set<number>();
   const key = new Set<number>();
-  const read = ({ cell, from, to, keys }: CodeSection, extra?: string) => {
-    const at = NB.where.get(cell) ?? [];
-    const find = (sub: string, after = -1) => {
-      const r = at.find((row) => row > after && NB.rows[row].text.includes(sub));
-      if (r === undefined) throw new Error(`Lab 3 map: cell ${cell} has no line "${sub}"`);
-      return r;
-    };
-    const a = find(from);
-    let b = find(to, a - 1);
-    // a call's closing bracket belongs to the section
-    if (NB.rows[b + 1]?.text.trim() === ')') b += 1;
-    for (let r = a; r <= b; r++) section.add(r);
-    const x = extra === undefined ? undefined : find(extra);
-    if (x !== undefined) section.add(x);
-    for (const k of keys) key.add(x !== undefined && NB.rows[x].text.includes(k) ? x : find(k, a - 1));
-    return a;
-  };
-  const to = read(step.code, step.code.extra);
-  if (step.code.more) read(step.code.more);
-  return { section, key, to };
+  for (let r = a; r <= b; r++) section.add(r);
+  const x = extra === undefined ? undefined : find(extra);
+  if (x !== undefined) section.add(x);
+  for (const k of keys) key.add(x !== undefined && NB.rows[x].text.includes(k) ? x : find(k, a - 1));
+  if (out) {
+    const r = (NB.outs.get(cell) ?? []).find((row) => NB.rows[row].text.includes(out));
+    if (r === undefined) throw new Error(`Lab 3 map: cell ${cell} printed no "${out}"`);
+    section.add(r);
+  }
+  return { section, key, to: a };
 }

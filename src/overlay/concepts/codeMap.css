@@ -86,4 +86,26 @@
 .cm__rail button.is-done { background: #d5ecef; border-color: #d5ecef; color: #14707f; }
 .cm__rail button.is-now { background: #1f2a33; border-color: #1f2a33; color: #fff; }
 @media (prefers-reduced-motion: reduce) { .cm__world, .cm__node, .cm-l, .cm__fade, .cm__side, .nr.is-near { transition: none; } .cm-l--on { animation: none; } }
-.cm__rail button:first-child, .cm__rail button:nth-last-child(-n + 2) { width: 62px; }
+.cm__rail button:first-child, .cm__rail button:nth-last-child(-n + 2) { width: 60px; }
+
+/* Part 0: the JupyterLab screenshot, over the map */
+.cm__guide { position: absolute; inset: 0; background: #fff; box-sizing: border-box; padding: 28px 42px 84px; display: flex; flex-direction: column; gap: 14px; }
+.cm__guide .cm__say { height: 142px; }
+.cm__shot { position: relative; flex: none; width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #dce2e8; align-self: flex-start; }
+.cm__shot img { display: block; width: 100%; height: auto; }
+.cm__spot { position: absolute; border: 3px solid #1b8a9c; border-radius: 8px; box-shadow: 0 0 0 4000px rgba(11, 14, 20, 0.5); transition: left 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.cm__spotlabel { position: absolute; left: 0; padding: 4px 12px; border-radius: 8px; background: #14707f; color: #fff; font: 700 18px/26px var(--font-mono, 'JetBrains Mono', monospace); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .cm__spot { transition: none; } }
+
+/* what a cell prints, under it as in Jupyter */
+.nr--out { margin-top: 2px; }
+.nr--out .nr__n { background: transparent; }
+.nr--out .nr__c { background: transparent; padding-left: calc(12px + 2ch); text-indent: -2ch; }
+
+/* the notebook's own text between the cells */
+.nr--md { font-family: var(--font-sans, Inter, system-ui, sans-serif); font-size: 17px; line-height: 25px; color: #3b4752; }
+.nr--md .nr__n { width: 0; padding: 0; background: transparent; }
+.nr--md .nr__c { background: transparent; padding: 2px 0; text-indent: 0; }
+.nt-md-code { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 15px; background: #eef1f3; border-radius: 4px; padding: 0 4px; }
+.nt-md-b { font-weight: 700; }
+

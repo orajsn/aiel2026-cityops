@@ -1,10 +1,11 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { MAP_STEPS, NB_ROWS, stepLines, type MapLine, type MapNode, type MapStep, type NbRow } from '../../content/lab3Map';
+import { MAP_STEPS, NB_FILE, NB_ROWS, stepLines, type MapLine, type MapNode, type MapStep, type NbRow } from '../../content/lab3Map';
 import { useDrawerStore } from '../../engine/presentation';
 import { useUiStore } from '../../engine/ui';
 import { ModelNet, Net } from './lab1/parts';
 import mercerPortrait from '../../assets/portraits/mercer.png';
 import vancePortrait from '../../assets/portraits/vance.png';
+import jupyterOpen from '../../assets/lab3/jupyter-open.webp';
 import './codeMap.css';
 
 /**
@@ -198,6 +199,37 @@ function Notebook({ step, lit, scroller }: { step: MapStep; lit: boolean; scroll
   );
 }
 
+/** the lit part of the JupyterLab screenshot, as fractions of the picture */
+const SPOTS = {
+  file: { x: 0.052, y: 0.408, w: 0.171, h: 0.072, label: 'notebook_student_ollama.ipynb' },
+  code: { x: 0.238, y: 0.482, w: 0.718, h: 0.518, label: 'A code cell' },
+  run: { x: 0.345, y: 0.145, w: 0.022, h: 0.068, label: 'Run' },
+} as const;
+
+/** Part 0: the real JupyterLab screen, dimmed but for the one thing this click is about */
+function Guide({ step, lit }: { step: MapStep; lit: boolean }) {
+  const spot = SPOTS[step.guide!];
+  return (
+    <div className="cm__guide" data-testid="code-map-guide" data-spot={step.guide}>
+      <div className="cm__say cm__fade" style={{ opacity: lit ? 1 : 0 }}>
+        <div className="cm__tags">
+          <span className="cm__tag">{step.tag}</span>
+        </div>
+        <div className="cm__ask">{step.ask}</div>
+        <div className="cm__plain">{step.plain}</div>
+      </div>
+      <div className="cm__shot">
+        <img src={jupyterOpen} alt="JupyterLab with notebook_student_ollama.ipynb open" />
+        <div className="cm__spot" style={{ left: `${spot.x * 100}%`, top: `${spot.y * 100}%`, width: `${spot.w * 100}%`, height: `${spot.h * 100}%` }}>
+          <span className="cm__spotlabel" style={step.guide === 'file' ? { left: 'calc(100% + 8px)', top: 0 } : spot.y > 0.45 ? { bottom: 'calc(100% + 8px)' } : { top: 'calc(100% + 8px)' }}>
+            {spot.label}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function CodeMap() {
   const n = useDrawerStore((s) => (s.open ? Math.min(s.focus, MAP_STEPS.length - 1) : 0));
   const step = MAP_STEPS[n];
@@ -220,7 +252,7 @@ export function CodeMap() {
 
   useEffect(() => {
     setLit(false);
-    const t = window.setTimeout(() => setLit(true), step.wide ? 300 : SETTLE_MS);
+    const t = window.setTimeout(() => setLit(true), step.wide || step.guide ? 300 : SETTLE_MS);
     const hl = stepLines(step);
     const el = scroller.current;
     let raf = 0;
@@ -255,7 +287,7 @@ export function CodeMap() {
         <div className="cm" style={{ transform: `scale(${k})`, flex: 'none' }}>
           <TheMap step={step} />
 
-          <div className={`cm__side${step.wide ? ' is-away' : ''}`}>
+          <div className={`cm__side${step.wide || step.guide ? ' is-away' : ''}`}>
             <div className="cm__say cm__fade" style={{ opacity: lit ? 1 : 0 }}>
               <div className="cm__tags">
                 {step.tag && <span className="cm__tag">{step.tag}</span>}
@@ -271,7 +303,7 @@ export function CodeMap() {
                     <path d="M2 1l7 4-7 4z" fill="#fff" />
                   </svg>
                 </span>
-                <span className="cm__file">notebook_student_ollama.ipynb</span>
+                <span className="cm__file">{NB_FILE}</span>
                 <span className="cm__kernel">Python 3 (ipykernel)</span>
               </div>
               <Notebook step={step} lit={lit} scroller={scroller} />
@@ -285,6 +317,8 @@ export function CodeMap() {
             </div>
           </div>
 
+          {step.guide && <Guide step={step} lit={lit} />}
+
           {step.wide && (
             <div className="cm__cap cm__fade" style={{ opacity: lit ? 1 : 0 }}>
               <div className="cm__ask">{step.ask}</div>
@@ -293,11 +327,14 @@ export function CodeMap() {
           )}
 
           <div className="cm__rail" role="group" aria-label="Steps of the map">
-            {MAP_STEPS.map((s, i) => (
-              <button key={s.rail} type="button" aria-label={`${s.rail}: ${s.title}`} aria-current={i === n ? 'step' : undefined} className={i === n ? 'is-now' : i < n ? 'is-done' : ''} onClick={() => jump(i)}>
-                {s.rail}
-              </button>
-            ))}
+            {MAP_STEPS.map((s, i) =>
+              // Part 0's clicks share one button, which starts at its first click
+              MAP_STEPS[i - 1]?.rail === s.rail ? null : (
+                <button key={s.rail} type="button" aria-label={`${s.rail}: ${s.title}`} aria-current={s.rail === step.rail ? 'step' : undefined} className={s.rail === step.rail ? 'is-now' : i < n ? 'is-done' : ''} onClick={() => jump(i)}>
+                  {s.rail}
+                </button>
+              ),
+            )}
           </div>
         </div>
       </div>
