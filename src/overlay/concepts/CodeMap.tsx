@@ -164,7 +164,7 @@ function TheMap({ step }: { step: MapStep }) {
   const dim = !!step.nodes;
   return (
     <div className="cm__world" data-testid="code-map-world" style={{ transform: `translate(${cam.x}px, ${cam.y}px) scale(${step.cam.s})` }}>
-      <div className="cm__db" />
+      <div className={`cm__db${step.lane ? ' is-on' : ''}`} data-lane-on={step.lane || undefined} />
       <svg className="cm__lines" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
         <defs>
           {[['grey', '#7C8B98'], ['teal', '#1B8A9C'], ['dim', '#C9D2DA']].map(([k, c]) => (

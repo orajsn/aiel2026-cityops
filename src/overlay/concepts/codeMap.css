@@ -2,6 +2,8 @@
 .cm { position: relative; width: 1824px; height: 870px; background: #fff; border: 1px solid #dce2e8; border-radius: 20px; overflow: hidden; color: #1f2a33; font-family: var(--font-sans, Inter, system-ui, sans-serif); box-shadow: 0 18px 50px rgba(11, 14, 20, 0.28); transform-origin: 50% 0; }
 .cm__world { position: absolute; left: -48px; top: -110px; width: 1920px; height: 1080px; transform-origin: 0 0; transition: transform 1.4s cubic-bezier(0.45, 0.05, 0.2, 1); will-change: transform; }
 .cm__db { position: absolute; left: 96px; top: 470px; width: 1728px; height: 480px; box-sizing: border-box; background: #e8f4f6; border: 2px solid #1b8a9c; border-radius: 20px; }
+.cm__db { transition: border-color 0.6s ease, box-shadow 0.6s ease, background-color 0.6s ease; }
+.cm__db.is-on { border-color: #1b8a9c; background: #dbeef1; box-shadow: 0 0 0 8px rgba(27, 138, 156, 0.18); }
 .cm__lane { position: absolute; display: flex; align-items: center; gap: 12px; font-size: 18px; font-weight: 700; letter-spacing: 0.08em; }
 .cm__node { position: absolute; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; gap: 14px; border-radius: 14px; background: #fff; border: 2.5px solid #c9d2da; box-shadow: 0 2px 6px rgba(31, 42, 51, 0.08); transition: opacity 0.6s ease, border-color 0.6s ease, background-color 0.6s ease, box-shadow 0.6s ease; }
 .cm__node.is-teal { border-color: #1b8a9c; }

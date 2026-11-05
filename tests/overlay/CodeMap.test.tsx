@@ -236,3 +236,36 @@ test('each kind of node looks like what it is: tables are cylinders, steps that 
   expect(shape('answer')).toBe('card');
   for (const id of ['asset', 'message', 'embedder']) expect(container.querySelector(`[data-node="${id}"] svg.cm__shape path`)).toBeTruthy();
 });
+
+// the colleague's comments on the canvas, 5 Nov: each click lights only what it is about, everything else stays pale
+test('each click lights only its own part: the database lane for Part 1, then one part at a time', () => {
+  const { container } = render(<CodeMap />);
+  const lit = () => [...container.querySelectorAll('.cm__node.is-on')].map((e) => e.getAttribute('data-node')).sort();
+  const lane = () => !!container.querySelector('.cm__db.is-on');
+  // Part 1: the lane lights, no node in it is lit yet (they are not mentioned yet)
+  for (const i of [4, 5]) {
+    go(i);
+    expect(lit(), MAP_STEPS[i].rail).toEqual([]);
+    expect(lane()).toBe(true);
+    expect(container.querySelectorAll('.cm__node.is-off').length).toBeGreaterThanOrEqual(11);
+  }
+  // Part 2: the embedder, and the picture stays on it through 2b
+  go(6);
+  expect(lit()).toEqual(['embedder']);
+  expect(lane()).toBe(false);
+  expect(MAP_STEPS[7].cam).toEqual(MAP_STEPS[6].cam);
+  go(7);
+  expect(lit()).toEqual(['embedder']);
+  // 3b (code): zoomed on the messages and the extractor, the memory stays pale
+  go(10);
+  expect(lit()).toEqual(['extractor', 'message']);
+  expect(container.querySelector('[data-node="memory"]')!.classList.contains('is-off')).toBe(true);
+  expect(MAP_STEPS[10].cam.s).toBeGreaterThan(1);
+  // Part 5: only the scope; Part 6: only call_copilot, zoomed
+  go(14);
+  expect(lit()).toEqual(['scope']);
+  go(15);
+  expect(lit()).toEqual(['copilot']);
+  expect(MAP_STEPS[15].cam.s).toBeGreaterThan(1);
+});
+
