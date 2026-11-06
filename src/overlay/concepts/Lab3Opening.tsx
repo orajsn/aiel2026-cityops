@@ -73,7 +73,7 @@ const bubble = (person: boolean): CSSProperties => ({
   borderRadius: person ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
   background: person ? 'var(--teal)' : 'rgba(138, 145, 156, 0.18)',
   color: person ? '#ffffff' : 'var(--ink)',
-  fontSize: 44,
+  fontSize: 30,
   lineHeight: 1.35,
 });
 
@@ -98,9 +98,9 @@ const Hl = ({ children, strong = false }: { children: ReactNode; strong?: boolea
 );
 
 const cap = (label: string, teal = false): ReactNode => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 20, fontWeight: 700, letterSpacing: '0.1em', color: teal ? 'var(--teal)' : 'var(--ink-dim)' }}>
+  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 18, fontWeight: 700, letterSpacing: '0.1em', color: teal ? 'var(--teal)' : 'var(--ink-dim)' }}>
     <span style={{ width: 14, height: 14, borderRadius: 7, background: teal ? 'var(--teal)' : G_MID }} />
-    <span style={{ color: 'var(--ink)', letterSpacing: 0, fontSize: 26, fontWeight: 600 }}>AI Agent</span>
+    <span style={{ color: 'var(--ink)', letterSpacing: 0, fontSize: 24, fontWeight: 600 }}>AI Agent</span>
     <span style={{ marginLeft: 'auto' }}>{label}</span>
   </div>
 );
@@ -129,7 +129,7 @@ export function Hook({ kicker, message }: HookProps) {
         <div data-hook="without" style={{ ...card('grey'), flex: 1, justifyContent: 'space-between' }}>
           {cap('WITHOUT MEMORY')}
           <div style={bubble(false)}>I have no earlier information. What do you see?</div>
-          <div style={{ fontSize: 30, color: 'var(--ink-dim)' }}>Every chat starts from zero.</div>
+          <div style={{ fontSize: 26, color: 'var(--ink-dim)' }}>Every chat starts from zero.</div>
         </div>
       </Reveal>
       <Reveal show={L >= 2} testId="with" style={{ flex: 1, display: 'flex' }}>
@@ -147,7 +147,7 @@ export function Hook({ kicker, message }: HookProps) {
               Mercer logged <b>corrosion</b> on Day 1: <b>about 25 percent section loss</b>, grade C, repair within <b>60 days</b>.
             </div>
           )}
-          <div style={{ fontSize: 30, color: L >= 4 ? 'var(--teal)' : 'var(--ink-dim)', fontWeight: L >= 4 ? 700 : 400 }}>{L >= 4 ? 'her finding · the guideline · her notes' : 'Same question. What is different?'}</div>
+          <div style={{ fontSize: 26, color: L >= 4 ? 'var(--teal)' : 'var(--ink-dim)', fontWeight: L >= 4 ? 700 : 400 }}>{L >= 4 ? 'her finding · the guideline · her notes' : 'Same question. What is different?'}</div>
         </div>
       </Reveal>
     </HalfPanel>
@@ -271,7 +271,7 @@ export function WhyForgot({ kicker, message }: WhyForgotProps) {
         {cap('DAY 1', !closed)}
         {MERCER_SAYS.map((t, i) => (
           <Reveal key={t} show={L > i} testId={`say-${i}`} style={{ alignSelf: 'flex-end' }}>
-            <div style={{ ...bubble(true), fontSize: 27, padding: '8px 18px', opacity: closed ? 0.45 : 1, transition: 'opacity 0.6s' }}>{t}</div>
+            <div style={{ ...bubble(true), fontSize: 25, padding: '8px 18px', opacity: closed ? 0.45 : 1, transition: 'opacity 0.6s' }}>{t}</div>
           </Reveal>
         ))}
         <Reveal show={closed} style={{ textAlign: 'center', fontSize: 22, fontWeight: 700, letterSpacing: '0.06em', color: 'var(--ink-dim)', borderTop: '2px dashed var(--line)', paddingTop: 10 }}>
