@@ -63,6 +63,9 @@ test('each click brings one card together with Vance’s question; the glass and
   build(1);
   const h = render(<Handover kicker="k" message="m" />).container;
   expect(shown(h, 'watch-')).toEqual(['true', 'false', 'false']);
-  expect(h.textContent).toMatch(/Part 6 · one whole turn/);
+  // version A: the real code map with the three jobs marked on it, one per click
+  expect(h.querySelector('[data-map-preview]')).not.toBeNull();
+  expect([...h.querySelectorAll('[data-mark]')].map((m) => m.getAttribute('data-mark'))).toEqual(['1', '1', '2', '3']);
+  expect(h.textContent).toContain('Parts 1 and 2');
   expect(h.textContent).not.toMatch(/engineering|harness/i);
 });

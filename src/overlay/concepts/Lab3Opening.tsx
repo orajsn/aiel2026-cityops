@@ -6,6 +6,7 @@ import { EASE, WidePanel } from './WidePanel';
 import { Fill } from './Fill';
 import { MiniGlass, CURATION } from './Glass';
 import { Logbook } from './lab2/Lab2Agent';
+import { MapPreview } from './CodeMap';
 import { SOLVED, SOLVED_GLASS } from './Ending';
 import { LineIcon } from './icons';
 import { useDrawerStore } from '../../engine/presentation';
@@ -517,49 +518,51 @@ export interface HandoverProps {
 }
 
 const WATCH = [
-  { n: '1', t: 'What to keep', s: 'small records, and the signed finding', where: 'Parts 3 and 4' },
-  { n: '2', t: 'What to bring in', s: 'only what this question needs', where: 'Part 6' },
-  { n: '3', t: 'What to do every turn', s: 'read, think, act, save', where: 'Part 6, then the two days' },
+  { n: '1', t: 'What to keep', s: 'small records, and the signed finding' },
+  { n: '2', t: 'What to bring in', s: 'only what this question needs' },
+  { n: '3', t: 'What to do every turn', s: 'read, think, act, save' },
 ];
-const PARTS = ['Part 1 · Oracle setup', 'Part 2 · the embedder', 'Part 3 · assets, extraction, memory', 'Part 4 · the findings', 'Part 5 · who sees what', 'Part 6 · one whole turn'];
+/** where each job lives on the code map, in map coordinates: Memory and the findings; the prompt; the turn */
+const MARKS = [
+  { x: 1778, y: 540, n: '1' },
+  { x: 822, y: 760, n: '1' },
+  { x: 1166, y: 220, n: '2' },
+  { x: 810, y: 220, n: '3' },
+];
 
+/**
+ * The handover to the notebook (owner's pick, version A): the real code map with the three jobs marked on it, one per click, the
+ * database bar for Parts 1 and 2 under it, and the line that opens the notebook.
+ */
 export function Handover({ kicker, message, notebook }: HandoverProps) {
   const L = useBuild();
+  // marks per job: 1 sits on two nodes, 2 and 3 on one each
+  const shown = L >= 3 ? 4 : L >= 2 ? 3 : L >= 1 ? 2 : 0;
   return (
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="handover">
       <Fill>
-        <div data-handover style={{ flex: 1, display: 'flex', alignItems: 'stretch', gap: 30 }}>
-          <div style={{ width: 800, display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div data-db-row>
-              <DbShelf height={124} badge={104} size={32}>
-                <div>Oracle Autonomous AI Database 26ai</div>
-                <div style={{ fontSize: 22, fontWeight: 600, opacity: 0.92, marginTop: 4 }}>Parts 1 and 2: the store and the embedder</div>
-              </DbShelf>
+        <div data-handover style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 22, alignItems: 'stretch' }}>
+            <div style={{ flex: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 18 }}>
+              <MapPreview width={980} marks={MARKS} shown={shown} />
+              <DbShelf height={88} badge={80} size={26}>Oracle Autonomous AI Database 26ai · <span style={{ fontWeight: 600, opacity: 0.92 }}>Parts 1 and 2</span></DbShelf>
             </div>
-            {WATCH.map((w, i) => (
-              <Reveal key={w.n} show={L > i} testId={`watch-${i}`} style={{ flex: 1, display: 'flex' }}>
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 20, padding: '0 28px', borderRadius: 20, background: 'var(--panel-strong)', border: '3px solid var(--teal)' }}>
-                  <div style={{ flex: 'none', width: 60, height: 60, borderRadius: 30, background: 'var(--teal)', color: '#fff', fontSize: 32, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{w.n}</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 38, fontWeight: 700 }}>{w.t}</div>
-                    <div style={{ fontSize: 25, color: 'var(--ink-dim)' }}>{w.s}</div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
+              {WATCH.map((w, i) => (
+                <Reveal key={w.n} show={L > i} testId={`watch-${i}`} style={{ flex: 1, display: 'flex' }}>
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 14, padding: '0 18px', borderRadius: 18, background: 'var(--panel-strong)', border: '2.5px solid var(--teal)' }}>
+                    <div style={{ flex: 'none', width: 48, height: 48, borderRadius: 24, background: 'var(--teal)', color: '#fff', fontSize: 27, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{w.n}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 27, fontWeight: 700, lineHeight: 1.1 }}>{w.t}</div>
+                      <div style={{ fontSize: 19, color: 'var(--ink-dim)' }}>{w.s}</div>
+                    </div>
                   </div>
-                  <div style={{ fontSize: 25, fontWeight: 700, color: 'var(--teal)', textAlign: 'right' }}>{w.where}</div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-          <Reveal show={L >= 4} testId="notebook" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 22 }}>
-            <div style={{ flex: 1, padding: '28px 34px', borderRadius: 22, background: 'var(--panel-strong)', border: '2px solid var(--line)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 23, color: 'var(--teal)' }}>notebook_complete_ollama.ipynb</div>
-              {PARTS.map((p) => (
-                <div key={p} style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 30 }}>
-                  <span style={{ width: 16, height: 16, borderRadius: 8, background: 'var(--teal)', flex: 'none' }} />
-                  {p}
-                </div>
+                </Reveal>
               ))}
             </div>
-            <div style={{ fontSize: 31, fontWeight: 700, lineHeight: 1.3 }}>Now we open the notebook and watch each one happen, in this order.</div>
+          </div>
+          <Reveal show={L >= 4} testId="open" style={{ flex: 'none', textAlign: 'center', fontSize: 34, fontWeight: 700 }}>
+            Now we open the notebook and <span style={{ color: 'var(--teal)' }}>walk this map</span>.
           </Reveal>
         </div>
       </Fill>
