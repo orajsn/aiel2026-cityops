@@ -62,8 +62,8 @@ export function Glass({ kicker, message, step, notebook }: GlassProps) {
 
 /* ---------- step 1 ---------- */
 
-const LAYER_H = 82;
-const GLASS_W = 480;
+const LAYER_H = 70;
+const GLASS_W = 440;
 const GLASS_TOP = 22;
 const GLASS_H = GLASS_TOP + LAYER_H * GLASS_LAYERS.length + 6;
 const SLANT = 0.17; // each side leans in by this share of the width at the bottom
@@ -127,7 +127,7 @@ function GlassFill() {
                 initial={{ opacity: 0, y: -60 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + i * 0.32, duration: 0.6, ease: EASE }}
-                style={{ height: LAYER_H, boxSizing: 'border-box', borderTop: i === GLASS_LAYERS.length - 1 ? 'none' : '5px solid var(--panel-strong)', background: `rgba(27, 138, 156, ${i % 2 ? 0.3 : 0.16})`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 27, fontWeight: 600, color: 'var(--ink)', ...(i === 0 ? { paddingBottom: 6 } : {}) }}
+                style={{ height: LAYER_H, boxSizing: 'border-box', borderTop: i === GLASS_LAYERS.length - 1 ? 'none' : '5px solid var(--panel-strong)', background: `rgba(27, 138, 156, ${i % 2 ? 0.3 : 0.16})`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 25, fontWeight: 600, color: 'var(--ink)', ...(i === 0 ? { paddingBottom: 6 } : {}) }}
               >
                 {name === 'Vance’s question' && <img data-portrait="vance" src={vancePortrait} alt="" width={54} height={54} style={{ borderRadius: '50%', border: '2px solid var(--teal)', objectFit: 'cover' }} />}
                 {name}
@@ -144,23 +144,23 @@ function GlassFill() {
         </motion.div>
 
         {/* the one arrow, and the model */}
-        <motion.div data-arrow="sees" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5, duration: 0.5 }} style={{ position: 'absolute', left: 515, top: 236, width: 290, textAlign: 'center' }}>
+        <motion.div data-arrow="sees" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5, duration: 0.5 }} style={{ position: 'absolute', left: 470, top: 196, width: 230, textAlign: 'center' }}>
           <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--teal)', lineHeight: 1.25, marginBottom: 6 }}>
             it sees this,
             <br />
             and nothing else
           </div>
-          <svg width={290} height={36} viewBox="0 0 290 36" aria-hidden="true">
+          <svg width={230} height={29} viewBox="0 0 290 36" aria-hidden="true">
             <motion.path d="M4 18h278M266 4l16 14-16 14" fill="none" stroke="var(--teal)" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 2.6, duration: 0.7, ease: EASE }} />
           </svg>
         </motion.div>
-        <motion.div data-model="language-model" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 3, duration: 0.6 }} style={{ position: 'absolute', left: 815, top: 130, width: 260, textAlign: 'center' }}>
+        <motion.div data-model="language-model" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 3, duration: 0.6 }} style={{ position: 'absolute', left: 790, top: 96, width: 260, textAlign: 'center' }}>
           <NeuralDrawing />
           <div style={{ fontSize: 26, fontWeight: 600, color: 'var(--ink)', marginTop: 4 }}>the language model</div>
         </motion.div>
 
         {/* outside the glass */}
-        <div data-outside="glass" style={{ position: 'absolute', left: 1090, top: 96, width: 310 }}>
+        <div data-outside="glass" style={{ position: 'absolute', left: 1095, top: 70, width: 305 }}>
           <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '0.14em', color: 'var(--ink-dim)', marginBottom: 16 }}>OUTSIDE THE GLASS</div>
           {OUTSIDE.map((o, i) => (
             <motion.div

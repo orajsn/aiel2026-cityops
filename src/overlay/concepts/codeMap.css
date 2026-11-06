@@ -32,6 +32,8 @@
 /* shaped nodes (owner, 4 Nov: each kind of node looks like what it is): tables are cylinders, steps that compute are hexagons, text is a page */
 .cm__nodeflat { display: contents; }
 .cm__node--shaped { padding: 0; background: none; border: 0; box-shadow: none; display: block; }
+/* a lit shaped node has no box behind it: its own outline glows (the plain-card rules of .is-on must not paint a rectangle) */
+.cm__node.cm__node--shaped, .cm__node.cm__node--shaped.is-on, .cm__node.cm__node--shaped.is-teal { background: none; border: 0; box-shadow: none; }
 .cm__shape { position: absolute; left: 0; top: 0; overflow: visible; transition: filter 0.6s ease; }
 .cm__shape path { fill: #fff; stroke: #c9d2da; stroke-width: 2.5; stroke-linejoin: round; transition: fill 0.6s ease, stroke 0.6s ease; }
 .cm__shape path.cm__shape-line { fill: none; }

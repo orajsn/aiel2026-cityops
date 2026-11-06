@@ -458,7 +458,7 @@ function Pour() {
       </div>
       <div style={{ width: 600, display: 'flex', flexDirection: 'column', gap: 10 }}>
         <div data-pour="logbook" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, marginBottom: 18 }}>
-          <div style={{ width: 200, height: 230, marginBottom: -26, position: 'relative', zIndex: 1 }}><Logbook /></div>
+          <div style={{ width: 200, height: 230, marginBottom: 14 }}><Logbook /></div>
           <div style={{ width: '100%' }}>
             <DbShelf height={84} badge={104} size={26}>Oracle Autonomous<br />AI Database 26ai</DbShelf>
           </div>

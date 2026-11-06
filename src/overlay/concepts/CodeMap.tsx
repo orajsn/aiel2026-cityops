@@ -7,6 +7,7 @@ import mercerPortrait from '../../assets/portraits/mercer.png';
 import vancePortrait from '../../assets/portraits/vance.png';
 import jupyterOpen from '../../assets/lab3/jupyter-open.webp';
 import extractionFigure from '../../assets/lab3/auto-extraction.png';
+import adbLogo from '../../assets/oracle/autonomous-ai-database.png';
 import './codeMap.css';
 
 /**
@@ -185,9 +186,10 @@ function TheMap({ step }: { step: MapStep }) {
       </div>
       <div className="cm__lane" style={{ left: 124, top: 486, color: '#14707F' }}>
         <Ic name="db" size={26} />
-        <span>ORACLE AI DATABASE · ONE CONNECTION</span>
+        <span>ORACLE AUTONOMOUS AI DATABASE 26ai · ONE CONNECTION</span>
         <span className="cm__tag">PART 1</span>
       </div>
+      <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ position: 'absolute', left: 168, top: 792, width: 112, height: 112, objectFit: 'contain', pointerEvents: 'none' }} />
       {NODES.map((n) => (
         <MapNodeCard key={n.id} n={n} step={step} />
       ))}
