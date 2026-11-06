@@ -544,7 +544,7 @@ export function Handover({ kicker, message, notebook }: HandoverProps) {
         <div data-handover style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 48, alignItems: 'stretch' }}>
             <div style={{ flex: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 26, padding: '10px 0' }}>
-              <MapPreview width={920} marks={MARKS} shown={shown} />
+              <MapPreview width={840} marks={MARKS} shown={shown} />
               <DbShelf height={88} badge={80} size={26}>Oracle Autonomous AI Database 26ai</DbShelf>
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 18, minWidth: 0 }}>

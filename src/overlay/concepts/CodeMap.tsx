@@ -290,12 +290,14 @@ function Guide({ step, lit }: { step: MapStep; lit: boolean }) {
 export function MapPreview({ width = 900, marks = [], shown = 0 }: { width?: number; marks?: { x: number; y: number; n: string }[]; shown?: number }) {
   // the map's content runs from (96, 140) to (1824, 960) in map coordinates
   const s = width / 1728;
-  const step: MapStep = { ...MAP_STEPS[0], wide: false, guide: undefined, nodes: undefined, lane: false, cam: { s, cx: 96 + 400 / s, cy: 140 + 435 / s } };
+  // white space round the map, so nothing (the marks, the logo badge) touches the picture's edge
+  const P = 46;
+  const step: MapStep = { ...MAP_STEPS[0], wide: false, guide: undefined, nodes: undefined, lane: false, cam: { s, cx: 96 + (400 - P) / s, cy: 140 + (435 - P) / s } };
   return (
-    <div className="cm" data-map-preview style={{ width, height: Math.round(s * 820), border: 0, boxShadow: 'none', borderRadius: 16, background: '#fff' }}>
+    <div className="cm" data-map-preview style={{ width: width + 2 * P, height: Math.round(s * 820) + 2 * P, border: '2px solid #e1e7ec', boxShadow: 'none', borderRadius: 18, background: '#fff' }}>
       <TheMap step={step} />
       {marks.map((m, i) => (
-        <div key={i} data-mark={m.n} style={{ position: 'absolute', left: s * (m.x - 96), top: s * (m.y - 140), transform: 'translate(-50%, -50%)', opacity: i < shown ? 1 : 0, transition: 'opacity 0.5s', width: 46, height: 46, borderRadius: 23, background: '#1b8a9c', color: '#fff', fontSize: 26, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 4px #fff, 0 3px 10px rgba(31,42,51,0.3)', zIndex: 5 }}>
+        <div key={i} data-mark={m.n} style={{ position: 'absolute', left: P + s * (m.x - 96), top: P + s * (m.y - 140), transform: 'translate(-50%, -50%)', opacity: i < shown ? 1 : 0, transition: 'opacity 0.5s', width: 46, height: 46, borderRadius: 23, background: '#1b8a9c', color: '#fff', fontSize: 26, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 4px #fff, 0 3px 10px rgba(31,42,51,0.3)', zIndex: 5 }}>
           {m.n}
         </div>
       ))}
