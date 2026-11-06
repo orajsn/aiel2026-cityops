@@ -66,6 +66,6 @@ test('each click brings one card together with Vance’s question; the glass and
   // version A: the real code map with the three jobs marked on it, one per click
   expect(h.querySelector('[data-map-preview]')).not.toBeNull();
   expect([...h.querySelectorAll('[data-mark]')].map((m) => m.getAttribute('data-mark'))).toEqual(['1', '1', '2', '3']);
-  expect(h.textContent).toContain('Parts 1 and 2');
+  expect(h.textContent).toContain('Oracle Autonomous AI Database 26ai');
   expect(h.textContent).not.toMatch(/engineering|harness/i);
 });

@@ -542,14 +542,14 @@ export function Handover({ kicker, message, notebook }: HandoverProps) {
     <WidePanel kicker={kicker} message={message} notebook={notebook} testId="handover">
       <Fill>
         <div data-handover style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 22, alignItems: 'stretch' }}>
-            <div style={{ flex: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 18 }}>
-              <MapPreview width={980} marks={MARKS} shown={shown} />
-              <DbShelf height={88} badge={80} size={26}>Oracle Autonomous AI Database 26ai · <span style={{ fontWeight: 600, opacity: 0.92 }}>Parts 1 and 2</span></DbShelf>
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 48, alignItems: 'stretch' }}>
+            <div style={{ flex: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 26, padding: '10px 0' }}>
+              <MapPreview width={920} marks={MARKS} shown={shown} />
+              <DbShelf height={88} badge={80} size={26}>Oracle Autonomous AI Database 26ai</DbShelf>
             </div>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 18, minWidth: 0 }}>
               {WATCH.map((w, i) => (
-                <Reveal key={w.n} show={L > i} testId={`watch-${i}`} style={{ flex: 1, display: 'flex' }}>
+                <Reveal key={w.n} show={L > i} testId={`watch-${i}`} style={{ height: 118, display: 'flex' }}>
                   <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 14, padding: '0 18px', borderRadius: 18, background: 'var(--panel-strong)', border: '2.5px solid var(--teal)' }}>
                     <div style={{ flex: 'none', width: 48, height: 48, borderRadius: 24, background: 'var(--teal)', color: '#fff', fontSize: 27, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{w.n}</div>
                     <div style={{ flex: 1 }}>
