@@ -10,8 +10,8 @@ const go = (n: number) => act(() => useDrawerStore.setState(n === 0 ? { open: fa
 afterEach(() => act(() => useDrawerStore.setState({ open: false, focus: 0 })));
 
 test('the page opens on the whole map, then one click per stop', () => {
-  expect(MAP_STEPS).toHaveLength(18);
-  expect(focusStepCount('3.6m')).toBe(17);
+  expect(MAP_STEPS).toHaveLength(19);
+  expect(focusStepCount('3.6m')).toBe(18);
 });
 
 test('every step after the map finds its lines in the notebook, and its key lines sit in its section', () => {
@@ -52,9 +52,12 @@ test('the two days show their own inspector and only their own path', () => {
   const { container } = render(<CodeMap />);
   go(16);
   expect(container.querySelector('[data-who]')!.getAttribute('data-who')).toBe('mercer');
+  expect(container.querySelector('[data-line="confirm"]')!.getAttribute('data-lit')).toBeNull();
+  go(17);
+  expect(container.querySelector('[data-who]')!.getAttribute('data-who')).toBe('mercer');
   expect(container.querySelector('[data-line="confirm"]')!.getAttribute('data-lit')).toBe('true');
   expect(container.querySelector('[data-line="read"]')!.getAttribute('data-lit')).toBeNull();
-  go(17);
+  go(18);
   expect(container.querySelector('[data-who]')!.getAttribute('data-who')).toBe('vance');
   expect(container.querySelector('[data-line="read"]')!.getAttribute('data-lit')).toBe('true');
   expect(container.querySelector('[data-line="confirm"]')!.getAttribute('data-lit')).toBeNull();

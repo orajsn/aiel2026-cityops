@@ -61,7 +61,7 @@ test('the code map shows each of its steps as a sub-page with its own preview', 
     expect(within(card).getByRole('img').getAttribute('src')).toBe(`./thumbs/3.6m_${k + 1}.jpg`);
     expect(within(card).getByText(stepName(m))).toBeInTheDocument();
   });
-  expect(screen.getAllByRole('button', { name: /^Lab 3 · Agent Memory 19[a-q]? /i }).length).toBe(MAP_STEPS.length);
+  expect(screen.getAllByRole('button', { name: /^Lab 3 · Agent Memory 19[a-r]? /i }).length).toBe(MAP_STEPS.length);
 });
 
 test('clicking a step of the code map opens that step; the open step is the current one', () => {
@@ -84,7 +84,7 @@ test('clicking a step of the code map opens that step; the open step is the curr
 test('the sub-page names are all different, so each step can be told apart', () => {
   const names = MAP_STEPS.slice(1).map(stepName);
   expect(new Set(names).size).toBe(names.length);
-  expect(names).toContain('Day 1: Mercer');
+  expect(names).toContain('Day 1b · Day 1, step 2: Mercer records');
   expect(names).toContain('0 · Run the cell.');
 });
 
