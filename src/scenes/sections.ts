@@ -18,8 +18,8 @@ export const SECTIONS: Section[] = [
   ...(WITH_LAB1 ? LAB1_SECTIONS.map((s, i) => (i === 0 ? { ...s, pages: ['1.0g', ...s.pages] } : s)) : []),
   // Lab 2 follows the Harbor Bridge deck's chapters (owner, 29 Oct): Story, Why, §0 to §6, then the recap
   ...LAB2_CHAPTERS.map((c, i): Section => ({ chapter: 1, name: c.name, pages: [...(i === 0 ? ['0.4g'] : []), ...c.pages.map((p) => p.id)] })),
-  { chapter: 2, name: 'The agent that forgets', pages: ['3.0g', '3.0', '3.1a', '3.1b', '3.1c'] },
-  { chapter: 2, name: 'How memory works', pages: ['3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.3a', '3.3b', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b'] },
+  { chapter: 2, name: 'The agent that forgets', pages: ['3.0g', '3.0', '3.2f', '3.2g', '3.1h', '3.1i'] },
+  { chapter: 2, name: 'How memory works', pages: ['3.3h', '3.3i', '3.3j', '3.3p', '3.3a', '3.3b', '3.3f', '3.5h'] },
   { chapter: 2, name: 'The code, on one map', pages: ['3.6m'] },
   { chapter: 2, name: 'Back on the bridge', pages: ['3.15', '3.15b', '3.15c', '3.16', '3.16a'] },
   { chapter: 2, name: 'Closing Lab 3', pages: ['3.17'] },

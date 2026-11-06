@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 import { CopilotChat, chatSchedule, type ChatItem } from '../../src/overlay/concepts/CopilotChat';
-import { chapter2 } from '../../src/scenes/chapter2';
+import { LAB3_ALL } from '../../src/scenes/chapter2';
 
 const items: ChatItem[] = [
   { divider: 'Day 1 · Evelyn_H_Mercer' },
@@ -26,7 +26,7 @@ test('the copilot types before it answers, and messages come in one after anothe
 });
 
 test('2.1: Day 1 is filled, the chat closes and empties, Day 2 finds the same three messages empty', () => {
-  const page = (id: string) => (chapter2.find((s) => s.id === id)!.overlayProps as { items: ChatItem[] }).items;
+  const page = (id: string) => (LAB3_ALL.find((s) => s.id === id)!.overlayProps as { items: ChatItem[] }).items;
   const states = (id: string) => page(id).filter((i) => 'from' in i && i.from === 'person').map((i) => ('state' in i ? i.state ?? 'shown' : 'shown'));
   expect(states('3.1a')).toEqual(['shown', 'shown', 'shown']);
   expect(states('3.1b')).toEqual(['emptying', 'emptying', 'emptying']);

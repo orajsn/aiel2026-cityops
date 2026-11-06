@@ -7,6 +7,7 @@ import type { GlassProps } from '../overlay/concepts/Glass';
 import type { DisciplineProps, WhoFixesWhatProps } from '../overlay/concepts/Engineering';
 import type { DeskCabinetProps, ThreeKindsProps, SharedShelfProps } from '../overlay/concepts/MemoryKinds';
 import type { MemoryLoopProps } from '../overlay/concepts/MemoryLoop';
+import type { HookProps, WhyForgotProps, WhereItGoesProps, GlassBridgeProps, HandoverProps } from '../overlay/concepts/Lab3Opening';
 import type { HandsOnProps, ScopeProps } from '../overlay/concepts/HandsOn';
 import type { CopilotTurnProps } from '../overlay/concepts/HandsOn2';
 import type { BothLabsProps, EndingProps, WithWithoutProps } from '../overlay/concepts/Ending';
@@ -148,6 +149,37 @@ const b24d = atRust('3.4d', 'Who fixes what', 'WhoFixesWhat', { kicker: 'Three d
 const b25b = atRust('3.5b', 'One store, any harness', 'MemoryLoop', { kicker: 'The agent loop, with memory wired in', message: 'One store, one memory manager, **any harness**.' } satisfies MemoryLoopProps);
 
 /**
+ * The compressed opening (owner, 6 Nov; drafted on the canvas "Lab 3 Opening, Compressed", payoff first): the hook, why the
+ * first one forgot, where it goes instead, the cards dropping into the glass, a fix for each of the four problems, and the
+ * handover to the notebook. The camera stays at the rust; the chat pages keep it on the left half. Pages 3.1 to 3.5b below
+ * it are hidden (LAB3_CUT), not deleted.
+ */
+const atRustWith = (id: string, title: string, shot: string, who: Who, overlay: string, props: object, group?: string, leave?: boolean): SceneDef => ({
+  id,
+  chapter: 2,
+  title,
+  shot,
+  world: { bridge: true, inspect: { pier: 'pier2', who, ...(leave ? { leave } : {}) } },
+  overlay,
+  overlayGroup: group,
+  overlayProps: props as Record<string, unknown>,
+});
+const VANCE: Who = 'character-male-d';
+const MERCER: Who = 'character-female-a';
+const nHook = (id: string, step: 1 | 2, message: string) => atRustWith(id, 'Same question, two answers', 'pier2-close', VANCE, 'Hook', { kicker: 'Day 2 · the same rust', step, message } satisfies HookProps, 'hook');
+const nHook1 = nHook('3.1h', 1, 'Same question. Same language model. **Two answers.**');
+const nHook2: SceneDef = nHook('3.1i', 2, 'Same question. Same language model. **Only the memory differs.**');
+const nForgot1 = atRustWith('3.2f', 'Why the first one forgot', 'pier2-inspect', MERCER, 'WhyForgot', { kicker: 'Before memory · Day 1', step: 1, message: 'Mercer talks. The book stays **open**.' } satisfies WhyForgotProps, 'forgot');
+const nForgot2 = atRustWith('3.2g', 'Why the first one forgot · the chat closes', 'pier2-close', MERCER, 'WhyForgot', { kicker: 'Before memory · the chat closes', step: 2, message: 'The chat closes. The book **shuts**.' } satisfies WhyForgotProps, 'forgot', true);
+const nWhere = (id: string, step: 1 | 2 | 3, kicker: string, message: string) => atRust(id, 'Where it goes instead', 'WhereItGoes', { kicker, step, message } satisfies WhereItGoesProps, 'where');
+const nWhere1 = nWhere('3.3h', 1, 'Long-term memory', 'Notes that survive the chat go in the **filing cabinet**.');
+const nWhere2: SceneDef = nWhere('3.3i', 2, 'Long-term memory · what the cabinet keeps', 'One report becomes **three kinds** of memory.');
+const nWhere3: SceneDef = nWhere('3.3j', 3, 'Day 2 · Vance asks', 'Vance’s three questions pull the **three cards** back.');
+const nPour = atRust('3.3p', 'From the cabinet to the glass', 'GlassBridge', { kicker: 'From the cabinet to the glass', message: 'The cards are in the cabinet. **But the model cannot read the cabinet.**', mode: 'pour' } satisfies GlassBridgeProps);
+const nFixes = atRust('3.3f', 'Each problem has a fix', 'GlassBridge', { kicker: 'The context window', message: 'Each one has a fix, **and we will see it in the code**.', mode: 'fixes' } satisfies GlassBridgeProps);
+const nHandover = atRust('3.5h', 'Now the code', 'Handover', { kicker: 'Handover to the notebook', message: 'Three things to watch, **on one map**.' } satisfies HandoverProps);
+
+/**
  * Lab 3 pages 15 to 19 (3.6-3.10), the notebook's Parts 1 to 5, in the Ops room (owner, 25 Oct; sketches agreed
  * in chat). The camera moves once, at 3.6, and holds; only the panel on the right changes.
  */
@@ -243,10 +275,18 @@ const b218: SceneDef = {
  * replaces 3.6 to 3.14a, which stay here hidden (LAB3_CUT): taking an id out of the set brings that page back.
  */
 const bMap = atOps('3.6m', 'The code, on one map', 'CodeMap', {});
-export const LAB3_CUT = new Set(['3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a']);
+export const LAB3_CUT = new Set(['3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b', '3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a']);
 
 export const LAB3_ALL: SceneDef[] = [
   b20,
+  nForgot1,
+  nForgot2,
+  nHook1,
+  nHook2,
+  nWhere1,
+  nWhere2,
+  nWhere3,
+  nPour,
   b21a,
   b21b,
   b21c,
@@ -259,11 +299,13 @@ export const LAB3_ALL: SceneDef[] = [
   b22e,
   b23a,
   b23b,
+  nFixes,
   b24a,
   b24b,
   b24c,
   b24d,
   b25b,
+  nHandover,
   b26,
   b27,
   b28a,
