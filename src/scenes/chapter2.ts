@@ -175,7 +175,7 @@ const nWhere = (id: string, step: 1 | 2 | 3, kicker: string, message: string) =>
 const nWhere1 = nWhere('3.3h', 1, 'Long-term memory', 'Notes that survive the chat go in the **filing cabinet**.');
 const nWhere2: SceneDef = nWhere('3.3i', 2, 'Long-term memory · what the cabinet keeps', 'One report becomes **three kinds** of memory.');
 const nWhere3: SceneDef = nWhere('3.3j', 3, 'Day 2 · Vance asks', 'Vance’s three questions pull the **three cards** back.');
-const nPour = atRust('3.3p', 'From the cabinet to the glass', 'GlassBridge', { kicker: 'From the cabinet to the glass', message: 'The cards are in the cabinet. **But the model cannot read the cabinet.**', mode: 'pour' } satisfies GlassBridgeProps);
+const nPour = atRust('3.3p', 'From the cabinet to the glass', 'GlassBridge', { kicker: 'From the cabinet to the glass', message: 'The cards are in the cabinet. **But the model cannot read the entire cabinet.**', mode: 'pour' } satisfies GlassBridgeProps);
 const nFixes = atRust('3.3f', 'Each problem has a fix', 'GlassBridge', { kicker: 'The context window', message: 'Each one has a fix, **and we will see it in the code**.', mode: 'fixes' } satisfies GlassBridgeProps);
 const nHandover = atRust('3.5h', 'Now the code', 'Handover', { kicker: 'Handover to the notebook', message: 'Three things to watch, **on one map**.' } satisfies HandoverProps);
 

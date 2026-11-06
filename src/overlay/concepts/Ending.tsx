@@ -105,7 +105,7 @@ export const SOLVED = [
  * the memory, its pieces teal where the problem was grey, and the stamp lands once it is.
  */
 const FIXED_AT = 1.9;
-const SOLVED_GLASS: ((t0: number) => ReactNode)[] = [
+export const SOLVED_GLASS: ((t0: number) => ReactNode)[] = [
   // volume: a summary and a few recent turns, plenty of room, nothing over the rim
   (t0) => (
     <>
