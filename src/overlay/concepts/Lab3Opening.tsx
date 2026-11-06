@@ -49,7 +49,8 @@ function HalfPanel({ kicker, message, testId, children }: { kicker: string; mess
         <div className="beat__headline">
           <Rich text={message} />
         </div>
-        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 18, marginTop: 14 }}>{children}</div>
+        {/* Fill scales the content down when it is taller than the panel (nothing is ever cut off), at any screen size or text size */}
+        <Fill gap={18} style={{ marginTop: 14 }}>{children}</Fill>
       </motion.div>
     </div>
   );
