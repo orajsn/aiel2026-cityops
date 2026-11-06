@@ -542,7 +542,7 @@ function PocketNotebook() {
 }
 
 /** the bridge logbook: a thick bound book, three-quarter view, with index tabs down its side */
-function Logbook() {
+export function Logbook() {
   return (
     <svg data-art="logbook" viewBox="0 0 230 264" style={{ width: '100%', height: '100%' }} aria-hidden>
       <ellipse cx="115" cy="256" rx="104" ry="7" fill="rgba(127,127,127,0.2)" />

@@ -5,6 +5,7 @@ import { useScriptClear } from '../scriptClear';
 import { EASE, WidePanel } from './WidePanel';
 import { Fill } from './Fill';
 import { MiniGlass, CURATION } from './Glass';
+import { Logbook } from './lab2/Lab2Agent';
 import { SOLVED, SOLVED_GLASS } from './Ending';
 import { LineIcon } from './icons';
 import { useDrawerStore } from '../../engine/presentation';
@@ -36,24 +37,18 @@ function Reveal({ show, children, style, testId }: { show: boolean; children: Re
 
 const fade = { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.35, ease: EASE } } as const;
 
-/** the right-hand panel of the chat pages, so the camera at the rust stays on the left half */
-function HalfPanel({ kicker, message, testId, step, children }: { kicker: string; message: string; testId: string; step: number; children: ReactNode }) {
+/** the right-hand panel of the chat pages, so the camera at the rust stays on the left half; the content shares out all the height */
+function HalfPanel({ kicker, message, testId, children }: { kicker: string; message: string; testId: string; children: ReactNode }) {
   const clear = useScriptClear();
   const free = clear === null;
   return (
     <div className="beat">
-      <motion.div className={`beat__panel beat__panel--tall${free ? ' is-free' : ''}`} style={free ? undefined : { bottom: Math.max(96, clear) }} data-testid={testId} data-step={step} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }}>
+      <motion.div className={`beat__panel beat__panel--tall${free ? ' is-free' : ''}`} style={free ? undefined : { bottom: Math.max(96, clear) }} data-testid={testId} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }}>
         <div className="beat__kicker">{kicker}</div>
-        <AnimatePresence mode="wait">
-          <motion.div key={message} className="beat__headline" {...fade}>
-            <Rich text={message} />
-          </motion.div>
-        </AnimatePresence>
-        <AnimatePresence mode="wait">
-          <motion.div key={step} {...fade} style={{ flex: 'none', display: 'flex', flexDirection: 'column', gap: 18, marginTop: 12 }}>
-            {children}
-          </motion.div>
-        </AnimatePresence>
+        <div className="beat__headline">
+          <Rich text={message} />
+        </div>
+        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 18, marginTop: 14 }}>{children}</div>
       </motion.div>
     </div>
   );
@@ -64,10 +59,10 @@ const card = (tone: 'teal' | 'grey'): CSSProperties => ({
   background: 'var(--panel-strong)',
   border: `2px solid ${tone === 'teal' ? 'var(--teal)' : 'var(--line)'}`,
   borderRadius: 18,
-  padding: '18px 22px',
+  padding: '22px 26px',
   display: 'flex',
   flexDirection: 'column',
-  gap: 14,
+  gap: 16,
 });
 
 const bubble = (person: boolean): CSSProperties => ({
@@ -92,39 +87,37 @@ const cap = (label: string, teal = false): ReactNode => (
 
 export interface HookProps {
   kicker: string;
-  /** 1: two answers, the second one hidden behind a lock; 2: the reveal, only the memory differs */
-  step: 1 | 2;
   message: string;
 }
 
-/** same question, two answers: without memory the AI agent has nothing, with memory it answers with Mercer's finding */
-export function Hook({ kicker, step, message }: HookProps) {
+/**
+ * Same question, two answers, one page that builds on every Next (owner, 6 Nov): Vance asks; the answer without memory;
+ * the answer with memory, behind a lock; the lock opens; what that answer used.
+ */
+export function Hook({ kicker, message }: HookProps) {
   const L = useBuild();
-  // 3.1h: Vance asks, then the answer without memory, then the answer with memory behind its lock; 3.1i: the reveal, then what it used
-  const showWithout = step === 2 || L >= 1;
-  const showWith = step === 2 || L >= 2;
-  const revealed = step === 2 && L >= 1;
+  const revealed = L >= 3;
   return (
-    <HalfPanel kicker={kicker} message={message} testId="hook" step={step}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <img src={vancePortrait} alt="Vance" style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', objectPosition: '50% 15%', border: '2px solid #fff' }} />
+    <HalfPanel kicker={kicker} message={message} testId="hook">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <img src={vancePortrait} alt="Vance" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', objectPosition: '50% 15%', border: '3px solid #fff', flex: 'none' }} />
         <div style={{ ...bubble(true), alignSelf: 'center' }}>“What happened at this rust?”</div>
       </div>
-      <Reveal show={showWithout} testId="without">
-        <div data-hook="without" style={card('grey')}>
+      <Reveal show={L >= 1} testId="without" style={{ flex: 1, display: 'flex' }}>
+        <div data-hook="without" style={{ ...card('grey'), flex: 1, justifyContent: 'space-between' }}>
           {cap('WITHOUT MEMORY')}
           <div style={bubble(false)}>I have no earlier information. What do you see?</div>
-          <div style={{ fontSize: 22, color: 'var(--ink-dim)' }}>Every chat starts from zero.</div>
+          <div style={{ fontSize: 28, color: 'var(--ink-dim)' }}>Every chat starts from zero.</div>
         </div>
       </Reveal>
-      <Reveal show={showWith} testId="with">
-        <div data-hook="with" style={card('teal')}>
+      <Reveal show={L >= 2} testId="with" style={{ flex: 1, display: 'flex' }}>
+        <div data-hook="with" style={{ ...card('teal'), flex: 1, justifyContent: 'space-between' }}>
           {cap('WITH MEMORY', true)}
           {!revealed ? (
             <div style={{ position: 'relative' }}>
-              <div style={{ ...bubble(false), filter: 'blur(7px)' }}>Mercer logged corrosion on Day 1: about 25 percent section loss, grade C, repair within 60 days.</div>
-              <div data-lock style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: 64, height: 64, borderRadius: 32, background: 'var(--panel-strong)', border: '3px solid var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6 11h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1zM8 11V8a4 4 0 0 1 8 0v3" /></svg>
+              <div style={{ ...bubble(false), filter: 'blur(8px)' }}>Mercer logged corrosion on Day 1: about 25 percent section loss, grade C, repair within 60 days.</div>
+              <div data-lock style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: 84, height: 84, borderRadius: 42, background: 'var(--panel-strong)', border: '4px solid var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6 11h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1zM8 11V8a4 4 0 0 1 8 0v3" /></svg>
               </div>
             </div>
           ) : (
@@ -132,7 +125,7 @@ export function Hook({ kicker, step, message }: HookProps) {
               Mercer logged <b>corrosion</b> on Day 1: <b>about 25 percent section loss</b>, grade C, repair within <b>60 days</b>.
             </div>
           )}
-          <div style={{ fontSize: 22, color: revealed && L >= 2 ? 'var(--teal)' : 'var(--ink-dim)', fontWeight: revealed && L >= 2 ? 700 : 400 }}>{revealed && L >= 2 ? 'her finding · the guideline · her notes' : 'Same question. What is different?'}</div>
+          <div style={{ fontSize: 28, color: L >= 4 ? 'var(--teal)' : 'var(--ink-dim)', fontWeight: L >= 4 ? 700 : 400 }}>{L >= 4 ? 'her finding · the guideline · her notes' : 'Same question. What is different?'}</div>
         </div>
       </Reveal>
     </HalfPanel>
@@ -141,117 +134,26 @@ export function Hook({ kicker, step, message }: HookProps) {
 
 /* ---------------------------------------------------------------- pictures */
 
-const SKIN = '#9a6040';
-const SKIN_D = '#7f4c31';
-const SHIRT = '#6f6a8f';
-const SHIRT_D = '#5d5879';
-const DESK_TOP = '#8a919c';
-const DESK_BODY = '#5c6b78';
+const TEAL_FILL_SOFT = 'rgba(27,138,156,0.16)';
 
-/** Mercer's head: her portrait in a white ring, on a neck */
-function MercerHead({ cx, cy, r, id }: { cx: number; cy: number; r: number; id: string }) {
+/**
+ * Lab 2's visit notebook (lab2/Lab2Agent.tsx PocketNotebook, the same pad): a small spiral pad. `lines` of this visit's notes are
+ * written on it (teal); when the visit is over (`cleared`) the lines are gone and the pad is faded, and what it held is not kept.
+ */
+export function VisitNotebook({ lines, cleared, width = 260 }: { lines: number; cleared: boolean; width?: number }) {
   return (
-    <g>
-      <rect x={cx - r * 0.3} y={cy + r * 0.6} width={r * 0.6} height={r * 0.9} rx={r * 0.2} fill={SKIN_D} />
-      <clipPath id={`${id}-clip`}>
-        <circle cx={cx} cy={cy} r={r} />
-      </clipPath>
-      <image href={mercerPortrait} x={cx - r * 1.12} y={cy - r * 1.12} width={r * 2.24} height={r * 2.24} preserveAspectRatio="xMidYMin slice" clipPath={`url(#${id}-clip)`} />
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#fff" strokeWidth={r * 0.07} />
-    </g>
-  );
-}
-
-/** Mercer seated behind a desk, both hands on the book (Lab 2's flat style: two greys, teal for the one thing that matters) */
-export function BookDesk({ open, width = 400 }: { open: boolean; width?: number }) {
-  return (
-    <svg data-art={open ? 'book-open' : 'book-shut'} width={width} height={(width * 420) / 640} viewBox="0 0 640 420" aria-hidden="true">
-      <ellipse cx="320" cy="408" rx="300" ry="9" fill="rgba(127,127,127,0.2)" />
-      {/* the back wall's lamp, a small second light */}
-      <g>
-        <path d="M92 300V236l44-34" stroke={DESK_BODY} strokeWidth="7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M118 196l34 18-12 20z" fill={DESK_BODY} />
-        <rect x="74" y="296" width="40" height="8" rx="4" fill={DESK_BODY} />
-        {open && <path d="M146 232l-10 46h56z" fill="rgba(27,138,156,0.12)" />}
-      </g>
-      {/* Mercer: shoulders, neck, head */}
-      <path d="M196 312c0-62 40-96 124-96s124 34 124 96z" fill={SHIRT} />
-      <path d="M296 218l24 34 24-34z" fill="rgba(255,255,255,0.8)" />
-      <path d="M196 312c0-30 8-52 22-68" stroke={SHIRT_D} strokeWidth="3" fill="none" strokeLinecap="round" />
-      <MercerHead cx={320} cy={138} r={64} id="bd" />
-      {/* the desk: top, front panel with a drawer, legs */}
-      <rect x="40" y="304" width="560" height="28" rx="9" fill={DESK_TOP} />
-      <rect x="40" y="304" width="560" height="7" rx="3.5" fill="rgba(255,255,255,0.35)" />
-      <rect x="70" y="332" width="500" height="66" rx="5" fill={DESK_BODY} />
-      <rect x="92" y="344" width="210" height="42" rx="5" fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="2.5" />
-      <rect x="178" y="360" width="38" height="8" rx="4" fill="rgba(255,255,255,0.5)" />
-      <rect x="338" y="344" width="210" height="42" rx="5" fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="2.5" />
-      <rect x="424" y="360" width="38" height="8" rx="4" fill="rgba(255,255,255,0.5)" />
-      <rect x="84" y="396" width="14" height="12" fill={DESK_BODY} />
-      <rect x="542" y="396" width="14" height="12" fill={DESK_BODY} />
-      {/* a mug, so the desk looks lived in */}
-      <g>
-        <rect x="520" y="272" width="34" height="32" rx="6" fill="#fff" stroke={DESK_BODY} strokeWidth="3.5" />
-        <path d="M554 280h8a8 8 0 0 1 0 16h-8" stroke={DESK_BODY} strokeWidth="3.5" fill="none" />
-      </g>
-      {open ? (
-        <g>
-          {/* the open book: two pages, a ribbon in the spine, one line lit in teal */}
-          <path d="M150 304c60-20 120-26 170-12v16c-50-14-110-8-170 12z" fill="#e4e7eb" />
-          <path d="M150 300V262c60-20 120-26 170-12v54c-50-14-110-8-170 8z" fill="#fff" stroke={DESK_BODY} strokeWidth="3.5" strokeLinejoin="round" />
-          <path d="M490 300V262c-60-20-120-26-170-12v54c50-14 110-8 170 8z" fill="#fff" stroke={DESK_BODY} strokeWidth="3.5" strokeLinejoin="round" />
-          {[0, 1, 2, 3].map((i) => (
-            <g key={i}>
-              <path d={`M172 ${274 + i * 5 + i * 5}q50-14 118-4`} stroke={G_MID} strokeWidth="5" fill="none" strokeLinecap="round" transform={`translate(0 ${-6 + i * 0})`} />
-              <path d={`M346 ${266 + i * 10}q58-10 118 4`} stroke={i === 1 ? '#1B8A9C' : G_MID} strokeWidth="5" fill="none" strokeLinecap="round" />
-            </g>
-          ))}
-          <path d="M318 252v58l9-8 9 8v-58z" fill="#1B8A9C" />
-        </g>
-      ) : (
-        <g>
-          <rect x="226" y="270" width="190" height="36" rx="6" fill="#fff" stroke={DESK_BODY} strokeWidth="3.5" />
-          <rect x="226" y="270" width="26" height="36" rx="6" fill={G_MID} />
-          <path d="M276 288h104" stroke={G_MID} strokeWidth="5" strokeLinecap="round" />
-        </g>
-      )}
-      {/* her arms and hands on the book */}
-      <path d="M214 270c-14 28-8 48 24 52l44 2 6-16-40-6c-8-12-8-22-8-34z" fill={SHIRT} />
-      <path d="M426 270c14 28 8 48-24 52l-44 2-6-16 40-6c8-12 8-22 8-34z" fill={SHIRT} />
-      <ellipse cx="286" cy="316" rx="20" ry="10" fill={SKIN} transform="rotate(-8 286 316)" />
-      <ellipse cx="354" cy="316" rx="20" ry="10" fill={SKIN} transform="rotate(8 354 316)" />
-    </svg>
-  );
-}
-
-/** a filing cabinet with Mercer standing beside it, pulling a card out of the middle drawer (Lab 2's flat style) */
-export function FilingCabinet({ width = 480 }: { width?: number }) {
-  return (
-    <svg data-art="cabinet" width={width} height={(width * 400) / 560} viewBox="0 0 560 400" aria-hidden="true">
-      <ellipse cx="290" cy="392" rx="270" ry="8" fill="rgba(127,127,127,0.2)" />
-      <rect x="250" y="20" width="290" height="360" rx="12" fill={G_LIGHT} stroke={G_DARK} strokeWidth="4" />
-      {[0, 1, 2].map((i) => (
-        <g key={i}>
-          <rect x="270" y={40 + i * 112} width="250" height="94" rx="8" fill="#e4e7eb" stroke={G_DARK} strokeWidth="3" />
-          <rect x="350" y={90 + i * 112} width="90" height="14" rx="7" fill={G_DARK} />
-          <rect x="316" y={52 + i * 112} width="158" height="22" rx="3" fill="#fff" stroke={G_MID} strokeWidth="2" />
-          <path d="M330 63h70" stroke={G_MID} strokeWidth="3.5" strokeLinecap="round" />
-        </g>
+    <svg data-art="visit-notebook" data-lines={lines} data-cleared={cleared} width={width} height={(width * 264) / 230} viewBox="0 0 230 264" style={{ opacity: cleared ? 0.5 : 1, transition: 'opacity 0.8s' }} aria-hidden="true">
+      <ellipse cx="115" cy="256" rx="100" ry="7" fill="rgba(127,127,127,0.2)" />
+      <rect x="24" y="30" width="182" height="222" rx="10" fill="var(--panel-strong)" stroke={G_DARK} strokeWidth="3" strokeDasharray={cleared ? '9 7' : undefined} />
+      {Array.from({ length: 7 }).map((_, i) => (
+        <rect key={i} x={40 + i * 24} y="18" width="10" height="26" rx="5" fill="none" stroke={G_DARK} strokeWidth="3" />
       ))}
-      <rect x="86" y="296" width="22" height="86" rx="6" fill="#4b5563" />
-      <rect x="120" y="296" width="22" height="86" rx="6" fill="#3f4854" />
-      <rect x="78" y="374" width="36" height="12" rx="6" fill="#2f3842" />
-      <rect x="116" y="374" width="36" height="12" rx="6" fill="#2f3842" />
-      <path d="M62 306c-4-60 14-100 52-100s56 40 52 100z" fill={SHIRT} />
-      <path d="M100 208l14 24 14-24z" fill="rgba(255,255,255,0.8)" />
-      <MercerHead cx={114} cy={150} r={42} id="fc" />
-      <path d="M148 232L246 176" stroke={SHIRT} strokeWidth="24" strokeLinecap="round" />
-      <path d="M64 240c-10 22-12 46-6 64" stroke={SHIRT_D} strokeWidth="18" strokeLinecap="round" fill="none" />
-      <g transform="rotate(-5 300 190)">
-        <rect x="244" y="150" width="130" height="78" rx="6" fill="#fff" stroke="#1B8A9C" strokeWidth="4" />
-        <path d="M262 176h94M262 194h94M262 212h58" stroke="#1B8A9C" strokeWidth="5.5" strokeLinecap="round" />
-      </g>
-      <circle cx="248" cy="176" r="12" fill={SKIN} />
+      {[78, 110, 142].map((y, i) => (
+        <motion.path key={y} d={`M46 ${y}h136`} stroke="#1B8A9C" strokeWidth="5" strokeLinecap="round" initial={false} animate={{ pathLength: lines > i && !cleared ? 1 : 0, opacity: lines > i && !cleared ? 1 : 0 }} transition={{ duration: 0.7, ease: EASE }} />
+      ))}
+      {[174, 206].map((y, i) => (
+        <path key={y} d={`M46 ${y}h${i === 1 ? 80 : 136}`} stroke={G_LIGHT} strokeWidth="5" strokeLinecap="round" strokeDasharray="2 10" />
+      ))}
     </svg>
   );
 }
@@ -328,39 +230,41 @@ const PROBLEMS: { word: string; title: string; text: string; art: ReactNode; par
 
 export interface WhyForgotProps {
   kicker: string;
-  /** 1: Mercer talks, the book is open on the desk; 2: the chat closes, the book is shut and the desk clear */
-  step: 1 | 2;
   message: string;
 }
 
 const MERCER_SAYS = ['Corrosion on the bearing assemblies', 'About 25 percent section loss', 'Repair within 60 days'];
 
-export function WhyForgot({ kicker, step, message }: WhyForgotProps) {
+/**
+ * Why the first one forgot, one page that builds on every Next (owner, 6 Nov): the memory analogy of Lab 2 (the visit notebook is
+ * short-term memory). Mercer's three messages arrive one by one and the AI agent writes each in its notebook; the chat closes; the
+ * notebook is cleared: it only held this visit.
+ */
+export function WhyForgot({ kicker, message }: WhyForgotProps) {
   const L = useBuild();
-  // 3.2f: Mercer's three messages arrive one per click; 3.2g: the chat closes, then the book shuts
-  const said = step === 1 ? L : 3;
-  const closed = step === 2 && L >= 1;
-  const shut = step === 2 && L >= 2;
-  const note = step === 1 ? L >= 3 : L >= 2;
+  const closed = L >= 4;
   return (
-    <HalfPanel kicker={kicker} message={message} testId="why-forgot" step={step}>
-      <div data-forgot="chat" style={{ ...card(closed ? 'grey' : 'teal'), minHeight: 250 }}>
+    <HalfPanel kicker={kicker} message={message} testId="why-forgot">
+      <div data-forgot="chat" style={{ ...card(closed ? 'grey' : 'teal'), flex: 'none' }}>
         {cap('DAY 1', !closed)}
         {MERCER_SAYS.map((t, i) => (
-          <Reveal key={t} show={said > i} testId={`say-${i}`} style={{ alignSelf: 'flex-end' }}>
+          <Reveal key={t} show={L > i} testId={`say-${i}`} style={{ alignSelf: 'flex-end' }}>
             <div style={{ ...bubble(true), opacity: closed ? 0.45 : 1, transition: 'opacity 0.6s' }}>{t}</div>
           </Reveal>
         ))}
-        <Reveal show={closed} style={{ marginTop: 'auto' }}>
-          <div style={{ textAlign: 'center', fontSize: 16, fontWeight: 700, letterSpacing: '0.06em', color: 'var(--ink-dim)', borderTop: '2px dashed var(--line)', paddingTop: 8 }}>SESSION CLOSED · Mercer goes home</div>
+        <Reveal show={closed} style={{ textAlign: 'center', fontSize: 22, fontWeight: 700, letterSpacing: '0.06em', color: 'var(--ink-dim)', borderTop: '2px dashed var(--line)', paddingTop: 10 }}>
+          SESSION CLOSED · Mercer goes home
         </Reveal>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-        <BookDesk open={!shut} width={440} />
-        <Reveal show={note} style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 27, fontWeight: 700 }}>{shut ? 'The book is shut. The desk is clear.' : 'Short-term memory is the open book on the desk.'}</div>
-          <div style={{ fontSize: 21, color: 'var(--ink-dim)' }}>{shut ? 'Like a librarian closing the book: nothing Mercer said stays on the desk.' : 'Like a librarian with one book open: the pages in front of you right now. This chat and its context window.'}</div>
-        </Reveal>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 34 }}>
+        <VisitNotebook lines={L} cleared={closed} width={300} />
+        <div style={{ maxWidth: 440 }}>
+          <div style={{ fontSize: 38, fontWeight: 700, lineHeight: 1.15 }}>Visit notebook</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, color: 'var(--teal)', marginTop: 6 }}>short-term memory</div>
+          <Reveal show={L >= 3}>
+            <div style={{ fontSize: 26, color: 'var(--ink-dim)', lineHeight: 1.35, marginTop: 10 }}>{closed ? 'The visit is over, so the notebook is cleared. Nothing Mercer said is kept.' : 'This visit’s scribbles: this chat and its context window.'}</div>
+          </Reveal>
+        </div>
       </div>
     </HalfPanel>
   );
@@ -370,8 +274,8 @@ export function WhyForgot({ kicker, step, message }: WhyForgotProps) {
 
 export interface WhereItGoesProps {
   kicker: string;
-  /** 1: the notes go in the filing cabinet; 2: one report becomes three cards; 3: Vance's three questions pull them back */
-  step: 1 | 2 | 3;
+  /** 1: the notes go in the filing cabinet; 2: one report becomes three cards, then Vance's three questions pull them back */
+  step: 1 | 2;
   message: string;
 }
 
@@ -384,7 +288,7 @@ const KINDS = [
 export function WhereItGoes({ kicker, step, message }: WhereItGoesProps) {
   return (
     <WidePanel kicker={kicker} message={message} testId="where-it-goes" step={step}>
-      <Fill>{step === 1 ? <CabinetStep /> : <CardsStep pull={step === 3} />}</Fill>
+      <Fill>{step === 1 ? <CabinetStep /> : <CardsStep />}</Fill>
     </WidePanel>
   );
 }
@@ -399,31 +303,37 @@ function CabinetStep() {
     </div>
   );
   return (
-    <div data-where="cabinet" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, padding: '0 10px' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22, width: 560 }}>
-        <div style={{ display: 'flex', gap: 22 }}>{[-5, 3, -2].map(note)}</div>
-        <div style={{ fontSize: 38, color: 'var(--ink-dim)', fontWeight: 600 }}>Mercer’s notes</div>
-      </div>
-      <Reveal show={L >= 1} testId="cabinet" style={{ display: 'flex', alignItems: 'center', gap: 30, flex: 1, justifyContent: 'flex-end' }}>
-        <svg width="130" height="70" viewBox="0 0 130 60" aria-hidden="true"><path d="M8 30h104M88 8l24 22-24 22" stroke="var(--teal)" strokeWidth="7" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
-          <FilingCabinet width={640} />
-          <Reveal show={L >= 2} testId="database" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-            <div style={{ padding: '10px 26px', borderRadius: 16, background: 'var(--panel-strong)', border: '3px solid var(--teal)', fontSize: 34, fontWeight: 700 }}>Oracle AI Database</div>
-            <div style={{ fontSize: 33, fontWeight: 700 }}>Long-term memory is the filing cabinet.</div>
-            <div style={{ fontSize: 24, color: 'var(--ink-dim)', textAlign: 'center' }}>Like the librarian’s index cards: one card per fact, kept for the next visit.</div>
-          </Reveal>
+    <div data-where="logbook" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, padding: '0 10px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22, width: 560 }}>
+          <div style={{ display: 'flex', gap: 22 }}>{[-5, 3, -2].map(note)}</div>
+          <div style={{ fontSize: 38, color: 'var(--ink-dim)', fontWeight: 600 }}>Mercer’s notes</div>
         </div>
+        <Reveal show={L >= 1} testId="logbook" style={{ display: 'flex', alignItems: 'center', gap: 30, flex: 1, justifyContent: 'flex-end' }}>
+          <svg width="130" height="70" viewBox="0 0 130 60" aria-hidden="true"><path d="M8 30h104M88 8l24 22-24 22" stroke="var(--teal)" strokeWidth="7" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <div style={{ width: 340, height: 390, flex: 'none' }}>{L >= 1 && <Logbook />}</div>
+          <div style={{ maxWidth: 400 }}>
+            <div style={{ fontSize: 40, fontWeight: 700, lineHeight: 1.15 }}>Bridge logbook</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 25, color: 'var(--teal)', marginTop: 6 }}>long-term memory</div>
+            <Reveal show={L >= 2}>
+              <div style={{ fontSize: 27, color: 'var(--ink-dim)', lineHeight: 1.35, marginTop: 10 }}>permanent, found by name or by meaning</div>
+            </Reveal>
+          </div>
+        </Reveal>
+      </div>
+      <Reveal show={L >= 2} testId="database" style={{ flex: 'none' }}>
+        <div style={{ height: 64, borderRadius: 16, background: 'var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, color: '#fff', fontSize: 30, fontWeight: 700 }}>Oracle AI Database · the logbook lives here</div>
       </Reveal>
     </div>
   );
 }
 
-function CardsStep({ pull }: { pull: boolean }) {
+function CardsStep() {
   const L = useBuild();
-  // one report becomes three cards, one per click; then Vance's three questions, one per click
-  const cardShown = (i: number) => pull || L > i;
-  const askShown = (i: number) => pull && L > i;
+  // one report becomes three cards, one per click; then Vance's three questions, one per click, then the line under them
+  const pull = L >= 4;
+  const cardShown = (i: number) => L > i;
+  const askShown = (i: number) => L > i + 3;
   return (
     <div data-where={pull ? 'pull' : 'cards'} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 22 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '16px 26px', borderRadius: 18, background: 'var(--panel-strong)', border: '2px solid var(--line)', fontSize: 31, lineHeight: 1.5 }}>
@@ -448,7 +358,7 @@ function CardsStep({ pull }: { pull: boolean }) {
           </div>
         ))}
       </div>
-      <Reveal show={pull && L >= 3} style={{ textAlign: 'center', fontSize: 38, fontWeight: 700 }}>
+      <Reveal show={L >= 6} style={{ textAlign: 'center', fontSize: 38, fontWeight: 700 }}>
         So Vance starts with the <span style={{ color: 'var(--teal)' }}>whole history</span>, not from zero.
       </Reveal>
     </div>
@@ -504,7 +414,7 @@ function Pour() {
         <GlassArt fill={level} id="gp" size={380} />
       </div>
       <Reveal show={L >= 3} style={{ width: 600 }}>
-        <div style={{ fontSize: 42, fontWeight: 700, lineHeight: 1.25 }}>The cabinet keeps it all.</div>
+        <div style={{ fontSize: 42, fontWeight: 700, lineHeight: 1.25 }}>The logbook keeps it all.</div>
         <div style={{ fontSize: 42, fontWeight: 700, lineHeight: 1.25, color: 'var(--teal)' }}>The model reads only what is in the glass.</div>
         <div style={{ fontSize: 30, color: 'var(--ink-dim)', marginTop: 18 }}>So what we pour in, this turn, is what matters.</div>
       </Reveal>

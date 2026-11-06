@@ -104,7 +104,7 @@ test('the QR for a join address is a real code, and every Thai script page is a 
   for (const id of Object.keys(SCRIPT_TH)) expect(ids.has(id) || LAB3_CUT.has(id), id).toBe(true); // a hidden page keeps its script
   expect(Object.keys(SCRIPT_TH)).toHaveLength(40);
   // the compressed opening (6 Nov) is English until the colleagues write its Thai in the script manager
-  const NEW_OPENING = ['3.1h', '3.1i', '3.2f', '3.2g', '3.3h', '3.3i', '3.3j', '3.3p', '3.3f', '3.5h'];
+  const NEW_OPENING = ['3.1h', '3.2f', '3.3h', '3.3i', '3.3p', '3.3f', '3.5h'];
   for (const s of SCENES.filter((x) => x.chapter === 2 && !NEW_OPENING.includes(x.id))) expect(SCRIPT_TH[s.id], s.id).toBeTruthy(); // the rest of Lab 3 has Thai
 });
 

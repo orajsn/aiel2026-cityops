@@ -166,16 +166,11 @@ const atRustWith = (id: string, title: string, shot: string, who: Who, overlay: 
 });
 const VANCE: Who = 'character-male-d';
 const MERCER: Who = 'character-female-a';
-const nHook = (id: string, step: 1 | 2, message: string) => atRustWith(id, 'Same question, two answers', 'pier2-close', VANCE, 'Hook', { kicker: 'Day 2 · the same rust', step, message } satisfies HookProps, 'hook');
-const nHook1 = nHook('3.1h', 1, 'Same question. Same language model. **Two answers.**');
-const nHook2: SceneDef = nHook('3.1i', 2, 'Same question. Same language model. **Only the memory differs.**');
-const nForgot1 = atRustWith('3.2f', 'Why the first one forgot', 'pier2-inspect', MERCER, 'WhyForgot', { kicker: 'Before memory · Day 1', step: 1, message: 'Mercer talks. The book stays **open**.' } satisfies WhyForgotProps, 'forgot');
-const nForgot2 = atRustWith('3.2g', 'Why the first one forgot · the chat closes', 'pier2-close', MERCER, 'WhyForgot', { kicker: 'Before memory · the chat closes', step: 2, message: 'The chat closes. The book **shuts**.' } satisfies WhyForgotProps, 'forgot', true);
-const nWhere = (id: string, step: 1 | 2 | 3, kicker: string, message: string) => atRust(id, 'Where it goes instead', 'WhereItGoes', { kicker, step, message } satisfies WhereItGoesProps, 'where');
-const nWhere1 = nWhere('3.3h', 1, 'Long-term memory', 'Notes that survive the chat go in the **filing cabinet**.');
-const nWhere2: SceneDef = nWhere('3.3i', 2, 'Long-term memory · what the cabinet keeps', 'One report becomes **three kinds** of memory.');
-const nWhere3: SceneDef = nWhere('3.3j', 3, 'Day 2 · Vance asks', 'Vance’s three questions pull the **three cards** back.');
-const nPour = atRust('3.3p', 'From the cabinet to the glass', 'GlassBridge', { kicker: 'From the cabinet to the glass', message: 'The cards are in the cabinet. **But the model cannot read the entire cabinet.**', mode: 'pour' } satisfies GlassBridgeProps);
+const nHook1 = atRustWith('3.1h', 'Same question, two answers', 'pier2-close', VANCE, 'Hook', { kicker: 'Day 2 · the same rust', message: 'Same question. Same language model. **Two answers.**' } satisfies HookProps);
+const nForgot1 = atRustWith('3.2f', 'Why the first one forgot', 'pier2-inspect', MERCER, 'WhyForgot', { kicker: 'Before memory · Day 1', message: 'Mercer talks. The AI agent writes it in its **visit notebook**.' } satisfies WhyForgotProps);
+const nWhere1 = atRust('3.3h', 'Where it goes instead', 'WhereItGoes', { kicker: 'Long-term memory', step: 1, message: 'Notes that survive the chat go in the **bridge logbook**.' } satisfies WhereItGoesProps);
+const nWhere2 = atRust('3.3i', 'One report, three cards', 'WhereItGoes', { kicker: 'Long-term memory · what the logbook keeps', step: 2, message: 'One report becomes **three kinds** of memory, and Vance’s questions pull them back.' } satisfies WhereItGoesProps);
+const nPour = atRust('3.3p', 'From the logbook to the glass', 'GlassBridge', { kicker: 'From the logbook to the glass', message: 'The notes are in the logbook. **But the model cannot read the entire logbook.**', mode: 'pour' } satisfies GlassBridgeProps);
 const nFixes = atRust('3.3f', 'Each problem has a fix', 'GlassBridge', { kicker: 'The context window', message: 'Each one has a fix, **and we will see it in the code**.', mode: 'fixes' } satisfies GlassBridgeProps);
 const nHandover = atRust('3.5h', 'Now the code', 'Handover', { kicker: 'Handover to the notebook', message: 'Three things to watch, **on one map**.' } satisfies HandoverProps);
 
@@ -280,12 +275,9 @@ export const LAB3_CUT = new Set(['3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p',
 export const LAB3_ALL: SceneDef[] = [
   b20,
   nForgot1,
-  nForgot2,
   nHook1,
-  nHook2,
   nWhere1,
   nWhere2,
-  nWhere3,
   nPour,
   b21a,
   b21b,

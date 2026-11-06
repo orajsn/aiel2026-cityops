@@ -1,69 +1,69 @@
-import { render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import { Hook, WhyForgot, WhereItGoes, GlassBridge, Handover } from '../../src/overlay/concepts/Lab3Opening';
-import { act } from '@testing-library/react';
-import { useDrawerStore, PAGE_STEPS } from '../../src/engine/presentation';
+import { useDrawerStore, PAGE_STEPS, focusStepCount } from '../../src/engine/presentation';
 import { LAB3_ALL, chapter2, LAB3_CUT } from '../../src/scenes/chapter2';
 
+const build = (focus: number) => act(() => useDrawerStore.setState({ open: focus > 0, focus, done: false }));
+afterEach(() => build(0));
+const shown = (c: HTMLElement, prefix: string) => [...c.querySelectorAll(`[data-reveal^="${prefix}"]`)].map((e) => e.getAttribute('data-shown'));
+
 // owner, 6 Nov: the compressed opening, Mercer first (Day 1), then Vance (Day 2); pages 3.1a to 3.5b are hidden, not deleted
-test('the opening runs Mercer first, then Vance, then the cabinet, the glass and the handover', () => {
+test('the opening runs Mercer first, then Vance, then the logbook, the glass and the handover; no two pages look the same', () => {
   const ids = chapter2.map((s) => s.id);
-  expect(ids.slice(0, 14)).toEqual(['3.0', '3.2f', '3.2g', '3.1h', '3.1i', '3.3h', '3.3i', '3.3j', '3.3p', '3.3a', '3.3b', '3.3f', '3.5h', '3.6m']);
+  expect(ids.slice(0, 11)).toEqual(['3.0', '3.2f', '3.1h', '3.3h', '3.3i', '3.3p', '3.3a', '3.3b', '3.3f', '3.5h', '3.6m']);
   const at = (id: string) => LAB3_ALL.find((s) => s.id === id)!;
   expect(at('3.2f').world).toMatchObject({ inspect: { who: 'character-female-a' } });
   expect(at('3.1h').world).toMatchObject({ inspect: { who: 'character-male-d' } });
   for (const id of ['3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b']) expect(LAB3_CUT.has(id), id).toBe(true);
+  // a page that keeps building does not repeat itself on the next page: one page per idea, every Next adds a part
+  expect(PAGE_STEPS).toMatchObject({ '3.1h': 4, '3.2f': 5, '3.3h': 2, '3.3i': 6, '3.3p': 3, '3.3f': 4, '3.5h': 4 });
+  expect(focusStepCount('3.2f')).toBe(5);
 });
 
-const build = (focus: number) => act(() => useDrawerStore.setState({ open: focus > 0, focus, done: false }));
-afterEach(() => build(0));
-
-test('every click of the opening builds the page up one part (owner, 6 Nov: not everything from the start)', () => {
-  expect(PAGE_STEPS).toMatchObject({ '3.1h': 2, '3.1i': 2, '3.2f': 3, '3.2g': 2, '3.3h': 2, '3.3i': 3, '3.3j': 3, '3.3p': 3, '3.3f': 4, '3.5h': 4 });
-  const c = render(<WhyForgot kicker="k" step={1} message="m" />).container;
-  const shown = () => [...c.querySelectorAll('[data-reveal^="say-"]')].map((e) => e.getAttribute('data-shown'));
-  expect(shown()).toEqual(['false', 'false', 'false']);
+test('the memory analogy is Lab 2’s: the visit notebook (short-term) and the bridge logbook (long-term)', () => {
+  build(0);
+  const c = render(<WhyForgot kicker="k" message="m" />).container;
+  expect(c.textContent).toContain('Visit notebook');
+  expect(shown(c, 'say-')).toEqual(['false', 'false', 'false']);
   build(2);
-  expect(shown()).toEqual(['true', 'true', 'false']);
+  expect(shown(c, 'say-')).toEqual(['true', 'true', 'false']);
+  expect(c.querySelector('[data-art="visit-notebook"]')!.getAttribute('data-lines')).toBe('2');
+  build(4);
+  expect(c.querySelector('[data-art="visit-notebook"]')!.getAttribute('data-cleared')).toBe('true');
+  expect(c.textContent).toContain('SESSION CLOSED');
   build(1);
-  const h = render(<Handover kicker="k" message="m" />).container;
-  expect([...h.querySelectorAll('[data-reveal^="watch-"]')].map((e) => e.getAttribute('data-shown'))).toEqual(['true', 'false', 'false']);
+  const lb = render(<WhereItGoes kicker="k" step={1} message="m" />).container;
+  expect(lb.textContent).toContain('Bridge logbook');
+  expect(lb.querySelector('[data-art="logbook"]')).not.toBeNull();
+  expect(lb.textContent).not.toMatch(/cabinet|librarian/i);
 });
 
-test('the hook: the with-memory answer is locked, then revealed; the without-memory one never changes', () => {
+test('the hook builds in four clicks: the answer without memory, the locked one, the reveal, what it used', () => {
   build(2);
-  const a = render(<Hook kicker="k" step={1} message="m" />).container;
+  const a = render(<Hook kicker="k" message="m" />).container;
+  expect(shown(a, 'with').slice(-1)).toEqual(['true']); // 'without' and 'with' are both on
   expect(a.querySelector('[data-lock]')).not.toBeNull();
-  build(1);
-  const b = render(<Hook kicker="k" step={2} message="m" />).container;
+  build(3);
+  const b = render(<Hook kicker="k" message="m" />).container;
   expect(b.querySelector('[data-lock]')).toBeNull();
   expect(b.textContent).toContain('Mercer logged');
-  expect(a.querySelector('[data-hook="without"]')!.textContent).toBe(b.querySelector('[data-hook="without"]')!.textContent);
 });
 
-test('Mercer is the character at the desk and by the cabinet, and the book is open, then shut', () => {
-  const open = render(<WhyForgot kicker="k" step={1} message="m" />).container;
+test('three cards, one per click, then Vance’s three questions; the glass and the handover name the notebook Parts', () => {
   build(2);
-  const shut = render(<WhyForgot kicker="k" step={2} message="m" />).container;
-  expect(open.querySelector('[data-art="book-open"] image')).not.toBeNull();
-  expect(shut.querySelector('[data-art="book-shut"]')).not.toBeNull();
-  expect(shut.textContent).toContain('SESSION CLOSED');
-  const cab = render(<WhereItGoes kicker="k" step={1} message="m" />).container;
-  expect(cab.querySelector('[data-art="cabinet"] image')).not.toBeNull();
-});
-
-test('three cards, then Vance’s three questions pull them back; the glass and the handover name the notebook Parts', () => {
-  build(0);
   const cards = render(<WhereItGoes kicker="k" step={2} message="m" />).container;
-  expect(cards.textContent).toContain('episodic');
-  expect(cards.querySelectorAll('[data-reveal^="ask-"][data-shown="true"]')).toHaveLength(0);
-  build(2);
-  const pull = render(<WhereItGoes kicker="k" step={3} message="m" />).container;
-  expect(pull.querySelectorAll('[data-reveal^="ask-"][data-shown="true"]')).toHaveLength(2);
+  expect(shown(cards, 'card-')).toEqual(['true', 'true', 'false']);
+  expect(shown(cards, 'ask-')).toEqual(['false', 'false', 'false']);
+  build(5);
+  const pull = render(<WhereItGoes kicker="k" step={2} message="m" />).container;
+  expect(shown(pull, 'ask-')).toEqual(['true', 'true', 'false']);
   build(4);
   const fixes = render(<GlassBridge kicker="k" message="m" mode="fixes" />).container;
   expect([...fixes.querySelectorAll('[data-fix]')].map((e) => e.getAttribute('data-fix'))).toEqual(['Part 3', 'Part 4', 'Part 4', 'Part 6']);
   expect(render(<GlassBridge kicker="k" message="m" mode="pour" />).container.querySelector('[data-glass="pour"]')).not.toBeNull();
+  build(1);
   const h = render(<Handover kicker="k" message="m" />).container;
+  expect(shown(h, 'watch-')).toEqual(['true', 'false', 'false']);
   expect(h.textContent).toMatch(/Part 6 · one whole turn/);
   expect(h.textContent).not.toMatch(/engineering|harness/i);
 });
