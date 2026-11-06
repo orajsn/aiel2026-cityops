@@ -10,13 +10,15 @@ const shown = (c: HTMLElement, prefix: string) => [...c.querySelectorAll(`[data-
 // owner, 6 Nov: the compressed opening, Mercer first (Day 1), then Vance (Day 2); pages 3.1a to 3.5b are hidden, not deleted
 test('the opening runs Mercer first, then Vance, then the logbook, the glass and the handover; no two pages look the same', () => {
   const ids = chapter2.map((s) => s.id);
-  expect(ids.slice(0, 11)).toEqual(['3.0', '3.2f', '3.1h', '3.3h', '3.3i', '3.3p', '3.3a', '3.3b', '3.3f', '3.5h', '3.6m']);
+  expect(ids.slice(0, 11)).toEqual(['3.0', '3.2f', '3.1h', '3.3h', '3.3i', '3.3p', '3.3a', '3.3b', '3.5h', '3.5g', '3.6m']); // the lab page again before the code
   const at = (id: string) => LAB3_ALL.find((s) => s.id === id)!;
   expect(at('3.2f').world).toMatchObject({ inspect: { who: 'character-female-a' } });
   expect(at('3.1h').world).toMatchObject({ inspect: { who: 'character-male-d' } });
   for (const id of ['3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b']) expect(LAB3_CUT.has(id), id).toBe(true);
   // a page that keeps building does not repeat itself on the next page: one page per idea, every Next adds a part
-  expect(PAGE_STEPS).toMatchObject({ '3.1h': 4, '3.2f': 5, '3.3h': 2, '3.3i': 6, '3.3p': 3, '3.3f': 4, '3.5h': 4 });
+  expect(ids.indexOf('3.15f')).toBeGreaterThan(ids.indexOf('3.6m')); // the four glasses solved are the ending, after the code
+  expect(LAB3_CUT.has('3.15b')).toBe(true);
+  expect(PAGE_STEPS).toMatchObject({ '3.1h': 4, '3.2f': 5, '3.3h': 2, '3.3i': 6, '3.3p': 3, '3.15f': 4, '3.5h': 4 });
   expect(focusStepCount('3.2f')).toBe(5);
 });
 

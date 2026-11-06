@@ -15,6 +15,7 @@ import type { RecapProps } from '../overlay/concepts/Recap';
 import type { AllLabsProps } from '../overlay/concepts/AllLabs';
 import type { Who } from '../world/Person';
 import { beat } from './chapter1';
+import { GO_LAB3_CODE } from './labGo';
 // bundled, not in public/: the dev server only serves public files it saw at start-up
 import mercerPortrait from '../assets/portraits/mercer.png';
 import vancePortrait from '../assets/portraits/vance.png';
@@ -171,7 +172,7 @@ const nForgot1 = atRustWith('3.2f', 'Why the first one forgot', 'pier2-inspect',
 const nWhere1 = atRust('3.3h', 'Where it goes instead', 'WhereItGoes', { kicker: 'Long-term memory', step: 1, message: 'Notes that survive the chat go in the **bridge logbook**.' } satisfies WhereItGoesProps);
 const nWhere2 = atRust('3.3i', 'One report, three cards', 'WhereItGoes', { kicker: 'Long-term memory · what the logbook keeps', step: 2, message: 'One report becomes **three kinds** of memory, and Vance’s questions pull them back.' } satisfies WhereItGoesProps);
 const nPour = atRust('3.3p', 'From the logbook to the glass', 'GlassBridge', { kicker: 'From the logbook to the glass', message: 'The notes are in the logbook. **But the model cannot read the entire logbook.**', mode: 'pour' } satisfies GlassBridgeProps);
-const nFixes = atRust('3.3f', 'Each problem has a fix', 'GlassBridge', { kicker: 'The context window', message: 'Each one has a fix, **and we will see it in the code**.', mode: 'fixes' } satisfies GlassBridgeProps);
+const nFixes = atRust('3.15f', 'The four failures, solved', 'GlassBridge', { kicker: 'Back to the glass', message: 'The four failures from the glass, **solved**, each by a Part of the notebook.', mode: 'fixes' } satisfies GlassBridgeProps);
 const nHandover = atRust('3.5h', 'Now the code', 'Handover', { kicker: 'Handover to the notebook', message: 'Three things to watch, **on one map**.' } satisfies HandoverProps);
 
 /**
@@ -270,7 +271,7 @@ const b218: SceneDef = {
  * replaces 3.6 to 3.14a, which stay here hidden (LAB3_CUT): taking an id out of the set brings that page back.
  */
 const bMap = atOps('3.6m', 'The code, on one map', 'CodeMap', {});
-export const LAB3_CUT = new Set(['3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b', '3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a']);
+export const LAB3_CUT = new Set(['3.15b', '3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b', '3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a']);
 
 export const LAB3_ALL: SceneDef[] = [
   b20,
@@ -291,13 +292,13 @@ export const LAB3_ALL: SceneDef[] = [
   b22e,
   b23a,
   b23b,
-  nFixes,
   b24a,
   b24b,
   b24c,
   b24d,
   b25b,
   nHandover,
+  GO_LAB3_CODE,
   b26,
   b27,
   b28a,
@@ -312,7 +313,7 @@ export const LAB3_ALL: SceneDef[] = [
   b214,
   b214a,
   b215,
-  b215b,
+  nFixes,
   b215c,
   b216,
   b216a,
