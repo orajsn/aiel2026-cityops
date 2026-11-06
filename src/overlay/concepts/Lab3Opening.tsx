@@ -60,19 +60,19 @@ const card = (tone: 'teal' | 'grey'): CSSProperties => ({
   background: 'var(--panel-strong)',
   border: `2px solid ${tone === 'teal' ? 'var(--teal)' : 'var(--line)'}`,
   borderRadius: 18,
-  padding: '22px 26px',
+  padding: '16px 22px',
   display: 'flex',
   flexDirection: 'column',
-  gap: 16,
+  gap: 10,
 });
 
 const bubble = (person: boolean): CSSProperties => ({
   alignSelf: person ? 'flex-end' : 'flex-start',
-  padding: '10px 16px',
+  padding: '10px 20px',
   borderRadius: person ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
   background: person ? 'var(--teal)' : 'rgba(138, 145, 156, 0.18)',
   color: person ? '#ffffff' : 'var(--ink)',
-  fontSize: 21,
+  fontSize: 44,
   lineHeight: 1.35,
 });
 
@@ -97,9 +97,9 @@ const Hl = ({ children, strong = false }: { children: ReactNode; strong?: boolea
 );
 
 const cap = (label: string, teal = false): ReactNode => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 15, fontWeight: 700, letterSpacing: '0.1em', color: teal ? 'var(--teal)' : 'var(--ink-dim)' }}>
-    <span style={{ width: 10, height: 10, borderRadius: 5, background: teal ? 'var(--teal)' : G_MID }} />
-    <span style={{ color: 'var(--ink)', letterSpacing: 0, fontSize: 17, fontWeight: 600 }}>AI Agent</span>
+  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 20, fontWeight: 700, letterSpacing: '0.1em', color: teal ? 'var(--teal)' : 'var(--ink-dim)' }}>
+    <span style={{ width: 14, height: 14, borderRadius: 7, background: teal ? 'var(--teal)' : G_MID }} />
+    <span style={{ color: 'var(--ink)', letterSpacing: 0, fontSize: 26, fontWeight: 600 }}>AI Agent</span>
     <span style={{ marginLeft: 'auto' }}>{label}</span>
   </div>
 );
@@ -121,14 +121,14 @@ export function Hook({ kicker, message }: HookProps) {
   return (
     <HalfPanel kicker={kicker} message={message} testId="hook">
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <img src={vancePortrait} alt="Vance" style={{ width: 88, height: 88, borderRadius: '50%', objectFit: 'cover', objectPosition: '50% 15%', border: '4px solid #fff', flex: 'none' }} />
+        <img src={vancePortrait} alt="Vance" style={{ width: 84, height: 84, borderRadius: '50%', objectFit: 'cover', objectPosition: '50% 15%', border: '4px solid #fff', flex: 'none' }} />
         <div data-question style={{ ...bubble(true), alignSelf: 'center', padding: '14px 26px' }}>“What happened at this rust?”</div>
       </div>
       <Reveal show={L >= 1} testId="without" style={{ flex: 1, display: 'flex' }}>
         <div data-hook="without" style={{ ...card('grey'), flex: 1, justifyContent: 'space-between' }}>
           {cap('WITHOUT MEMORY')}
           <div style={bubble(false)}>I have no earlier information. What do you see?</div>
-          <div style={{ fontSize: 28, color: 'var(--ink-dim)' }}>Every chat starts from zero.</div>
+          <div style={{ fontSize: 30, color: 'var(--ink-dim)' }}>Every chat starts from zero.</div>
         </div>
       </Reveal>
       <Reveal show={L >= 2} testId="with" style={{ flex: 1, display: 'flex' }}>
@@ -138,7 +138,7 @@ export function Hook({ kicker, message }: HookProps) {
             <div style={{ position: 'relative' }}>
               <div style={{ ...bubble(false), filter: 'blur(8px)' }}>Mercer logged corrosion on Day 1: about 25 percent section loss, grade C, repair within 60 days.</div>
               <div data-lock style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: 84, height: 84, borderRadius: 42, background: 'var(--panel-strong)', border: '4px solid var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6 11h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1zM8 11V8a4 4 0 0 1 8 0v3" /></svg>
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6 11h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1zM8 11V8a4 4 0 0 1 8 0v3" /></svg>
               </div>
             </div>
           ) : (
@@ -146,7 +146,7 @@ export function Hook({ kicker, message }: HookProps) {
               Mercer logged <b>corrosion</b> on Day 1: <b>about 25 percent section loss</b>, grade C, repair within <b>60 days</b>.
             </div>
           )}
-          <div style={{ fontSize: 28, color: L >= 4 ? 'var(--teal)' : 'var(--ink-dim)', fontWeight: L >= 4 ? 700 : 400 }}>{L >= 4 ? 'her finding · the guideline · her notes' : 'Same question. What is different?'}</div>
+          <div style={{ fontSize: 30, color: L >= 4 ? 'var(--teal)' : 'var(--ink-dim)', fontWeight: L >= 4 ? 700 : 400 }}>{L >= 4 ? 'her finding · the guideline · her notes' : 'Same question. What is different?'}</div>
         </div>
       </Reveal>
     </HalfPanel>
@@ -270,7 +270,7 @@ export function WhyForgot({ kicker, message }: WhyForgotProps) {
         {cap('DAY 1', !closed)}
         {MERCER_SAYS.map((t, i) => (
           <Reveal key={t} show={L > i} testId={`say-${i}`} style={{ alignSelf: 'flex-end' }}>
-            <div style={{ ...bubble(true), opacity: closed ? 0.45 : 1, transition: 'opacity 0.6s' }}>{t}</div>
+            <div style={{ ...bubble(true), fontSize: 27, padding: '8px 18px', opacity: closed ? 0.45 : 1, transition: 'opacity 0.6s' }}>{t}</div>
           </Reveal>
         ))}
         <Reveal show={closed} style={{ textAlign: 'center', fontSize: 22, fontWeight: 700, letterSpacing: '0.06em', color: 'var(--ink-dim)', borderTop: '2px dashed var(--line)', paddingTop: 10 }}>
@@ -278,7 +278,7 @@ export function WhyForgot({ kicker, message }: WhyForgotProps) {
         </Reveal>
       </div>
       <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 34 }}>
-        <VisitNotebook lines={L} cleared={closed} width={300} />
+        <VisitNotebook lines={L} cleared={closed} width={270} />
         <div style={{ maxWidth: 440 }}>
           <div style={{ fontSize: 38, fontWeight: 700, lineHeight: 1.15 }}>Visit notebook</div>
           <div style={{ marginTop: 10, fontSize: 26 }}><Hl strong>short-term memory</Hl></div>
