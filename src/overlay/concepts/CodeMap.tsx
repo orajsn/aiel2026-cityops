@@ -189,7 +189,10 @@ function TheMap({ step }: { step: MapStep }) {
         <span>ORACLE AUTONOMOUS AI DATABASE 26ai · ONE CONNECTION</span>
         <span className="cm__tag">PART 1</span>
       </div>
-      <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ position: 'absolute', left: 168, top: 792, width: 112, height: 112, objectFit: 'contain', pointerEvents: 'none' }} />
+      <div data-logo-block style={{ position: 'absolute', left: 1180, top: 680, width: 560, height: 124, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22, pointerEvents: 'none' }}>
+        <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ width: 124, height: 124, objectFit: 'contain' }} />
+        <div style={{ fontSize: 30, fontWeight: 700, lineHeight: 1.2, color: '#14707F' }}>Oracle Autonomous<br />AI Database 26ai</div>
+      </div>
       {NODES.map((n) => (
         <MapNodeCard key={n.id} n={n} step={step} />
       ))}
