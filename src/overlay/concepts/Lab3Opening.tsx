@@ -315,9 +315,7 @@ function CabinetStep() {
           <div style={{ maxWidth: 400 }}>
             <div style={{ fontSize: 40, fontWeight: 700, lineHeight: 1.15 }}>Bridge logbook</div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 25, color: 'var(--teal)', marginTop: 6 }}>long-term memory</div>
-            <Reveal show={L >= 2}>
-              <div style={{ fontSize: 27, color: 'var(--ink-dim)', lineHeight: 1.35, marginTop: 10 }}>permanent, found by name or by meaning</div>
-            </Reveal>
+            <div style={{ fontSize: 27, color: 'var(--ink-dim)', lineHeight: 1.35, marginTop: 10 }}>permanent, found by name or by meaning</div>
           </div>
         </Reveal>
       </div>
