@@ -18,7 +18,7 @@ test('the opening runs Mercer first, then Vance, then the logbook, the glass and
   // a page that keeps building does not repeat itself on the next page: one page per idea, every Next adds a part
   expect(ids.indexOf('3.15f')).toBeGreaterThan(ids.indexOf('3.6m')); // the four glasses solved are the ending, after the code
   expect(LAB3_CUT.has('3.15b')).toBe(true);
-  expect(PAGE_STEPS).toMatchObject({ '3.1h': 4, '3.2f': 5, '3.3h': 2, '3.3i': 3, '3.3p': 3, '3.15f': 4, '3.5h': 4 });
+  expect(PAGE_STEPS).toMatchObject({ '3.1h': 3, '3.2f': 5, '3.3h': 2, '3.3i': 3, '3.3p': 3, '3.15f': 4, '3.5h': 4 });
   expect(focusStepCount('3.2f')).toBe(5);
 });
 
@@ -40,7 +40,7 @@ test('the memory analogy is Lab 2’s: the visit notebook (short-term) and the b
   expect(lb.textContent).not.toMatch(/cabinet|librarian/i);
 });
 
-test('the hook builds in four clicks: the answer without memory, the locked one, the reveal, what it used', () => {
+test('the hook builds in three clicks: the answer without memory, the locked one, the reveal', () => {
   build(2);
   const a = render(<Hook kicker="k" message="m" />).container;
   expect(shown(a, 'with').slice(-1)).toEqual(['true']); // 'without' and 'with' are both on

@@ -81,7 +81,9 @@ const bubble = (person: boolean): CSSProperties => ({
  * The database shelf (Lab 2's "both memories on one shelf" bar): a teal bar the memory stands on, the Oracle Autonomous AI Database
  * logo in a white badge on its left end, so the logo is part of the picture and never floats alone.
  */
-function DbShelf({ height = 84, badge = 112, size = 30, children }: { height?: number; badge?: number; size?: number; children: ReactNode }) {
+function DbShelf({ height = 84, badge: badgeWanted = 112, size = 30, children }: { height?: number; badge?: number; size?: number; children: ReactNode }) {
+  // the badge never reaches past the bar: the panel clips what hangs over its edge
+  const badge = Math.min(badgeWanted, height - 8);
   return (
     <div data-db-shelf style={{ position: 'relative', height, borderRadius: 18, background: 'var(--teal)', color: '#fff', display: 'flex', alignItems: 'center', paddingLeft: badge + 30, paddingRight: 24, fontSize: size, fontWeight: 700, lineHeight: 1.15, boxShadow: '0 6px 0 rgba(15,85,98,0.35)' }}>
       <div style={{ position: 'absolute', left: 14, top: (height - badge) / 2, width: badge, height: badge, borderRadius: badge / 2, background: '#fff', border: '4px solid var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 10px rgba(11,14,20,0.25)' }}>
@@ -95,6 +97,11 @@ function DbShelf({ height = 84, badge = 112, size = 30, children }: { height?: n
 /** a highlighted word: teal marker behind it */
 const Hl = ({ children, strong = false }: { children: ReactNode; strong?: boolean }) => (
   <span style={{ background: strong ? 'var(--teal)' : 'rgba(27,138,156,0.28)', color: strong ? '#fff' : 'inherit', borderRadius: 8, padding: '0 9px', fontWeight: 700, whiteSpace: 'nowrap' }}>{children}</span>
+);
+
+/** an important word in the answer: teal and bold, with a soft teal marker behind it */
+const Tl = ({ children }: { children: ReactNode }) => (
+  <span data-key style={{ color: '#12707f', fontWeight: 700, background: 'rgba(27,138,156,0.22)', borderRadius: 6, padding: '0 6px', boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>{children}</span>
 );
 
 const cap = (label: string, teal = false): ReactNode => (
@@ -114,7 +121,7 @@ export interface HookProps {
 
 /**
  * Same question, two answers, one page that builds on every Next (owner, 6 Nov): Vance asks; the answer without memory;
- * the answer with memory, behind a lock; the lock opens; what that answer used.
+ * the answer with memory, behind a lock; the lock opens.
  */
 export function Hook({ kicker, message }: HookProps) {
   const L = useBuild();
@@ -144,10 +151,10 @@ export function Hook({ kicker, message }: HookProps) {
             </div>
           ) : (
             <div style={bubble(false)}>
-              Mercer logged <b>corrosion</b> on Day 1: <b>about 25 percent section loss</b>, grade C, repair within <b>60 days</b>.
+              Mercer logged <Tl>corrosion</Tl> on Day 1: <Tl>about 25 percent section loss</Tl>, grade C, repair within <Tl>60 days</Tl>.
             </div>
           )}
-          <div style={{ fontSize: 26, color: L >= 4 ? 'var(--teal)' : 'var(--ink-dim)', fontWeight: L >= 4 ? 700 : 400 }}>{L >= 4 ? 'her finding · the guideline · her notes' : 'Same question. What is different?'}</div>
+          <div style={{ fontSize: 26, color: 'var(--ink-dim)' }}>Same question. What is different?</div>
         </div>
       </Reveal>
     </HalfPanel>
@@ -347,7 +354,7 @@ function CabinetStep() {
         </Reveal>
       </div>
       <Reveal show={L >= 2} testId="database" style={{ flex: 'none', paddingTop: 10 }}>
-        <DbShelf height={96} badge={132} size={36}>Oracle Autonomous AI Database 26ai · <span style={{ opacity: 0.9, fontWeight: 600 }}>the logbook lives here</span></DbShelf>
+        <DbShelf height={124} badge={116} size={36}>Oracle Autonomous AI Database 26ai · <span style={{ opacity: 0.9, fontWeight: 600 }}>the logbook lives here</span></DbShelf>
       </Reveal>
     </div>
   );
