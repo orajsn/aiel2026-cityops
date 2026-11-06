@@ -27,13 +27,13 @@ afterAll(() => proc.kill());
 test('a session has a 6-digit code; only the presenter token can move the page; phones get the state first, then every change', async () => {
   const { code, token } = await (await fetch(base + 'api/create', { method: 'POST' })).json();
   expect(code).toMatch(/^\d{6}$/);
-  expect((await fetch(`${base}api/s/${code}/state`, { method: 'POST', headers: { 'x-token': 'nope' }, body: '{"id":"3.2a"}' })).status).toBe(403);
-  expect((await fetch(`${base}api/s/${code}/state`, { method: 'POST', headers: { 'x-token': token }, body: '{"id":"3.2a"}' })).status).toBe(200);
+  expect((await fetch(`${base}api/s/${code}/state`, { method: 'POST', headers: { 'x-token': 'nope' }, body: '{"id":"3.3a"}' })).status).toBe(403);
+  expect((await fetch(`${base}api/s/${code}/state`, { method: 'POST', headers: { 'x-token': token }, body: '{"id":"3.3a"}' })).status).toBe(200);
   const events = await fetch(`${base}api/s/${code}/events`);
   const reader = events.body!.getReader();
   const read = async () => new TextDecoder().decode((await reader.read()).value);
   let text = await read();
-  expect(text + (await read())).toContain('"id":"3.2a"');
+  expect(text + (await read())).toContain('"id":"3.3a"');
   await fetch(`${base}api/s/${code}/state`, { method: 'POST', headers: { 'x-token': token }, body: '{"id":"3.2b"}' });
   let more = '';
   for (let i = 0; i < 5 && !more.includes('"id":"3.2b"'); i++) more += await read();
@@ -71,19 +71,19 @@ test('the script manager: a login name is needed, every save is a version that g
     const as = (u: string) => ({ 'x-remote-user': u });
     expect((await fetch(m + 'api/m/me')).status).toBe(401);
     expect((await (await fetch(m + 'api/m/me', { headers: as('Mali') })).json()).user).toBe('Mali');
-    const put = (u: string, text: string, base: number) => fetch(m + 'api/m/script/3.2a', { method: 'PUT', headers: as(u), body: JSON.stringify({ lang: 'th', text, base }) });
+    const put = (u: string, text: string, base: number) => fetch(m + 'api/m/script/3.3a', { method: 'PUT', headers: as(u), body: JSON.stringify({ lang: 'th', text, base }) });
     const a = await put('Mali', 'แก้ครั้งแรก', 0);
     expect((await a.json()).version).toBe(1);
     expect((await put('Nok', 'แก้ซ้อน', 0)).status).toBe(409); // Nok started from the default, Mali saved first
     expect((await put('Nok', 'แก้ต่อ', 1)).status).toBe(200);
     const pages = (await (await fetch(m + 'api/pages')).json()).pages; // public: phones read the latest
-    expect(pages.find((p: { id: string }) => p.id === '3.2a').th).toBe('แก้ต่อ');
-    const vs = (await (await fetch(m + 'api/m/versions/3.2a?lang=th', { headers: as('Mali') })).json()).versions;
+    expect(pages.find((p: { id: string }) => p.id === '3.3a').th).toBe('แก้ต่อ');
+    const vs = (await (await fetch(m + 'api/m/versions/3.3a?lang=th', { headers: as('Mali') })).json()).versions;
     expect(vs.map((v: { by: string }) => v.by)).toEqual(['Nok', 'Mali']);
-    const c = await (await fetch(m + 'api/m/comments/3.2a', { method: 'POST', headers: as('Mali'), body: JSON.stringify({ text: 'ช้าไป' }) })).json();
-    await fetch(m + 'api/m/comments/3.2a', { method: 'POST', headers: as('Nok'), body: JSON.stringify({ text: 'ok', parent: c.cid }) });
-    expect((await fetch(m + 'api/m/comments/3.2a', { method: 'PATCH', headers: as('Nok'), body: JSON.stringify({ op: 'delete', cid: c.cid }) })).status).toBe(403); // only the author deletes
-    const list = (await (await fetch(m + 'api/m/comments/3.2a', { headers: as('Mali') })).json()).comments;
+    const c = await (await fetch(m + 'api/m/comments/3.3a', { method: 'POST', headers: as('Mali'), body: JSON.stringify({ text: 'ช้าไป' }) })).json();
+    await fetch(m + 'api/m/comments/3.3a', { method: 'POST', headers: as('Nok'), body: JSON.stringify({ text: 'ok', parent: c.cid }) });
+    expect((await fetch(m + 'api/m/comments/3.3a', { method: 'PATCH', headers: as('Nok'), body: JSON.stringify({ op: 'delete', cid: c.cid }) })).status).toBe(403); // only the author deletes
+    const list = (await (await fetch(m + 'api/m/comments/3.3a', { headers: as('Mali') })).json()).comments;
     expect(list.filter((x: { parent: string | null }) => x.parent === c.cid)).toHaveLength(1);
   } finally {
     mp.kill();
@@ -103,10 +103,8 @@ test('the QR for a join address is a real code, and every Thai script page is a 
   expect(q.d.startsWith('M')).toBe(true);
   const ids = new Set(SCENES.map((s) => s.id));
   for (const id of Object.keys(SCRIPT_TH)) expect(ids.has(id) || LAB3_CUT.has(id), id).toBe(true); // a hidden page keeps its script
-  expect(Object.keys(SCRIPT_TH)).toHaveLength(40);
-  // the compressed opening (6 Nov) is English until the colleagues write its Thai in the script manager
-  const NEW_OPENING = ['3.1h', '3.2f', '3.3h', '3.3i', '3.3p', '3.15f', '3.5h', '3.5g'];
-  for (const s of SCENES.filter((x) => x.chapter === 2 && !NEW_OPENING.includes(x.id))) expect(SCRIPT_TH[s.id], s.id).toBeTruthy(); // the rest of Lab 3 has Thai
+  expect(Object.keys(SCRIPT_TH)).toHaveLength(48);
+  for (const s of SCENES.filter((x) => x.chapter === 2)) expect(SCRIPT_TH[s.id], s.id).toBeTruthy(); // all of Lab 3 has Thai
 });
 
 // owner, 4 Nov: the viewer can show the slide's plain preview picture, or not

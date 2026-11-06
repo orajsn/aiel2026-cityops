@@ -393,12 +393,11 @@ export function CodeMap() {
 
           {step.guide && <Guide step={step} lit={lit} />}
 
-          {step.wide && (
-            <div className="cm__cap cm__fade" style={{ opacity: lit ? 1 : 0 }}>
-              <div className="cm__ask">{step.ask}</div>
-              <div className="cm__plain">{step.plain}</div>
-            </div>
-          )}
+          {/* the map's caption fades out with the map's own step, it is not removed at once (that left the map bare for a moment) */}
+          <div className="cm__cap cm__fade" style={{ opacity: step.wide && lit ? 1 : 0, pointerEvents: 'none' }}>
+            <div className="cm__ask">{MAP_STEPS[0].ask}</div>
+            <div className="cm__plain">{MAP_STEPS[0].plain}</div>
+          </div>
 
           <div className="cm__rail" role="group" aria-label="Steps of the map">
             {MAP_STEPS.map((s, i) =>
