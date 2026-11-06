@@ -18,7 +18,7 @@ test('the opening runs Mercer first, then Vance, then the logbook, the glass and
   // a page that keeps building does not repeat itself on the next page: one page per idea, every Next adds a part
   expect(ids.indexOf('3.15f')).toBeGreaterThan(ids.indexOf('3.6m')); // the four glasses solved are the ending, after the code
   expect(LAB3_CUT.has('3.15b')).toBe(true);
-  expect(PAGE_STEPS).toMatchObject({ '3.1h': 4, '3.2f': 5, '3.3h': 2, '3.3i': 6, '3.3p': 3, '3.15f': 4, '3.5h': 4 });
+  expect(PAGE_STEPS).toMatchObject({ '3.1h': 4, '3.2f': 5, '3.3h': 2, '3.3i': 3, '3.3p': 3, '3.15f': 4, '3.5h': 4 });
   expect(focusStepCount('3.2f')).toBe(5);
 });
 
@@ -51,14 +51,11 @@ test('the hook builds in four clicks: the answer without memory, the locked one,
   expect(b.textContent).toContain('Mercer logged');
 });
 
-test('three cards, one per click, then Vance’s three questions; the glass and the handover name the notebook Parts', () => {
+test('each click brings one card together with Vance’s question; the glass and the handover name the notebook Parts', () => {
   build(2);
   const cards = render(<WhereItGoes kicker="k" step={2} message="m" />).container;
   expect(shown(cards, 'card-')).toEqual(['true', 'true', 'false']);
-  expect(shown(cards, 'ask-')).toEqual(['false', 'false', 'false']);
-  build(5);
-  const pull = render(<WhereItGoes kicker="k" step={2} message="m" />).container;
-  expect(shown(pull, 'ask-')).toEqual(['true', 'true', 'false']);
+  expect(shown(cards, 'ask-')).toEqual(['true', 'true', 'false']);
   build(4);
   const fixes = render(<GlassBridge kicker="k" message="m" mode="fixes" />).container;
   expect([...fixes.querySelectorAll('[data-fix]')].map((e) => e.getAttribute('data-fix'))).toEqual(['Part 3', 'Part 4', 'Part 4', 'Part 6']);

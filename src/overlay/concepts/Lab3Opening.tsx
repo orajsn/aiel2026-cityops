@@ -11,6 +11,7 @@ import { LineIcon } from './icons';
 import { useDrawerStore } from '../../engine/presentation';
 import mercerPortrait from '../../assets/portraits/mercer.png';
 import vancePortrait from '../../assets/portraits/vance.png';
+import adbLogo from '../../assets/oracle/autonomous-ai-database.png';
 
 /**
  * Lab 3's compressed opening (owner, 6 Nov, drafted on the canvas "Lab 3 Opening, Compressed"): the hook (same
@@ -74,6 +75,11 @@ const bubble = (person: boolean): CSSProperties => ({
   fontSize: 21,
   lineHeight: 1.35,
 });
+
+/** a highlighted word: teal marker behind it */
+const Hl = ({ children, strong = false }: { children: ReactNode; strong?: boolean }) => (
+  <span style={{ background: strong ? 'var(--teal)' : 'rgba(27,138,156,0.28)', color: strong ? '#fff' : 'inherit', borderRadius: 8, padding: '0 9px', fontWeight: 700, whiteSpace: 'nowrap' }}>{children}</span>
+);
 
 const cap = (label: string, teal = false): ReactNode => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 15, fontWeight: 700, letterSpacing: '0.1em', color: teal ? 'var(--teal)' : 'var(--ink-dim)' }}>
@@ -260,7 +266,7 @@ export function WhyForgot({ kicker, message }: WhyForgotProps) {
         <VisitNotebook lines={L} cleared={closed} width={300} />
         <div style={{ maxWidth: 440 }}>
           <div style={{ fontSize: 38, fontWeight: 700, lineHeight: 1.15 }}>Visit notebook</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, color: 'var(--teal)', marginTop: 6 }}>short-term memory</div>
+          <div style={{ marginTop: 10, fontSize: 26 }}><Hl strong>short-term memory</Hl></div>
           <Reveal show={L >= 3}>
             <div style={{ fontSize: 26, color: 'var(--ink-dim)', lineHeight: 1.35, marginTop: 10 }}>{closed ? 'The visit is over, so the notebook is cleared. Nothing Mercer said is kept.' : 'This visit’s scribbles: this chat and its context window.'}</div>
           </Reveal>
@@ -280,10 +286,15 @@ export interface WhereItGoesProps {
 }
 
 const KINDS = [
-  { name: 'What happened', term: 'episodic', say: 'Found corrosion at the bearings.', like: 'like last summer’s trip', ask: '“What happened here?”' },
-  { name: 'What is true', term: 'semantic', say: 'About 25% section loss.', like: 'like what you learned at school', ask: '“How bad is it?”' },
-  { name: 'How we work', term: 'procedural', say: 'Remove loose rust before the primer.', like: 'like riding a bike', ask: '“What do we do?”' },
+  { name: 'What happened', term: 'episodic', say: 'Found corrosion at the bearings.', hl: 'corrosion', like: 'like last summer’s trip', ask: '“What happened here?”', icon: 'pin' as const },
+  { name: 'What is true', term: 'semantic', say: 'About 25% section loss.', hl: '25%', like: 'like what you learned at school', ask: '“How bad is it?”', icon: 'cap' as const },
+  { name: 'How we work', term: 'procedural', say: 'Remove loose rust before the primer.', hl: 'loose rust', like: 'like riding a bike', ask: '“What do we do?”', icon: 'bike' as const },
 ];
+/** the card's sentence with its key words highlighted */
+const marked = (say: string, hl: string): ReactNode => {
+  const i = say.indexOf(hl);
+  return i < 0 ? say : <>{say.slice(0, i)}<Hl>{hl}</Hl>{say.slice(i + hl.length)}</>;
+};
 
 export function WhereItGoes({ kicker, step, message }: WhereItGoesProps) {
   return (
@@ -314,13 +325,19 @@ function CabinetStep() {
           <div style={{ width: 340, height: 390, flex: 'none' }}>{L >= 1 && <Logbook />}</div>
           <div style={{ maxWidth: 400 }}>
             <div style={{ fontSize: 40, fontWeight: 700, lineHeight: 1.15 }}>Bridge logbook</div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 25, color: 'var(--teal)', marginTop: 6 }}>long-term memory</div>
-            <div style={{ fontSize: 27, color: 'var(--ink-dim)', lineHeight: 1.35, marginTop: 10 }}>permanent, found by name or by meaning</div>
+            <div style={{ marginTop: 10, fontSize: 27 }}><Hl strong>long-term memory</Hl></div>
+            <div style={{ fontSize: 29, color: 'var(--ink)', lineHeight: 1.7, marginTop: 10 }}><Hl strong>permanent</Hl>, found by <Hl>name</Hl> or by <Hl>meaning</Hl></div>
           </div>
         </Reveal>
       </div>
       <Reveal show={L >= 2} testId="database" style={{ flex: 'none' }}>
-        <div style={{ height: 64, borderRadius: 16, background: 'var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, color: '#fff', fontSize: 30, fontWeight: 700 }}>Oracle AI Database · the logbook lives here</div>
+        <div style={{ height: 160, borderRadius: 20, background: '#fff', border: '3px solid var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 28, overflow: 'hidden' }}>
+          <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ height: 150, width: 150, objectFit: 'contain' }} />
+          <div>
+            <div style={{ fontSize: 38, fontWeight: 700 }}>Oracle Autonomous AI Database 26ai</div>
+            <div style={{ fontSize: 28, color: 'var(--teal)', fontWeight: 600 }}>the logbook lives here</div>
+          </div>
+        </div>
       </Reveal>
     </div>
   );
@@ -329,34 +346,45 @@ function CabinetStep() {
 function CardsStep() {
   const L = useBuild();
   // one report becomes three cards, one per click; then Vance's three questions, one per click, then the line under them
-  const pull = L >= 4;
+  const pull = L >= 1;
   const cardShown = (i: number) => L > i;
-  const askShown = (i: number) => L > i + 3;
+  const askShown = (i: number) => L > i;
   return (
     <div data-where={pull ? 'pull' : 'cards'} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 22 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '16px 26px', borderRadius: 18, background: 'var(--panel-strong)', border: '2px solid var(--line)', fontSize: 31, lineHeight: 1.5 }}>
         <img src={mercerPortrait} alt="Mercer" style={{ width: 68, height: 68, borderRadius: '50%', objectFit: 'cover', objectPosition: '50% 15%', flex: 'none' }} />
-        <div>{KINDS.map((k, i) => <span key={k.say} style={{ background: cardShown(i) ? 'rgba(27,138,156,0.28)' : 'rgba(27,138,156,0.1)', borderRadius: 8, padding: '0 8px', marginRight: 12, transition: 'background 0.5s' }}>{k.say}</span>)}</div>
+        <div style={{ flex: 1 }}>{KINDS.map((k, i) => <span key={k.say} style={{ background: cardShown(i) ? 'rgba(27,138,156,0.28)' : 'rgba(27,138,156,0.1)', borderRadius: 8, padding: '0 8px', marginRight: 12, transition: 'background 0.5s' }}>{k.say}</span>)}</div>
+        <div data-logbook-mini style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 96, height: 110 }}><Logbook /></div>
+          <div style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>in the<br /><span style={{ color: 'var(--teal)' }}>bridge logbook</span></div>
+        </div>
       </div>
       <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 26 }}>
         {KINDS.map((k, i) => (
           <div key={k.term} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minHeight: 0 }}>
-            <Reveal show={askShown(i)} testId={`ask-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 12, height: 60 }}>
-              <img src={vancePortrait} alt="Vance" style={{ width: 54, height: 54, borderRadius: '50%', objectFit: 'cover', objectPosition: '50% 15%' }} />
-              <div style={{ ...bubble(true), fontSize: 27, padding: '8px 18px' }}>{k.ask}</div>
+            <Reveal show={askShown(i)} testId={`ask-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 12, height: 84 }}>
+              <img src={vancePortrait} alt="Vance" style={{ width: 66, height: 66, borderRadius: '50%', objectFit: 'cover', objectPosition: '50% 15%', border: '3px solid #fff', flex: 'none' }} />
+              <div data-question style={{ ...bubble(true), fontSize: 34, lineHeight: 1.2, padding: '10px 20px', whiteSpace: 'nowrap' }}>{k.ask}</div>
             </Reveal>
             <Reveal show={cardShown(i)} testId={`card-${i}`} style={{ flex: 1, minHeight: 0, display: 'flex' }}>
               <div style={{ ...card('teal'), flex: 1, gap: 14, padding: '26px 30px', boxShadow: askShown(i) ? '0 0 0 5px rgba(27,138,156,0.25)' : undefined }}>
-                <div style={{ fontSize: 40, fontWeight: 700 }}>{k.name}</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, color: 'var(--teal)' }}>{k.term}</div>
-                <div style={{ fontSize: 38, lineHeight: 1.25, flex: 1, display: 'flex', alignItems: 'center' }}>{k.say}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <div style={{ width: 70, height: 70, borderRadius: 20, background: 'var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
+                    <LineIcon name={k.icon} size={46} color="#fff" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 40, fontWeight: 700, lineHeight: 1.1 }}>{k.name}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, color: 'var(--teal)' }}>{k.term}</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 38, lineHeight: 1.45, flex: 1, display: 'flex', alignItems: 'center' }}><span>{marked(k.say, k.hl)}</span></div>
                 <div style={{ borderTop: '2px dashed var(--line)', paddingTop: 14, fontSize: 28, color: 'var(--ink-dim)' }}>{k.like}</div>
               </div>
             </Reveal>
           </div>
         ))}
       </div>
-      <Reveal show={L >= 6} style={{ textAlign: 'center', fontSize: 38, fontWeight: 700 }}>
+      <Reveal show={L >= 3} style={{ textAlign: 'center', fontSize: 38, fontWeight: 700 }}>
         So Vance starts with the <span style={{ color: 'var(--teal)' }}>whole history</span>, not from zero.
       </Reveal>
     </div>
@@ -411,11 +439,20 @@ function Pour() {
         </svg>
         <GlassArt fill={level} id="gp" size={380} />
       </div>
-      <Reveal show={L >= 3} style={{ width: 600 }}>
+      <div style={{ width: 600, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div data-pour="logbook" style={{ display: 'flex', alignItems: 'center', gap: 22, marginBottom: 14 }}>
+          <div style={{ width: 190, height: 218, flex: 'none' }}><Logbook /></div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ width: 170, height: 170, objectFit: 'contain', borderRadius: 24 }} />
+            <div style={{ fontSize: 22, fontWeight: 700, textAlign: 'center', lineHeight: 1.2 }}>Oracle Autonomous<br />AI Database 26ai</div>
+          </div>
+        </div>
+      <Reveal show={L >= 3}>
         <div style={{ fontSize: 42, fontWeight: 700, lineHeight: 1.25 }}>The logbook keeps it all.</div>
         <div style={{ fontSize: 42, fontWeight: 700, lineHeight: 1.25, color: 'var(--teal)' }}>The model reads only what is in the glass.</div>
         <div style={{ fontSize: 30, color: 'var(--ink-dim)', marginTop: 18 }}>So what we pour in, this turn, is what matters.</div>
       </Reveal>
+      </div>
     </div>
   );
 }
