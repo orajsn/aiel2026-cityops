@@ -76,6 +76,21 @@ const bubble = (person: boolean): CSSProperties => ({
   lineHeight: 1.35,
 });
 
+/**
+ * The database shelf (Lab 2's "both memories on one shelf" bar): a teal bar the memory stands on, the Oracle Autonomous AI Database
+ * logo in a white badge on its left end, so the logo is part of the picture and never floats alone.
+ */
+function DbShelf({ height = 84, badge = 112, size = 30, children }: { height?: number; badge?: number; size?: number; children: ReactNode }) {
+  return (
+    <div data-db-shelf style={{ position: 'relative', height, borderRadius: 18, background: 'var(--teal)', color: '#fff', display: 'flex', alignItems: 'center', paddingLeft: badge + 30, paddingRight: 24, fontSize: size, fontWeight: 700, lineHeight: 1.15, boxShadow: '0 6px 0 rgba(15,85,98,0.35)' }}>
+      <div style={{ position: 'absolute', left: 14, top: (height - badge) / 2, width: badge, height: badge, borderRadius: badge / 2, background: '#fff', border: '4px solid var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 10px rgba(11,14,20,0.25)' }}>
+        <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ width: badge * 0.82, height: badge * 0.82, objectFit: 'contain' }} />
+      </div>
+      <div>{children}</div>
+    </div>
+  );
+}
+
 /** a highlighted word: teal marker behind it */
 const Hl = ({ children, strong = false }: { children: ReactNode; strong?: boolean }) => (
   <span style={{ background: strong ? 'var(--teal)' : 'rgba(27,138,156,0.28)', color: strong ? '#fff' : 'inherit', borderRadius: 8, padding: '0 9px', fontWeight: 700, whiteSpace: 'nowrap' }}>{children}</span>
@@ -330,14 +345,8 @@ function CabinetStep() {
           </div>
         </Reveal>
       </div>
-      <Reveal show={L >= 2} testId="database" style={{ flex: 'none' }}>
-        <div style={{ height: 160, borderRadius: 20, background: '#fff', border: '3px solid var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 28, overflow: 'hidden' }}>
-          <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ height: 150, width: 150, objectFit: 'contain' }} />
-          <div>
-            <div style={{ fontSize: 38, fontWeight: 700 }}>Oracle Autonomous AI Database 26ai</div>
-            <div style={{ fontSize: 28, color: 'var(--teal)', fontWeight: 600 }}>the logbook lives here</div>
-          </div>
-        </div>
+      <Reveal show={L >= 2} testId="database" style={{ flex: 'none', paddingTop: 10 }}>
+        <DbShelf height={96} badge={132} size={36}>Oracle Autonomous AI Database 26ai · <span style={{ opacity: 0.9, fontWeight: 600 }}>the logbook lives here</span></DbShelf>
       </Reveal>
     </div>
   );
@@ -440,11 +449,10 @@ function Pour() {
         <GlassArt fill={level} id="gp" size={380} />
       </div>
       <div style={{ width: 600, display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div data-pour="logbook" style={{ display: 'flex', alignItems: 'center', gap: 22, marginBottom: 14 }}>
-          <div style={{ width: 190, height: 218, flex: 'none' }}><Logbook /></div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ width: 170, height: 170, objectFit: 'contain', borderRadius: 24 }} />
-            <div style={{ fontSize: 22, fontWeight: 700, textAlign: 'center', lineHeight: 1.2 }}>Oracle Autonomous<br />AI Database 26ai</div>
+        <div data-pour="logbook" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, marginBottom: 18 }}>
+          <div style={{ width: 200, height: 230, marginBottom: -26, position: 'relative', zIndex: 1 }}><Logbook /></div>
+          <div style={{ width: '100%' }}>
+            <DbShelf height={84} badge={104} size={26}>Oracle Autonomous<br />AI Database 26ai</DbShelf>
           </div>
         </div>
       <Reveal show={L >= 3}>
@@ -514,9 +522,11 @@ export function Handover({ kicker, message, notebook }: HandoverProps) {
       <Fill>
         <div data-handover style={{ flex: 1, display: 'flex', alignItems: 'stretch', gap: 30 }}>
           <div style={{ width: 800, display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '20px 28px', borderRadius: 20, background: 'rgba(27,138,156,0.12)', border: '3px solid var(--teal)' }}>
-              <div style={{ fontSize: 36, fontWeight: 700 }}>Oracle AI Database</div>
-              <div style={{ marginLeft: 'auto', fontSize: 24, color: 'var(--ink-dim)', textAlign: 'right' }}>Parts 1 and 2: the store<br />and the embedder</div>
+            <div data-db-row>
+              <DbShelf height={124} badge={104} size={32}>
+                <div>Oracle Autonomous AI Database 26ai</div>
+                <div style={{ fontSize: 22, fontWeight: 600, opacity: 0.92, marginTop: 4 }}>Parts 1 and 2: the store and the embedder</div>
+              </DbShelf>
             </div>
             {WATCH.map((w, i) => (
               <Reveal key={w.n} show={L > i} testId={`watch-${i}`} style={{ flex: 1, display: 'flex' }}>
