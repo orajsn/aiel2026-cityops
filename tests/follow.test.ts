@@ -1,6 +1,6 @@
 // @ts-nocheck (spawns Node; the project has no @types/node)
 import { spawn, type ChildProcess } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { qrPath } from '../src/engine/follow';
 import { SCRIPT_TH } from '../src/content/scriptTh';
 import { SCENES } from '../src/scenes/index';
@@ -63,6 +63,7 @@ test('a session ends by itself when the presenter goes quiet, and its phones are
 
 test('the script manager: a login name is needed, every save is a version that goes live, a stale save is refused, comments thread', async () => {
   const dir = `/tmp/follow-test-${PORT}`;
+  rmSync(dir, { recursive: true, force: true }); // a folder left by an earlier run with the same port would keep its saved versions
   const mp = spawn(process.execPath, ['follow/server.mjs'], { env: { ...process.env, FOLLOW_PORT: String(PORT + 2), FOLLOW_BASE: '/f/', FOLLOW_DATA: dir }, stdio: 'ignore' });
   try {
     const m = `http://127.0.0.1:${PORT + 2}/f/`;

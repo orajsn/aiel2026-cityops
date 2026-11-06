@@ -161,7 +161,8 @@ function MapNodeCard({ n, step }: { n: NodeDef; step: MapStep }) {
 }
 
 function TheMap({ step }: { step: MapStep }) {
-  const cam = step.wide ? { x: (W + 96 - step.cam.s * 1920) / 2, y: 6 } : { x: FOCUS_X - step.cam.s * step.cam.cx, y: FOCUS_Y - step.cam.s * step.cam.cy };
+  // the whole map and Part 0's pictures share one camera, so the map behind does not jump when the picture comes in
+  const cam = step.wide || step.guide ? { x: (W + 96 - step.cam.s * 1920) / 2, y: 6 } : { x: FOCUS_X - step.cam.s * step.cam.cx, y: FOCUS_Y - step.cam.s * step.cam.cy };
   const dim = !!step.nodes;
   return (
     <div className="cm__world" data-testid="code-map-world" style={{ transform: `translate(${cam.x}px, ${cam.y}px) scale(${step.cam.s})` }}>
@@ -184,14 +185,13 @@ function TheMap({ step }: { step: MapStep }) {
         <Ic name="chip" size={26} />
         <span>THE AI AGENT · ONE TURN</span>
       </div>
-      <div className="cm__lane" style={{ left: 124, top: 486, color: '#14707F' }}>
-        <Ic name="db" size={26} />
+      <div className="cm__lane" style={{ left: 260, top: 486, color: '#14707F' }}>
         <span>ORACLE AUTONOMOUS AI DATABASE 26ai · ONE CONNECTION</span>
         <span className="cm__tag">PART 1</span>
       </div>
-      <div data-logo-block style={{ position: 'absolute', left: 1180, top: 680, width: 560, height: 124, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22, pointerEvents: 'none' }}>
-        <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ width: 124, height: 124, objectFit: 'contain' }} />
-        <div style={{ fontSize: 30, fontWeight: 700, lineHeight: 1.2, color: '#14707F' }}>Oracle Autonomous<br />AI Database 26ai</div>
+      {/* the database logo before the section's title, a white badge straddling the section's top edge */}
+      <div data-logo-badge style={{ position: 'absolute', left: 126, top: 412, width: 120, height: 120, borderRadius: 60, background: '#fff', border: '3px solid #1b8a9c', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 12px rgba(31,42,51,0.18)', pointerEvents: 'none' }}>
+        <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ width: 98, height: 98, objectFit: 'contain' }} />
       </div>
       {NODES.map((n) => (
         <MapNodeCard key={n.id} n={n} step={step} />
