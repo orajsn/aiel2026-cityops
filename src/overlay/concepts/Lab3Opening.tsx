@@ -100,8 +100,8 @@ export function Hook({ kicker, message }: HookProps) {
   return (
     <HalfPanel kicker={kicker} message={message} testId="hook">
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <img src={vancePortrait} alt="Vance" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', objectPosition: '50% 15%', border: '3px solid #fff', flex: 'none' }} />
-        <div style={{ ...bubble(true), alignSelf: 'center' }}>“What happened at this rust?”</div>
+        <img src={vancePortrait} alt="Vance" style={{ width: 104, height: 104, borderRadius: '50%', objectFit: 'cover', objectPosition: '50% 15%', border: '4px solid #fff', flex: 'none' }} />
+        <div data-question style={{ ...bubble(true), alignSelf: 'center', fontSize: 44, lineHeight: 1.25, padding: '20px 32px' }}>“What happened at this rust?”</div>
       </div>
       <Reveal show={L >= 1} testId="without" style={{ flex: 1, display: 'flex' }}>
         <div data-hook="without" style={{ ...card('grey'), flex: 1, justifyContent: 'space-between' }}>
