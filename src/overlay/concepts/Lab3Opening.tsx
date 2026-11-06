@@ -455,11 +455,11 @@ function Pour() {
             <DbShelf height={84} badge={104} size={26}>Oracle Autonomous<br />AI Database 26ai</DbShelf>
           </div>
         </div>
-      <Reveal show={L >= 3}>
+      <div>
         <div style={{ fontSize: 42, fontWeight: 700, lineHeight: 1.25 }}>The logbook keeps it all.</div>
         <div style={{ fontSize: 42, fontWeight: 700, lineHeight: 1.25, color: 'var(--teal)' }}>The model reads only what is in the glass.</div>
         <div style={{ fontSize: 30, color: 'var(--ink-dim)', marginTop: 18 }}>So what we pour in, this turn, is what matters.</div>
-      </Reveal>
+      </div>
       </div>
     </div>
   );
