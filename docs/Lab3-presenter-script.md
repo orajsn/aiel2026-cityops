@@ -1,14 +1,14 @@
 # Lab 3 · Agent Memory: presenter script
 
-Exported 2026-11-06 from the script manager (the current text, including colleagues' edits). 19 pages, in show order; English first, then Thai. Pages marked "builds" show one more part on every Next.
+Exported 2026-11-07 from the script manager (the current text, including colleagues' edits). 19 pages in show order, English then Thai. Key words are **bold**, names are `code`, and a line starting with **>** says what each Next shows.
 
 ## 0 · Open Lab 3  (`3.0g`)
 
-**English**
+### English
 
 Lab 3 runs in the same environment as Lab 2. If you closed it, open it again with this address. It is the one called "AI Labs 1 and 2" on LiveLabs.
 
-**ไทย**
+### ไทย
 
 Lab 3 ใช้สภาพแวดล้อมเดียวกับ Lab 2 ครับ ถ้าปิดไปแล้ว ให้เปิดใหม่ด้วยลิงก์บนหน้าจอ หรือสแกน QR ได้เลย
 
@@ -16,11 +16,11 @@ Lab 3 ใช้สภาพแวดล้อมเดียวกับ Lab 2 �
 
 ## 1 · Back at the bridge  (`3.0`)
 
-**English**
+### English
 
 We are back at Harbor Bridge, because the problem has not gone away: the rust is still there. Two inspectors will look at it on different days. Mercer comes first, Vance comes next. What should Vance know before he starts?
 
-**ไทย**
+### ไทย
 
 กลับมาที่ Harbor Bridge กันอีกครั้งครับ เพราะปัญหายังไม่หายไปไหน สนิมที่เสายังอยู่ตรงนี้เหมือนเดิม
 
@@ -30,87 +30,171 @@ We are back at Harbor Bridge, because the problem has not gone away: the rust is
 
 ---
 
-## 2 · Why the first one forgot  (`3.2f`) · builds in 5 clicks
+## 2 · Why the first one forgot  (`3.2f`) · builds in 4 clicks
 
-**English**
+### English
 
-Why did the first one have nothing? Day 1. Mercer tells the AI agent: corrosion on the bearing assemblies, about 25 percent section loss, repair within 60 days. The agent writes each line in its visit notebook, the same notebook as this afternoon: short-term memory, this visit’s scribbles. Then the chat closes and Mercer goes home. The visit is over, so the notebook is cleared. Nothing she said is kept.
+**Why did the first AI agent have nothing for Vance?** Go back to **Day 1**.
 
-**ไทย**
+Mercer tells the AI agent: *corrosion on the bearing assemblies, about 25 percent section loss, repair within 60 days.*
 
-ทำไม AI agent ตัวแรกถึงไม่มีอะไรให้ Vance เลย ลองย้อนไปดูวันที่ 1 ครับ Mercer เล่าให้ AI agent ฟังทีละเรื่อง: เจอการกัดกร่อนที่แผ่นรองรับ หน้าตัดเหล็กหายไปประมาณ 25 เปอร์เซ็นต์ และแนะนำให้ซ่อมภายใน 60 วัน
+> **Next ×3**: one message arrives at a time, and the AI agent writes each line in its notebook.
 
-AI agent จดทุกบรรทัดลงใน visit notebook หรือสมุดบันทึกประจำการเยี่ยมครั้งนี้ ซึ่งเป็นสมุดเล่มเดียวกับที่เราเห็นเมื่อบ่ายนี้ นี่คือ short-term memory: รอยจดของการเยี่ยมครั้งนี้เท่านั้น
+It writes everything in its **visit notebook**, the same notebook as this afternoon. That is **short-term memory**: only this visit's scribbles.
 
-จากนั้นแชตปิดลง และ Mercer กลับบ้าน การเยี่ยมจบแล้ว สมุดจึงถูกล้างออก ไม่มีสิ่งที่เธอพูดเหลืออยู่เลย
+> **Next**: the chat closes.
+
+Then the chat closes and Mercer goes home. **The visit is over, so the notebook is cleared.** Nothing she said is kept.
+
+### ไทย
+
+**ทำไม AI agent ตัวแรกถึงไม่มีอะไรให้ Vance เลย?** ลองย้อนไปดู **วันที่ 1** ครับ
+
+Mercer เล่าให้ AI agent ฟัง: *เจอการกัดกร่อนที่แผ่นรองรับ หน้าตัดเหล็กหายไปประมาณ 25 เปอร์เซ็นต์ แนะนำให้ซ่อมภายใน 60 วัน*
+
+> **Next ×3**: ข้อความเข้ามาทีละเรื่อง และ AI agent จดแต่ละบรรทัดลงสมุด
+
+AI agent จดทุกอย่างลงใน **visit notebook** สมุดเล่มเดียวกับที่เราเห็นเมื่อบ่ายนี้ นี่คือ **short-term memory**: รอยจดของการเยี่ยมครั้งนี้เท่านั้น
+
+> **Next**: แชตปิดลง
+
+จากนั้นแชตปิดลง และ Mercer กลับบ้าน **การเยี่ยมจบแล้ว สมุดจึงถูกล้างออก** ไม่มีสิ่งที่เธอพูดเหลืออยู่เลย
 
 ---
 
 ## 3 · Same question, two answers  (`3.1h`) · builds in 3 clicks
 
-**English**
+### English
 
-Day 2. Same question, same language model, two answers. Vance is back at the rust and asks: what happened here? Without memory, the AI agent has nothing. Every chat starts from zero. With memory, it also answered, but we keep that answer hidden for a moment. What is different? Only the memory. With memory, it answers with Mercer’s finding from yesterday: corrosion, about 25 percent section loss, grade C, repair within 60 days. Her finding, the guideline, her notes. Same model, same question.
+**Day 2. Same question, same language model, two answers.**
 
-**ไทย**
+Vance is back at the rust and asks: *"What happened at this rust?"*
 
-วันที่ 2 คำถามเดียวกัน language model ตัวเดียวกัน แต่ได้คำตอบสองแบบ Vance กลับมาที่สนิมและถามว่า ที่นี่เกิดอะไรขึ้น
+> **Next**: the answer **without memory**.
 
-แบบแรก ไม่มี memory AI agent ไม่มีอะไรเลย ทุกแชตเริ่มจากศูนย์ มันตอบได้แค่ว่า ไม่มีข้อมูลก่อนหน้านี้ แล้วคุณเห็นอะไร
+The AI agent has **nothing**. *Every chat starts from zero.*
 
-แบบที่สอง มี memory ตอนแรกคำตอบถูกล็อกไว้ แล้วเราเปิดออก: Mercer บันทึกการกัดกร่อนไว้ในวันที่ 1 หน้าตัดหายไปประมาณ 25 เปอร์เซ็นต์ ระดับ C ควรซ่อมภายใน 60 วัน โมเดลเดียวกัน คำถามเดียวกัน ต่างกันที่ memory อย่างเดียวครับ
+> **Next**: the answer **with memory**, still locked.
+
+It also answered, but we keep that answer hidden for a moment. **What is different?**
+
+> **Next**: the lock opens.
+
+With memory it answers with **Mercer's finding** from yesterday: **corrosion**, **about 25 percent section loss**, grade C, repair within **60 days**.
+
+**Same model. Same question. Only the memory differs.**
+
+### ไทย
+
+**วันที่ 2 คำถามเดียวกัน language model ตัวเดียวกัน แต่ได้คำตอบสองแบบ**
+
+Vance กลับมาที่สนิมและถามว่า *"ที่นี่เกิดอะไรขึ้น?"*
+
+> **Next**: คำตอบ **แบบไม่มี memory**
+
+AI agent **ไม่มีอะไรเลย** *ทุกแชตเริ่มจากศูนย์*
+
+> **Next**: คำตอบ **แบบมี memory** ที่ยังถูกล็อกอยู่
+
+มันก็ตอบเหมือนกัน แต่เรายังซ่อนคำตอบนี้ไว้ก่อน **ต่างกันตรงไหน?**
+
+> **Next**: เปิดล็อก
+
+เมื่อมี memory มันตอบด้วย **ผลตรวจของ Mercer** จากเมื่อวาน: **การกัดกร่อน** **หน้าตัดหายไปประมาณ 25 เปอร์เซ็นต์** ระดับ C ควรซ่อมภายใน **60 วัน**
+
+**โมเดลเดียวกัน คำถามเดียวกัน ต่างกันที่ memory อย่างเดียวครับ**
 
 ---
 
 ## 4 · Where it goes instead  (`3.3h`) · builds in 2 clicks
 
-**English**
+### English
 
-The notes need somewhere that survives the chat. That is long-term memory: the bridge logbook, the same logbook as this afternoon. Permanent, found by name or by meaning. In our case it lives in Oracle AI Database.
+The notes need somewhere that **survives the chat**. That is **long-term memory**: the **bridge logbook**, the same logbook as this afternoon.
 
-**ไทย**
+- **permanent**: it stays
+- found **by name** or **by meaning**
 
-บันทึกต้องอยู่ในที่ที่รอดจากการปิดแชต นั่นคือ long-term memory หรือ bridge logbook สมุดบันทึกของสะพาน เล่มเดียวกับที่เราเห็นเมื่อบ่ายนี้ เก็บถาวร และค้นหาได้ทั้งจากชื่อและจากความหมาย
+> **Next**: Mercer's notes go into the logbook. **Next**: the database.
 
-ในกรณีของเรา สมุดเล่มนี้อยู่ใน Oracle Autonomous AI Database 26ai ครับ
+In our case the logbook lives in **Oracle Autonomous AI Database 26ai**.
+
+### ไทย
+
+บันทึกต้องอยู่ในที่ที่ **รอดจากการปิดแชต** นั่นคือ **long-term memory**: **bridge logbook** สมุดบันทึกของสะพาน เล่มเดียวกับที่เราเห็นเมื่อบ่ายนี้
+
+- **เก็บถาวร**: อยู่ต่อไป
+- ค้นหาได้ **จากชื่อ** หรือ **จากความหมาย**
+
+> **Next**: บันทึกของ Mercer เข้าสมุด **Next**: ฐานข้อมูล
+
+ในกรณีของเรา สมุดเล่มนี้อยู่ใน **Oracle Autonomous AI Database 26ai** ครับ
 
 ---
 
 ## 5 · One report, three cards  (`3.3i`) · builds in 3 clicks
 
-**English**
+### English
 
-One report from Mercer becomes three kinds of memory. What happened, like last summer’s trip. What is true, like what you learned at school. How we work, like riding a bike. Three cards in the same logbook. Then Day 2: Vance asks what happened here, how bad is it, what do we do. Each question pulls back its own card. So Vance starts with the whole history, not from zero.
+**One report** from Mercer becomes **three kinds of memory**:
 
-**ไทย**
+1. **What happened** (*episodic*): like last summer's trip
+2. **What is true** (*semantic*): like what you learned at school
+3. **How we work** (*procedural*): like riding a bike
 
-รายงานหนึ่งฉบับของ Mercer กลายเป็นความจำสามชนิด สิ่งที่เกิดขึ้น เหมือนทริปเมื่อฤดูร้อนที่แล้ว สิ่งที่เป็นจริง เหมือนที่เราเรียนมาตอนเด็ก และวิธีที่เราทำงาน เหมือนการปั่นจักรยาน เป็นการ์ดสามใบในสมุดเล่มเดียวกัน
+> **Next ×3**: one card each time, together with the question that pulls it back.
 
-จากนั้นวันที่ 2 Vance ถามสามคำถาม: เกิดอะไรขึ้น แย่แค่ไหน และเราต้องทำอะไร แต่ละคำถามดึงการ์ดของตัวเองกลับมา Vance จึงเริ่มต้นพร้อมประวัติทั้งหมด ไม่ใช่เริ่มจากศูนย์
+Day 2: Vance asks three questions: *"What happened here?"*, *"How bad is it?"*, *"What do we do?"* Each question pulls back its **own card**.
+
+**So Vance starts with the whole history, not from zero.**
+
+### ไทย
+
+**รายงานหนึ่งฉบับ** ของ Mercer กลายเป็น **ความจำสามชนิด**:
+
+1. **สิ่งที่เกิดขึ้น** (*episodic*): เหมือนทริปเมื่อฤดูร้อนที่แล้ว
+2. **สิ่งที่เป็นจริง** (*semantic*): เหมือนที่เราเรียนมาตอนเด็ก
+3. **วิธีที่เราทำงาน** (*procedural*): เหมือนการปั่นจักรยาน
+
+> **Next ×3**: ครั้งละหนึ่งการ์ด พร้อมคำถามที่ดึงมันกลับมา
+
+วันที่ 2 Vance ถามสามคำถาม: *"เกิดอะไรขึ้น?"* *"แย่แค่ไหน?"* *"เราต้องทำอะไร?"* แต่ละคำถามดึง **การ์ดของตัวเอง** กลับมา
+
+**Vance จึงเริ่มต้นพร้อมประวัติทั้งหมด ไม่ใช่เริ่มจากศูนย์**
 
 ---
 
 ## 6 · From the logbook to the glass  (`3.3p`) · builds in 3 clicks
 
-**English**
+### English
 
-The notes are in the logbook, but the language model cannot read the entire logbook. It reads only what is in the glass, this turn. So what we pour in, on every turn, is what matters.
+The notes are in the logbook, but the language model **cannot read the entire logbook**.
 
-**ไทย**
+It reads **only what is in the glass**, this turn.
 
-บันทึกอยู่ในสมุดแล้ว แต่ language model อ่านสมุดทั้งเล่มไม่ได้ มันอ่านได้เฉพาะสิ่งที่อยู่ในแก้ว ในรอบนี้เท่านั้น
+> **Next ×3**: a card drops into the glass each time.
 
-กด Next เพื่อหย่อนการ์ดลงแก้วทีละใบ สิ่งที่เราเทลงไปในแต่ละรอบ คือสิ่งที่สำคัญ
+**So what we pour in, on every turn, is what matters.**
+
+### ไทย
+
+บันทึกอยู่ในสมุดแล้ว แต่ language model **อ่านสมุดทั้งเล่มไม่ได้**
+
+มันอ่านได้ **เฉพาะสิ่งที่อยู่ในแก้ว** ในรอบนี้เท่านั้น
+
+> **Next ×3**: หย่อนการ์ดลงแก้วทีละใบ
+
+**สิ่งที่เราเทลงไปในแต่ละรอบ คือสิ่งที่สำคัญ**
 
 ---
 
 ## 7 · The glass  (`3.3a`)
 
-**English**
+### English
 
 The language model reads only what is in the glass, this turn. We fill it ourselves on every turn: the system prompt, the instructions, the tool list, the notes we retrieved, the chat so far and Vance’s question. It is a fixed size, and nothing outside it is seen: not Mercer’s closed chat, not the database, not yesterday.
 
-**ไทย**
+### ไทย
 
 language model อ่านได้เฉพาะสิ่งที่อยู่ใน “แก้ว” ในรอบนี้เท่านั้น
 
@@ -122,11 +206,11 @@ language model อ่านได้เฉพาะสิ่งที่อย�
 
 ## 8 · Four things go wrong  (`3.3b`) · builds in 3 clicks
 
-**English**
+### English
 
 Filling it, four things go wrong. Volume: every tool result piles in, and by turn 15 it overflows. Relevance: thirty search results crowd in, and Mercer’s finding spills out. Accuracy: a summary squeezes her finding down to rust on the pier, and the 25 percent falls out. Timing: her finding came in at turn 1, and by turn 15, when Vance asks, it is gone.
 
-**ไทย**
+### ไทย
 
 เวลาเติมแก้ว มีสี่อย่างที่ผิดพลาดได้ เราจะดูทีละอย่าง กด Next เพื่อเปิดแก้วถัดไป
 
@@ -142,39 +226,59 @@ Filling it, four things go wrong. Volume: every tool result piles in, and by tur
 
 ## 9 · Now the code  (`3.5h`) · builds in 4 clicks
 
-**English**
+### English
 
-Three things to watch as we run the notebook, marked on the map. Number 1 sits on CITY_MEMORY and the findings table: what to keep, small records and the signed finding, Parts 3 and 4. Number 2 sits on the prompt: what to bring in, only what this question needs, Part 6. Number 3 sits on call_copilot: what to do on every turn, read, think, act and save, Part 6 and then the two days. Parts 1 and 2, the database and the embedder, sit underneath. Now we open the notebook and walk this map.
+**Three things to watch** as we run the notebook, marked on the map:
 
-**ไทย**
+1. **What to keep**: small records and the signed finding. Parts 3 and 4, `CITY_MEMORY` and `CITY_INSPECTION_FINDING`
+2. **What to bring in**: only what this question needs. Part 6, the prompt
+3. **What to do every turn**: read, think, act, save. Part 6 and the two days, `call_copilot`
 
-มีสามเรื่องที่ต้องดูตอนเรารัน notebook ครับ อย่างแรก เก็บอะไรไว้: บันทึกชิ้นเล็ก ๆ และผลตรวจที่ลงนามแล้ว อยู่ที่ Part 3 และ Part 4 คือเลข 1 บนแผนที่ ที่ CITY_MEMORY และ CITY_INSPECTION_FINDING
+> **Next ×3**: one job at a time, marked on the map.
 
-อย่างที่สอง ดึงอะไรเข้ามา: เฉพาะสิ่งที่คำถามนี้ต้องการ คือ prompt ที่ Part 6 เลข 2 บนแผนที่
+Parts 1 and 2, **the database and the embedder**, sit underneath.
 
-อย่างที่สาม ทำอะไรในทุกรอบ: อ่าน คิด ลงมือ และบันทึก คือ call_copilot ใน Part 6 และสองวัน เลข 3
+**Now we open the notebook and walk this map.**
 
-ส่วน Part 1 และ Part 2 คือฐานข้อมูลและ embedder ที่อยู่ข้างใต้ ตอนนี้เราเปิด notebook แล้วเดินตามแผนที่นี้ตามลำดับครับ
+### ไทย
+
+**มีสามเรื่องที่ต้องดู** ตอนเรารัน notebook โดยมีเครื่องหมายบนแผนที่:
+
+1. **เก็บอะไรไว้**: บันทึกชิ้นเล็ก ๆ และผลตรวจที่ลงนามแล้ว Part 3 และ 4 คือ `CITY_MEMORY` และ `CITY_INSPECTION_FINDING`
+2. **ดึงอะไรเข้ามา**: เฉพาะสิ่งที่คำถามนี้ต้องการ Part 6 คือ prompt
+3. **ทำอะไรในทุกรอบ**: อ่าน คิด ลงมือ บันทึก Part 6 และสองวัน คือ `call_copilot`
+
+> **Next ×3**: ทีละเรื่อง โดยมีเครื่องหมายบนแผนที่
+
+Part 1 และ 2 คือ **ฐานข้อมูลและ embedder** ที่อยู่ข้างใต้
+
+**ตอนนี้เราเปิด notebook แล้วเดินตามแผนที่นี้ครับ**
 
 ---
 
 ## 10 · Open the lab to code  (`3.5g`)
 
-**English**
+### English
 
-That was the story. Now we run it. Open your lab environment, the same one as Lab 2, with this address or the code on the screen. It is the one called "AI Labs 1 and 2" on LiveLabs. Then we open the notebook and watch each part happen.
+**That was the story. Now we run it.**
 
-**ไทย**
+1. Open your lab environment: the **same one as Lab 2**, with the address or the code on the screen
+2. On LiveLabs it is called **AI Labs 1 and 2**
+3. Then we open the notebook `notebook_complete_ollama.ipynb` and watch each part happen
 
-นั่นคือเรื่องราวทั้งหมดครับ ต่อไปเราจะรันมันจริง เปิดสภาพแวดล้อมของ lab ซึ่งเป็นอันเดียวกับ Lab 2 ด้วยลิงก์หรือ QR บนหน้าจอ บน LiveLabs ชื่อว่า AI Labs 1 and 2
+### ไทย
 
-จากนั้นเราจะเปิด notebook และดูแต่ละส่วนทำงานทีละขั้น
+**นั่นคือเรื่องราวทั้งหมดครับ ต่อไปเราจะรันมันจริง**
+
+1. เปิดสภาพแวดล้อมของ lab: **อันเดียวกับ Lab 2** ด้วยลิงก์หรือ QR บนหน้าจอ
+2. บน LiveLabs ชื่อว่า **AI Labs 1 and 2**
+3. จากนั้นเราเปิด notebook `notebook_complete_ollama.ipynb` และดูแต่ละส่วนทำงาน
 
 ---
 
 ## 11 · The code, on one map  (`3.6m`) · builds in 18 clicks
 
-**English**
+### English
 
 This one map is everything in today’s notebook. One turn of the AI agent runs along the top, and everything it remembers sits in one database underneath. We walk it in the order the code runs.
 
@@ -206,7 +310,7 @@ Day 2. Vance comes to the same rust and asks the same question as before: what h
 
 This time the AI agent knows. Mercer logged corrosion here on Day 1: about 25 percent, grade C, repair within 60 days, with both sources. No human handoff. The finding and the memory carried it.
 
-**ไทย**
+### ไทย
 
 แผนที่นี้คือทุกอย่างใน notebook ของวันนี้ครับ ด้านบนคือการทำงานหนึ่งรอบของ AI agent ด้านล่างคือฐานข้อมูลเดียวที่เก็บทุกอย่างที่มันจำได้ เราจะเดินตามแผนที่นี้ทีละขั้น ตามลำดับที่โค้ดทำงานจริง
 
@@ -276,11 +380,11 @@ AI agent บันทึกเป็นผลตรวจของ Harbor Bridge
 
 ## 12 · With and without memory  (`3.15`)
 
-**English**
+### English
 
 Same question, asked twice. Without memory: no earlier information. With memory: Mercer’s finding, grade C, 60 days. It knows it is the same bridge, cites the real finding, gives a specific action, and never sees anyone’s private chats. Same model. Same question. Only the memory differs.
 
-**ไทย**
+### ไทย
 
 ถามคำถามเดียวกันสองครั้ง ไม่มีความจำ: ไม่มีข้อมูลก่อนหน้า มีความจำ: ผลตรวจของ Mercer เกรด C 60 วัน
 
@@ -292,27 +396,37 @@ Same question, asked twice. Without memory: no earlier information. With memory:
 
 ## 13 · The four failures, solved  (`3.15f`) · builds in 4 clicks
 
-**English**
+### English
 
-Back to the glass. Remember the four failures? Each one has been solved by a Part of the notebook we just ran. Volume: the extractor keeps small records, Part 3. Relevance: search with walls, so only Mercer’s finding comes in, Part 4. Accuracy: the signed finding keeps the 25 percent as a fact of its own, Part 4. Timing: her finding is fetched again when Vance asks, Part 6.
+**Back to the glass.** Remember the four failures? Each one is now **solved by a Part of the notebook** we just ran.
 
-**ไทย**
+> **Next ×4**: one glass at a time.
 
-กลับมาที่แก้วครับ จำสี่ปัญหาได้ไหม ตอนนี้แต่ละข้อถูกแก้ด้วยส่วนหนึ่งของ notebook ที่เราเพิ่งรัน
+1. **Volume**: the extractor keeps *small records*. Part 3
+2. **Relevance**: search with walls, so only *Mercer's finding* comes in. Part 4
+3. **Accuracy**: the signed finding keeps the **25 percent** as a fact of its own. Part 4
+4. **Timing**: her finding is **fetched again** when Vance asks. Part 6
 
-ปริมาณ: extractor เก็บเป็นบันทึกชิ้นเล็ก ๆ อยู่ที่ Part 3 ความเกี่ยวข้อง: การค้นหาที่มีกำแพง ทำให้เข้ามาเฉพาะผลตรวจของ Mercer อยู่ที่ Part 4
+### ไทย
 
-ความถูกต้อง: ผลตรวจที่ลงนามแล้วเก็บตัวเลข 25 เปอร์เซ็นต์ไว้เป็นข้อเท็จจริงของมันเอง อยู่ที่ Part 4 จังหวะเวลา: ดึงผลตรวจกลับมาใหม่ในตอนที่ Vance ถาม อยู่ที่ Part 6
+**กลับมาที่แก้วครับ** จำสี่ปัญหาได้ไหม ตอนนี้แต่ละข้อ **ถูกแก้ด้วยส่วนหนึ่งของ notebook** ที่เราเพิ่งรัน
+
+> **Next ×4**: ทีละแก้ว
+
+1. **ปริมาณ**: extractor เก็บเป็น *บันทึกชิ้นเล็ก ๆ* Part 3
+2. **ความเกี่ยวข้อง**: การค้นหาที่มีกำแพง เข้ามาเฉพาะ *ผลตรวจของ Mercer* Part 4
+3. **ความถูกต้อง**: ผลตรวจที่ลงนามแล้วเก็บ **25 เปอร์เซ็นต์** ไว้เป็นข้อเท็จจริงของมันเอง Part 4
+4. **จังหวะเวลา**: **ดึงผลตรวจกลับมาใหม่** ตอนที่ Vance ถาม Part 6
 
 ---
 
 ## 14 · What you built  (`3.15c`)
 
-**English**
+### English
 
 And here is the full memory map. Short-term and long-term memory, the three kinds, and shared memory: most of it you built today with oracleagentmemory, in one database. Tools, workflows and caching are left to your agent framework.
 
-**ไทย**
+### ไทย
 
 และนี่คือแผนที่ความจำทั้งหมด: short-term และ long-term memory สามชนิด และความจำที่แบ่งกัน ส่วนใหญ่คุณสร้างวันนี้ด้วย oracleagentmemory ในฐานข้อมูลเดียว
 
@@ -322,11 +436,11 @@ And here is the full memory map. Short-term and long-term memory, the three kind
 
 ## 15 · Where both labs meet  (`3.16`)
 
-**English**
+### English
 
 And here both labs meet. This afternoon’s rule says: section loss over 25 percent means an immediate structural review. Today’s history says Mercer measured about 25 percent. This afternoon the agent had the rule. Now it has the history.
 
-**ไทย**
+### ไทย
 
 ตรงนี้คือจุดที่สอง Lab มาพบกัน กฎของช่วงบ่ายบอกว่า: หน้าตัดสูญเสียเกิน 25 เปอร์เซ็นต์ต้องตรวจโครงสร้างทันที
 
@@ -338,11 +452,11 @@ And here both labs meet. This afternoon’s rule says: section loss over 25 perc
 
 ## 16 · Together they make the call  (`3.16a`)
 
-**English**
+### English
 
 Together they make the call: an immediate structural review. Neither lab alone makes it.
 
-**ไทย**
+### ไทย
 
 รวมกันแล้วตัดสินใจได้: ตรวจโครงสร้างทันที ไม่มี Lab ใดทำได้เพียงลำพัง
 
@@ -350,11 +464,11 @@ Together they make the call: an immediate structural review. Neither lab alone m
 
 ## 17 · Lab 3 recap  (`3.17`)
 
-**English**
+### English
 
 That is Lab 3: memory is **the foundation**, not a feature; the context window is **a curation problem**; and **one converged store** beats four services. Before the quiz, let us look at the whole day.
 
-**ไทย**
+### ไทย
 
 นั่นคือ Lab 3: ความจำคือรากฐาน ไม่ใช่ฟีเจอร์ context window คือปัญหาของการคัดสรร และที่เก็บเดียวที่รวมทุกอย่างดีกว่าสี่บริการ ก่อนทำควิซ มาดูภาพรวมของทั้งวัน
 
@@ -362,11 +476,11 @@ That is Lab 3: memory is **the foundation**, not a feature; the context window i
 
 ## 18 · Takeaways · all three labs  (`3.18`)
 
-**English**
+### English
 
 Three labs, one bridge. In Lab 1 we built **an assistant**, in Lab 2 it became **an agent**, in Lab 3 it learned to **remember**. Under all three, **one Oracle AI Database**. Now scan the code for the quiz: five minutes, 80 percent to pass, and a badge.
 
-**ไทย**
+### ไทย
 
 สามแล็บ สะพานเดียว ใน Lab 1 เราสร้างผู้ช่วย ใน Lab 2 มันกลายเป็น agent ใน Lab 3 มันเรียนรู้ที่จะจำ ใต้ทั้งสามแล็บคือ Oracle AI Database หนึ่งเดียว
 

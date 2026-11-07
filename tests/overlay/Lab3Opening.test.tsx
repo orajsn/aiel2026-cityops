@@ -18,8 +18,8 @@ test('the opening runs Mercer first, then Vance, then the logbook, the glass and
   // a page that keeps building does not repeat itself on the next page: one page per idea, every Next adds a part
   expect(ids.indexOf('3.15f')).toBeGreaterThan(ids.indexOf('3.6m')); // the four glasses solved are the ending, after the code
   expect(LAB3_CUT.has('3.15b')).toBe(true);
-  expect(PAGE_STEPS).toMatchObject({ '3.1h': 3, '3.2f': 5, '3.3h': 2, '3.3i': 3, '3.3p': 3, '3.15f': 4, '3.5h': 4 });
-  expect(focusStepCount('3.2f')).toBe(5);
+  expect(PAGE_STEPS).toMatchObject({ '3.1h': 3, '3.2f': 4, '3.3h': 2, '3.3i': 3, '3.3p': 3, '3.15f': 4, '3.5h': 4 });
+  expect(focusStepCount('3.2f')).toBe(4);
 });
 
 test('the memory analogy is Lab 2’s: the visit notebook (short-term) and the bridge logbook (long-term)', () => {
@@ -30,7 +30,7 @@ test('the memory analogy is Lab 2’s: the visit notebook (short-term) and the b
   build(2);
   expect(shown(c, 'say-')).toEqual(['true', 'true', 'false']);
   expect(c.querySelector('[data-art="visit-notebook"]')!.getAttribute('data-lines')).toBe('2');
-  build(4);
+  build(4); // the last click: the chat closes and the notebook is cleared
   expect(c.querySelector('[data-art="visit-notebook"]')!.getAttribute('data-cleared')).toBe('true');
   expect(c.textContent).toContain('SESSION CLOSED');
   build(1);
