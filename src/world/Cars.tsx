@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { drivableRoutes, useTrafficStore } from '../engine/traffic';
 import { roadHeight } from './roadHeight';
+import { addCityDim } from './BangkokCity';
 import { makePath, placeOnRoutes, travel } from './trafficPaths';
 
 /** a car in metres (body 1.8 x 4.4, cabin on top); 1 map unit is about 108 m; each route sets its cars' size */
@@ -91,10 +92,10 @@ export function Cars() {
     <group name="cars">
       {/* keyed on the count: an InstancedMesh cannot grow after it is made */}
       <instancedMesh key={`b${cars.length}`} ref={body} args={[geo.body, undefined, cars.length]} frustumCulled={false} castShadow>
-        <meshStandardMaterial roughness={0.6} metalness={0.1} />
+        <meshStandardMaterial ref={addCityDim} roughness={0.6} metalness={0.1} />
       </instancedMesh>
       <instancedMesh key={`c${cars.length}`} ref={cabin} args={[geo.cabin, undefined, cars.length]} frustumCulled={false}>
-        <meshStandardMaterial roughness={0.3} metalness={0.2} color="#2a3440" />
+        <meshStandardMaterial ref={addCityDim} roughness={0.3} metalness={0.2} color="#2a3440" />
       </instancedMesh>
     </group>
   );
