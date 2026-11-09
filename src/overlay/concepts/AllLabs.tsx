@@ -6,6 +6,7 @@ import { QuizCard } from './Ending';
 import { ArrowRight, DIM, INK, SHAPES, TEAL, TEAL_D, TINT, fadeIn, pop } from './Recap';
 import { FlowDown, Shield } from './lab1/parts';
 import { Rich } from '../Rich';
+import adbLogo from '../../assets/oracle/autonomous-ai-database.png';
 
 /**
  * 3.18 · Takeaways of all three labs, the last page of the show (owner approved Flow318V3, 29 Oct): a tight
@@ -152,15 +153,14 @@ export function AllLabs({ kicker, message, steps, foundation, quiz }: AllLabsPro
           </div>
           <motion.div
             data-foundation
-            style={{ height: 66, flex: 'none', transformOrigin: 'left', borderRadius: 14, background: TEAL, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 25, fontWeight: 700 }}
+            style={{ height: 80, flex: 'none', transformOrigin: 'left', borderRadius: 14, background: TEAL, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 25, fontWeight: 700 }}
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ delay: FOUNDATION_AT, duration: 1.1, ease: EASE }}
           >
-            <svg width={26} height={28} viewBox="0 0 60 66" aria-hidden="true">
-              <ellipse cx="30" cy="10" rx="25" ry="8" fill="none" stroke="#fff" strokeWidth={4} />
-              <path d="M5 10v46c0 4.4 11.2 8 25 8s25-3.6 25-8V10M5 26c0 4.4 11.2 8 25 8s25-3.6 25-8M5 41c0 4.4 11.2 8 25 8s25-3.6 25-8" fill="none" stroke="#fff" strokeWidth={4} />
-            </svg>
+            <span style={{ width: 72, height: 72, borderRadius: '50%', background: '#fff', border: '3px solid var(--teal)', boxShadow: '0 3px 10px rgba(11,14,20,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
+              <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ width: 66, height: 66, objectFit: 'contain' }} />
+            </span>
             {foundation}
           </motion.div>
         </div>
