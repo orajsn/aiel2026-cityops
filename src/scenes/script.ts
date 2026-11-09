@@ -129,8 +129,8 @@ export const SCRIPT: Record<string, string> = {
   '3.15c': 'And here is the full memory map. Short-term and long-term memory, the three kinds, and shared memory: most of it you built today with oracleagentmemory, in one database. Tools, workflows and caching are left to your agent framework.',
   '3.16': 'And this is where both labs meet. I want you to see that neither lab can decide alone. Start with the rule from Lab 2 on its own. The rule says the limit is 25 percent. But without this bridge\'s number, it cannot decide. Now look at the history on its own. Mercer found about 25 percent. But without knowing the limit, it cannot decide either. But put them together: over 25 percent needs a review, and the number is about 25 percent. So the AI agent can decide. And it decides together with Vance: order an immediate structural review. We need both labs.',
   '3.16a': 'Together they make the call: an immediate structural review. Neither lab alone makes it.',
-  '3.17': 'That is Lab 3: memory is **the foundation**, not a feature; the context window is **a curation problem**; and **one converged store** beats four services. Before the quiz, let us look at the whole day.',
-  '3.18': 'Three labs, one bridge. In Lab 1 we built **an assistant**, in Lab 2 it became **an agent**, in Lab 3 it learned to **remember**. Under all three, **one Oracle AI Database**. Now scan the code for the quiz: five minutes, 80 percent to pass, and a badge.',
+  '3.17': 'That is Lab 3: memory is **the foundation**, not a feature; the context window is **a curation problem**; and **one converged store** beats four services. Now let us look at the whole day.',
+  '3.18': 'Three labs, one bridge. In Lab 1 we built **an assistant**, in Lab 2 it became **an agent**, in Lab 3 it learned to **remember**. Under all three, **one Oracle AI Database**.',
 };
 
 // The map page says what the pages it replaced said, step by step (3.6 to 3.14a stay above for when a page comes back)

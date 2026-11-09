@@ -18,7 +18,8 @@ export interface AllLabsProps {
   message: string;
   steps: { tag: string; title: string; line: string; where: string }[];
   foundation: string;
-  quiz: string[];
+  /** the quiz card beside the staircase; left out for now (owner, 9 Nov), the staircase then takes the whole width */
+  quiz?: string[];
 }
 
 /** when each step rises, the foundation under them, then the quiz */
@@ -117,12 +118,12 @@ function Stair({ n, step, children }: { n: number; step: AllLabsProps['steps'][n
       transition={{ delay: t, duration: 0.9, ease: EASE }}
     >
       <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.1em', color: TEAL_D, textTransform: 'uppercase' }}>{step.tag}</div>
-      <div style={{ fontSize: 30, fontWeight: 700, marginTop: 4, lineHeight: 1.15, color: INK, minHeight: '2.3em' }}>{step.title}</div>
+      <div style={{ fontSize: 31, fontWeight: 700, marginTop: 4, lineHeight: 1.15, color: INK }}>{step.title}</div>
       <motion.div {...fadeIn(t + 0.6)} style={{ flex: 1, minHeight: 0, margin: '14px 0', borderRadius: 12, background: 'var(--panel-strong)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         {/* the picture grows with the step */}
-        <div style={{ zoom: 1.1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>{children}</div>
+        <div style={{ zoom: 1.2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>{children}</div>
       </motion.div>
-      <div style={{ fontSize: 21, lineHeight: 1.35, color: INK, minHeight: '4.05em' }}><Rich text={step.line} /></div>
+      <div style={{ fontSize: 24, lineHeight: 1.35, color: INK, minHeight: '4.05em' }}><Rich text={step.line} /></div>
       <div style={{ fontSize: 15, color: DIM, marginTop: 4 }}>{step.where}</div>
     </motion.div>
   );
@@ -163,7 +164,7 @@ export function AllLabs({ kicker, message, steps, foundation, quiz }: AllLabsPro
             {foundation}
           </motion.div>
         </div>
-        <QuizCard quiz={quiz} delay={QUIZ_AT} style={{ flex: '0 0 256px' }} />
+        {quiz && <QuizCard quiz={quiz} delay={QUIZ_AT} style={{ flex: '0 0 256px' }} />}
       </div>
     </WidePanel>
   );

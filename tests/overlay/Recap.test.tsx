@@ -61,7 +61,7 @@ test('Lab 3 recap: Mercer files the finding, Vance finds it; four stores fold in
   expect(c.textContent).not.toMatch(/copilot/i);
 });
 
-test('3.18 is the last page: a three-step staircase on one teal foundation, and the quiz is the one red thing', () => {
+test('3.18 is the last page: a three-step staircase on one teal foundation, the quiz left out for now', () => {
   const last = SCENES[SCENES.length - 1];
   expect(last.id).toBe('3.18');
   expect(last.chapter).toBe(2);
@@ -73,8 +73,7 @@ test('3.18 is the last page: a three-step staircase on one teal foundation, and 
   for (const w of ['An assistant', 'An agent', 'An agent that remembers', 'the repair plan', 'the crack', 'the rust']) expect(c.textContent).toContain(w);
   expect(c.querySelectorAll('[data-foundation]')).toHaveLength(1);
   expect(c.querySelector('[data-foundation]')!.textContent).toBe('One Oracle AI Database, ready for AI workloads, under all three');
-  expectOneRed(c, '[data-quiz]');
-  expect(c.querySelector('[data-quiz]')!.textContent).toContain('80% to pass');
+  expect(c.querySelector('[data-quiz]')).toBeNull();
   expect(c.querySelector('[data-portrait="mercer"]')).not.toBeNull();
   expect(c.querySelector('[data-portrait="vance"]')).not.toBeNull();
 });

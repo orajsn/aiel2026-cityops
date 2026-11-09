@@ -262,7 +262,6 @@ const b218: SceneDef = {
       { tag: 'Lab 3 · Agent Memory', title: 'An agent that remembers', line: '**how to make an agent remember**: what Mercer learns on Day 1, Vance knows on Day\u00a02', where: 'on the bridge: the rust' },
     ],
     foundation: 'One Oracle AI Database, ready for AI workloads, under all three',
-    quiz: ['5 minutes', '80% to pass', 'a badge'],
   } satisfies AllLabsProps as unknown as Record<string, unknown>,
 };
 
