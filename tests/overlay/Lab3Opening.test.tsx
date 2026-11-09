@@ -1,5 +1,5 @@
 import { render, act } from '@testing-library/react';
-import { Hook, WhyForgot, WhereItGoes, GlassBridge, Handover } from '../../src/overlay/concepts/Lab3Opening';
+import { Hook, WhyForgot, WhereItGoes, GlassBridge, Handover, Neither } from '../../src/overlay/concepts/Lab3Opening';
 import { useDrawerStore, PAGE_STEPS, focusStepCount } from '../../src/engine/presentation';
 import { LAB3_ALL, chapter2, LAB3_CUT } from '../../src/scenes/chapter2';
 
@@ -68,4 +68,17 @@ test('each click brings one card together with Vance’s question; the glass and
   expect([...h.querySelectorAll('[data-mark]')].map((m) => m.getAttribute('data-mark'))).toEqual(['1', '1', '2', '3']);
   expect(h.textContent).toContain('Oracle Autonomous AI Database 26ai');
   expect(h.textContent).not.toMatch(/engineering|harness/i);
+});
+
+test('where both labs meet: neither alone, then together, then the call, one part per Next (owner, 9 Nov)', () => {
+  expect(PAGE_STEPS['3.16']).toBe(3);
+  expect(LAB3_CUT.has('3.16a')).toBe(true);
+  build(1);
+  const c = render(<Neither kicker="k" message="m" />).container;
+  expect(shown(c, 'meet-')).toEqual(['true', 'true', 'false']);
+  expect(shown(c, 'call')).toEqual(['false']);
+  build(3);
+  const d = render(<Neither kicker="k" message="m" />).container;
+  expect(shown(d, 'meet-')).toEqual(['true', 'true', 'true']);
+  expect(shown(d, 'call')).toEqual(['true']);
 });

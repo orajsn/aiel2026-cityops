@@ -1,6 +1,6 @@
 # Lab 3 · Agent Memory: presenter script
 
-Exported 2026-11-07 from the script manager (the current text, including colleagues' edits). 19 pages in show order, English then Thai. Key words are **bold**, names are `code`, and a line starting with **>** says what each Next shows.
+Exported 2026-11-09 from the script manager (the current text, including colleagues' edits). 18 pages in show order, English then Thai. Key words are **bold**, names are `code`, and a line starting with **>** says what each Next shows.
 
 ## 0 · Open Lab 3  (`3.0g`)
 
@@ -434,35 +434,47 @@ And here is the full memory map. Short-term and long-term memory, the three kind
 
 ---
 
-## 15 · Where both labs meet  (`3.16`)
+## 15 · Where both labs meet  (`3.16`) · builds in 3 clicks
 
 ### English
 
-And here both labs meet. This afternoon’s rule says: section loss over 25 percent means an immediate structural review. Today’s history says Mercer measured about 25 percent. This afternoon the agent had the rule. Now it has the history.
+**And here both labs meet. Neither lab can make the call alone.**
+
+The **rule alone**: *the limit is 25 percent*, but **what is this bridge's number?** It **cannot decide**.
+
+> **Next**: the history alone.
+
+The **history alone**: *Mercer found about 25 percent*, but **what is the limit?** It **cannot decide** either.
+
+> **Next**: together.
+
+**Together**: over 25 percent needs a review, and it is about 25 percent, so the AI agent can **decide**.
+
+> **Next**: the call.
+
+With Vance, it orders **an immediate structural review**. **Both labs are needed.**
 
 ### ไทย
 
-ตรงนี้คือจุดที่สอง Lab มาพบกัน กฎของช่วงบ่ายบอกว่า: หน้าตัดสูญเสียเกิน 25 เปอร์เซ็นต์ต้องตรวจโครงสร้างทันที
+**ตรงนี้คือจุดที่สอง Lab มาพบกัน และไม่มี Lab ไหนตัดสินใจได้เพียงลำพังครับ**
 
-ประวัติของวันนี้บอกว่า Mercer วัดได้ประมาณ 25 เปอร์เซ็นต์
+**กฎอย่างเดียว**: *ขีดจำกัดคือ 25 เปอร์เซ็นต์* แต่ **ตัวเลขของสะพานนี้คือเท่าไร?** ตัดสินใจไม่ได้
 
-ช่วงบ่าย agent มีกฎ ตอนนี้มันมีประวัติ
+> **Next**: ประวัติอย่างเดียว
 
----
+**ประวัติอย่างเดียว**: *Mercer พบประมาณ 25 เปอร์เซ็นต์* แต่ **ขีดจำกัดคือเท่าไร?** ก็ตัดสินใจไม่ได้เหมือนกัน
 
-## 16 · Together they make the call  (`3.16a`)
+> **Next**: รวมกัน
 
-### English
+**พอรวมกัน**: เกิน 25 เปอร์เซ็นต์ต้องตรวจสอบ และตัวเลขอยู่ที่ประมาณ 25 เปอร์เซ็นต์ AI agent จึง **ตัดสินใจได้**
 
-Together they make the call: an immediate structural review. Neither lab alone makes it.
+> **Next**: การตัดสินใจ
 
-### ไทย
-
-รวมกันแล้วตัดสินใจได้: ตรวจโครงสร้างทันที ไม่มี Lab ใดทำได้เพียงลำพัง
+ร่วมกับ Vance สั่ง **ตรวจโครงสร้างทันที** **ต้องมีทั้งสอง Lab ครับ**
 
 ---
 
-## 17 · Lab 3 recap  (`3.17`)
+## 16 · Lab 3 recap  (`3.17`)
 
 ### English
 
@@ -474,7 +486,7 @@ That is Lab 3: memory is **the foundation**, not a feature; the context window i
 
 ---
 
-## 18 · Takeaways · all three labs  (`3.18`)
+## 17 · Takeaways · all three labs  (`3.18`)
 
 ### English
 

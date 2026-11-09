@@ -569,3 +569,71 @@ export function Handover({ kicker, message, notebook }: HandoverProps) {
     </WidePanel>
   );
 }
+
+
+/* ---------------------------------------------------------------- 6 · where both labs meet (owner's pick, version C: neither alone) */
+
+export interface NeitherProps {
+  kicker: string;
+  message: string;
+  notebook?: string;
+}
+
+const RED = 'var(--red)';
+
+/**
+ * Where both labs meet, built up by Next (owner, 9 Nov: "I like the neither lab"): the rule alone cannot decide; the history alone
+ * cannot decide; together they can; then the AI agent's call.
+ */
+export function Neither({ kicker, message, notebook }: NeitherProps) {
+  const L = useBuild();
+  const col = (i: number, title: string, ok: boolean, who: string, l1: ReactNode, l2: ReactNode) => {
+    const c = ok ? 'var(--teal)' : G_MID;
+    return (
+      <Reveal show={L >= i} testId={`meet-${i}`} style={{ flex: 1, display: 'flex' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '24px 22px', borderRadius: 22, background: 'var(--panel-strong)', border: `3px solid ${c}`, textAlign: 'center' }}>
+          <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '0.1em', color: c }}>{title}</div>
+          <div style={{ width: 72, height: 72, borderRadius: 36, background: ok ? 'var(--teal)' : 'rgba(138,145,156,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {ok ? (
+              <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4 10-11" /></svg>
+            ) : (
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke={G_MID} strokeWidth="3" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+            )}
+          </div>
+          <div style={{ fontSize: 31, fontWeight: 700, lineHeight: 1.18 }}>{who}</div>
+          <div style={{ fontSize: 25, lineHeight: 1.3 }}>{l1}</div>
+          <div style={{ fontSize: 25, lineHeight: 1.3, color: 'var(--ink-dim)' }}>{l2}</div>
+        </div>
+      </Reveal>
+    );
+  };
+  const sign = (i: number, t: string) => (
+    <Reveal show={L >= i} style={{ flex: 'none', alignSelf: 'center', fontSize: 54, fontWeight: 700 }}>
+      {t}
+    </Reveal>
+  );
+  return (
+    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="labs-neither">
+      <Fill>
+        <div data-neither style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 16, alignItems: 'stretch' }}>
+            {col(0, 'THE RULE ALONE · LAB 2', false, '“The limit is 25%.”', <>But what is <b>this</b> bridge’s number?</>, 'Cannot decide.')}
+            {sign(1, '+')}
+            {col(1, 'THE HISTORY ALONE · LAB 3', false, '“Mercer found about 25%.”', <>But what is the <b>limit</b>?</>, 'Cannot decide.')}
+            {sign(2, '=')}
+            {col(2, 'TOGETHER', true, '“Over 25% needs a review, and it is about 25%.”', 'Now the AI agent can decide.', <b style={{ color: 'var(--teal)' }}>Both labs are needed.</b>)}
+          </div>
+          <Reveal show={L >= 3} testId="call" style={{ flex: 'none' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 22, padding: '16px 28px', borderRadius: 20, background: 'var(--panel-strong)', border: '3px solid var(--teal)' }}>
+              <img src={vancePortrait} alt="Vance" style={{ width: 84, height: 84, borderRadius: '50%', objectFit: 'cover', objectPosition: '50% 15%', border: '3px solid #fff', flex: 'none' }} />
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--teal)' }}>THE AI AGENT’S CALL, WITH VANCE</div>
+                <div style={{ fontSize: 38, fontWeight: 700 }}>Order an immediate structural review.</div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </Fill>
+    </WidePanel>
+  );
+}

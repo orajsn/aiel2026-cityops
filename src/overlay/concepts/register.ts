@@ -27,7 +27,7 @@ import { Day1, Day2, LabsMeet } from './BackOnBridge';
 import { Lab2Recap, Lab3Recap } from './Recap';
 import { AllLabs } from './AllLabs';
 import { ThreeLabs } from './ThreeLabs';
-import { Hook, WhyForgot, WhereItGoes, GlassBridge, Handover } from './Lab3Opening';
+import { Hook, WhyForgot, WhereItGoes, GlassBridge, Handover, Neither } from './Lab3Opening';
 
 registerOverlay('TitleCard', TitleCard);
 registerOverlay('PinLegend', PinLegend);
@@ -53,6 +53,7 @@ registerOverlay('WhyForgot', WhyForgot);
 registerOverlay('WhereItGoes', WhereItGoes);
 registerOverlay('GlassBridge', GlassBridge);
 registerOverlay('Handover', Handover);
+registerOverlay('Neither', Neither);
 registerOverlay('Discipline', Discipline);
 registerOverlay('WhoFixesWhat', WhoFixesWhat);
 registerOverlay('DeskCabinet', DeskCabinet);

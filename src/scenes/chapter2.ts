@@ -7,7 +7,7 @@ import type { GlassProps } from '../overlay/concepts/Glass';
 import type { DisciplineProps, WhoFixesWhatProps } from '../overlay/concepts/Engineering';
 import type { DeskCabinetProps, ThreeKindsProps, SharedShelfProps } from '../overlay/concepts/MemoryKinds';
 import type { MemoryLoopProps } from '../overlay/concepts/MemoryLoop';
-import type { HookProps, WhyForgotProps, WhereItGoesProps, GlassBridgeProps, HandoverProps } from '../overlay/concepts/Lab3Opening';
+import type { NeitherProps, HookProps, WhyForgotProps, WhereItGoesProps, GlassBridgeProps, HandoverProps } from '../overlay/concepts/Lab3Opening';
 import type { HandsOnProps, ScopeProps } from '../overlay/concepts/HandsOn';
 import type { CopilotTurnProps } from '../overlay/concepts/HandsOn2';
 import type { BothLabsProps, EndingProps, WithWithoutProps } from '../overlay/concepts/Ending';
@@ -222,7 +222,7 @@ const b215b = atRust('3.15b', 'The four failures, solved', 'FailuresSolved', { k
 // 3.15c · the full memory map, moved from the start of the lab (owner, 28 Oct): after the hands-on its layers mean something (notebook cell 90)
 const b215c = atRust('3.15c', 'What you built', 'MemoryMap', { kicker: 'Kinds of memory', step: 5, built: true, message: 'The full memory map: **what you actually built** today.' } satisfies MemoryMapProps);
 
-const b216 = atRust('3.16', 'Where both labs meet', 'LabsMeet', { kicker: 'Where both labs meet', step: 1, message: 'This afternoon the agent had **the rule**. Now it has **the history**.' }, 'meet');
+const b216 = atRust('3.16', 'Where both labs meet', 'Neither', { kicker: 'Where both labs meet', message: 'Neither lab can make the call **alone**.' } satisfies NeitherProps);
 const b216a = atRust('3.16a', 'Together they make the call', 'LabsMeet', { kicker: 'Where both labs meet', step: 2, message: 'Together they **make the call**.' }, 'meet');
 
 // 3.17 · the Lab 3 recap (owner approved Flow317V2, 29 Oct); the quiz moved to 3.18
@@ -271,7 +271,7 @@ const b218: SceneDef = {
  * replaces 3.6 to 3.14a, which stay here hidden (LAB3_CUT): taking an id out of the set brings that page back.
  */
 const bMap = atOps('3.6m', 'The code, on one map', 'CodeMap', {});
-export const LAB3_CUT = new Set(['3.15b', '3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b', '3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a']);
+export const LAB3_CUT = new Set(['3.15b', '3.16a', '3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b', '3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a']);
 
 export const LAB3_ALL: SceneDef[] = [
   b20,

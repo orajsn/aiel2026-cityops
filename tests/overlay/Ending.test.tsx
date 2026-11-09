@@ -28,8 +28,8 @@ test('pages 26 to 29 render their parts', () => {
   expect(t.querySelector('[data-quiz]')).not.toBeNull();
 });
 
-test('Back on the bridge: Day 1, Day 2 and both labs meet each build in two steps on one panel (owner, 29 Oct)', () => {
-  for (const [a, b, overlay] of [['3.13', '3.13a', 'Day1'], ['3.14', '3.14a', 'Day2'], ['3.16', '3.16a', 'LabsMeet']]) {
+test('Back on the bridge: Day 1 and Day 2 each build in two steps on one panel (owner, 29 Oct)', () => {
+  for (const [a, b, overlay] of [['3.13', '3.13a', 'Day1'], ['3.14', '3.14a', 'Day2']]) {
     const s1 = chapter2.find((s) => s.id === a)!;
     const s2 = chapter2.find((s) => s.id === b)!;
     expect([s1.overlay, s2.overlay]).toEqual([overlay, overlay]);
