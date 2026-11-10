@@ -61,7 +61,7 @@ test('the code map shows each of its steps as a sub-page with its own preview', 
     expect(within(card).getByRole('img').getAttribute('src')).toBe(`./thumbs/3.6m_${k + 1}.jpg`);
     expect(within(card).getByText(stepName(m))).toBeInTheDocument();
   });
-  expect(screen.getAllByRole('button', { name: new RegExp(`^Lab 3 · Agent Memory ${pageLabel('3.6m')}[a-r]? `, 'i') }).length).toBe(MAP_STEPS.length);
+  expect(screen.getAllByRole('button', { name: new RegExp(`^Lab 3 · Agent Memory ${pageLabel('3.6m')}[a-z]? `, 'i') }).length).toBe(MAP_STEPS.length);
 });
 
 test('clicking a step of the code map opens that step; the open step is the current one', () => {

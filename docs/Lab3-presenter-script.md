@@ -310,7 +310,7 @@ Once it is open, we will open the notebook together and watch each part work, on
 
 ---
 
-## 11 · The code, on one map  (`3.6m`) · 19 stops, one script each
+## 11 · The code, on one map  (`3.6m`) · 21 stops, one script each
 
 Every click is its own page (11, 11a, 11b ...), with its own script in the script manager (`3.6m`, `3.6m.1` ...). Thai first, then English.
 
@@ -578,7 +578,27 @@ assert เช็กว่าได้ใบรับกลับมาอย่�
 
 So how does a report get filed? Two lines do it: build the content string, then call add_messages_async. **Saving the message is also what starts the extractor.**
 
-### 11k · 3c · Finding a memory  (`3.6m.11`) · stop 11
+### 11k · 3b · Peek at the tables  (`3.6m.11`) · stop 11
+
+#### ไทย
+
+ลองเปิดตู้ทั้งสองใบดูครับ ฟังก์ชันเล็ก ๆ ชื่อ peek_sdk_tables พิมพ์แถวของ CITY_MESSAGE กับ CITY_MEMORY ออกมาสำหรับแฟ้มหนึ่งเล่ม ที่เห็นตรงนี้คือแฟ้มทดสอบ smoke_thread ข้อความหนึ่งแถวคือต้นฉบับคำต่อคำ และถัดลงมาคือบัตรความจำสองใบที่ extractor เขียนจากข้อความนั้น
+
+#### English
+
+Let us open both tables and look inside. A small helper called peek_sdk_tables prints the rows of CITY_MESSAGE and CITY_MEMORY for one thread. Here it is the test thread: one message, **word for word**, and below it the two memory cards the extractor wrote from it.
+
+### 11l · 3b · Run four reports  (`3.6m.12`) · stop 12
+
+#### ไทย
+
+ทีนี้ลองกับรายงานหลายฉบับครับ โค้ดสุ่มรายงานมาสี่ฉบับ มีทั้งงานปกติ คำเตือน และงานวิกฤต แล้วยื่นทีละฉบับเข้าแฟ้ม inspect_demo ด้วย report_event ตัวเดิม ทุกฉบับถูกเก็บคำต่อคำ และ extractor อ่านแล้วเขียนบัตรให้เหมือนกัน
+
+#### English
+
+Now we try it on more reports. The code samples four reports, a mix of routine, warning and critical, and files each one into the inspect_demo thread with the **same report_event call**. Each is saved word for word, and the extractor writes its cards.
+
+### 11m · 3c · Finding a memory  (`3.6m.13`) · stop 13
 
 #### ไทย
 
@@ -588,7 +608,7 @@ So how does a report get filed? Two lines do it: build the content string, then 
 
 Part 3c. Why did this search come back empty? Because **a memory belongs to whoever wrote it**. Search with no name and you get nothing. Give the right name, and the cards light up.
 
-### 11l · 4a · The official record  (`3.6m.12`) · stop 12
+### 11n · 4a · The official record  (`3.6m.14`) · stop 14
 
 #### ไทย
 
@@ -598,7 +618,7 @@ Part 4 ครับ ถ้า finding ไม่ใช่ความจำ แ�
 
 Part 4. What is a finding, if it is not a memory? A memory is what the AI agent noticed. **A finding is what a person signed.** It gets its own table, and its description becomes numbers too.
 
-### 11m · 4b · Search with walls  (`3.6m.13`) · stop 13
+### 11o · 4b · Search with walls  (`3.6m.15`) · stop 15
 
 #### ไทย
 
@@ -608,7 +628,7 @@ Part 4. What is a finding, if it is not a memory? A memory is what the AI agent 
 
 Now we search the findings. We want the nearest in meaning, but only for this bridge. One SQL statement does both: the closest in meaning, **inside the walls** of this asset and this category.
 
-### 11n · 5 · Who sees what  (`3.6m.14`) · stop 14
+### 11p · 5 · Who sees what  (`3.6m.16`) · stop 16
 
 #### ไทย
 
@@ -618,7 +638,7 @@ Part 5 ครับ ทำไม Vance อ่านโน้ตส่วนต�
 
 Part 5. Why can Vance not read Mercer’s private note? Each inspector has a private thread. What the extractor learns goes on a shelf for the asset. And **the database enforces this**, not the AI agent.
 
-### 11o · 6 · One whole turn  (`3.6m.15`) · stop 15
+### 11q · 6 · One whole turn  (`3.6m.17`) · stop 17
 
 #### ไทย
 
@@ -628,7 +648,7 @@ Part 6 คือหนึ่งเทิร์นเต็ม ๆ ครับ A
 
 Part 6 is one whole turn. What does the AI agent actually read? Two lines fetch it: its context card and the similar findings. Then it all goes into one prompt: ask, then save.
 
-### 11p · Day 1a · Day 1, step 1: Mercer asks  (`3.6m.16`) · stop 16
+### 11r · Day 1a · Day 1, step 1: Mercer asks  (`3.6m.18`) · stop 18
 
 #### ไทย
 
@@ -638,7 +658,7 @@ Part 6 is one whole turn. What does the AI agent actually read? Two lines fetch 
 
 Now the story, Day 1. Mercer calls call_copilot for diagnostic help. She types what she sees on Harbor Bridge. The AI agent searches what is already known and reasons about it. Her turn is saved, and the extractor keeps what matters.
 
-### 11q · Day 1b · Day 1, step 2: Mercer records  (`3.6m.17`) · stop 17
+### 11s · Day 1b · Day 1, step 2: Mercer records  (`3.6m.19`) · stop 19
 
 #### ไทย
 
@@ -648,7 +668,7 @@ Now the story, Day 1. Mercer calls call_copilot for diagnostic help. She types w
 
 Once Mercer is sure, she signs the finding herself with log_finding. That is a separate path: **one row in the official record**.
 
-### 11r · Day N · Later: Vance  (`3.6m.18`) · stop 18
+### 11t · Day N · Later: Vance  (`3.6m.20`) · stop 20
 
 #### ไทย
 

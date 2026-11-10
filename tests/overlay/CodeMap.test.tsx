@@ -10,8 +10,8 @@ const go = (n: number) => act(() => useDrawerStore.setState(n === 0 ? { open: fa
 afterEach(() => act(() => useDrawerStore.setState({ open: false, focus: 0 })));
 
 test('the page opens on the whole map, then one click per stop', () => {
-  expect(MAP_STEPS).toHaveLength(19);
-  expect(focusStepCount('3.6m')).toBe(18);
+  expect(MAP_STEPS).toHaveLength(21);
+  expect(focusStepCount('3.6m')).toBe(20);
 });
 
 test('every step after the map finds its lines in the notebook, and its key lines sit in its section', () => {
@@ -40,7 +40,7 @@ test('the first step is the whole map with nothing dimmed; Next lights the node 
 test('once the camera arrives only the section stays: key lines lit, the rest faded', () => {
   vi.useFakeTimers();
   const { container } = render(<CodeMap />);
-  go(11);
+  go(13);
   act(() => vi.advanceTimersByTime(1400));
   const key = [...container.querySelectorAll('.nr.is-key')].map((e) => e.textContent);
   expect(key.join('')).toContain('user_id="inspector_demo"');
@@ -50,14 +50,14 @@ test('once the camera arrives only the section stays: key lines lit, the rest fa
 
 test('the two days show their own inspector and only their own path', () => {
   const { container } = render(<CodeMap />);
-  go(16);
+  go(18);
   expect(container.querySelector('[data-who]')!.getAttribute('data-who')).toBe('mercer');
   expect(container.querySelector('[data-line="confirm"]')!.getAttribute('data-lit')).toBeNull();
-  go(17);
+  go(19);
   expect(container.querySelector('[data-who]')!.getAttribute('data-who')).toBe('mercer');
   expect(container.querySelector('[data-line="confirm"]')!.getAttribute('data-lit')).toBe('true');
   expect(container.querySelector('[data-line="read"]')!.getAttribute('data-lit')).toBeNull();
-  go(18);
+  go(20);
   expect(container.querySelector('[data-who]')!.getAttribute('data-who')).toBe('vance');
   expect(container.querySelector('[data-line="read"]')!.getAttribute('data-lit')).toBe('true');
   expect(container.querySelector('[data-line="confirm"]')!.getAttribute('data-lit')).toBeNull();
@@ -74,7 +74,7 @@ test('the map and the panel number by Part, and never by TODO', () => {
   const tags = container.querySelector('.cm__tags')!.textContent!;
   expect(tags).toContain('PART 2');
   expect(tags).not.toMatch(/TODO|STEP/);
-  go(14);
+  go(16);
   expect(container.querySelector('.cm__tags')!.textContent).toBe('PART 5');
 });
 
@@ -158,8 +158,8 @@ test('the window draws cells the way JupyterLab does, without changing their tex
 
 // owner, 4 Nov: Part 3 is 3a CITY_ASSET (the code loads the asset registry), 3b the extraction (its picture first), 3c CITY_MEMORY
 test('Part 3 is three parts: the assets, then the extraction with its picture first, then the memory', () => {
-  expect(MAP_STEPS.slice(8, 12).map((s) => s.rail)).toEqual(['3a', '3b', '3b', '3c']);
-  expect(MAP_STEPS.slice(8, 12).map((s) => s.tag)).toEqual(['PART 3a', 'PART 3b', 'PART 3b', 'PART 3c']);
+  expect(MAP_STEPS.slice(8, 14).map((s) => s.rail)).toEqual(['3a', '3b', '3b', '3b', '3b', '3c']);
+  expect(MAP_STEPS.slice(8, 14).map((s) => s.tag)).toEqual(['PART 3a', 'PART 3b', 'PART 3b', 'PART 3b', 'PART 3b', 'PART 3c']);
   expect(MAP_STEPS[8].nodes).toEqual(['asset']);
   expect(MAP_STEPS[9].guide).toBe('extract');
   expect(MAP_STEPS[10].guide).toBeUndefined();
@@ -265,10 +265,10 @@ test('each click lights only its own part: the database lane for Part 1, then on
   expect(container.querySelector('[data-node="memory"]')!.classList.contains('is-off')).toBe(true);
   expect(MAP_STEPS[10].cam.s).toBeGreaterThan(1);
   // Part 5: only the scope; Part 6: only call_copilot, zoomed
-  go(14);
+  go(16);
   expect(lit()).toEqual(['scope']);
-  go(15);
+  go(17);
   expect(lit()).toEqual(['copilot']);
-  expect(MAP_STEPS[15].cam.s).toBeGreaterThan(1);
+  expect(MAP_STEPS[17].cam.s).toBeGreaterThan(1);
 });
 
