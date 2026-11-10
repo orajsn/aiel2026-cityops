@@ -5,6 +5,7 @@ import { LineIcon, type IconName } from './icons';
 import { Fill, FitBox } from './Fill';
 import vancePortrait from '../../assets/portraits/vance.png';
 import { useDrawerStore } from '../../engine/presentation';
+import adbLogo from '../../assets/oracle/autonomous-ai-database.png';
 
 export interface GlassProps {
   kicker: string;
@@ -434,13 +435,22 @@ function FourGlasses() {
           );
         })}
       </div>
-      <div data-legend="glass" style={{ flex: 'none', display: 'flex', gap: 48, marginTop: 20, fontSize: 21, color: 'var(--ink-dim)' }}>
+      {/* the last click (owner, 10 Nov): a tease, the four problems get solved with Oracle AI Database in the lab */}
+      <div style={{ flex: 'none', position: 'relative', height: 84, marginTop: 14 }}>
+      <motion.div data-teaser="glass" initial={false} animate={{ opacity: step >= 4 ? 1 : 0, y: step >= 4 ? 0 : 10 }} transition={{ duration: 0.5, ease: EASE }} style={{ position: 'absolute', inset: 0, borderRadius: 18, background: 'var(--teal)', color: '#fff', display: 'flex', alignItems: 'center', paddingLeft: 110, paddingRight: 24, fontSize: 30, fontWeight: 700, boxShadow: '0 6px 0 rgba(15,85,98,0.35)' }}>
+        <span style={{ position: 'absolute', left: 12, top: 4, width: 76, height: 76, borderRadius: '50%', background: '#fff', border: '4px solid var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 10px rgba(11,14,20,0.25)' }}>
+          <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ width: 62, height: 62, objectFit: 'contain' }} />
+        </span>
+        <span>We will solve <u style={{ textDecorationThickness: 3, textUnderlineOffset: 5 }}>all four</u> with Oracle AI Database, in the lab.</span>
+      </motion.div>
+      <div data-legend="glass" style={{ position: 'absolute', left: 0, top: 22, display: 'flex', gap: 48, fontSize: 21, color: 'var(--ink-dim)', opacity: step >= 4 ? 0 : 1, transition: 'opacity 0.4s' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <i style={{ width: 24, height: 18, borderRadius: 3, background: GREY_FILL, border: `1.5px solid ${GREY_LINE}` }} /> grey = noise and old turns
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <i style={{ width: 24, height: 18, borderRadius: 3, background: TEAL_FILL, border: '2px solid var(--teal)' }} /> teal = what Vance needs
         </span>
+      </div>
       </div>
     </Fill>
   );
