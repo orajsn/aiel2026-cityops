@@ -79,6 +79,25 @@ export const MAP_STEPS: MapStep[] = [
 ];
 
 /** a step's name in the page overview: its button and what it is about; the picture steps are told apart by their question */
+/**
+ * The notebook part's name and its engineering discipline, shown after the PART badge (a colleague's review, 10 Nov: "add notebook part name and
+ * classification after the Part #"). Keyed by the rail button; Part 1, Part 0 and the days have none.
+ */
+const EMBEDDER = { name: 'Embedder and SDK', kind: 'Supporting infrastructure + memory configuration' };
+const EXTRACT = { name: 'Auto-extraction', kind: 'Memory engineering' };
+const SIMILAR = { name: 'Similar-finding search', kind: 'Context engineering' };
+export const PART_KIND: Record<string, { name: string; kind: string }> = {
+  '2a': EMBEDDER,
+  '2b': EMBEDDER,
+  '3a': EXTRACT,
+  '3b': EXTRACT,
+  '3c': EXTRACT,
+  '4a': SIMILAR,
+  '4b': SIMILAR,
+  '5': { name: 'Scoping', kind: 'Memory scope + context filtering' },
+  '6': { name: 'Execution flow', kind: 'Basic harness engineering' },
+};
+
 export const stepName = (m: MapStep): string => (m.guide ? `${m.rail} · ${m.ask}` : m.title.startsWith(m.rail) ? m.title : `${m.rail} · ${m.title}`);
 
 export const NB_FILE = completeNotebook.file;

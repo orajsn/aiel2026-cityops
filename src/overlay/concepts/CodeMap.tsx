@@ -1,5 +1,5 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { MAP_STEPS, NB_FILE, NB_ROWS, stepLines, type MapLine, type MapNode, type MapStep, type NbRow } from '../../content/lab3Map';
+import { MAP_STEPS, NB_FILE, PART_KIND, NB_ROWS, stepLines, type MapLine, type MapNode, type MapStep, type NbRow } from '../../content/lab3Map';
 import { useDrawerStore } from '../../engine/presentation';
 import { useUiStore } from '../../engine/ui';
 import { ModelNet, Net } from './lab1/parts';
@@ -256,6 +256,18 @@ const SPOTS = {
   run: { x: 0.345, y: 0.145, w: 0.022, h: 0.068, label: 'Run' },
 } as const;
 
+/** the notebook part's name and its engineering discipline, after the PART badge (PART_KIND in lab3Map.ts) */
+function PartKind({ step }: { step: MapStep }) {
+  const k = PART_KIND[step.rail];
+  if (!k) return null;
+  return (
+    <>
+      <span className="cm__pname" data-testid="code-map-part-name">{k.name}</span>
+      <span className="cm__pkind" data-testid="code-map-part-kind">{k.kind}</span>
+    </>
+  );
+}
+
 /** Part 0: the real JupyterLab screen, dimmed but for the one thing this click is about */
 function Guide({ step, lit }: { step: MapStep; lit: boolean }) {
   const figure = step.guide === 'extract';
@@ -265,6 +277,7 @@ function Guide({ step, lit }: { step: MapStep; lit: boolean }) {
       <div className="cm__say cm__fade" style={{ opacity: lit ? 1 : 0 }}>
         <div className="cm__tags">
           <span className="cm__tag">{step.tag}</span>
+          <PartKind step={step} />
         </div>
         <div className="cm__ask">{step.ask}</div>
         <div className="cm__plain">{step.plain}</div>
@@ -366,6 +379,7 @@ export function CodeMap() {
             <div className="cm__say cm__fade" style={{ opacity: lit ? 1 : 0 }}>
               <div className="cm__tags">
                 {step.tag && <span className="cm__tag">{step.tag}</span>}
+                <PartKind step={step} />
               </div>
               <div className="cm__ask" data-testid="code-map-ask">{step.ask}</div>
               <div className="cm__plain">{step.plain}</div>

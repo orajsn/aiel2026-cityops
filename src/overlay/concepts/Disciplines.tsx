@@ -1,0 +1,87 @@
+import { motion } from 'motion/react';
+import type { CSSProperties, ReactNode } from 'react';
+import { EASE, WidePanel } from './WidePanel';
+import { Fill } from './lab1/parts';
+import { useBuild } from './Lab3Opening';
+
+/**
+ * 3.5e · The three engineering disciplines (a colleague's review of the Lab 3 material, 10 Nov; her diagram): memory retains evidence,
+ * context selects the model's input, the harness coordinates execution and recovery. Built up one part per Next (PAGE_STEPS):
+ * the harness, then memory, then context, then the runtime with the loop that writes back. Context engineering is the page's one red thing.
+ */
+
+export interface DisciplinesProps {
+  kicker: string;
+  message: string;
+  notebook?: string;
+}
+
+const W = 1100;
+const H = 672;
+const INK = 'var(--ink)';
+const DIM = 'var(--ink-dim)';
+const LINE = '#4a5a6a';
+const RED = 'var(--red)';
+
+const mono: CSSProperties = { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' };
+
+function Card({ x, y, w, h, show, tone, tag, title, ask, lines, failure, testId }: { x: number; y: number; w: number; h: number; show: boolean; tone: 'white' | 'grey' | 'red'; tag: string; title: string; ask?: string; lines: string[]; failure?: string; testId: string }) {
+  const bg = tone === 'grey' ? 'rgba(138,145,156,0.16)' : tone === 'red' ? 'rgba(199,70,52,0.07)' : 'var(--panel-strong)';
+  const border = tone === 'red' ? RED : tone === 'grey' ? '#7b8794' : INK;
+  return (
+    <motion.div data-discipline={testId} data-shown={show} initial={false} animate={{ opacity: show ? 1 : 0, y: show ? 0 : 10 }} transition={{ duration: 0.5, ease: EASE }} style={{ position: 'absolute', left: x, top: y, width: w, height: h, boxSizing: 'border-box', padding: '16px 18px', borderRadius: 10, background: bg, border: `2px solid ${border}`, display: 'flex', flexDirection: 'column', gap: 8, overflow: 'hidden' }}>
+      <span style={{ ...mono, alignSelf: 'flex-start', padding: '2px 8px', borderRadius: 4, border: '1px solid rgba(127,127,127,0.5)', background: 'rgba(127,127,127,0.1)', color: DIM }}>{tag}</span>
+      <div style={{ fontSize: 22, fontWeight: 700, color: INK, lineHeight: 1.2 }}>{title}</div>
+      {ask && <div style={{ fontSize: 16, fontWeight: 600, color: INK, lineHeight: 1.3 }}>{ask}</div>}
+      <div style={{ fontSize: 14.5, color: INK, lineHeight: 1.45, display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {lines.map((l) => (
+          <span key={l}>{l}</span>
+        ))}
+      </div>
+      {failure && (
+        <div style={{ marginTop: 'auto', fontSize: 14, lineHeight: 1.4, color: DIM }}>
+          <div style={{ ...mono, marginBottom: 3 }}>Typical failure</div>
+          {failure}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+function Arrow({ show, d, label, lx, ly, dashed, testId }: { show: boolean; d: string; label: string; lx: number; ly: number; dashed?: boolean; testId: string }) {
+  return (
+    <motion.g data-arrow={testId} data-shown={show} initial={false} animate={{ opacity: show ? 1 : 0 }} transition={{ duration: 0.5, ease: EASE }}>
+      <path d={d} fill="none" stroke={LINE} strokeWidth={2} strokeDasharray={dashed ? '6 5' : undefined} markerEnd="url(#arrow-head)" />
+      <text x={lx} y={ly} fill={DIM} fontSize={11} fontFamily="JetBrains Mono, monospace" letterSpacing="1.1">{label}</text>
+    </motion.g>
+  );
+}
+
+export function Disciplines({ kicker, message, notebook }: DisciplinesProps) {
+  const L = useBuild();
+  return (
+    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="disciplines" kickerColor="var(--teal)">
+      <Fill max={1.4}>
+        <div data-disciplines style={{ position: 'relative', width: W, height: H, margin: '0 auto', flex: 'none' }}>
+          <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ position: 'absolute', inset: 0, overflow: 'visible' }} aria-hidden="true">
+            <defs>
+              <marker id="arrow-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                <path d="M0 0L10 5L0 10z" fill={LINE} />
+              </marker>
+            </defs>
+            <Arrow show={L >= 1} testId="read-write" d="M160 190 V254" label="READ / WRITE" lx={172} ly={226} />
+            <Arrow show={L >= 2} testId="assemble" d="M570 190 V254" label="ASSEMBLE" lx={582} ly={226} />
+            <Arrow show={L >= 3} testId="run-loop" d="M960 190 V320" label="RUN LOOP" lx={972} ly={262} />
+            <Arrow show={L >= 2} testId="retrieve" d="M330 440 H410" label="RETRIEVE" lx={338} ly={428} />
+            <Arrow show={L >= 3} testId="model-input" d="M730 420 H830" label="MODEL INPUT" lx={737} ly={408} />
+            <Arrow show={L >= 3} testId="write-policy" dashed d="M965 500 V642 H160 V596" label="WRITE POLICY" lx={500} ly={632} />
+          </svg>
+          <Card testId="harness" show tone="white" x={0} y={0} w={W} h={190} tag="Orchestration" title="Harness engineering" ask="What makes the process execute and recover reliably?" lines={['Model/tool loop · read/write triggers · permissions · checkpoints · retries · budgets · validation · observability']} failure="Retrieval skipped · write lost · tool action repeated · task declared complete prematurely" />
+          <Card testId="memory" show={L >= 1} tone="grey" x={0} y={256} w={320} h={338} tag="Retained state" title="Memory engineering" ask="What should persist, and how should it change?" lines={['Representation · provenance (source and history)', 'Storage · indexing · scope · consolidation', 'Versioning · correction · retention · deletion']} failure="A preference is lost, incorrectly extracted, stale, or attributed to the wrong person." />
+          <Card testId="context" show={L >= 2} tone="red" x={410} y={256} w={320} h={338} tag="Current input" title="Context engineering" ask="What information is needed for this inference?" lines={['Query construction · retrieval · filtering', 'Ranking · deduplication · compression', 'Evidence expansion · token allocation']} failure="The right fact exists but is absent, buried, or stripped of an essential qualifier." />
+          <Card testId="runtime" show={L >= 3} tone="white" x={830} y={322} w={270} h={178} tag="Runtime" title="Model + tools" lines={['Reason · call tools', 'Return results to the loop']} />
+        </div>
+      </Fill>
+    </WidePanel>
+  );
+}

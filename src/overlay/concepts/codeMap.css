@@ -63,6 +63,8 @@
 .cm__side.is-away { opacity: 0; transform: translateX(60px); pointer-events: none; }
 .cm__say { flex: none; height: 176px; display: flex; flex-direction: column; gap: 8px; }
 .cm__tags { display: flex; gap: 8px; align-items: center; }
+.cm__pname { font-size: 22px; font-weight: 700; color: #1f2a33; }
+.cm__pkind { display: inline-flex; align-items: center; height: 26px; padding: 0 12px; border-radius: 13px; border: 1.5px solid #1B8A9C; color: #146f7f; font-size: 16px; font-weight: 700; white-space: nowrap; }
 .cm__ask { font-size: 34px; line-height: 42px; font-weight: 700; text-wrap: balance; }
 .cm__plain { font-size: 21px; line-height: 30px; color: #3b4752; }
 .cm__cap { position: absolute; left: 110px; top: 690px; width: 1604px; display: flex; flex-direction: column; gap: 4px; }

@@ -75,7 +75,9 @@ test('the map and the panel number by Part, and never by TODO', () => {
   expect(tags).toContain('PART 2');
   expect(tags).not.toMatch(/TODO|STEP/);
   go(16);
-  expect(container.querySelector('.cm__tags')!.textContent).toBe('PART 5');
+  expect(container.querySelector('.cm__tags .cm__tag')!.textContent).toBe('PART 5');
+  expect(container.querySelector('[data-testid="code-map-part-name"]')!.textContent).toBe('Scoping');
+  expect(container.querySelector('[data-testid="code-map-part-kind"]')!.textContent).toBe('Memory scope + context filtering');
 });
 
 // owner, 4 Nov: Part 1 highlights the settings, then the connection that proves it worked
@@ -272,3 +274,20 @@ test('each click lights only its own part: the database lane for Part 1, then on
   expect(MAP_STEPS[17].cam.s).toBeGreaterThan(1);
 });
 
+
+// a colleague's review, 10 Nov: the notebook part's name and its engineering discipline sit after the PART badge
+test('each notebook part names itself and its discipline after the PART badge', () => {
+  const { container } = render(<CodeMap />);
+  const at = (rail: string) => MAP_STEPS.findIndex((s) => s.rail === rail);
+  const read = () => [container.querySelector('[data-testid="code-map-part-name"]')?.textContent ?? null, container.querySelector('[data-testid="code-map-part-kind"]')?.textContent ?? null];
+  go(at('2a'));
+  expect(read()).toEqual(['Embedder and SDK', 'Supporting infrastructure + memory configuration']);
+  go(at('3c'));
+  expect(read()).toEqual(['Auto-extraction', 'Memory engineering']);
+  go(at('4b'));
+  expect(read()).toEqual(['Similar-finding search', 'Context engineering']);
+  go(at('6'));
+  expect(read()).toEqual(['Execution flow', 'Basic harness engineering']);
+  go(at('1a'));
+  expect(read()).toEqual([null, null]);
+});
