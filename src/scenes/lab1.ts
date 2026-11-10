@@ -80,6 +80,7 @@ export const lab1: SceneDef[] = [
   atBridge('1.4', 'What the specifications require', 'L1Specs', { kicker: 'Hands-on 1 · Unstructured RAG', message: 'Put the specification in a vector store, and the answers **cite it**.' }),
   atBridge('1.5', 'Which supplier is ready', 'L1Suppliers', { kicker: 'Hands-on 2 · Semantic Store', message: 'Ask in plain words. Get **governed data**, for this project only.' }),
   atBridge('1.6a', 'Launch the app', 'L1Launch', { kicker: 'Hands-on 3 · Launch the app', message: 'Launch the packaged app **on OCI**. No key is stored.' }),
+  atBridge('1.6b', 'Ask the app about the PDF', 'L1AskPdf', { kicker: 'Hands-on 3 · Test the app with a question', message: 'The user asks. The AI app **reads the PDF** and answers.' }),
   atBridge('1.6', 'A photo from the site', 'L1SitePhoto', { kicker: 'Hands-on 3 · Test the app with a photo', message: 'A photo shows **what is visible**. It cannot prove what is safe.' }),
   atBridge('1.7', 'Does every question need the big model?', 'L1Baseline', { kicker: 'Hands-on 4 · First, the baseline', message: 'Today, **every request** goes to the **multimodal model**.' }),
   atBridge('1.8', 'Model routing', 'L1Routing', { kicker: 'Hands-on 4 · Model routing', message: 'Text goes to the **lower-cost model**. Photos stay on the **multimodal model**.' }),
@@ -99,7 +100,7 @@ export const lab1: SceneDef[] = [
 
 export const LAB1_SECTIONS: Section[] = [
   { chapter: 3, name: 'The repair and its data', pages: ['1.0', '1.1', '1.2', '1.3', '1.3p1', '1.3p2', '1.3p3', '1.3p4', '1.3s1', '1.3s2', '1.3s3', '1.3s4', '1.3a'] },
-  { chapter: 3, name: 'One assistant, step by step', pages: ['1.4', '1.5', '1.6a', '1.6'] },
+  { chapter: 3, name: 'One assistant, step by step', pages: ['1.4', '1.5', '1.6a', '1.6b', '1.6'] },
   { chapter: 3, name: 'The right model, the right rules', pages: ['1.7', '1.8', '1.9'] },
   { chapter: 3, name: 'Closing Lab 1', pages: ['1.10'] },
 ];
@@ -122,6 +123,7 @@ export const LAB1_SCRIPT: Record<string, string> = {
   '1.4': 'Hands-on 1. The specification PDF waits in Object Storage. A data sync connector reads it into a vector store, which cuts it into chunks and embeddings. The assistant searches it with file_search, and every answer cites the specification.',
   '1.5': 'Hands-on 2. The project manager asks which supplier to use. The semantic store knows what the tables mean, NL2SQL writes the query, the app checks it stays inside this project, and the ADB MCP Server fetches the answer: status, fit score, risk level and why.',
   '1.6a': 'Hands-on 3 launches the packaged app on OCI Container Instances from Cloud Shell. OCI hands it short-lived credentials through a resource principal, so no key sits in the image. The app opens with the same three stores from Hands-on 1 and 2.',
+  '1.6b': 'Now ask the app a question. The user types what the specification requires for the repair. The AI app goes into the PDF, reads it, and answers the user from what it read: surface preparation, materials, inspection and acceptance. The answer comes from the PDF, not from what the model remembers.',
   '1.6': 'Now a photo from the site: a structural-steel delivery. The assistant says what it can see, and keeps that apart from what it is only assuming. A photo cannot prove the grade, the certificate or that the steel is safe; that comes from governed data and the engineer.',
   '1.7': 'Before we change anything, we record a baseline. Right now every request, text or photo, goes to the same multimodal model, and the runtime bar says so each time. Note the model and the rough response time. Then ask: do text questions need a model that can see?',
   '1.8': 'Hands-on 4. One check decides the model: does the request carry an image? Text-only goes to the lower-cost model, photos stay on the multimodal one, and the runtime bar shows which answered. Response time is not cost, so we compare models, not claim a saving.',

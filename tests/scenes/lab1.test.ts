@@ -47,8 +47,8 @@ test('Lab 1 names its exercises Hands-on 1 to 5, never Lab 2 or Lab 3 (only its 
 
 // owner, 29 Oct (V2 from the real workshop guide): two new pages, Meet the app and Two ways to launch
 test('Lab 1 runs in the V2 order and ends on its recap (1.10), all at the bridge, each page with its own registered panel', () => {
-  expect(lab1.map((s) => s.id)).toEqual(['1.0', '1.1', '1.2', '1.3', '1.3p1', '1.3p2', '1.3p3', '1.3p4', '1.3s1', '1.3s2', '1.3s3', '1.3s4', '1.3a', '1.4', '1.5', '1.6a', '1.6', '1.7', '1.8', '1.9', '1.10']);
-  expect(lab1.map((s) => s.overlay)).toEqual(['L1Crack', 'L1Plan', 'L1Capture', 'L1Assistant', ...Array(4).fill('L1Vector'), ...Array(4).fill('L1Semantic'), 'L1App', 'L1Specs', 'L1Suppliers', 'L1Launch', 'L1SitePhoto', 'L1Baseline', 'L1Routing', 'L1Guardrails', 'L1Recap']);
+  expect(lab1.map((s) => s.id)).toEqual(['1.0', '1.1', '1.2', '1.3', '1.3p1', '1.3p2', '1.3p3', '1.3p4', '1.3s1', '1.3s2', '1.3s3', '1.3s4', '1.3a', '1.4', '1.5', '1.6a', '1.6b', '1.6', '1.7', '1.8', '1.9', '1.10']);
+  expect(lab1.map((s) => s.overlay)).toEqual(['L1Crack', 'L1Plan', 'L1Capture', 'L1Assistant', ...Array(4).fill('L1Vector'), ...Array(4).fill('L1Semantic'), 'L1App', 'L1Specs', 'L1Suppliers', 'L1Launch', 'L1AskPdf', 'L1SitePhoto', 'L1Baseline', 'L1Routing', 'L1Guardrails', 'L1Recap']);
   expect(new Set(lab1.map((s) => s.shot))).toEqual(new Set(['bridge', 'pier3', 'sky-v1', 'sky-v2', 'sky-v3', 'sky-v4', 'sky-s1', 'sky-s2', 'sky-s3', 'sky-s4']));
   for (const s of lab1) expect(OVERLAYS[s.overlay!]).toBeDefined();
 });

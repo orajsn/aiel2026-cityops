@@ -3,8 +3,9 @@ import type { CSSProperties, ReactNode } from 'react';
 import { WidePanel } from '../WidePanel';
 import { LineIcon, type IconName } from '../icons';
 import steelDelivery from '../../../assets/photos/steel-delivery.webp';
-import { CARD, Clip, BreathingCoin, Coin, DbIcon, DIM, Flow, LockIcon, ModelNet, Net, netWaveEnd, RuntimeBar, SOFT, Shield, Spark, SteelPhoto, Switch, TEAL, TEAL_D, GREY, TextIcon, TINT, cap, capTeal, card, fade, fadeUp, mono, Fill } from './parts';
+import { CARD, Clip, BreathingCoin, Coin, DbIcon, DIM, Flow, LockIcon, ModelNet, Net, netWaveEnd, RuntimeBar, SOFT, Shield, Spark, SteelPhoto, Switch, TEAL, TEAL_D, GREY, TextIcon, TINT, cap, capTeal, card, fade, fadeUp, mono, Fill, Avatar, FlowDown } from './parts';
 import type { Lab1Props } from './parts';
+import { Doc } from '../ThreeLabs';
 
 /**
  * Lab 1 · AI Economics, running the app and choosing the model (V2, from the real workshop guide).
@@ -15,6 +16,55 @@ import type { Lab1Props } from './parts';
  *   L1Guardrails 1.9   Hands-on 5: ApplyGuardrails, allowed vs attack (Blocked by guardrails, the red one), fail closed
  * Cost is shown only as relative coins: never a number, never a claimed saving.
  */
+
+/* ---------- 1.6b · ask the app a question about the PDF (owner, 10 Nov: the page before the photo) ---------- */
+
+/** the user asks, the AI app reads the specification PDF, and answers the user from it */
+export function L1AskPdf({ kicker, message, notebook }: Lab1Props) {
+  const bubble = (who: 'q' | 'a'): CSSProperties => ({ padding: '16px 20px', borderRadius: 18, fontSize: 27, lineHeight: 1.35, background: who === 'q' ? 'rgba(31,42,51,0.92)' : CARD, color: who === 'q' ? '#fff' : 'var(--ink)', border: who === 'a' ? `2.5px solid ${TEAL}` : 'none', boxSizing: 'border-box' });
+  return (
+    <WidePanel kicker={kicker} message={message} notebook={notebook} testId="l1-ask-pdf" kickerColor="var(--teal)">
+      <Fill max={1.6}>
+        <div data-flow style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 70px minmax(0, 0.9fr) 70px minmax(0, 1.15fr)', alignItems: 'center', marginTop: 6 }}>
+          <motion.div data-step="user" {...fadeUp(0.3)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+            <Avatar who="pm" size={110} />
+            <div style={cap}>The user asks</div>
+            <div style={{ ...bubble('q'), maxWidth: 400 }}>What does the specification require for the repair?</div>
+          </motion.div>
+          <motion.div {...fade(1.0)} style={{ display: 'flex', justifyContent: 'center' }}>
+            <Flow w={60} delay={1.0} />
+          </motion.div>
+          <div data-step="app" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+            <motion.div {...fadeUp(1.4)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+              <Spark size={110} />
+              <div style={cap}>Our AI app</div>
+            </motion.div>
+            <motion.div {...fade(2.0)}>
+              <FlowDown h={44} delay={2.0} />
+            </motion.div>
+            <motion.div data-step="pdf" {...fadeUp(2.4)} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 20px', borderRadius: 16, border: `2.5px solid ${TEAL}`, background: TINT }}>
+              <Doc label="PDF" w={64} />
+              <div style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.2 }}>reads the<br />specification</div>
+            </motion.div>
+          </div>
+          <motion.div {...fade(3.4)} style={{ display: 'flex', justifyContent: 'center' }}>
+            <Flow w={60} delay={3.4} />
+          </motion.div>
+          <motion.div data-step="answer" {...fadeUp(3.8)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+            <Avatar who="pm" size={110} />
+            <div style={cap}>The user gets the answer</div>
+            <div style={{ ...bubble('a'), maxWidth: 400 }}>
+              <b style={{ color: TEAL_D }}>Surface preparation, materials, inspection and acceptance.</b>
+            </div>
+          </motion.div>
+        </div>
+        <motion.div {...fadeUp(4.6)} style={{ textAlign: 'center', fontSize: 26, color: DIM, paddingTop: 10 }}>
+          The app answers <b style={{ color: 'var(--ink)' }}>from the PDF</b>, not from what the model remembers.
+        </motion.div>
+      </Fill>
+    </WidePanel>
+  );
+}
 
 /* ---------- 1.6a · two ways to launch ---------- */
 
