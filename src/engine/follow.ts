@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import qrcode from 'qrcode-generator';
 import { at } from './base';
 import { useSceneStore } from './store';
+import { useDrawerStore } from './presentation';
+import { stepOf, stepScriptId } from '../content/scriptSteps';
 
 /**
  * Phone follow (owner, 3 Nov): the audience opens a page on their phones, types a 6-digit code (or scans the QR) and reads the presenter script of
@@ -64,7 +66,10 @@ export const useFollowStore = create<FollowState>((set, get) => {
     unsub?.();
     last = '';
     const send = async () => {
-      const id = useSceneStore.getState().current().id;
+      const page = useSceneStore.getState().current().id;
+      const d = useDrawerStore.getState();
+      // a page with one script per click tells the phones which click it is on
+      const id = page && stepScriptId(page, stepOf(page, d.open, d.focus));
       if (!id || id === last) return;
       last = id;
       const n = await post(code, token, id);
@@ -73,7 +78,9 @@ export const useFollowStore = create<FollowState>((set, get) => {
         set({ status: 'error' });
       } else set({ status: 'on', listeners: n });
     };
-    unsub = useSceneStore.subscribe(() => void send());
+    const unDrawer = useDrawerStore.subscribe(() => void send());
+    const unScene = useSceneStore.subscribe(() => void send());
+    unsub = () => (unDrawer(), unScene());
     void send();
   };
   const saved0 = typeof sessionStorage === 'undefined' ? null : saved();

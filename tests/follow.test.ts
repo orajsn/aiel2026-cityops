@@ -111,7 +111,7 @@ test('the QR for a join address is a real code, and every Thai script page is a 
 test('the phone viewer has a slide-picture switch, and the pictures reach the open phone page', () => {
   const html = readFileSync('follow/public/index.html', 'utf8');
   expect(html).toContain('id="thumbBtn"');
-  expect(html).toContain('thumbs/${encodeURIComponent(p.id)}.jpg');
+  expect(html).toContain('thumbs/${encodeURIComponent(p.id.replace(');
   expect(existsSync('follow/public/thumbs/3.7.jpg')).toBe(true);
 });
 
@@ -135,4 +135,16 @@ test('the phone viewer renders markdown safely, and leaves names with underscore
   expect(box.querySelector('img')).toBeNull();
   expect(box.textContent).toContain('<img src=x onerror=alert(1)>');
   expect(box.textContent).toContain('[bad](javascript:alert(1))');
+});
+
+test('the code map has one script per click: English and Thai for every stop, nothing left as a wall', async () => {
+  const { STEP_EN, STEP_TH, STEP_PAGES, stepScriptId } = await import('../src/content/scriptSteps');
+  const { MAP_STEPS } = await import('../src/content/lab3Map');
+  expect(STEP_PAGES['3.6m']).toBe(MAP_STEPS.length);
+  expect(STEP_EN['3.6m']).toHaveLength(MAP_STEPS.length);
+  expect(STEP_TH['3.6m']).toHaveLength(MAP_STEPS.length);
+  expect(stepScriptId('3.6m', 0)).toBe('3.6m');
+  expect(stepScriptId('3.6m', 7)).toBe('3.6m.7');
+  for (const t of STEP_EN['3.6m']) expect(t.length).toBeLessThan(400);
+  for (const t of STEP_TH['3.6m']) expect(t.trim().length).toBeGreaterThan(0);
 });

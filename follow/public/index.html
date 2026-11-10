@@ -192,7 +192,7 @@ h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
     $('thumbBtn').setAttribute('aria-pressed', String(showThumb));
     pic.onerror = () => { pic.hidden = true; };
     pic.hidden = !(p && showThumb);
-    if (pic.hidden) pic.removeAttribute('src'); else pic.src = `thumbs/${encodeURIComponent(p.id)}.jpg`;
+    if (pic.hidden) pic.removeAttribute('src'); else pic.src = `thumbs/${encodeURIComponent(p.id.replace(/^3\.6m\./, '3.6m_'))}.jpg`;
     const box = $('script'); box.className = 'script fade'; box.replaceChildren();
     if (p) {
       const th = lang === 'th' ? p.th : '';

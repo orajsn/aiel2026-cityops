@@ -13,6 +13,7 @@ import { CameraEditor } from './CameraEditor';
 import { TrafficEditor } from './TrafficEditor';
 import { useTrafficStore } from '../engine/traffic';
 import { Rich } from './Rich';
+import { STEP_EN, stepOf } from '../content/scriptSteps';
 import { SettingsPanel } from './SettingsPanel';
 import { pageLabel } from '../scenes';
 import { FollowCard } from './FollowCard';
@@ -78,6 +79,8 @@ export function Overlay() {
   const presenting = usePresentationStore((s) => s.on);
   // the open Jupyter drawer reaches down to the corner buttons: the caption steps aside while it is open
   const drawerOpen = useDrawerStore((s) => s.open) && !PAGE_STEPS[scene?.id ?? ''];
+  // a page with one script per click (the code map) shows the script of the click it stands on
+  const mapStep = useDrawerStore((s) => stepOf(scene?.id ?? '', s.open, s.focus));
   const showFps = useGraphicsStore((s) => s.showFps);
   const blank = usePresentationStore((s) => s.blank);
   // while Settings is open nothing hides
@@ -143,7 +146,7 @@ export function Overlay() {
       {/* presenter script under the page; CC (or S) hides it */}
       {scene.script && scriptOpen && !trafficEditing && !drawerOpen && (
         <div className="script" aria-label="presenter script">
-          <Rich text={scene.script} />
+          <Rich text={STEP_EN[scene.id]?.[mapStep] ?? scene.script} />
         </div>
       )}
 

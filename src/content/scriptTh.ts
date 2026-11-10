@@ -1,3 +1,5 @@
+import { STEP_TH } from './scriptSteps';
+
 /**
  * Thai presenter script, all of Lab 3 (pages 1 to 38), for the phone follow app (follow/). One paragraph per
  * array item. Written 3 Nov for the owner; the English script stays in script.ts. Pages without an entry show the English line.
@@ -268,9 +270,5 @@ export const SCRIPT_TH: Record<string, string[]> = {
 
 };
 
-// the map page (3.6m) says what the pages it replaced said; they stay above for when a page comes back
-SCRIPT_TH['3.6m'] = [
-  'แผนที่นี้คือทุกอย่างใน notebook ของวันนี้ครับ ด้านบนคือการทำงานหนึ่งรอบของ AI agent ด้านล่างคือฐานข้อมูลเดียวที่เก็บทุกอย่างที่มันจำได้ เราจะเดินตามแผนที่นี้ทีละขั้น ตามลำดับที่โค้ดทำงานจริง',
-  'ก่อนอื่นเปิด notebook กันก่อนครับ ในรายการไฟล์ เปิดโฟลเดอร์ agent_memory แล้วดับเบิลคลิก notebook_complete_ollama.ipynb แต่ละกล่องคือหนึ่ง cell คลิกในกล่องเพื่อเลือก แล้วกดปุ่ม Run หรือกด Shift + Enter',
-  ...['3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a'].flatMap((id) => SCRIPT_TH[id]),
-];
+// the code map is one script per stop (src/content/scriptSteps.ts); this is the first stop, the whole map
+SCRIPT_TH['3.6m'] = [STEP_TH['3.6m'][0]];

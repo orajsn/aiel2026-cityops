@@ -1,3 +1,5 @@
+import { STEP_EN } from '../content/scriptSteps';
+
 /**
  * What the presenter says on each page (first draft). Built on the Storyboard tab's one-line message for
  * each row; facts and numbers only from the storyboard and the notebooks' recorded runs.
@@ -133,9 +135,5 @@ export const SCRIPT: Record<string, string> = {
   '3.18': 'Three labs, one bridge. In Lab 1 we built **an assistant**, in Lab 2 it became **an agent**, in Lab 3 it learned to **remember**. Under all three, **one Oracle AI Database**.',
 };
 
-// The map page says what the pages it replaced said, step by step (3.6 to 3.14a stay above for when a page comes back)
-SCRIPT['3.6m'] = [
-  'This one map is everything in today’s notebook. One turn of the AI agent runs along the top, and everything it remembers sits in one database underneath. We walk it in the order the code runs.',
-  'First, open the notebook. In the file list, open agent_memory and double-click notebook_complete_ollama.ipynb. Each box is a cell: click inside one to select it, then click Run or press Shift and Enter.',
-  ...['3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a'].map((id) => SCRIPT[id]),
-].join('\n\n');
+// The code map is one script per stop (src/content/scriptSteps.ts); this is the first stop, the whole map
+SCRIPT['3.6m'] = STEP_EN['3.6m'][0];
