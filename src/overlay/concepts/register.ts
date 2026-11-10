@@ -24,6 +24,7 @@ import { OneConnection, WritePath, Scope, SystemOfRecord, VectorWalls } from './
 import { DoorsAndHall, CopilotTurn } from './HandsOn2';
 import { WithWithout, FailuresSolved, BothLabs } from './Ending';
 import { Disciplines } from './Disciplines';
+import { WhyOracle } from './WhyOracle';
 import { Day1, Day2, LabsMeet } from './BackOnBridge';
 import { Lab2Recap, Lab3Recap } from './Recap';
 import { AllLabs } from './AllLabs';
@@ -70,6 +71,7 @@ registerOverlay('DoorsAndHall', DoorsAndHall);
 registerOverlay('CopilotTurn', CopilotTurn);
 registerOverlay('WithWithout', WithWithout);
 registerOverlay('Disciplines', Disciplines);
+registerOverlay('WhyOracle', WhyOracle);
 registerOverlay('FailuresSolved', FailuresSolved);
 registerOverlay('Day1', Day1);
 registerOverlay('Day2', Day2);

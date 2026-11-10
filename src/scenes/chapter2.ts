@@ -222,6 +222,8 @@ const b215b = atRust('3.15b', 'The four failures, solved', 'FailuresSolved', { k
 // 3.15c · the full memory map, moved from the start of the lab (owner, 28 Oct): after the hands-on its layers mean something (notebook cell 90)
 const b215c = atRust('3.15c', 'What you built', 'MemoryMap', { kicker: 'Kinds of memory', step: 5, built: true, message: 'The full memory map: **what you actually built** today.' } satisfies MemoryMapProps);
 
+// 3.15d · why Oracle AI Database, after 'What you built' (owner, 10 Nov), one reason per Next
+const b215d = atRust('3.15d', 'Why Oracle AI Database', 'WhyOracle', { kicker: 'Why Oracle AI Database', message: 'One database for **everything the agent remembers**.' });
 const b216 = atRust('3.16', 'Where both labs meet', 'Neither', { kicker: 'Where both labs meet', message: 'Neither lab can make the call **alone**.' } satisfies NeitherProps);
 const b216a = atRust('3.16a', 'Together they make the call', 'LabsMeet', { kicker: 'Where both labs meet', step: 2, message: 'Together they **make the call**.' }, 'meet');
 
@@ -317,6 +319,7 @@ export const LAB3_ALL: SceneDef[] = [
   b215,
   nFixes,
   b215c,
+  b215d,
   b216,
   b216a,
   b217,
