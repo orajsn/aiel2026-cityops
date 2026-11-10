@@ -225,7 +225,7 @@ const PROBLEMS: { word: string; title: string; text: string; art: ReactNode; par
     part: 'Part 3',
     fix: 'the extractor keeps small records',
   },
-  { word: 'Relevance', title: 'Wrong data is in it', text: 'Mercer’s finding is there, but buried under search results Vance never asked for.', art: <GlassArt fill={0.7} id="gr">{lines}</GlassArt>, part: 'Part 4', fix: 'search with walls' },
+  { word: 'Relevance', title: 'Wrong data is in it', text: 'Mercer’s finding is there, but buried under search results Vance never asked for.', art: <GlassArt fill={0.7} id="gr">{lines}</GlassArt>, part: 'Parts 4 and 5', fix: 'search with walls, and who may see what' },
   {
     word: 'Accuracy',
     title: 'Summaries lose details',

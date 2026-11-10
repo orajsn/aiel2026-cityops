@@ -58,7 +58,7 @@ test('each click brings one card together with Vance’s question; the glass and
   expect(shown(cards, 'ask-')).toEqual(['true', 'true', 'false']);
   build(4);
   const fixes = render(<GlassBridge kicker="k" message="m" mode="fixes" />).container;
-  expect([...fixes.querySelectorAll('[data-fix]')].map((e) => e.getAttribute('data-fix'))).toEqual(['Part 3', 'Part 4', 'Part 4', 'Part 6']);
+  expect([...fixes.querySelectorAll('[data-fix]')].map((e) => e.getAttribute('data-fix'))).toEqual(['Part 3', 'Parts 4 and 5', 'Part 4', 'Part 6']);
   expect(render(<GlassBridge kicker="k" message="m" mode="pour" />).container.querySelector('[data-glass="pour"]')).not.toBeNull();
   build(1);
   const h = render(<Handover kicker="k" message="m" />).container;
