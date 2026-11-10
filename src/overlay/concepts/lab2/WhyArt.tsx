@@ -5,6 +5,7 @@ import { EASE } from '../WidePanel';
 import { Fill } from '../Fill';
 import { AgentAvatar } from './AgentAvatar';
 import { CARD, ChiefInspector, DIM, INK, SOFT, TEAL, TEAL_D, TINT, TINT2, capTeal } from './parts';
+import { useDrawerStore } from '../../../engine/presentation';
 
 /**
  * 2.0 · Why AI needs your data (owner, 29 Oct: "animation of graphic explaining what no data is, same for all 3
@@ -298,6 +299,8 @@ function AgentLoop() {
 }
 
 export function Ladder() {
+  // one level per Next (owner, 10 Nov: not all four at once): the chatbot at once, then RAG, the workflow and the agent
+  const build = useDrawerStore((s) => (s.open ? s.focus : 0));
   return (
     <Fill>
       <div data-levels style={{ flex: '1 0 auto', minHeight: 450, position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 18, alignItems: 'end' }}>
@@ -314,7 +317,7 @@ export function Ladder() {
           </div>
         </motion.div>
         {LEVELS.map((l, i) => (
-          <motion.div key={l.level} data-level={l.level} initial={{ opacity: 0, height: '20%' }} animate={{ opacity: 1, height: `${64 + i * 12}%` }} transition={{ delay: 0.3 + i * 0.35, duration: 0.6, ease: EASE }} style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', borderRadius: '16px 16px 6px 6px', border: `2px solid ${i === 3 ? TEAL : 'var(--line)'}`, background: i === 3 ? TINT : SOFT, padding: '16px 20px', gap: 10, boxSizing: 'border-box' }}>
+          <motion.div key={l.level} data-level={l.level} initial={{ opacity: 0, height: '20%' }} animate={i <= build ? { opacity: 1, height: `${64 + i * 12}%` } : { opacity: 0, height: '20%' }} transition={{ delay: i === 0 ? 0.3 : 0.1, duration: 0.6, ease: EASE }} style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', borderRadius: '16px 16px 6px 6px', border: `2px solid ${i === 3 ? TEAL : 'var(--line)'}`, background: i === 3 ? TINT : SOFT, padding: '16px 20px', gap: 10, boxSizing: 'border-box' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <span style={{ width: 38, height: 38, borderRadius: '50%', background: TEAL, color: '#fff', fontSize: 19, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>{i + 1}</span>
               <span style={{ fontSize: 30, fontWeight: 700, color: INK }}>{l.level}</span>
@@ -338,7 +341,7 @@ export function Ladder() {
                 next step: <b style={{ color: TEAL_D, fontSize: 24 }}>{l.who}</b>
               </div>
               <div style={{ height: 12, borderRadius: 6, background: 'rgba(127,127,127,0.18)', overflow: 'hidden', marginTop: 8 }}>
-                <motion.div initial={{ width: 0 }} animate={{ width: `${l.free * 100}%` }} transition={{ delay: 0.8 + i * 0.35, duration: 0.8, ease: EASE }} style={{ height: '100%', background: TEAL, borderRadius: 6 }} />
+                <motion.div initial={{ width: 0 }} animate={{ width: i <= build ? `${l.free * 100}%` : 0 }} transition={{ delay: i === 0 ? 0.8 : 0.5, duration: 0.8, ease: EASE }} style={{ height: '100%', background: TEAL, borderRadius: 6 }} />
               </div>
             </div>
           </motion.div>
