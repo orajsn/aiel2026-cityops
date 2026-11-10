@@ -32,6 +32,8 @@ export interface WithWithoutProps extends EndingProps {
 
 /** the deck's comparison rows (slide 14 and the storyline doc's four-row comparison), said plainly */
 export const COMPARE_ROWS = ['knows it is the same bridge', 'cites the real finding', 'gives a specific action', 'never sees private chats'];
+/** a plain line under each row: what it means on this bridge */
+const ROW_NOTES = ['Harbor Bridge, the rust: not any bridge.', 'Mercer’s own finding, with her number.', 'What to do next, not general advice.', 'Only the finding is shared, never her chat.'];
 /** each row's icon, in the same order (owner, 26 Oct: an icon in place of the tick) */
 const ROW_ICONS: IconName[] = ['pin', 'quote', 'wrench', 'lock'];
 
@@ -70,14 +72,17 @@ export function WithWithout({ kicker, message, notebook, question, without, with
               {COMPARE_ROWS.map((r, i) => {
                 const last = i === COMPARE_ROWS.length - 1;
                 return (
-                  <motion.div key={r} data-row={r} style={{ flex: last ? 'none' : '1 0 auto', display: 'grid', gridTemplateColumns: '50px 1fr', columnGap: 18 }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 + i * 0.5, duration: 0.45, ease: EASE }}>
+                  <motion.div key={r} data-row={r} style={{ flex: last ? 'none' : '1 0 auto', display: 'grid', gridTemplateColumns: '62px 1fr', columnGap: 18 }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 + i * 0.5, duration: 0.45, ease: EASE }}>
                     <div style={{ position: 'relative' }}>
-                      <span style={{ width: 50, height: 50, borderRadius: '50%', background: 'var(--teal)', color: '#fff', fontWeight: 700, fontSize: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{i + 1}</span>
-                      {!last && <span style={{ position: 'absolute', left: 24, top: 56, bottom: 6, borderLeft: '2.5px dotted var(--teal)' }} />}
+                      <span style={{ width: 62, height: 62, borderRadius: '50%', background: 'var(--teal)', color: '#fff', fontWeight: 700, fontSize: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{i + 1}</span>
+                      {!last && <span style={{ position: 'absolute', left: 30, top: 68, bottom: 6, borderLeft: '2.5px dotted var(--teal)' }} />}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, paddingBottom: last ? 0 : 20 }}>
-                      <LineIcon name={ROW_ICONS[i]} size={44} />
-                      <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.25, paddingTop: 8 }}>{r}</div>
+                      <LineIcon name={ROW_ICONS[i]} size={54} />
+                      <div style={{ paddingTop: 2 }}>
+                        <div style={{ fontSize: 32, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.2 }}>{r}</div>
+                        <div style={{ fontSize: 23, color: 'var(--ink-dim)', lineHeight: 1.3, marginTop: 6 }}>{ROW_NOTES[i]}</div>
+                      </div>
                     </div>
                   </motion.div>
                 );
