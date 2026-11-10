@@ -10,7 +10,7 @@ const shown = (c: HTMLElement, prefix: string) => [...c.querySelectorAll(`[data-
 // owner, 6 Nov: the compressed opening, Mercer first (Day 1), then Vance (Day 2); pages 3.1a to 3.5b are hidden, not deleted
 test('the opening runs Mercer first, then Vance, then the logbook, the glass and the handover; no two pages look the same', () => {
   const ids = chapter2.map((s) => s.id);
-  expect(ids.slice(0, 12)).toEqual(['3.0', '3.2f', '3.1h', '3.3h', '3.3i', '3.3p', '3.3a', '3.3b', '3.5h', '3.5g', '3.5e', '3.6m']); // the lab page again before the code, then the three disciplines
+  expect(ids.slice(0, 11)).toEqual(['3.0', '3.2f', '3.1h', '3.3h', '3.3i', '3.3p', '3.3b', '3.5h', '3.5g', '3.5e', '3.6m']); // the lab page again before the code, then the three disciplines
   const at = (id: string) => LAB3_ALL.find((s) => s.id === id)!;
   expect(at('3.2f').world).toMatchObject({ inspect: { who: 'character-female-a' } });
   expect(at('3.1h').world).toMatchObject({ inspect: { who: 'character-male-d' } });

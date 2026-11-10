@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import type { CSSProperties, ReactNode } from 'react';
 import { EASE, WidePanel } from './WidePanel';
 import { Fill } from './lab1/parts';
+import { Rich } from '../Rich';
 import { LineIcon, type IconName } from './icons';
 import { useBuild } from './Lab3Opening';
 
@@ -26,6 +27,9 @@ const RED = 'var(--red)';
 
 const mono: CSSProperties = { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' };
 
+/** a card's emphasis colour: the context card marks its words in Oracle Red (the page's one red thing), the others in teal */
+const mark = (tone: 'white' | 'grey' | 'red', t: string) => (tone === 'red' ? t.replace(/\*\*([^*]+)\*\*/g, '!!$1!!') : t);
+
 function Card({ x, y, w, h, show, tone, tag, title, ask, lines, failure, testId, icon, parts }: { x: number; y: number; w: number; h: number; show: boolean; tone: 'white' | 'grey' | 'red'; tag: string; title: string; ask?: string; lines: string[]; failure?: string; testId: string; icon: IconName; parts?: string[] }) {
   const bg = tone === 'grey' ? 'rgba(138,145,156,0.16)' : tone === 'red' ? 'rgba(199,70,52,0.07)' : 'var(--panel-strong)';
   const border = tone === 'red' ? RED : tone === 'grey' ? '#7b8794' : INK;
@@ -37,22 +41,22 @@ function Card({ x, y, w, h, show, tone, tag, title, ask, lines, failure, testId,
         </span>
         <div style={{ minWidth: 0 }}>
           <span style={{ ...mono, display: 'inline-block', padding: '2px 8px', borderRadius: 4, border: '1px solid rgba(127,127,127,0.5)', background: 'rgba(127,127,127,0.1)', color: DIM }}>{tag}</span>
-          <div style={{ fontSize: 22, fontWeight: 700, color: INK, lineHeight: 1.2, marginTop: 4 }}>{title}</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: tone === 'red' ? RED : tone === 'grey' ? '#146f7f' : INK, lineHeight: 1.2, marginTop: 4 }}>{title}</div>
         </div>
       </div>
 
-      {ask && <div style={{ fontSize: 16, fontWeight: 600, color: INK, lineHeight: 1.3 }}>{ask}</div>}
-      <div style={{ fontSize: 14.5, color: INK, lineHeight: 1.45, display: 'flex', flexDirection: 'column', gap: 3 }}>
+      {ask && <div style={{ fontSize: 18, fontWeight: 700, color: INK, lineHeight: 1.3 }}><Rich text={mark(tone, ask)} /></div>}
+      <div style={{ fontSize: 16, color: INK, lineHeight: 1.45, display: 'flex', flexDirection: 'column', gap: 4 }}>
         {lines.map((l) => (
-          <span key={l}>{l}</span>
+          <span key={l}><Rich text={mark(tone, l)} /></span>
         ))}
       </div>
       {failure && (
-        <div style={{ marginTop: 'auto', fontSize: 14, lineHeight: 1.4, color: DIM }}>
+        <div style={{ marginTop: 'auto', fontSize: 15.5, lineHeight: 1.4, color: DIM }}>
           <div style={{ ...mono, marginBottom: 3, display: 'flex', alignItems: 'center', gap: 6 }}>
             <LineIcon name="flag" size={16} color="#8a919c" /> Typical failure
           </div>
-          {failure}
+          <Rich text={mark(tone, failure)} />
         </div>
       )}
       {parts && (
@@ -69,7 +73,7 @@ function Arrow({ show, d, label, lx, ly, dashed, testId }: { show: boolean; d: s
   return (
     <motion.g data-arrow={testId} data-shown={show} initial={false} animate={{ opacity: show ? 1 : 0 }} transition={{ duration: 0.5, ease: EASE }}>
       <path d={d} fill="none" stroke={LINE} strokeWidth={2} strokeDasharray={dashed ? '6 5' : undefined} markerEnd="url(#arrow-head)" />
-      <text x={lx} y={ly} fill={DIM} fontSize={11} fontFamily="JetBrains Mono, monospace" letterSpacing="1.1">{label}</text>
+      <text x={lx} y={ly} fill={DIM} fontSize={10.5} fontFamily="JetBrains Mono, monospace" letterSpacing="0.6">{label}</text>
     </motion.g>
   );
 }
@@ -93,10 +97,10 @@ export function Disciplines({ kicker, message, notebook }: DisciplinesProps) {
             <Arrow show={L >= 3} testId="model-input" d="M920 446 H1010" label="MODEL INPUT" lx={925} ly={434} />
             <Arrow show={L >= 3} testId="write-policy" dashed d="M1190 544 V640 H210 V618" label="WRITE POLICY" lx={640} ly={632} />
           </svg>
-          <Card testId="harness" show tone="white" x={0} y={0} w={W} h={216} icon="loop" parts={['Part 6']} tag="Orchestration" title="Harness engineering" ask="What makes the process execute and recover reliably?" lines={['Model/tool loop · read/write triggers · permissions · checkpoints · retries · budgets · validation · observability']} failure="Retrieval skipped · write lost · tool action repeated · task declared complete prematurely" />
-          <Card testId="memory" show={L >= 1} tone="grey" x={0} y={284} w={420} h={332} icon="database" parts={['Part 3', 'Part 5', 'Part 6']} tag="Retained state" title="Memory engineering" ask="What should persist, and how should it change?" lines={['Representation · provenance (source and history)', 'Storage · indexing · scope · consolidation', 'Versioning · correction · retention · deletion']} failure="A preference is lost, incorrectly extracted, stale, or attributed to the wrong person." />
-          <Card testId="context" show={L >= 2} tone="red" x={500} y={284} w={420} h={332} icon="funnel" parts={['Part 4', 'Part 5', 'Part 6']} tag="Current input" title="Context engineering" ask="What information is needed for this inference?" lines={['Query construction · retrieval · filtering', 'Ranking · deduplication · compression', 'Evidence expansion · token allocation']} failure="The right fact exists but is absent, buried, or stripped of an essential qualifier." />
-          <Card testId="runtime" show={L >= 3} tone="white" x={1010} y={348} w={370} h={196} icon="nodes" tag="Runtime" title="Model + tools" lines={['Reason · call tools', 'Return results to the loop']} />
+          <Card testId="harness" show tone="white" x={0} y={0} w={W} h={216} icon="loop" parts={['Part 6']} tag="Orchestration" title="Harness engineering" ask="What makes the process **execute and recover** reliably?" lines={['**Model/tool loop** · read/write triggers · **permissions** · **checkpoints** · **retries** · budgets · validation · observability']} failure="**Retrieval skipped** · **write lost** · tool action repeated · task declared complete prematurely" />
+          <Card testId="memory" show={L >= 1} tone="grey" x={0} y={284} w={420} h={332} icon="database" parts={['Part 3', 'Part 5', 'Part 6']} tag="Retained state" title="Memory engineering" ask="What should **persist**, and how should it **change**?" lines={['**Representation** · **provenance** (source and history)', '**Storage** · indexing · **scope** · consolidation', '**Versioning** · **correction** · retention · deletion']} failure="A preference is **lost**, incorrectly extracted, stale, or **attributed to the wrong person**." />
+          <Card testId="context" show={L >= 2} tone="red" x={500} y={284} w={420} h={332} icon="funnel" parts={['Part 4', 'Part 5', 'Part 6']} tag="Current input" title="Context engineering" ask="What information is **needed for this inference**?" lines={['**Query construction** · **retrieval** · **filtering**', '**Ranking** · deduplication · **compression**', '**Evidence expansion** · **token allocation**']} failure="The right fact exists but is **absent**, **buried**, or stripped of an essential qualifier." />
+          <Card testId="runtime" show={L >= 3} tone="white" x={1010} y={348} w={370} h={196} icon="nodes" tag="Runtime" title="Model + tools" lines={['**Reason** · call tools', 'Return **results** to the loop']} />
         </div>
       </Fill>
     </WidePanel>

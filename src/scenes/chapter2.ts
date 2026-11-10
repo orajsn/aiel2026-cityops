@@ -272,7 +272,7 @@ const b218: SceneDef = {
 // 3.5e · the three engineering disciplines, after the page that opens the lab (a colleague's review, 10 Nov), built one part per Next
 const bDisc = atOps('3.5e', 'The three engineering disciplines', 'Disciplines', { kicker: 'Lab 3 · Three disciplines', message: 'Memory **retains** evidence. Context **selects** the input. The harness **coordinates** the run.' });
 const bMap = atOps('3.6m', 'The code, on one map', 'CodeMap', {});
-export const LAB3_CUT = new Set(['3.15b', '3.16a', '3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b', '3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a']);
+export const LAB3_CUT = new Set(['3.3a', '3.15b', '3.16a', '3.1a', '3.1b', '3.1c', '3.2a', '3.2b', '3.2p', '3.2q', '3.2r', '3.2c', '3.2e', '3.4a', '3.4b', '3.4c', '3.4d', '3.5b', '3.6', '3.7', '3.8a', '3.8b', '3.9', '3.10', '3.11', '3.12a', '3.12b', '3.13', '3.13a', '3.14', '3.14a']);
 
 export const LAB3_ALL: SceneDef[] = [
   b20,
