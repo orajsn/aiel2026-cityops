@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { drivableRoutes, useTrafficStore } from '../engine/traffic';
 import { roadHeight } from './roadHeight';
+import { CITY_DIM } from './BangkokCity';
 import { makePath, placeOnRoutes, travel } from './trafficPaths';
 
 /** a car in metres (body 1.8 x 4.4, cabin on top); 1 map unit is about 108 m; each route sets its cars' size */
@@ -39,6 +40,7 @@ export function carColour(tint: number): string {
   return MIX[0][0];
 }
 const WHITE = new THREE.Color('#ffffff');
+const CABIN = new THREE.Color('#2a3440');
 
 /**
  * Cars on the routes drawn in Traffic mode (none until a car route is drawn). All of them are one instanced
@@ -56,17 +58,26 @@ export function Cars() {
   useEffect(() => () => (geo.body.dispose(), geo.cabin.dispose()), [geo]);
   const tmp = useMemo(() => ({ m: new THREE.Matrix4(), q: new THREE.Quaternion(), p: new THREE.Vector3(), s: new THREE.Vector3(), y: new THREE.Vector3(0, 1, 0), c: new THREE.Vector3() }), []);
 
+  const scene = useThree((s) => s.scene);
+  // the cars fade into the haze with the city on the Ops pages (CITY_DIM), by their colours: no shader is touched
+  const shown = useRef(-1);
+  const paint = (dim: number) => {
+    const haze = scene.fog?.color ?? WHITE;
+    const tmp = new THREE.Color();
+    cars.forEach((v, i) => {
+      body.current?.setColorAt(i, tmp.set(carColour(v.tint)).lerp(haze, dim));
+      cabin.current?.setColorAt(i, tmp.copy(WHITE).lerp(haze, dim));
+    });
+    for (const mesh of [body.current, cabin.current]) if (mesh?.instanceColor) mesh.instanceColor.needsUpdate = true;
+    if (cabin.current) (cabin.current.material as THREE.MeshStandardMaterial).color.copy(CABIN).lerp(haze, dim);
+    shown.current = dim;
+  };
   // colours: set once per fleet (instanceColor)
-  useEffect(() => {
-    for (const mesh of [body.current, cabin.current]) {
-      if (!mesh) continue;
-      cars.forEach((v, i) => mesh.setColorAt(i, mesh === cabin.current ? WHITE : new THREE.Color(carColour(v.tint))));
-      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    }
-  }, [cars]);
+  useEffect(() => paint(CITY_DIM.value), [cars]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useFrame(({ clock }) => {
     if (!body.current || !cabin.current || !cars.length) return;
+    if (Math.abs(CITY_DIM.value - shown.current) > 0.01) paint(CITY_DIM.value);
     cars.forEach((v, i) => {
       const k = carScale(v.size ?? 1);
       tmp.s.set(k, k, k);
@@ -94,7 +105,7 @@ export function Cars() {
         <meshStandardMaterial roughness={0.6} metalness={0.1} />
       </instancedMesh>
       <instancedMesh key={`c${cars.length}`} ref={cabin} args={[geo.cabin, undefined, cars.length]} frustumCulled={false}>
-        <meshStandardMaterial roughness={0.3} metalness={0.2} color="#2a3440" />
+        <meshStandardMaterial roughness={0.3} metalness={0.2} color={CABIN} />
       </instancedMesh>
     </group>
   );
