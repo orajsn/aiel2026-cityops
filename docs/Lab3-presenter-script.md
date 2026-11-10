@@ -632,11 +632,11 @@ Now we search the findings. We want the nearest in meaning, but only for this br
 
 #### ไทย
 
-Part 5 ครับ ทำไม Vance อ่านโน้ตส่วนตัวของ Mercer ไม่ได้ ช่างแต่ละคนมีแฟ้มส่วนตัวของตัวเอง สิ่งที่ extractor เรียนรู้จะขึ้นไปอยู่บนชั้นของทรัพย์สิน และคนที่บังคับกฎนี้คือฐานข้อมูล ไม่ใช่ AI agent
+Part 5 ครับ ทำไม Vance อ่านโน้ตส่วนตัวของ Mercer ไม่ได้ ใน notebook พิสูจน์ด้วยการค้นสองครั้ง Mercer บันทึกโน้ตส่วนตัวของเธอ แล้ว Vance ค้นในชื่อของเขา ได้ผลลัพธ์ศูนย์ ส่วนแนวปฏิบัติของทั้งเมืองที่ Mercer บันทึกไว้ Vance ค้นเจอ และคนที่บังคับกฎนี้คือฐานข้อมูล ไม่ใช่ AI agent
 
 #### English
 
-Part 5. Why can Vance not read Mercer’s private note? Each inspector has a private thread. What the extractor learns goes on a shelf for the asset. And **the database enforces this**, not the AI agent.
+Part 5. Why can Vance not read Mercer’s private note? The notebook proves it with two searches. Mercer saves a personal note, and Vance searches under his own name: **nothing comes back**. Mercer also saves a city-wide guideline, and Vance finds it. And **the database enforces this**, not the AI agent.
 
 ### 11q · 6 · One whole turn  (`3.6m.17`) · stop 17
 
