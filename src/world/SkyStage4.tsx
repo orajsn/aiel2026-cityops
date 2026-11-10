@@ -8,6 +8,7 @@ import { NeuralNet } from './NeuralNet';
 import { ReferenceFolder } from './ReferenceFolder';
 import { PDFS, vectorNumbers } from './SkyVectorize';
 import { STAGE4, type Vec3 } from './shots';
+import { useDrawerStore } from '../engine/presentation';
 
 /**
  * Lab 1's 4a (Vector Store) and 4b (Semantic Store) on the sky stage, built from the two approved drafts (owner, 2 Nov).
@@ -317,7 +318,13 @@ const NET_AT: Vec3 = [-3.2, 1.7, 0];
 const DB_AT: [number, number] = [-5.0, -2.2];
 const DB_SEM: [number, number] = [-5.0, -3.6];
 
-export function Vector4({ act, t }: { act: 'vector' | 'vector2' | 'vector3' | 'retrieve'; t: number }) {
+export function Vector4({ act, t: clock }: { act: 'vector' | 'vector2' | 'vector3' | 'retrieve'; t: number }) {
+  // the last click (1.3p4, owner, 10 Nov): the picture holds with the five nearest points lit, and the five fly to the folder, the model and the answer only on Next
+  const clicked = useDrawerStore((s) => act === 'retrieve' && s.open && s.focus >= 1);
+  const clickAt = useRef<number | null>(null);
+  if (!clicked) clickAt.current = null;
+  else if (clickAt.current === null) clickAt.current = clock;
+  const t = act !== 'retrieve' ? clock : clickAt.current === null ? Math.min(clock, 1450) : 1500 + (clock - clickAt.current);
   let cloudShow = 1;
   let groups = 1;
   let ask = 0;
