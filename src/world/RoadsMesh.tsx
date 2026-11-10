@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { useUiStore } from '../engine/ui';
 import { HALF_WIDTH, ELEVATION, ribbonGeometry, roadRibbons, type RoadClass } from './roads';
-import { addCityDim, bangkokCovers } from './BangkokCity';
+import { bangkokCovers } from './BangkokCity';
 import { harborBridgeFrame } from './bridgeFrame';
 
 const ROAD_CLASSES: RoadClass[] = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'link'];
@@ -13,8 +13,6 @@ const BRIDGE_LIFT = 1.4;
  * Real Bangkok streets as flat ribbons: a lighter kerb under a darker carriageway.
  * Elevated runs (expressways, bridges, the skytrain) sit on piers.
  */
-const dimmed = (m: THREE.Material) => (addCityDim(m), m);
-
 export function Roads() {
   const theme = useUiStore((s) => s.theme);
   const built = useMemo(() => {
@@ -61,7 +59,7 @@ export function Roads() {
   }, []);
 
   const pierMesh = useMemo(() => {
-    const m = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), dimmed(new THREE.MeshStandardMaterial({ color: '#b9bcc4', roughness: 1 })), built.piers.length);
+    const m = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: '#b9bcc4', roughness: 1 }), built.piers.length);
     built.piers.forEach((mat, i) => m.setMatrixAt(i, mat));
     m.instanceMatrix.needsUpdate = true;
     m.castShadow = true;
@@ -73,17 +71,17 @@ export function Roads() {
     <group name="roads">
       {built.kerb && (
         <mesh geometry={built.kerb} receiveShadow>
-          <meshStandardMaterial ref={addCityDim} color={light ? '#e6e1d6' : '#1a2230'} roughness={1} side={THREE.DoubleSide} />
+          <meshStandardMaterial color={light ? '#e6e1d6' : '#1a2230'} roughness={1} side={THREE.DoubleSide} />
         </mesh>
       )}
       {built.road && (
         <mesh geometry={built.road} receiveShadow>
-          <meshStandardMaterial ref={addCityDim} color={light ? '#9ea4ae' : '#2a3442'} roughness={1} side={THREE.DoubleSide} />
+          <meshStandardMaterial color={light ? '#9ea4ae' : '#2a3442'} roughness={1} side={THREE.DoubleSide} />
         </mesh>
       )}
       {built.rail && (
         <mesh geometry={built.rail}>
-          <meshStandardMaterial ref={addCityDim} color={light ? '#b4b8c0' : '#3a4656'} roughness={1} side={THREE.DoubleSide} />
+          <meshStandardMaterial color={light ? '#b4b8c0' : '#3a4656'} roughness={1} side={THREE.DoubleSide} />
         </mesh>
       )}
       <primitive object={pierMesh} />

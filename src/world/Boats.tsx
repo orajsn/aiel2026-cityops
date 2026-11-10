@@ -7,7 +7,6 @@ import { terrainHeight } from './terrain';
 import { speedUnits } from '../content/traffic';
 import { drivableRoutes, useTrafficStore } from '../engine/traffic';
 import { makePath, placeOnRoutes, travel, type Path, type Vehicle } from './trafficPaths';
-import { addCityDim } from './BangkokCity';
 
 export interface BoatSpec {
   t: number;
@@ -168,22 +167,22 @@ function BoatBody({ kind }: { kind: 'ferry' | 'barge' }) {
     <group scale={BOAT_SCALE}>
       <mesh position={[0, 0.3, 0]} castShadow>
         <boxGeometry args={[d.w, 0.6, d.l]} />
-        <meshStandardMaterial ref={addCityDim} color={ferry ? '#f4f1ea' : '#4d5f73'} roughness={0.9} />
+        <meshStandardMaterial color={ferry ? '#f4f1ea' : '#4d5f73'} roughness={0.9} />
       </mesh>
       {ferry ? (
         <mesh position={[0, 0.85, -0.3]} castShadow>
           <boxGeometry args={[0.8, 0.5, 2.0]} />
-          <meshStandardMaterial ref={addCityDim} color="#1B8A9C" roughness={0.9} />
+          <meshStandardMaterial color="#1B8A9C" roughness={0.9} />
         </mesh>
       ) : (
         <>
           <mesh position={[0, 0.8, 0.4]} castShadow>
             <boxGeometry args={[1.2, 0.45, 3]} />
-            <meshStandardMaterial ref={addCityDim} color="#c9a37a" roughness={0.9} />
+            <meshStandardMaterial color="#c9a37a" roughness={0.9} />
           </mesh>
           <mesh position={[0, 1.0, -2]} castShadow>
             <boxGeometry args={[0.8, 0.8, 0.8]} />
-            <meshStandardMaterial ref={addCityDim} color="#f4f1ea" roughness={0.9} />
+            <meshStandardMaterial color="#f4f1ea" roughness={0.9} />
           </mesh>
         </>
       )}

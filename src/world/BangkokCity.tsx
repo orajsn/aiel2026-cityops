@@ -121,22 +121,6 @@ uniform float uCityDim;`)
   mat.customProgramCacheKey = () => 'bkk-edge-fade-haze';
 }
 
-/** The same fade into the haze for things that stand on the map but are not part of it (cars, boats, roads), so they dim with the city. */
-export function addCityDim(mat: THREE.Material | null) {
-  if (!mat) return;
-  mat.onBeforeCompile = (shader) => {
-    shader.uniforms.uCityDim = CITY_DIM;
-    shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `#include <common>
-uniform float uCityDim;`)
-      .replace('#include <fog_fragment>', `#include <fog_fragment>
-        #ifdef USE_FOG
-          gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, uCityDim);
-        #endif`);
-  };
-  mat.customProgramCacheKey = () => 'city-dim';
-}
-
 export function BangkokCity() {
   const gltf = useGLTF(URL);
   const scene = useMemo(() => {
