@@ -310,105 +310,353 @@ Once it is open, we will open the notebook together and watch each part work, on
 
 ---
 
-## 11 · The code, on one map  (`3.6m`) · 18 clicks
+## 11 · The code, on one map  (`3.6m`) · 19 stops, one script each
 
-### ไทย
+Every click is its own page (11, 11a, 11b ...), with its own script in the script manager (`3.6m`, `3.6m.1` ...). Thai first, then English.
 
-แผนที่นี้คือทุกอย่างใน notebook ของวันนี้ครับ ด้านบนคือการทำงานหนึ่งรอบของ AI agent ด้านล่างคือฐานข้อมูลเดียวที่เก็บทุกอย่างที่มันจำได้ เราจะเดินตามแผนที่นี้ทีละขั้น ตามลำดับที่โค้ดทำงานจริง
+### 11 · The code, on one map  (`3.6m`) · stop 0
 
-ก่อนอื่นเปิด notebook กันก่อนครับ ในรายการไฟล์ เปิดโฟลเดอร์ agent_memory แล้วดับเบิลคลิก notebook_complete_ollama.ipynb แต่ละกล่องคือหนึ่ง cell คลิกในกล่องเพื่อเลือก แล้วกดปุ่ม Run หรือกด Shift + Enter
+#### ไทย
 
-ส่วนที่ 1 และ 2 AI agent ต้องการการเชื่อมต่อเดียวคือเข้าฐานข้อมูล ซึ่งเก็บทั้งความจำ ผลตรวจ และ embedding model
+ตัวละครของเรามีสองคนครับ คุณ Mercer ช่างตรวจที่ไปตรวจ Harbor Bridge ก่อน กับคุณ Vance ช่างคนใหม่ที่ไปสะพานเดียวกันหลายสัปดาห์ต่อมา สองคนนี้ไม่เคยเจอกัน ไม่เคยคุยกัน โจทย์คือทำยังไงให้สิ่งที่ Mercer รู้ ไปถึงมือ Vance เอง
+**สำนักงานของเรามีห้องเก็บเอกสารห้องเดียวครับ คือ Oracle AI Database ทะเบียนเมือง รายงานที่เซ็นแล้ว และความจำของที่ปรึกษา อยู่ในห้องเดียวกันหมด และสำนักงานนี้ยกทั้งหลังไปตั้งบน OCI ได้ ระหว่างทางผมจะชี้ให้ดูว่าห้องไหนตรงกับบริการอะไร**
 
-มีสองโมเดล สองหน้าที่ embedding model หาสิ่งที่คล้ายกัน และทำงานอยู่ภายใน Oracle Database ส่วน language model ซึ่งรันบน Ollama ทำหน้าที่สกัดความจำและเขียนคำตอบ
+**เรามาดู workflow ของ lab นี้กัน นิดนึงครับ**
+แถวบนคือเคาน์เตอร์หน้าสำนักงาน ช่างเดินเข้ามาถาม call_agent เป็นคนรับเรื่อง เดินไปหยิบเอกสารที่เกี่ยวข้องมาใส่แฟ้ม คือ The prompt ส่งแฟ้มให้ที่ปรึกษาอ่าน แล้วส่งคำตอบกลับให้ช่าง
 
-เมื่อผู้ตรวจสอบรายงาน จะเกิดสองอย่าง
+กรอบใหญ่ด้านล่างคือห้องเก็บเอกสารครับ มีประตูบานเดียว ข้างในมีทะเบียนเมือง ตู้ต้นฉบับรายงาน โต๊ะเสมียนที่คัดสิ่งสำคัญ ตู้บัตรรายการ และตู้รายงานที่เซ็นแล้ว
+แถบเลขด้านล่างคือเส้นทางทัวร์สำนักงานวันนี้ เริ่มจาก 0 ไปจนถึง Day N ระหว่างทางใครหลง กลับมาดูแผนผังนี้ได้ตลอดครับ
 
-รายงานทั้งฉบับถูกเก็บคำต่อคำใน CITY_MESSAGE
+#### English
 
-และตัวสกัด (extractor) ดึงสิ่งที่ควรเก็บออกมาเป็นการ์ดความจำเล็ก ๆ ใน CITY_MEMORY เช่น fact และ guideline ข้อความเดียวให้ความจำได้สามอัน
+This one map is everything in today’s notebook. One turn of the AI agent runs along the top, and everything it remembers sits in one database underneath. We will walk it in the order the code runs.
 
-agent ไม่ได้เก็บสิ่งที่คุณพูด แต่เก็บสิ่งที่มันเรียนรู้
+### 11a · 0 · First, open the notebook.  (`3.6m.1`) · stop 1
 
-ตอนนี้ลองค้นความจำเหล่านั้น ถ้าไม่ใส่ user id ผลค้นจะว่างเปล่า ได้ศูนย์รายการ
+#### ไทย
 
-พอใส่กุญแจที่ถูกต้อง คือ user_id เป็น inspector_demo ความจำก็ปรากฏขึ้น
+//**Part0**
+เมื่อทุกคนเปิดหน้า LiveLabs ของ workshop แล้วกดลิงก์เปิด JupyterLab และ ทำการ login ด้วย password ที่กำหนด ครับ
+----
+แถบซ้ายคือชั้นหนังสือของสำนักงานครับ ดับเบิลคลิก notebooks แล้วเข้า agent_memory จากนั้นดับเบิลคลิก notebook_complete_ollama.ipynb
+//[ชี้ไฟล์ notebook_student_ollama.ipynb]
+บนชั้นเดียวกันมีคู่มืออีกเล่มครับ notebook_student_ollama.ipynb เล่มนั้นเว้นช่องว่างไว้หกจุดให้พนักงานเติมเอง วันนี้เราใช้เล่ม complete ที่เติมครบแล้ว ใครอยากท้าทายตัวเอง กลับบ้านไปลองเล่ม student ได้
+--
 
-เรคคอร์ดสืบทอด scope มาจากเธรดที่เขียนมัน
+#### English
 
-ข้าง ๆ ความจำมี system of record คือผลตรวจอย่างเป็นทางการสิบห้ารายการ แต่ละรายการมีหมวด ความรุนแรง เกรด ข้อเสนอแนะ และ embedding
+First, open the notebook. In the file list on the left, open the agent_memory folder and double-click notebook_complete_ollama.ipynb.
 
-Mercer บันทึกหนึ่งรายการโดยตั้งใจ: การกัดกร่อน ระดับปานกลาง เกรด C ซ่อมภายใน 60 วัน
+### 11b · 0 · This is where the code is.  (`3.6m.2`) · stop 2
 
-ความจำคือสิ่งที่ agent เรียนรู้ ส่วนผลตรวจคือสิ่งที่เมืองบันทึกไว้
+#### ไทย
 
-เพื่อหาผลตรวจที่ใช่ เราค้นด้วยความหมาย แล้วห้ารายการที่ใกล้ที่สุดก็สว่างขึ้น
+คู่มือแบ่งเป็นหน้าเล็ก ๆ เรียกว่า cell มีสองแบบ
+//[ชี้ข้อความคำอธิบาย]
+แบบแรกเป็นคำอธิบาย อ่านอย่างเดียว บอกว่าถัดไปจะทำอะไร
+//[ชี้ code cell ที่มีเลขบรรทัด]
+แบบที่สองคือคำสั่งงาน กล่องสีเทาที่มีเลขบรรทัด กดแล้วงานเกิดขึ้นจริง ตัวอักษรสีเขียวเอียงที่ขึ้นต้นด้วย # คือโน้ตที่คนเขียนคู่มือทิ้งไว้ให้อ่าน ไม่มีผลกับงาน
+ด้านซ้ายของหน้าคำสั่งงานมีช่องเช็กสถานะครับ เหมือนตราประทับบนใบงาน
+มุมขวาบนคือพนักงานที่ลงมือทำงานตามคู่มือ เรียกว่า kernel วงกลมโปร่งแปลว่าว่างอยู่ ถ้าวงกลมทึบแปลว่ากำลังทำงาน
 
-จากนั้นใส่สองกำแพง: เฉพาะ Harbor Bridge และเฉพาะการกัดกร่อน กว้างห้ารายการ ตามสินทรัพย์ห้ารายการ ตามหมวดสี่รายการ
+#### English
 
-ความคล้ายเชิง vector และตัวกรองเชิงสัมพันธ์ ในคำสั่ง SQL เดียว
+This is where the code lives. Each box is a cell. Click inside one to select it, and the blue bar on its left shows which cell you are on.
 
-กุญแจสามดอกกำหนดว่าใครเห็นอะไร: ผู้ใช้ agent และเธรด
+### 11c · 0 · Run the cell.  (`3.6m.3`) · stop 3
 
-Mercer เก็บบันทึกส่วนตัวไว้หลังประตูของเธอ: สลับกะวันอังคาร ส่วนแนวทางของ Harbor Bridge วางไว้ในห้องโถงกลาง
+#### ไทย
 
-เมื่อ Vance ค้น เขาชนประตูของเธอ แต่เจอแนวทางในห้องโถง: ไม่มีความจำส่วนตัวของเธอเลย มีหนึ่งรายการที่แบ่งกัน
+**การสั่งงาน**
+1. คลิกที่หน้า แล้วกด Shift + Enter ทำหน้านี้แล้วพลิกไปหน้าถัดไปให้เลย วันนี้ใช้วิธีนี้เป็นหลัก
+2. กดปุ่ม ▶ บนแถบเครื่องมือ ได้ผลเหมือนกัน
+3. เมนู Run แล้ว Run All Cells ทำทั้งเล่มรวดเดียว วันนี้อย่าเพิ่งใช้นะครับ เราจะเดินไปด้วยกันทีละหน้า
+**กฎสามข้อของสำนักงาน**
+1. ทำตามลำดับหน้า ห้ามข้าม หน้าหลังใช้ของที่หน้าก่อนเตรียมไว้ เหมือนจะเข้าห้องเอกสารโดยยังไม่ได้เปิดประตู ก็เจอ error ทันที
+2. เห็นดอกจันแล้วรอ หน้าที่ต้องถามที่ปรึกษาใช้เวลา 30 ถึง 60 วินาที กดซ้ำเท่ากับเคาะประตูห้องที่ปรึกษาซ้ำ ๆ เขาไม่ได้ตอบเร็วขึ้นครับ
+3. ถ้าค้าง กด ■ เพื่อหยุด ถ้ายังแปลก ๆ ไปที่เมนู Kernel เลือก Restart Kernel แล้วเริ่มจากหน้าแรกใหม่
 
-นี่คือเงื่อนไข WHERE ใน SQL ไม่ใช่ตัวกรองใน Python
+#### English
 
-นี่คือหนึ่งรอบของ AI agent ทีละขั้น: เปิดเธรดของ Vance เอง อ่านเรคคอร์ดของสะพาน สร้าง context card หาผลตรวจที่คล้ายกัน ค้นความจำที่แบ่งกัน ถาม language model บันทึกทั้งสองข้อความ และสกัดความจำใหม่
+To run a cell, click Run, or press Shift and Enter. The cell runs, and the next one is selected for you. Run them in order and you will follow along with me.
 
-และนี่คือ context card ที่มันสร้างขึ้น: สรุป หัวข้อ ข้อมูลที่เกี่ยวข้อง และข้อความล่าสุด นี่คือ prompt ที่โมเดลได้รับจริง ๆ
+### 11d · 1a · Oracle setup  (`3.6m.4`) · stop 4
 
-วันที่ 1 Mercer อยู่หน้างานตรงสนิม หน้าตัดหายไปประมาณ 25 เปอร์เซ็นต์ที่ขอบแผ่นรองรับ คำแนะนำของเธอคือซ่อมภายใน 60 วัน
+#### ไทย
 
-AI agent บันทึกเป็นผลตรวจของ Harbor Bridge
+//**Part 1a: สำนักงานมีอะไรอยู่ที่ไหน**
+สำนักงานนี้มีอะไร อยู่ที่ไหน" สไลด์นี้ตอบไว้ประโยคเดียว "One filing room, not five" 
+ที่เก็บเอกสารห้องเดียว ไม่ใช่ห้า
+ในหน้านี้มีที่อยู่สามอย่างครับ ห้องเอกสารอยู่ไหน คนปักหมุดแผนที่คือใคร และห้องที่ปรึกษาอยู่ตรงไหน
+ห้องเก็บเอกสาร
+//[ชี้บรรทัด 71–72 DB_USER กับ DB_DSN]
+DB_DSN คือที่อยู่ของห้องเก็บเอกสารครับ อ่านเหมือนป้ายบอกทางในสำนักงานได้เลย
 
-มีสองอย่างที่ถูกบันทึก ผลตรวจอย่างเป็นทางการเข้าตารางผลตรวจ: การกัดกร่อน ระดับปานกลาง เกรด C ซ่อมภายใน 60 วัน
+คนปักหมุดแผนที่
+ในห้องเอกสารนี้มีคนทำงานพิเศษคนหนึ่งครับ เขาอ่านรายงานทุกฉบับแล้วปักหมุดลงบนแผนที่เมือง แต่ไม่ใช่แผนที่ถนน เป็นแผนที่ของความหมาย รายงานที่พูดเรื่องเดียวกันจะได้หมุดอยู่ย่านเดียวกัน
+คนปักหมุดคนนี้ชื่อ ALL_MINILM_L12_V2 เป็นโมเดลแบบ ONNX 
+คำคอมเมนต์บรรทัด 74 บอกว่า "preloaded into Oracle" เขานั่งทำงานอยู่ในห้องเอกสารอยู่แล้ว เราแค่เรียกชื่อ ไม่ต้องส่งรายงานออกไปให้ใครข้างนอก
+**คนปักหมุดทำงานในห้องเอกสาร แปลว่ารายงานไม่เคยออกจากห้องเลยครับ ไม่มีค่าจ้างต่อฉบับ และใน Oracle AI Database 26ai ความสามารถ AI Vector Search รวมมาให้โดยไม่คิดเงินเพิ่ม ห้องเอกสารบน Autonomous AI Database ก็มีคนปักหมุดแบบเดียวกัน**
 
-แนวทางของเธอไปอยู่ในความจำที่แบ่งกันของ Harbor Bridge ส่วนแชตยังเป็นส่วนตัว
+ที่ปรึกษา
+สองบรรทัดนี้คือห้องของที่ปรึกษาอาวุโสครับ ห้องชื่อ ollama เลขที่ 11434 
+ที่ปรึกษาชื่อ llama3.2 เป็นที่ปรึกษาตัวเล็กที่นั่งอยู่ในสำนักงานเดียวกัน
+คอมเมนต์บรรทัด 78 บอกว่าที่ปรึกษาคนนี้ทำงานสองตำแหน่ง ช่วยเสมียนสรุปบัตรรายการ และตอบคำถามช่างที่เคาน์เตอร์
+พอสำนักงานโตขึ้น จะจ้างที่ปรึกษาที่เก่งกว่านี้ก็แค่เปลี่ยนเลขห้องสองบรรทัดนี้ครับ บน OCI Generative AI มีที่ปรึกษาให้เลือก เช่น grok, gemma, และ OpenAI gpt-oss หรือจะ bring your own model ก็ได้
 
-นี่คือสิ่งที่ผู้ตรวจสอบคนถัดไปจะได้รับสืบทอด
+#### English
 
-วันที่ 2 Vance มาที่สนิมเดิมและถามคำถามเดิม: ที่เสานี้เกิดอะไรขึ้น
+Part 1. Where does everything live? In **one filing room, not five**. These few settings name the database, the embedding model and the language model.
 
-ก่อนตอบ AI agent ไปค้นก่อน: การค้นผลตรวจเจอของ Mercer และความจำที่แบ่งกันมีแนวทางของเธอ แชตส่วนตัวของเธอไม่เคยถูกค้น
+### 11e · 1b · Oracle setup  (`3.6m.5`) · stop 5
 
-คราวนี้ AI agent รู้แล้ว Mercer บันทึกการกัดกร่อนที่นี่ในวันที่ 1: ประมาณ 25 เปอร์เซ็นต์ เกรด C ซ่อมภายใน 60 วัน พร้อมแหล่งที่มาทั้งสอง
+#### ไทย
 
-ไม่ต้องส่งต่อด้วยคน ผลตรวจและความจำส่งต่อให้เอง
+// Part 1b: เปิดประตูห้องเอกสาร
+รู้ที่อยู่แล้ว ทีนี้เดินไปเปิดประตูห้องเอกสารกันครับ
+connect_to_oracle คือการเดินไปที่หน้าห้อง ยื่นบัตรพนักงาน ใส่รหัส แล้วเปิดประตูครับ บรรทัดเดียวจบ ไม่มีขั้นตอนพิเศษ
+--
+กด Shift + Enter แล้วควรเห็นป้ายสรุปออกมาครับ
+ใครเห็น Connected แล้ว ยกมือให้ผมดูหน่อยครับ
 
-### English
+**ลองนึกถึงสำนักงานที่เก็บทะเบียนไว้ตึกหนึ่ง แผนที่ไว้อีกตึก บัตรรายการไว้อีกตึกครับ สามประตู สามกุญแจ และสามที่ที่เอกสารอาจไม่ตรงกัน บริษัทที่ใช้ vector DB แยกกับฐานข้อมูลหลักเจอแบบนี้อยู่ทุกวัน
+ที่นี่ประตูเดียวจบ และถ้าย้ายห้องเอกสารไปอยู่บน Autonomous AI Database งานแม่บ้านของห้องเก็บเอกสาร เช่น ซ่อมบำรุง สำเนาเอกสาร และล็อกตู้ ระบบทำให้เอง**
 
-This one map is everything in today’s notebook. One turn of the AI agent runs along the top, and everything it remembers sits in one database underneath. We walk it in the order the code runs.
+#### English
 
-First, open the notebook. In the file list, open agent_memory and double-click notebook_complete_ollama.ipynb. Each box is a cell: click inside one to select it, then click Run or press Shift and Enter.
+Now run the connection cell. **One connection** opens the database. If you see this line, you are in, and everything after this uses the same connection.
 
-Parts 1 and 2. The AI agent needs one connection: the database, which holds its memory, the findings and the embedding model. Two models, two jobs: the embedding model finds what is similar, and it runs inside Oracle Database. The language model, on Ollama, extracts memories and writes the answers.
+### 11f · 2a · The embedder  (`3.6m.6`) · stop 6
 
-When an inspector reports, two things happen. The whole report is filed word for word in CITY_MESSAGE. And the extractor pulls out what is worth keeping as small memory cards in CITY_MEMORY: a fact, a guideline. One message gives three memories. The agent does not store what you said. It stores what it learned.
+#### ไทย
 
-Now search those memories. With no user id, the search comes back empty: zero memories.
+**Part 2a: คนปักหมุดแผนที่ความหมาย**
+ปัญหาแรกของห้องเอกสารครับ ช่างแต่ละคนเขียนไม่เหมือนกัน Mercer เขียนว่า "สนิมเกาะตลับลูกปืน Pier 2" ส่วน Vance เขียนว่า "เห็นคราบสนิมไหลใกล้ตอม่อฝั่งใต้" เรื่องเดียวกัน แต่คำไม่ตรงกันสักคำ ถ้าเสมียนค้นตามคำ หากันไม่เจอแน่นอน
+[ชี้ประโยคบนสไลด์]
+นี่คืองานของคนปักหมุดครับ สไลด์บอกไว้เลย ข้อความกลายเป็นตัวเลข 384 ตัว เหมือนที่อยู่บนแผนที่ความหมาย รายงานที่หมายถึงเรื่องเดียวกันจะไปอยู่ย่านเดียวกัน
+ลองนึกแผนที่เมืองของเราครับ ย่านหนึ่งเป็นเรื่องสนิม อีกย่านเป็นเรื่องท่อรั่ว อีกย่านเป็นเรื่องไฟฟ้าดับ รายงานของ Mercer กับ Vance จะได้หมุดอยู่ย่านสนิมทั้งคู่ เพราะความหมายเดียวกัน แม้คำจะต่างกัน แค่แผนที่นี้มี 384 มิติ แทนที่จะมีแค่เหนือใต้ตะวันออกตะวันตก
+[ชี้กล่อง Embedder บนแผนผัง]
+บนแผนผังสำนักงาน คนปักหมุดนั่งที่กล่อง Embedder ครับ ลูกศรสองเส้นบอกว่าเขาปักหมุดให้ทั้งตู้บัตรรายการ และตู้รายงานที่เซ็นแล้ว
+**บรรทัด 17 คือหัวใจครับ คำว่า database แปลว่าคนปักหมุดนั่งอยู่ในห้องเอกสาร ไม่ต้องส่งรายงานออกไปให้ใครข้างนอกปักหมุดให้**
+• บรรทัด 21 ส่งรายงานให้คนปักหมุด ได้พิกัดกลับมา
+• บรรทัด 22 เขียนพิกัดให้อยู่ในรูปแบบ float32 เพราะเสมียนอ่านได้แบบเดียว เขียนผิดแบบเสมียนไม่รับ
+กด Shift+Enter
+ด่านตรวจคือการทดสอบคนปักหมุดวันแรกครับ ยื่นรายงานสั้น ๆ ให้ฉบับหนึ่ง "corrosion on bearing assembly" ต้องได้หมุดกลับมาหนึ่งอัน พิกัด 384 หลักพอดี
 
-Give it the right key, user_id inspector_demo, and the memories light up. Records inherit the scope of the thread that wrote them.
+#### English
 
-Next to memory sits the system of record: fifteen official findings, each with a category, a severity, a grade, a recommendation and an embedding. Mercer logs one on purpose: corrosion, medium, grade C, repair within 60 days. Memory is what the agent learns. Findings are what the city records.
+Part 2. How do you search by meaning? The embedder turns text into **384 numbers**, like an address on a map of meaning. Reports that mean the same thing land close together.
 
-To find the right findings we search by meaning, and the five nearest light up. Then two walls: only Harbor Bridge, only corrosion. Broad five, asset five, category four. Vector similarity and relational filters in one SQL statement.
+### 11g · 2b · The memory SDK  (`3.6m.7`) · stop 7
 
-Three keys decide who sees what: the user, the agent and the thread. Mercer keeps a private note behind her own door: swap shifts Tuesday. Her guideline for Harbor Bridge goes in the shared hall. When Vance searches, he bounces off her door and finds the guideline in the hall: none of her private memories, one shared. This is a SQL WHERE clause, not a Python filter.
+#### ไทย
 
-Here is one AI agent turn, step by step: open Vance’s own thread, read the bridge’s record, build the context card, find similar findings, search the shared memory, ask the language model, save both messages, and extract new memories.
+Part 2b: เสมียนประจำห้องเอกสาร
+ห้องเอกสารมีแล้ว คนปักหมุดมีแล้ว คำถามต่อไปคือใครจะเป็นคนจดครับ
+คำตอบคือเสมียนประจำห้อง คือ SDK oracleagentmemory เสมียนคนนี้ทำงานสองอย่างครับ เก็บต้นฉบับทุกคำที่ช่างพูด และเขียนบัตรรายการสรุปสิ่งที่สำคัญเก็บไว้
 
-And this is the context card it builds: a summary, the topics, the relevant information and the recent messages. This is the prompt the model actually receives.
+ส่วนบนของ cell บอกเสมียนว่าเวลาสรุปบัตรไม่ออก ให้ไปปรึกษาที่ปรึกษาห้องเดิมครับ 
+บรรทัด 18 คือบรรทัดที่ผมชอบที่สุดในคู่มือครับ ถ้าไม่มีบรรทัดนี้ เสมียนจะแค่เก็บต้นฉบับเข้าตู้เฉย ๆ พอมีบรรทัดนี้ เขาจะอ่านทุกฉบับแล้วเขียนบัตรสรุปให้เอง เราไม่ต้องสอนเขาเขียนสักบรรทัด
 
-Day 1. Mercer is at the rust: about 25 percent section loss at the bearing plate edges. Her advice: repair within 60 days. The AI agent logs it as a finding for Harbor Bridge.
+กด Shift+Enter แล้วดูที่ output OracleAgentMemory ready. Tables under prefix CITY_*
 
-Two things are saved. The official finding goes into the findings table: corrosion, medium, grade C, repair within 60 days. Her guideline goes to shared memory for Harbor Bridge. The chat itself stays private. This is what the next inspector inherits.
+#### English
 
-Day 2. Vance comes to the same rust and asks the same question as before: what happened at this pier? Before answering, the AI agent looks it up: a search over the findings finds Mercer’s, and shared memory holds her guideline. Her private chat is never searched.
+Next, the memory SDK. It sits on that same connection and sets up its own tables, and the embedder we just met does the numbers for it.
 
-This time the AI agent knows. Mercer logged corrosion here on Day 1: about 25 percent, grade C, repair within 60 days, with both sources. No human handoff. The finding and the memory carried it.
+### 11h · 3a · City assets  (`3.6m.8`) · stop 8
+
+#### ไทย
+
+** Part 3a: ขนกล่องเอกสารเก่าเข้าห้อง**
+สำนักงานเราไม่ได้เริ่มจากศูนย์นะครับ ชั้นใต้ดินมีกล่องเอกสารเก่าอยู่สองกอง กองแรกเป็นบันทึกซ่อมบำรุง กองที่สองเป็นรายงานตรวจสภาพ cell นี้คือการยกสองกองนี้ขึ้นมาเปิดอ่าน แล้วทำทะเบียนทรัพย์สินของเมืองให้เรียบร้อย
+โค้ดส่วนนี้ไล่อ่านทุกแผ่นในสองกอง แล้วดึงรหัสทรัพย์สินออกมา สะพาน ท่อ อุโมงค์ เจอรหัสไหนก็จดลงทะเบียน รหัสซ้ำก็จดครั้งเดียว
+ทะเบียนนี้คือตู้ CITY_ASSET ครับ ตู้แรกในห้องเอกสาร เป็นตาราง Oracle ธรรมดา ไม่มีอะไรพิเศษ
+[กด Shift+Enter แล้วชี้ output]
+308 บันทึกซ่อม 60 รายงานตรวจ รวมกันแล้วเมืองเรามีทรัพย์สิน 26 ชิ้น ตรงกับที่ผมเล่าตอนเปิดเรื่องครับ ทะเบียน 26 แถวนี้จะเป็นกระดูกสันหลังของทุกอย่างที่เหลือ
+
+#### English
+
+Part 3. Before any memory, the AI agent needs to know what exists. This code reads two data files and finds **26 city assets**, and Harbor Bridge is one of them.
+
+### 11i · 3b · What happens to a new message?  (`3.6m.9`) · stop 9
+
+#### ไทย
+
+***Part 3b: แฟ้มงานส่วนตัว และเสมียนเขียนบัตร**
+ทีนี้มาถึงชีวิตประจำวันของสำนักงานครับ ช่างคนหนึ่งเดินกลับจากหน้างานแล้วพูดว่า "วันนี้เจออะไรมา" คำพูดนั้นต้องไปอยู่ที่ไหน
+คำตอบคือแฟ้มงานส่วนตัวครับ ช่างหนึ่งคนกับสะพานหนึ่งตัวมีแฟ้มหนึ่งเล่ม Mercer กับ Pier 2 เป็นแฟ้มหนึ่ง Vance กับ Pier 2 เป็นอีกแฟ้ม ในโค้ดเรียกแฟ้มนี้ว่า thread
+
+Part 3b1: รายงานใหม่หนึ่งฉบับ เดินทางไปไหนบ้าง
+[เปิดสไลด์ 3b · What happens to a new message?]
+ทีนี้มาถึงชีวิตประจำวันของสำนักงานครับ ช่างคนหนึ่งเดินกลับจากหน้างานแล้วเล่าว่า "วันนี้เจออะไรมา" คำถามคือคำพูดประโยคนั้นเดินทางไปไหนบ้างในห้องเอกสาร สไลด์นี้ตอบไว้ในภาพเดียวครับ
+ก่อนอื่นแนะนำแฟ้มงานส่วนตัวก่อน ช่างหนึ่งคนกับสะพานหนึ่งตัวมีแฟ้มหนึ่งเล่ม Mercer กับ Pier 2 เป็นแฟ้มหนึ่ง Vance กับ Pier 2 เป็นอีกแฟ้ม ในโค้ดเรียกแฟ้มนี้ว่า thread
+ทางแรก: เก็บต้นฉบับทุกคำ
+[ชี้กล่อง New message แล้วลากตามลูกศรไปที่ CITY_MESSAGE verbatim]
+พอเรียก thread.add_messages(...) สิ่งแรกที่เสมียนทำคือเย็บต้นฉบับเข้าแฟ้มครับ ทุกคำตามที่ช่างพูด ไม่ตัด ไม่สรุป เก็บในตู้ CITY_MESSAGE คำว่า verbatim บนภาพแปลว่าคำต่อคำ ถ้าวันหลังมีข้อโต้แย้งว่า "ช่างพูดจริงหรือเปล่า" เปิดต้นฉบับดูได้เสมอ
+ทางที่สอง: เสมียนนั่งเขียนบัตรรายการ
+[ชี้ลูกศรเส้นที่สองที่วิ่งไปกล่องหกเหลี่ยม Extractor LLM]
+ข้อความเดียวกันถูกส่งไปที่โต๊ะเสมียนด้วยครับ กล่องหกเหลี่ยมนี้คือเสมียนของเรา บนภาพเขียนว่า the SDK's own model คือเสมียนมีที่ปรึกษาประจำโต๊ะช่วยอ่าน ใน lab นี้ก็คือ llama3.2 ตัวที่เราใส่ไว้ตอน 2b นั่นเอง
+แต่เสมียนไม่ได้อ่านข้อความใหม่โดด ๆ นะครับ บนโต๊ะเขามีของอีกสองอย่างวางอยู่
+[ชี้กล่อง Running thread summary และเส้นประ advisory]
+อย่างแรกคือแผ่นสรุปที่แปะหน้าแฟ้ม แฟ้มนี้คุยเรื่องอะไรมาแล้วบ้าง เส้นประเขียนว่า advisory แปลว่าเสมียนแค่ชำเลืองดูให้รู้บริบท ไม่ได้ลอกมาเขียนบัตร เหมือนรู้ว่า "อ๋อ แฟ้มนี้กำลังพูดเรื่องสนิมลูกปืน" จะได้ตีความประโยคใหม่ถูก
+[ชี้กระบอก Past memories และเส้นประ dedup / update]
+อย่างที่สองคือบัตรเก่าที่อยู่ในตู้แล้วครับ ก่อนเขียนบัตรใหม่ เสมียนเปิดตู้ดูก่อนว่ามีใบที่พูดเรื่องเดียวกันอยู่หรือยัง ถ้ามีแล้วก็ไม่เขียนซ้ำ ถ้าข้อมูลเปลี่ยน เช่นเมื่อเดือนก่อนสนิมกิน 15% วันนี้เป็น 25% ก็แก้บัตรใบเดิมแทน นี่คือคำว่า dedup / update บนภาพ ตู้บัตรจึงไม่บวมด้วยบัตรซ้ำ ๆ
+ผลลัพธ์: บัตรเล็ก ๆ 2 ถึง 8 ใบ
+[ชี้กล่อง 2-8 atomic typed records แล้วลากไป CITY_MEMORY]
+อ่านครบสามอย่างแล้ว เสมียนเขียนบัตรออกมา 2 ถึง 8 ใบต่อข้อความครับ คำว่า atomic แปลว่าบัตรหนึ่งใบเขียนเรื่องเดียว ไม่ยัดหลายเรื่องรวมกัน ค้นทีหลังจะได้หยิบตรงใบ
+บัตรมีสี่สี ตามที่เราตั้งไว้ในตารางตัวละคร
+สีบัตร
+ใช้กับ
+ตัวอย่างจากรายงาน Mercer
+fact
+ข้อเท็จจริง
+Pier 2 section loss ราว 25%
+preference
+ความชอบของช่างคนนั้น
+วิธีทำงานที่ช่างชอบ
+guideline
+แนวปฏิบัติ
+ข้อความใต้ Standing guidance
+memory
+เรื่องเล่าทั่วไป
+สิ่งที่เกิดขึ้นวันนั้น
+บัตรทุกใบเข้าตู้ CITY_MEMORY แล้วคนปักหมุดก็ปักหมุดให้ทุกใบบนแผนที่ความหมาย พรุ่งนี้ใครค้นเรื่องสนิมก็หาเจอ
+[ชี้บรรทัด extract_memories=True บนสไลด์]
+จำได้ไหมครับ บรรทัด extract_memories=True ใน 2b ที่ผมบอกว่าชอบที่สุด ทางที่สองทั้งเส้นนี้เกิดขึ้นเพราะบรรทัดนั้นบรรทัดเดียว เราไม่ได้เขียนโค้ดสั่งเสมียนอ่าน ไม่ได้เขียน prompt สั่งแยกสี ไม่ได้เขียนโค้ดเช็กบัตรซ้ำ SDK ทำให้หมด
+หมายเหตุสำหรับผู้พูด: จำนวน 2 ถึง 8 ใบเป็นช่วงโดยประมาณ แล้วแต่ข้อความยาวสั้น อย่าสัญญาตัวเลขตายตัว
+จังหวะขายของ
+ดูภาพนี้อีกทีครับ ต้นฉบับ แผ่นสรุป บัตรเก่า บัตรใหม่ ทั้งหมดอยู่ในห้องเอกสารห้องเดียว ตอนเสมียนเช็กบัตรซ้ำ เขาไม่ต้องเดินข้ามไปอีกตึกเพื่อถาม vector DB แยก เพราะบัตรกับหมุดอยู่ในแถวเดียวกันของตาราง Oracle
+[เปลี่ยนไปที่โค้ด]
+เห็นภาพรวมแล้ว ทีนี้มาดูโค้ดที่ช่างใช้เดินมาส่งรายงานกันครับ
+
+#### English
+
+Now the heart of it. A new message is filed word for word in **CITY_MESSAGE**. Then the extractor reads it, together with the running thread summary and the past memories, and writes two to eight small typed records into **CITY_MEMORY**.
+
+### 11j · 3b · Auto-extraction  (`3.6m.10`) · stop 10
+
+#### ไทย
+
+Part 3b2: ยื่นรายงานเข้าแฟ้มทำยังไง (TODO 2)
+[เปิดสไลด์ 3b · How does a report get filed?]
+ภาพเมื่อกี้ดูเหมือนงานเยอะใช่ไหมครับ เก็บต้นฉบับ อ่านแผ่นสรุป เช็กบัตรซ้ำ เขียนบัตรสี่สี แต่สไลด์นี้บอกว่าในโค้ดจริงใช้แค่สองบรรทัด เตรียมหน้ากระดาษ แล้วยื่นเข้าแฟ้ม ที่เหลือเสมียนทำเอง
+[ชี้แผนผังด้านซ้าย กล่อง CITY_MESSAGE กับ Extractor ที่ไฮไลต์]
+บนแผนผังสำนักงาน เราอยู่ตรงนี้ครับ ตู้ต้นฉบับกับโต๊ะเสมียน สองกล่องที่เพิ่งเห็นใน 3b1
+ก่อนยื่น: สั่งให้มีแผ่นสรุปหน้าแฟ้ม
+[ชี้บรรทัด 13–14]
+ด้านบนของฟังก์ชันคือการหาแฟ้มของช่างคนนี้กับสะพานนี้ ถ้าไม่มีก็เปิดแฟ้มใหม่ และเขียนชื่อช่างเป็นเจ้าของบนสันแฟ้มด้วย user_id=inspector บรรทัดชื่อเจ้าของนี้จำไว้ให้ดี มันจะกลับมาเป็นพระเอกใน 3c กับ Part 5
+สองบรรทัดที่เห็นอยู่คือคำสั่งเรื่องแผ่นสรุปครับ
+บรรทัด
+โค้ด
+ในสำนักงาน
+13
+enable_context_summary=True
+ให้มีแผ่นสรุปแปะหน้าแฟ้ม แผ่นที่เสมียนชำเลืองดูใน 3b1
+14
+context_summary_update_frequency=2
+ทุก 2 ข้อความ เขียนแผ่นสรุปใหม่ครั้งหนึ่ง
+ทำไมไม่เขียนใหม่ทุกข้อความ เพราะการเขียนแผ่นสรุปต้องถามที่ปรึกษาทุกครั้งครับ ถามทุกหน้าเสียเวลา สองหน้าครั้งกำลังพอดี
+บรรทัดที่หนึ่ง: ประทับหัวกระดาษ
+[ชี้บรรทัด 16 ที่ไฮไลต์]
+content = f"[Asset: {asset_id}] [Inspector: {inspector}] {narrative}"
+ก่อนยื่น เสมียนประทับตราหัวกระดาษสองอันครับ รหัสสะพาน และชื่อช่าง แล้วตามด้วยเนื้อเรื่องที่ช่างเล่า
+ทำไมต้องประทับ เพราะช่างมักเล่าแบบไม่บอกชื่อสะพานครับ "เจอสนิมที่เสาต้นที่สอง" เสาต้นที่สองของสะพานไหน พอมีตราประทับหัวกระดาษ เสมียนก็เขียนบัตรได้ครบ และคนปักหมุดก็ปักหมุดได้ตรงย่านของสะพานนั้น
+บรรทัดที่สอง: ยื่นเข้าแฟ้ม
+[ชี้บรรทัด 17 ที่ไฮไลต์]
+return await t.add_messages_async([Message(role="user", content=content)])
+บรรทัดนี้คือการยื่นกระดาษใส่แฟ้ม t ครับ role="user" แปลว่าคนพูดคือช่าง ไม่ใช่ที่ปรึกษา
+ประโยคสำคัญบนสไลด์คือประโยคนี้ครับ Saving the message is also what starts the extractor การยื่นกระดาษเข้าแฟ้มคือกริ่งเรียกเสมียนไปในตัว เราไม่ต้องเดินไปเคาะโต๊ะเสมียนอีกรอบ ทุกอย่างในภาพ 3b1 เกิดจากบรรทัด 17 บรรทัดเดียว
+ด่านตรวจ: ทดสอบด้วยช่างทดสอบ
+[ชี้บรรทัด 19–26]
+ด่านตรวจหยิบบันทึกซ่อมใบแรกจากกองเอกสารเก่าใน 3a ครับ _logs[0] คอมเมนต์บอกว่าน่าจะเป็นการตรวจประจำที่ Harbor Bridge แล้วส่งให้ช่างทดสอบชื่อ smoke_inspector ยื่นเข้าแฟ้มทดสอบ smoke_thread ใช้ชื่อทดสอบก็เพื่อไม่ให้ปนกับแฟ้มของ Mercer กับ Vance
+[ชี้บรรทัด 27]
+assert เช็กว่าได้ใบรับกลับมาอย่างน้อยหนึ่งใบ ถ้าไม่ได้ แปลว่ากระดาษไม่เคยเข้าแฟ้ม จะขึ้นข้อความ TODO 2 incomplete ทันที
+[กด Shift+Enter แล้วชี้แถบ YOU SHOULD SEE]
+
+#### English
+
+So how does a report get filed? Two lines do it: build the content string, then call add_messages_async. **Saving the message is also what starts the extractor.**
+
+### 11k · 3c · Finding a memory  (`3.6m.11`) · stop 11
+
+#### ไทย
+
+ส่วน 3c ครับ ทำไมค้นแล้วได้ผลว่างเปล่า เพราะความจำเป็นของคนที่เขียนมันครับ ค้นโดยไม่ใส่ชื่อ ก็ไม่ได้อะไรเลย พอใส่ชื่อให้ถูก บัตรก็สว่างขึ้นมาทันที
+
+#### English
+
+Part 3c. Why did this search come back empty? Because **a memory belongs to whoever wrote it**. Search with no name and you get nothing. Give the right name, and the cards light up.
+
+### 11l · 4a · The official record  (`3.6m.12`) · stop 12
+
+#### ไทย
+
+Part 4 ครับ ถ้า finding ไม่ใช่ความจำ แล้วมันคืออะไร ความจำคือสิ่งที่ AI agent สังเกตเห็น ส่วน finding คือสิ่งที่คนเซ็นรับรอง มันมีตารางของตัวเอง และคำอธิบายของมันก็ถูกแปลงเป็นตัวเลขเหมือนกัน
+
+#### English
+
+Part 4. What is a finding, if it is not a memory? A memory is what the AI agent noticed. **A finding is what a person signed.** It gets its own table, and its description becomes numbers too.
+
+### 11m · 4b · Search with walls  (`3.6m.13`) · stop 13
+
+#### ไทย
+
+ทีนี้ค้นหา finding ครับ เราอยากได้ใบที่ใกล้ที่สุดในความหมาย แต่เฉพาะสะพานนี้เท่านั้น SQL คำสั่งเดียวทำได้ทั้งสองอย่าง คือใกล้ที่สุดในความหมาย ภายในกำแพงของทรัพย์สินนี้และหมวดนี้
+
+#### English
+
+Now we search the findings. We want the nearest in meaning, but only for this bridge. One SQL statement does both: the closest in meaning, **inside the walls** of this asset and this category.
+
+### 11n · 5 · Who sees what  (`3.6m.14`) · stop 14
+
+#### ไทย
+
+Part 5 ครับ ทำไม Vance อ่านโน้ตส่วนตัวของ Mercer ไม่ได้ ช่างแต่ละคนมีแฟ้มส่วนตัวของตัวเอง สิ่งที่ extractor เรียนรู้จะขึ้นไปอยู่บนชั้นของทรัพย์สิน และคนที่บังคับกฎนี้คือฐานข้อมูล ไม่ใช่ AI agent
+
+#### English
+
+Part 5. Why can Vance not read Mercer’s private note? Each inspector has a private thread. What the extractor learns goes on a shelf for the asset. And **the database enforces this**, not the AI agent.
+
+### 11o · 6 · One whole turn  (`3.6m.15`) · stop 15
+
+#### ไทย
+
+Part 6 คือหนึ่งเทิร์นเต็ม ๆ ครับ AI agent อ่านอะไรจริง ๆ สองบรรทัดดึงมาให้ คือการ์ดบริบทของมัน กับ finding ที่คล้ายกัน แล้วทุกอย่างรวมเข้าใน prompt เดียว ถามแล้วบันทึก
+
+#### English
+
+Part 6 is one whole turn. What does the AI agent actually read? Two lines fetch it: its context card and the similar findings. Then it all goes into one prompt: ask, then save.
+
+### 11p · Day 1a · Day 1, step 1: Mercer asks  (`3.6m.16`) · stop 16
+
+#### ไทย
+
+มาถึงเรื่องราวแล้วครับ วันที่ 1 Mercer เรียก call_copilot เพื่อขอความช่วยเหลือด้านการวินิจฉัย เธอพิมพ์สิ่งที่เห็นบน Harbor Bridge AI agent ค้นสิ่งที่รู้อยู่แล้วและคิดต่อ เทิร์นของเธอถูกบันทึก และ extractor เก็บสิ่งที่สำคัญไว้
+
+#### English
+
+Now the story, Day 1. Mercer calls call_copilot for diagnostic help. She types what she sees on Harbor Bridge. The AI agent searches what is already known and reasons about it. Her turn is saved, and the extractor keeps what matters.
+
+### 11q · Day 1b · Day 1, step 2: Mercer records  (`3.6m.17`) · stop 17
+
+#### ไทย
+
+เมื่อ Mercer มั่นใจแล้ว เธอบันทึก finding ด้วยตัวเองผ่าน log_finding ครับ นี่เป็นเส้นทางแยกต่างหาก เป็นหนึ่งแถวในบันทึกทางการ
+
+#### English
+
+Once Mercer is sure, she signs the finding herself with log_finding. That is a separate path: **one row in the official record**.
+
+### 11r · Day N · Later: Vance  (`3.6m.18`) · stop 18
+
+#### ไทย
+
+และต่อมาก็ถึงคิว Vance ครับ เขาเรียกแค่ call_copilot ส่วนแฟ้มของเขาว่างเปล่า แต่ความจำของทรัพย์สินและ finding ของ Mercer ขึ้นมาตามทางเดียวกัน ไม่ต้องมีคนส่งต่อ
+
+#### English
+
+And later, Vance. He only calls call_copilot. His own thread is empty, but the asset’s memory and Mercer’s finding come up the same road. **No human handoff.**
 
 ---
 
@@ -526,11 +774,11 @@ And it decides together with Vance: order an **immediate structural review**. We
 
 ### ไทย
 
-นั่นคือ Lab 3: ความจำคือรากฐาน ไม่ใช่ฟีเจอร์ context window คือปัญหาของการคัดสรร และที่เก็บเดียวที่รวมทุกอย่างดีกว่าสี่บริการ ก่อนทำควิซ มาดูภาพรวมของทั้งวัน
+นั่นคือ Lab 3: ความจำคือรากฐาน ไม่ใช่ฟีเจอร์ context window คือปัญหาของการคัดสรร และที่เก็บเดียวที่รวมทุกอย่างดีกว่าสี่บริการ มาดูภาพรวมของทั้งวัน
 
 ### English
 
-That is Lab 3: memory is **the foundation**, not a feature; the context window is **a curation problem**; and **one converged store** beats four services. Before the quiz, let us look at the whole day.
+That is Lab 3: memory is **the foundation**, not a feature; the context window is **a curation problem**; and **one converged store** beats four services. Now let us look at the whole day.
 
 ---
 
@@ -540,10 +788,8 @@ That is Lab 3: memory is **the foundation**, not a feature; the context window i
 
 สามแล็บ สะพานเดียว ใน Lab 1 เราสร้างผู้ช่วย ใน Lab 2 มันกลายเป็น agent ใน Lab 3 มันเรียนรู้ที่จะจำ ใต้ทั้งสามแล็บคือ Oracle AI Database หนึ่งเดียว
 
-ตอนนี้สแกนโค้ดเพื่อทำควิซ ห้านาที ผ่านที่ 80 เปอร์เซ็นต์ และได้รับ badge
-
 ### English
 
-Three labs, one bridge. In Lab 1 we built **an assistant**, in Lab 2 it became **an agent**, in Lab 3 it learned to **remember**. Under all three, **one Oracle AI Database**. Now scan the code for the quiz: five minutes, 80 percent to pass, and a badge.
+Three labs, one bridge. In Lab 1 we built **an assistant**, in Lab 2 it became **an agent**, in Lab 3 it learned to **remember**. Under all three, **one Oracle AI Database**.
 
 ---
