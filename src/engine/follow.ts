@@ -80,7 +80,13 @@ export const useFollowStore = create<FollowState>((set, get) => {
     };
     const unDrawer = useDrawerStore.subscribe(() => void send());
     const unScene = useSceneStore.subscribe(() => void send());
-    unsub = () => (unDrawer(), unScene());
+    // a heartbeat: the relay ends a session after 90 minutes without a word from the presenter, and a long hands-on part keeps one page on
+    // screen for longer than that (11 Nov: a phone typed the right code and the session had ended); repeating the page keeps it alive
+    const beat = setInterval(() => {
+      if (!last) return;
+      void post(code, token, last).then((n) => (n === null ? set({ status: 'error' }) : set({ status: 'on', listeners: n })));
+    }, 5 * 60 * 1000);
+    unsub = () => (unDrawer(), unScene(), clearInterval(beat));
     void send();
   };
   const saved0 = typeof sessionStorage === 'undefined' ? null : saved();
