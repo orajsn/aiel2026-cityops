@@ -41,7 +41,7 @@ export function Dims(p: L2Props) {
     <L2Page testId="l2-dims" {...p}>
       <Fill gap={16}>
         <div style={{ flex: '1 0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1.95fr) minmax(0, 1fr)', columnGap: 28, alignItems: 'stretch' }}>
-          {/* the path: question, embedding model, fingerprint, 384 numbers */}
+          {/* the path: question, embedding model, fingerprint, 384 dimensions */}
           <div data-path style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.div {...fadeUp(0.2)} style={{ ...box, flex: '1 1 0', minWidth: 0, padding: '18px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, textAlign: 'center' }}>
               <div style={{ fontSize: 26, fontWeight: 700, color: INK }}>Question</div>
@@ -66,7 +66,7 @@ export function Dims(p: L2Props) {
             {arrow}
             <motion.div {...fadeUp(1.1)} data-count style={{ flex: 'none', width: 138, padding: '22px 10px', borderRadius: 18, background: TEAL, color: '#fff', textAlign: 'center' }}>
               <div style={{ fontSize: 52, fontWeight: 700, lineHeight: 1 }}>384</div>
-              <div style={{ fontSize: 22, fontWeight: 600, marginTop: 6, lineHeight: 1.2 }}>numbers in this lab</div>
+              <div style={{ fontSize: 22, fontWeight: 600, marginTop: 6, lineHeight: 1.2 }}>dimensions in this lab</div>
             </motion.div>
           </div>
           {/* what controls the length */}
@@ -86,7 +86,7 @@ export function Dims(p: L2Props) {
           </motion.div>
         </div>
         <div style={{ flex: 'none', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {strip(<LineIcon name="clipboard" size={40} color={TEAL} />, <>A dimension is one numeric coordinate, <b>not a word count</b>.</>, false, 1.4)}
+          {strip(<LineIcon name="clipboard" size={40} color={TEAL} />, <>The dimensions are a group of numbers that describe the meaning, <b>not a word count</b>.</>, false, 1.4)}
           {strip(<LineIcon name="target" size={46} />, <><b style={{ color: TEAL_D }}>Larger models may capture richer meaning</b>, but model size and vector dimensions are different. More dimensions do not guarantee better retrieval.</>, true, 1.7)}
           {strip(<LineIcon name="inspect" size={40} color={TEAL} />, <>Use the same model for documents and queries. Compare retrieval quality, latency and storage on your own data.</>, false, 2)}
         </div>

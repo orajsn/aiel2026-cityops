@@ -44,7 +44,7 @@ export const NB_PAGES: Record<string, NbPage> = {
       [17, 3, 1, 62],
       null,
       [17, 5, 0],
-      [17, 6, 2, 62],
+      [17, 6, 2],
       [17, 7, 3],
       [17, 8, 3]
     ],
