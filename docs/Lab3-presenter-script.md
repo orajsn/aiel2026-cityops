@@ -10,7 +10,7 @@ Lab 3 ใช้สภาพแวดล้อมเดียวกับ Lab 2 �
 
 ### English
 
-Lab 3 runs in the same environment as Lab 2. If you closed it, open it again with this address. It is the one called "AI Labs 1 and 2" on LiveLabs.
+Lab 3 runs in the same environment as Lab 2. If you closed it, open it again with this address. It is the one called "AI Labs 2 and 3" on LiveLabs.
 
 ---
 
@@ -298,13 +298,13 @@ Parts 1 and 2, the database and the embedder, sit underneath. So now let us open
 
 ### ไทย
 
-เอาล่ะครับ นั่นคือเรื่องราวทั้งหมด ต่อไปเราจะรันมันจริง ๆ ขอให้ทุกท่านเปิด **สภาพแวดล้อมของ lab** ซึ่งเป็นอันเดียวกับ Lab 2 ด้วยลิงก์หรือ QR บนหน้าจอ บน LiveLabs จะชื่อว่า **AI Labs 1 and 2** ครับ
+เอาล่ะครับ นั่นคือเรื่องราวทั้งหมด ต่อไปเราจะรันมันจริง ๆ ขอให้ทุกท่านเปิด **สภาพแวดล้อมของ lab** ซึ่งเป็นอันเดียวกับ Lab 2 ด้วยลิงก์หรือ QR บนหน้าจอ บน LiveLabs จะชื่อว่า **AI Labs 2 and 3** ครับ
 
 พอเปิดแล้ว เราจะเปิด notebook ตัวนี้ด้วยกัน แล้วดูแต่ละส่วนทำงานทีละขั้น
 
 ### English
 
-All right, that was the whole story. Now we run it for real. Please open your **lab environment**, the same one as Lab 2, with the address or the code on the screen. On LiveLabs it is called **AI Labs 1 and 2**.
+All right, that was the whole story. Now we run it for real. Please open your **lab environment**, the same one as Lab 2, with the address or the code on the screen. On LiveLabs it is called **AI Labs 2 and 3**.
 
 Once it is open, we will open the notebook together and watch each part work, one step at a time.
 
