@@ -5,3 +5,5 @@ assets-original
 dev.log
 src/content/traffic.prev.json
 follow/data/
+.claude/worktrees/
+.claude/settings.local.json

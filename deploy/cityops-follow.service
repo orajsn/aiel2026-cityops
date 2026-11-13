@@ -1,0 +1,23 @@
+# The phone-follow relay (follow/server.mjs): a zero-dependency Node server on 127.0.0.1:8090 that nginx proxies to.
+# Install:  sudo cp deploy/cityops-follow.service /etc/systemd/system/ && edit the three __PLACEHOLDERS__ below
+#           sudo systemctl daemon-reload && sudo systemctl enable --now cityops-follow
+# Logs:     journalctl -u cityops-follow -n 50
+# Data:     the script manager's saved versions and comments live in __APP_DIR__/follow/data (append-only .jsonl files): back them up.
+[Unit]
+Description=CityOps phone follow relay
+After=network-online.target
+
+[Service]
+User=__USER__
+WorkingDirectory=__APP_DIR__
+Environment=FOLLOW_PORT=8090
+Environment=FOLLOW_BASE=/aiexperiencelive2026/follow/
+# Environment=FOLLOW_IDLE_MS=21600000   # end a phone session after this long without a page change (default 90 minutes)
+ExecStart=__NODE__ follow/server.mjs
+MemoryMax=300M
+TasksMax=64
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

@@ -2,6 +2,8 @@
 
 A deterministic, offline, click-through 3D web experience for two Oracle LiveLabs workshops on 12 Nov 2026 (Lab 2: RAG to Agents, Lab 3: Agent Memory). Bangkok-themed Oracle city in the Hightopo "smart city" style. No AI at runtime.
 
+**New here?** `README.md` (setup, deploy, layout), `AGENTS.md` (the short entry for coding agents) and the skill `.claude/skills/cityops-live/` (a map of the whole system and a recipe per kind of change). `tools/verify-setup.sh` proves a checkout works. This file is the owner's long memory of rules and decisions.
+
 **Read first:** `docs/HANDOFF-2026-10-24.md` (current city = TerraMesh model, what the owner demanded, open items), then `docs/HANDOFF-2026-10-23.md` for the original decisions.
 
 **Verification rule (owner's words):** never judge a scene from a wide shot. Screenshot at full size and zoom into the close-up before calling anything done.

@@ -1,0 +1,22 @@
+# OPTIONAL: the owner's setup, the Vite dev server as the live site (what the workshop VM ran). Use the static build in deploy/README.md
+# unless you need Camera mode and Traffic mode to SAVE (they write src/content/cameraOverrides.json and traffic.json through the dev server).
+# Install:  sudo cp deploy/cityops-dev.service /etc/systemd/system/ && edit the placeholders
+#           sudo systemctl daemon-reload && sudo systemctl enable --now cityops-dev
+[Unit]
+Description=CityOps Live dev server (Vite on 127.0.0.1:8082 behind nginx)
+After=network-online.target
+
+[Service]
+User=__USER__
+WorkingDirectory=__APP_DIR__
+Environment=CITYOPS_BASE=/aiexperiencelive2026/
+# every request already passed nginx's login, so the dev server may take saves from them
+Environment=CITYOPS_BEHIND_LOGIN=1
+# commit and push each camera/traffic save to this repo's git remote (leave out if you do not want that)
+Environment=CITYOPS_AUTOCOMMIT=1
+ExecStart=__NODE__ node_modules/vite/bin/vite.js --host 127.0.0.1 --port 8082 --strictPort
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
