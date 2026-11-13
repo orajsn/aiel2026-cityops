@@ -215,8 +215,18 @@ The short version (the full list is in `CLAUDE.md` and the skill):
 | Black screen, no city | The browser has no WebGL (headless, remote desktop). Panels still work; use a machine with a GPU |
 | Changes do not show after a deploy | The map is cached by a service worker: hard-reload, or clear site data |
 | Phone says "code not found" | The session ended (stopped, or 90 minutes without a page change) or the code is old; start sharing again. The presenter's page repeats its page every 5 minutes to keep a session alive |
+| On Windows the phone page shows no pictures | `follow/public/thumbs` is a symlink to `public/thumbs`: clone with `git clone -c core.symlinks=true` (and Developer Mode on), or copy the folder |
 | `npm ci` fails | You need Node 20 or newer (`node -v`) and network access to the npm registry |
 | The build says the base is wrong | The address is baked in at build time: `CITYOPS_BASE=/your/path/ npm run build` (or `tools/deploy-static.sh`) |
+
+## 📦 What is not in the repository (and why you do not need it)
+
+Everything the app **needs to install, build, run and deploy is in git** (checked on clean clones: build, 391 tests, all 87 pages open with no missing file). Left out on purpose:
+
+- `node_modules/` and `dist/`: made by `npm ci` and `npm run build`.
+- `follow/data/`: the script manager's saved versions and comments (private to your deployment; back it up).
+- The workshop's **source material**: the original `.ipynb` notebooks (their text is in `src/content/notebooks/*.json`), the Lab 2 deck and its exports (`exports/`, 47 MB), the Lab 1 workshop guide JSON, the original city texture (`assets-original/`). Only the one-off tools that regenerate data from them need those: `tools/gen-seer-guide.py`, `tools/build_roads.py` (an OpenStreetMap export), `tools/erase_texture_strip.py`.
+- `src/content/traffic.prev.json`: an automatic backup of the previous traffic save.
 
 ## 🙏 Credits and licences
 
