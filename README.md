@@ -3,7 +3,8 @@
 # 🌆 CityOps Live
 
 **A click-through 3D smart city that teaches engineers how AI really works.**<br/>
-Offline · deterministic · no AI at runtime · built for a live stage.
+Offline · deterministic · no AI at runtime · built for a live stage.<br/>
+Used in **Thailand's Oracle AI Live Experience 2026 (12-Nov-2026)**.
 
 ![Node 20+](https://img.shields.io/badge/node-20%2B-1B8A9C?style=flat-square)
 ![React 18](https://img.shields.io/badge/react-18-1B8A9C?style=flat-square)
@@ -22,7 +23,7 @@ Offline · deterministic · no AI at runtime · built for a live stage.
 
 ## What is this?
 
-CityOps Live is the stage show for **AI Experience Live 2026** (Oracle LiveLabs, Bangkok, 12 Nov 2026). One engineer, **Mercer**, finds rust on **Harbor Bridge** and records it. Weeks later a second engineer, **Vance**, stands at the same rust. The three workshops follow how an AI system helps them, step by step:
+CityOps Live is the stage show used in **Thailand's Oracle AI Live Experience 2026 (12-Nov-2026)** (Oracle LiveLabs, Bangkok). One engineer, **Mercer**, finds rust on **Harbor Bridge** and records it. Weeks later a second engineer, **Vance**, stands at the same rust. The three workshops follow how an AI system helps them, step by step:
 
 | Part | Pages | The story |
 |---|---:|---|
@@ -237,4 +238,4 @@ Everything the app **needs to install, build, run and deploy is in git** (checke
 - Oracle names, logos and LiveLabs screenshots belong to Oracle.
 - This repository has **no licence file yet**: ask the owner before reusing the code or content.
 
-<div align="center"><sub>Made for AI Experience Live 2026 · Oracle Cloud Engineering Thailand</sub></div>
+<div align="center"><sub>Made for Thailand's Oracle AI Live Experience 2026 (12-Nov-2026) · Oracle Cloud Engineering Thailand</sub></div>
