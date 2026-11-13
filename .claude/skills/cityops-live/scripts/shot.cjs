@@ -25,7 +25,9 @@ const file = out || `/tmp/cityops-${id}-${clicks}.${flag('--thumb') ? 'jpg' : 'p
   const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: flag('--thumb') ? 0.2 : 1 });
   const page = await ctx.newPage();
   const bad = [];
-  page.on('pageerror', (e) => bad.push(e.message.slice(0, 160)));
+  // without a GPU three.js cannot read a shader's log and throws from WebGLProgram: expected there, not a bug in the page
+  let noGpu = 0;
+  page.on('pageerror', (e) => ((e.stack || '').includes('WebGLProgram') ? noGpu++ : bad.push(e.message.slice(0, 160))));
   await page.goto(`${base}#scene=${id}`);
   await page.reload();
   await page.waitForTimeout(6000);
@@ -34,6 +36,6 @@ const file = out || `/tmp/cityops-${id}-${clicks}.${flag('--thumb') ? 'jpg' : 'p
   await page.waitForTimeout(5500); // the panel and its animations settle
   const info = await page.evaluate(() => ({ hash: location.hash, strip: document.querySelector('.strip')?.textContent || '' }));
   await page.screenshot({ path: path.resolve(file), type: flag('--thumb') ? 'jpeg' : 'png', quality: flag('--thumb') ? 82 : undefined });
-  console.log(`${info.strip}  ${info.hash}  ->  ${path.resolve(file)}${bad.length ? `\npage errors: ${bad.join(' | ')}` : ''}`);
+  console.log(`${info.strip}  ${info.hash}  ->  ${path.resolve(file)}${bad.length ? `\npage errors: ${bad.join(' | ')}` : ''}${noGpu ? `\n(${noGpu} WebGL shader errors ignored: this machine has no GPU, the 3D city is not drawn)` : ''}`);
   await browser.close();
 })();

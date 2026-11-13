@@ -14,7 +14,7 @@ bash tools/verify-setup.sh          # everything from a clean install, including
 npm run dev &                                                       # 5174
 node .claude/skills/cityops-live/scripts/shot.cjs 3.15d 4 /tmp/p.png --clean    # page id, number of Next presses
 ```
-Then open the picture. Check: nothing clipped or overflowing, text sizes (read computed `font-size`, the panel often renders larger than the numbers in code), spacing and alignment, the first state and the last state of a build, that a following page does not open like the end of the previous one. **A headless browser without WebGL does not draw the 3D city** (the page behind the panel is plain): say "panels checked, 3D not checked". Wait ~5 s after the last click before shooting (animations).
+Then open the picture. (`shot.cjs` reports page errors; "WebGL shader errors ignored" just means no GPU.) Check: nothing clipped or overflowing, text sizes (read computed `font-size`, the panel often renders larger than the numbers in code), spacing and alignment, the first state and the last state of a build, that a following page does not open like the end of the previous one. **A headless browser without WebGL does not draw the 3D city** (the page behind the panel is plain): say "panels checked, 3D not checked". Wait ~5 s after the last click before shooting (animations).
 
 ## When you add, remove or move a page, update these (tests tell you which)
 | What changed | Update |

@@ -112,9 +112,9 @@ Browsers keep the map in a service-worker cache; after a deploy a hard reload sh
 
 ## What was tested
 
-On a clean `git clone` of this repository (so the instructions here are the ones that ran):
+On a clean `git clone` of this repository from GitHub (commit 5f9c190, so the instructions here are the ones that ran):
 
-1. `bash tools/verify-setup.sh`: `npm ci`, type check, 391 tests, production build (140 MB), the built app served, the dev server, the relay (session created, page change accepted, script manager lists 107 pages). All passed.
+1. `bash tools/verify-setup.sh`: `npm ci`, type check, 391 tests, production build (106 MB), the built app served, the dev server, the relay (session created, page change accepted, script manager lists 107 pages). All passed.
 2. `bash tools/deploy-static.sh <root>`, then nginx (1.20, rendered from `deploy/nginx-cityops.conf`) and the relay (`FOLLOW_BASE=/aiexperiencelive2026/follow/`). Results: app without login 401, with login 200, bundle 200, 3D model 200, redirect without a slash 301, phone page without login 200, create session without login 401 and with login 200, script manager without login 401 and with login 200 and `{"user":"tester"}`.
 3. A headless Chromium opened `#scene=3.5e` through nginx with the login: the page rendered its panel; the only failed requests were the two dev-server endpoints (`__camera-overrides`, `__traffic`), which a static build does not have; the app then uses the saved angles and traffic bundled in the build.
 
