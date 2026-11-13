@@ -13,7 +13,8 @@ WorkingDirectory=__APP_DIR__
 Environment=FOLLOW_PORT=8090
 Environment=FOLLOW_BASE=/aiexperiencelive2026/follow/
 # Environment=FOLLOW_IDLE_MS=21600000   # end a phone session after this long without a page change (default 90 minutes)
-ExecStart=__NODE__ follow/server.mjs
+# bash -c exec: works on SELinux hosts too, where a node binary under a home folder cannot be started directly by systemd
+ExecStart=/usr/bin/bash -c 'exec "__NODE__" follow/server.mjs'
 MemoryMax=300M
 TasksMax=64
 Restart=on-failure

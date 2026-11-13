@@ -11,7 +11,7 @@ npm run dev                      # http://localhost:5174  (fixed port)
 bash tools/verify-setup.sh       # PROVES the checkout is healthy: types, ~390 tests, build, serve, dev server, phone relay (3 to 5 min)
 ```
 
-Other commands: `npx vitest run` (tests), `npx tsc --noEmit` (types), `npm run build` (→ `dist/`).
+Other commands: `npx vitest run` (tests), `npx tsc --noEmit` (types), `npm run build` (→ `dist/`), and for a running site `node .claude/skills/cityops-live/scripts/smoke.cjs <url> [user password]` (opens all pages, tests phone follow and the script manager; needs Playwright).
 
 ## Deploy
 

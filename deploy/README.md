@@ -80,12 +80,24 @@ Then open `$B/`, press `J`, and click through. Settings › Phone follow › Sta
 
 ## C · The workshop setup (Vite dev server as the live site)
 
-This is what the event ran: `cityops-dev` (Vite on 127.0.0.1:8082 with `CITYOPS_BASE=/aiexperiencelive2026/`, `CITYOPS_BEHIND_LOGIN=1`, `CITYOPS_AUTOCOMMIT=1`), the relay, and nginx. Camera mode and Traffic mode save into `src/content/*.json` through the dev server and each save is committed and pushed.
+This is what the event ran: the Vite dev server serves the app (so Camera mode and Traffic mode **save** into `src/content/*.json`, and each save is committed and pushed to the repo's git remote), the relay serves phones and the script manager, and nginx adds the login.
 
-- One-time host setup (nginx site, login file, systemd unit): `printf '%s\n' '<password>' | bash tools/vm-setup.sh <username>`. It edits an existing nginx site and a code-server host, so read the script first.
-- The unit file template is `deploy/cityops-dev.service`.
-- Restart after a change: `bash tools/serve-vm.sh` (rebuilds `scripts.json`, restarts the relay and the dev server).
-- The VM's git: `origin` is a bare repo with a post-receive hook that pulls into the working folder, so a push from a laptop updates the live site. From a laptop use `bash tools/sync-vm.sh` (pull, then push, never force).
+1. Steps 2 and 4 of option B are the same (login file, relay service). Do not run `tools/deploy-static.sh`.
+2. **The dev server as a service**:
+   ```bash
+   sudo cp deploy/cityops-dev.service /etc/systemd/system/
+   sudo sed -i "s#__USER__#$USER#; s#__APP_DIR__#$PWD#; s#__NODE__#$(command -v node)#" /etc/systemd/system/cityops-dev.service
+   sudo systemctl daemon-reload && sudo systemctl enable --now cityops-dev
+   ```
+   Environment it sets: `CITYOPS_BASE=/aiexperiencelive2026/`, `CITYOPS_BEHIND_LOGIN=1` (the saves are accepted because nginx already checked the login), `CITYOPS_AUTOCOMMIT=1` (each save is committed and pushed to `origin`; the repo needs a git identity and a writable `origin`, or remove that line).
+3. **nginx**: render `deploy/nginx-cityops-dev.conf` (`__DEV_PORT__` 8082, `__HTPASSWD__`) and include it like in option B. It proxies the app to the dev server, with the websocket headers hot reload needs.
+4. Check: `curl -u mali:pw -X POST -H 'content-type: application/json' -d '{}' https://your-host/aiexperiencelive2026/__camera-overrides` answers `ok` (without the login: 401).
+
+Restart after a change the dev server does not pick up: `sudo systemctl restart cityops-dev` (on the workshop VM: `bash tools/serve-vm.sh`, which also rebuilds `scripts.json` and restarts the relay).
+
+**`tools/vm-setup.sh` is specific to the workshop VM** (Oracle Linux 9, an existing nginx site shared with code-server, a Caddy site it removes, an SELinux port label). It was written for that machine and was **not** run on any other host. For a new host use the templates above.
+
+The workshop VM's git, for the record: `origin` is a bare repo with a post-receive hook that pulls into the working folder, so a push updates the live site. From a laptop use `bash tools/sync-vm.sh` (pull, then push, never force).
 
 ## Updating a running deployment
 
@@ -112,10 +124,17 @@ Browsers keep the map in a service-worker cache; after a deploy a hard reload sh
 
 ## What was tested
 
-On a clean `git clone` of this repository from GitHub (commit 5f9c190, so the instructions here are the ones that ran):
+Everything below ran on clean `git clone`s of this repository from GitHub (so the instructions here are the ones that ran), on Oracle Linux 9 aarch64 with Node 26 and nginx 1.20, with a headless Chromium. The test servers used other ports and were removed afterwards.
 
-1. `bash tools/verify-setup.sh`: `npm ci`, type check, 391 tests, production build (106 MB), the built app served, the dev server, the relay (session created, page change accepted, script manager lists 107 pages). All passed.
-2. `bash tools/deploy-static.sh <root>`, then nginx (1.20, rendered from `deploy/nginx-cityops.conf`) and the relay (`FOLLOW_BASE=/aiexperiencelive2026/follow/`). Results: app without login 401, with login 200, bundle 200, 3D model 200, redirect without a slash 301, phone page without login 200, create session without login 401 and with login 200, script manager without login 401 and with login 200 and `{"user":"tester"}`.
-3. A headless Chromium opened `#scene=3.5e` through nginx with the login: the page rendered its panel; the only failed requests were the two dev-server endpoints (`__camera-overrides`, `__traffic`), which a static build does not have; the app then uses the saved angles and traffic bundled in the build.
+| # | What | Result |
+|---|---|---|
+| 1 | `bash tools/verify-setup.sh`: `npm ci`, type check, 391 tests, production build (106 MB), the built app served, the dev server, the relay (a session code issued, a page change accepted, the script manager lists 107 pages) | all passed |
+| 2 | README quick start: `npm run dev` on 5174; the camera-save and traffic-save endpoints write the files | passed |
+| 3 | Option B: `tools/deploy-static.sh <root>` (default address) and again with another address (`/workshop/`, with the nginx file's address and the relay's `FOLLOW_BASE` changed as described), nginx rendered from `deploy/nginx-cityops.conf` | login 401 / 200, bundle and 3D model 200, redirect 301, phone page open, creating a session needs the login, the script manager sees the signed-in name |
+| 4 | The same behind **HTTPS** (a self-signed certificate) | app, phone page and relay work; the service worker becomes active and caches the map |
+| 5 | `bash .claude/skills/cityops-live/scripts/smoke.cjs <url> <user> <password>` against that HTTPS deployment | 14 checks passed: all 87 pages open with no failed request and no page error; the presenter starts sharing and gets a code; a phone joins with it, shows the page and **follows the presenter to the next page**; the script manager lists 107 pages, a script version saves, the text is restored, both versions are in the history; Stop sharing ends the session |
+| 6 | Option C: the dev server with `CITYOPS_BASE`, `CITYOPS_BEHIND_LOGIN=1`, `CITYOPS_AUTOCOMMIT=1` behind nginx rendered from `deploy/nginx-cityops-dev.conf`, with a local bare repo as `origin` | camera save through nginx: 401 without the login, 200 with it; the save was committed and pushed to `origin` ("Camera angles saved by the owner on the VM") |
+| 7 | `deploy/cityops-follow.service` and `deploy/cityops-dev.service` (placeholders filled in, other ports): `systemd-analyze verify`, started with systemd | both active and answering; the relay was killed with `kill -9` and systemd restarted it |
+| 8 | `tools/follow-user.sh` against a temporary login file (`CITYOPS_HTPASSWD`, `NO_RELOAD=1`) | adds a user, replaces the password of an existing one; the stored hash verifies |
 
-Not tested here: a real GPU (the test machine could not draw WebGL), HTTPS certificates, and `tools/vm-setup.sh` on a new host.
+**Not tested:** `tools/vm-setup.sh` on a new host (see option C), a real certificate authority (the HTTPS test used a self-signed certificate), a phone on a real mobile network, and the 3D city on a real GPU (the test machine has none; the panels, the pages and the logic were checked).

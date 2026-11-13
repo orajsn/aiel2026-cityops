@@ -28,6 +28,7 @@ npx tsc --noEmit                 # types alone
 ```
 
 Find a page: `npx vite-node .claude/skills/cityops-live/scripts/where.ts <id or part of the title>` prints its number, part, shot, overlay component file, script state, clicks, hidden state, where it is defined and the tests that name it.
+Test a running site (all pages, phone follow, script manager): `node .claude/skills/cityops-live/scripts/smoke.cjs <app url> [user password]`.
 Look at a page: `node .claude/skills/cityops-live/scripts/shot.cjs <id> <clicks> out.png --clean` (needs the dev server and Playwright, see the script's header).
 
 ### Pages and their ids

@@ -9,6 +9,12 @@ bash tools/verify-setup.sh          # everything from a clean install, including
 ```
 `tests/follow.test.ts` starts a real relay on a free port; it needs no network.
 
+## Test a running site
+```bash
+node .claude/skills/cityops-live/scripts/smoke.cjs <app url> [user password]
+```
+Opens all 87 pages (no failed request, no page error), checks the service worker, then runs the phone-follow flow (presenter starts sharing, a phone joins and follows a page change, Stop sharing) and the script manager (lists pages, saves a version, restores it). It writes one test version into the page named by `SMOKE_PAGE` (default `0.1`) and puts the text back. Use it after any deploy.
+
 ## Look at the page (not optional)
 ```bash
 npm run dev &                                                       # 5174

@@ -14,7 +14,8 @@ Environment=CITYOPS_BASE=/aiexperiencelive2026/
 Environment=CITYOPS_BEHIND_LOGIN=1
 # commit and push each camera/traffic save to this repo's git remote (leave out if you do not want that)
 Environment=CITYOPS_AUTOCOMMIT=1
-ExecStart=__NODE__ node_modules/vite/bin/vite.js --host 127.0.0.1 --port 8082 --strictPort
+# bash -c exec: works on SELinux hosts too, where a node binary under a home folder cannot be started directly by systemd
+ExecStart=/usr/bin/bash -c 'exec "__NODE__" node_modules/vite/bin/vite.js --host 127.0.0.1 --port 8082 --strictPort'
 Restart=on-failure
 RestartSec=5
 

@@ -87,7 +87,14 @@ bash tools/verify-setup.sh          # 3 to 5 minutes
 SKIP_INSTALL=1 bash tools/verify-setup.sh   # when node_modules already exists
 ```
 
-It ends with `All checks passed.` Last verified on a clean clone of this repository: Oracle Linux 9 (aarch64), Node 26, 391 tests passing.
+It ends with `All checks passed.` To test a **running** site (dev server or a deployment, with or without a login) use the browser smoke test, which opens all 87 pages and runs the phone-follow and script-manager flows:
+
+```bash
+npm i --no-save playwright-core && npx playwright-core install chromium   # once
+node .claude/skills/cityops-live/scripts/smoke.cjs http://localhost:5174/                      # or: <url> <user> <password>
+```
+
+ Last verified on clean clones of this repository: Oracle Linux 9 (aarch64), Node 26, 391 tests passing, and a full deployment run (static build, nginx, HTTPS, the phone relay, the dev-server setup, systemd): see `deploy/README.md` › What was tested.
 
 ---
 
@@ -99,7 +106,7 @@ Three ways, from simplest to the one the workshop ran. Full steps, config files 
 |---|---|---|
 | **A · Run on your laptop** | `npm run dev` | rehearsing, editing, presenting from one machine |
 | **B · Static build behind nginx** | `bash tools/deploy-static.sh /var/www/cityops` + `deploy/nginx-cityops.conf` + `deploy/cityops-follow.service` | a shared address with a login for the presenter and open phone pages (recommended for a new host) |
-| **C · The workshop setup** | Vite dev server as the live site, nginx login, relay, git hook (`tools/vm-setup.sh`, `deploy/cityops-dev.service`) | you want Camera mode and Traffic mode to **save** into the repo from the live site |
+| **C · The workshop setup** | Vite dev server as the live site behind nginx (`deploy/cityops-dev.service`, `deploy/nginx-cityops-dev.conf`) | you want Camera mode and Traffic mode to **save** into the repo from the live site |
 
 A quick taste of B (the address is baked into the build; the default is `/aiexperiencelive2026/`):
 
