@@ -5,6 +5,7 @@ import { useAnimations, useGLTF } from '@react-three/drei';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import type { Vec3 } from './shots';
 import { at } from '../engine/base';
+import { addInspectorAppearance, type InspectorAppearance } from './InspectorAppearance';
 
 /** Kenney Mini Characters (CC0): character-{male|female}-{a..f}.glb, each with idle/walk/sit/crouch/interact clips. */
 export type Who = `character-${'male' | 'female'}-${'a' | 'b' | 'c' | 'd' | 'e' | 'f'}`;
@@ -29,13 +30,17 @@ export interface PersonProps {
   height: number;
   /** whether the person casts a shadow (default yes); a room floating above the street has none to cast */
   shadow?: boolean;
+  /** Opt in only for bridge inspectors; the source rig, height and clips stay unchanged. */
+  inspection?: boolean;
+  /** Reused world-position vector and torch attachment, sampled after the rig and walk update. */
+  onInspectionTorchPosition?(world: THREE.Vector3, torch: THREE.Object3D): void;
 }
 
 /**
  * One person. Walks from `from` to `position` (facing the way they walk), then turns to `facing`
  * and plays `pose`. The model is normalised to `height` so the same code works in any diorama.
  */
-export function Person({ who, position, from, walkMs = 2400, delayMs = 0, pose, facing = 0, height, shadow = true }: PersonProps) {
+export function Person({ who, position, from, walkMs = 2400, delayMs = 0, pose, facing = 0, height, shadow = true, inspection = false, onInspectionTorchPosition }: PersonProps) {
   const gltf = useGLTF(url(who));
   const model = useMemo(() => cloneSkinned(gltf.scene) as THREE.Object3D, [gltf]);
   const size = useMemo(() => {
@@ -43,9 +48,18 @@ export function Person({ who, position, from, walkMs = 2400, delayMs = 0, pose, 
     return b.max.y - b.min.y || 1;
   }, [model]);
   const root = useRef<THREE.Group>(null);
+  const appearance = useRef<InspectorAppearance | null>(null);
+  const torchPosition = useMemo(() => new THREE.Vector3(), []);
   const { actions, mixer } = useAnimations(gltf.animations, root);
   const start = useRef(performance.now());
   const phase = useRef<'wait' | 'walk' | 'there'>(from ? 'wait' : 'there');
+
+  useEffect(() => {
+    if (!inspection) return;
+    const attached = addInspectorAppearance(model);
+    appearance.current = attached;
+    return () => { attached?.dispose(); appearance.current = null; };
+  }, [inspection, model]);
 
   useEffect(() => {
     model.traverse((o) => {
@@ -104,6 +118,13 @@ export function Person({ who, position, from, walkMs = 2400, delayMs = 0, pose, 
       g.rotation.y = facing;
       play(pose);
     }
+  });
+
+  useFrame(() => {
+    if (!inspection || !appearance.current || !root.current || !onInspectionTorchPosition) return;
+    root.current.updateWorldMatrix(true, true);
+    appearance.current.emitter.getWorldPosition(torchPosition);
+    onInspectionTorchPosition(torchPosition, appearance.current.torch);
   });
 
   return (

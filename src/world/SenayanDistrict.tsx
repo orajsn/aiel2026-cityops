@@ -1,5 +1,6 @@
 import React from 'react';
 import * as THREE from 'three';
+import { useFrame } from '@react-three/fiber';
 import DATA from './senayanData';
 import type { Point, Polygon, Polygons } from './senayanTypes';
 import { fromBridgeLocal, toBridgeLocal } from './bridgeFrame';
@@ -219,7 +220,8 @@ function build(): THREE.Group {
             g.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
             g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
             g.computeBoundingSphere();
-            const mesh = new THREE.Mesh(g, mat);
+            // Context meshes own their material instances; their fade never touches the wider city.
+        const mesh = new THREE.Mesh(g, target === contextGroup ? mat.clone() : mat);
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             target.add(mesh);
@@ -255,27 +257,76 @@ function landmarkLabels(): THREE.Group { const root = new THREE.Group(); root.na
     sprite.renderOrder = 12;
     root.add(sprite);
 } return root; }
+/** Visibility target for inspection context, independent of camera paths and lesson timing. */
+export function inspectionContextOpacity(previous: number, cutaway: boolean, settled: boolean, distance: number): number {
+    if (cutaway) {
+        const k = THREE.MathUtils.clamp((distance - 12) / 8, 0, 1);
+        return k * k * (3 - 2 * k);
+    }
+    // A departing close-up holds its context until arrival, or until the camera is safely far away.
+    return settled || distance >= 20 ? 1 : previous;
+}
+
+function setContextOpacity(context: THREE.Object3D, opacity: number): void {
+    context.visible = opacity > .001;
+    const opaque = opacity >= .999;
+    context.traverse(object => {
+        if (!(object instanceof THREE.Mesh)) return;
+        object.castShadow = opaque;
+        for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+            if (material.transparent === opaque) {
+                material.transparent = !opaque;
+                material.needsUpdate = true;
+            }
+            material.depthWrite = opaque;
+            material.opacity = opacity;
+        }
+    });
+}
+
 export function SenayanDistrict() {
     const scene = React.useMemo(build, []), labels = React.useMemo(landmarkLabels, []);
     const current = useSceneStore(s => s.scenes[s.index]);
     const id = current?.id;
-    const cutaway = current?.shot === 'bridge' || String(current?.shot ?? '').startsWith('pier');
-    const showCutawayLabel = cutaway && current?.overlay !== 'LabGo';
+    const context = React.useMemo(() => scene.getObjectByName('Senayan mapped context near inspection'), [scene]);
+    const label = React.useRef<HTMLDivElement | null>(null);
+    const view = React.useRef({ opacity: 1, lastId: id, waitForMove: false, applied: -1 });
     React.useEffect(() => { setTerrainGrid(null); }, []);
     React.useEffect(() => {
-        const context = scene.getObjectByName('Senayan mapped context near inspection');
-        if (context)
-            context.visible = !cutaway;
-        if (!showCutawayLabel)
-            return;
-        const label = document.createElement('div');
-        label.className = 'senayan-inspection-cutaway';
-        label.setAttribute('role', 'note');
-        label.textContent = 'Inspection cutaway · nearby buildings hidden';
-        Object.assign(label.style, { position: 'absolute', bottom: '88px', left: '48px', padding: '8px 12px', borderRadius: '5px', background: 'rgba(247,248,242,.94)', color: '#264e4d', font: '500 18px Inter, Arial', zIndex: '62', pointerEvents: 'none' });
-        const host = document.getElementById('app') || document.body;
-        host.appendChild(label);
-        return () => label.remove();
-    }, [scene, cutaway, showCutawayLabel]);
+        const element = document.createElement('div');
+        element.className = 'senayan-inspection-cutaway';
+        element.setAttribute('role', 'note');
+        element.textContent = 'Inspection cutaway · nearby buildings hidden';
+        Object.assign(element.style, { position: 'absolute', bottom: '88px', left: '48px', padding: '8px 12px', borderRadius: '5px', background: 'rgba(247,248,242,.94)', color: '#264e4d', font: '500 18px Inter, Arial', zIndex: '62', pointerEvents: 'none', display: 'none' });
+        (document.getElementById('app') || document.body).appendChild(element);
+        label.current = element;
+        return () => { element.remove(); label.current = null; };
+    }, []);
+    useFrame(({ camera }, dt) => {
+        if (!context) return;
+        const state = useSceneStore.getState(), active = state.current();
+        const cutaway = active.shot === 'bridge' || active.shot.startsWith('pier');
+        const distance = Math.hypot(camera.position.x + 38.19, camera.position.y - .1, camera.position.z + 19.57);
+        const v = view.current;
+        if (v.lastId !== active.id) {
+            // Hash navigation can briefly retain the old settled value before CameraRig starts its move.
+            v.waitForMove = !cutaway && v.opacity < .999;
+            v.lastId = active.id;
+        }
+        if (!state.settled) v.waitForMove = false;
+        const target = inspectionContextOpacity(v.opacity, cutaway, state.settled && !v.waitForMove, distance);
+        // A near inspection must never show a foreground wall, including a direct deep-link load.
+        if (cutaway && distance <= 12) v.opacity = 0;
+        else v.opacity += (target - v.opacity) * (1 - Math.exp(-Math.min(dt, .1) * 7));
+        if (Math.abs(v.opacity - target) < .001) v.opacity = target;
+        if (Math.abs(v.opacity - v.applied) > .001 || v.opacity === 0 && v.applied !== 0 || v.opacity === 1 && v.applied !== 1) {
+            setContextOpacity(context, v.opacity);
+            v.applied = v.opacity;
+        }
+        if (label.current) {
+            label.current.style.display = v.opacity < .98 && active.overlay !== 'LabGo' ? 'block' : 'none';
+            label.current.textContent = v.opacity < .02 ? 'Inspection cutaway · nearby buildings hidden' : 'Inspection cutaway · nearby context reduced';
+        }
+    });
     return React.createElement('group', null, React.createElement('primitive', { object: scene }), ['0.0', '0.1', '0.2'].includes(id) && React.createElement('primitive', { object: labels }));
 }

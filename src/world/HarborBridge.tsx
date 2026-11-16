@@ -1,4 +1,4 @@
-import { useMemo, useRef, type ReactElement } from 'react';
+import { useCallback, useEffect, useMemo, useRef, type ReactElement } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
@@ -13,13 +13,55 @@ const S = BRIDGE_S;
 /** Legacy compatibility value; the Senayan crossing renders no pylons. */
 export const PYLON_H = 2.6;
 
+type BridgeSurface = 'concrete' | 'asphalt' | 'steel' | 'rubber' | 'paint';
+
+/** Subtle local surface grain; no remote textures or geometry displacement. */
+function surfaceGrain(kind: 'concrete' | 'asphalt'): THREE.CanvasTexture | null {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 128;
+  const context = canvas.getContext('2d');
+  if (!context) return null;
+  const pixels = context.createImageData(128, 128);
+  let seed = kind === 'concrete' ? 14397 : 7139;
+  for (let i = 0; i < pixels.data.length; i += 4) {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    const grain = seed / 4294967296;
+    const value = kind === 'concrete' ? 220 + Math.floor(grain * 28) : 187 + Math.floor(grain * 62);
+    pixels.data[i] = value;
+    pixels.data[i + 1] = value;
+    pixels.data[i + 2] = value;
+    pixels.data[i + 3] = 255;
+  }
+  context.putImageData(pixels, 0, 0);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+const SURFACE: Record<BridgeSurface, { roughness: number; metalness: number }> = {
+  concrete: { roughness: 0.94, metalness: 0 },
+  asphalt: { roughness: 0.98, metalness: 0 },
+  steel: { roughness: 0.42, metalness: 0.66 },
+  rubber: { roughness: 0.98, metalness: 0 },
+  paint: { roughness: 0.62, metalness: 0.32 },
+};
+
 export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: 'pier3' | 'pier2'; who: Who; leave?: boolean }; markers?: boolean | 'pier2' }) {
   const theme = useUiStore((state) => state.theme);
   const f = harborBridgeFrame();
+  const textures = useMemo(() => ({ concrete: surfaceGrain('concrete'), asphalt: surfaceGrain('asphalt') }), []);
+  useEffect(() => () => { textures.concrete?.dispose(); textures.asphalt?.dispose(); }, [textures]);
+  const kindFor = (key: string): BridgeSurface => /^(deck|approach)/.test(key) ? 'asphalt' : /^bearing/.test(key) ? 'rubber' : /^(rail|post|rung|bolt|base)/.test(key) ? 'steel' : /^platform/.test(key) || /^training-platform/.test(key) ? 'paint' : 'concrete';
   const box = (key: string, x: number, y: number, z: number, w: number, h: number, d: number, color: string, rotation?: Vec3): ReactElement => (
     <mesh key={key} position={[x / S, y / S, z / S]} rotation={rotation} castShadow receiveShadow>
       <boxGeometry args={[w / S, h / S, d / S]} />
-      <meshStandardMaterial color={color} roughness={0.88} />
+      <meshStandardMaterial color={color} {...SURFACE[kindFor(key)]}
+        map={kindFor(key) === 'concrete' ? textures.concrete : kindFor(key) === 'asphalt' ? textures.asphalt : null}
+        bumpMap={kindFor(key) === 'concrete' ? textures.concrete : kindFor(key) === 'asphalt' ? textures.asphalt : null}
+        bumpScale={(kindFor(key) === 'asphalt' ? 0.00035 : 0.00016) / S} />
     </mesh>
   );
   const pieces: ReactElement[] = [];
@@ -43,9 +85,29 @@ export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: '
   }
   for (const [i, p] of BRIDGE.platforms.entries()) {
     pieces.push(box(`training-platform${i}`, p.x, p.y - 0.006, p.z, p.w, 0.012, p.d, '#7f9294'));
-    for (const side of [-1, 1]) pieces.push(box(`platform-side${i}${side}`, p.x + side * p.w / 2, p.y + 0.045, p.z, 0.008, 0.09, p.d, '#d4aa4d'));
+    // Open guardrails preserve the existing platform envelope while revealing the inspector's footing.
+    for (const side of [-1, 1]) {
+      pieces.push(box(`platform-side${i}${side}`, p.x + side * p.w / 2, p.y + 0.086, p.z, 0.008, 0.008, p.d, '#c5a35c'));
+      pieces.push(box(`platform-mid${i}${side}`, p.x + side * p.w / 2, p.y + 0.047, p.z, 0.006, 0.006, p.d, '#c5a35c'));
+      for (const end of [-1, 1]) pieces.push(box(`platform-upright${i}${side}${end}`, p.x + side * p.w / 2, p.y + 0.045, p.z + end * (p.d / 2 - .004), .008, .09, .008, '#c5a35c'));
+    }
     pieces.push(box(`platform-front${i}`, p.x, p.y + 0.09, p.z + p.d / 2, p.w, 0.008, 0.008, '#d4aa4d'));
     for (let rung = 0; rung < 4; rung++) pieces.push(box(`rung${i}${rung}`, p.x + 0.15, 0.045 + rung * 0.045, 0.255, 0.055, 0.006, 0.012, '#7e8c89'));
+  }
+  // Concrete pour joints, deck expansion joints and hardware stay within the original extents.
+  for (const side of [-1, 1]) {
+    const x = side * .61;
+    for (const y of [-.09, .035]) pieces.push(box(`form-joint${side}${y}`, x, y, .2504, .238, .001, .0008, '#9baba3'));
+    for (const dx of [-.075, .075]) for (const y of [-.12, .10]) {
+      pieces.push(<mesh key={`tie${side}${dx}${y}`} position={[(x + dx) / S, y / S, .2508 / S]}>
+        <circleGeometry args={[.0025 / S, 10]} /><meshStandardMaterial color="#89958f" roughness={1} />
+      </mesh>);
+    }
+    pieces.push(box(`expansion-joint${side}`, side * (f.water - .003), top + .0004, 0, .002, .0008, .338, '#364347'));
+  }
+  for (const edge of [-1, 1]) for (let i = 0; i <= 9; i++) {
+    const x = -.70 + i * .1555;
+    pieces.push(box(`baseplate${edge}${i}`, x, top + .030, edge * .19, .018, .004, .018, '#738782'));
   }
   pieces.push(<Crack key="crack" alert={markers === true || inspect?.pier === 'pier3'} />);
   pieces.push(<Corrosion key="rust" alert={!!markers || inspect?.pier === 'pier2'} />);
@@ -153,6 +215,20 @@ function Inspection({ pier, who, leave = false }: { pier: 'pier3' | 'pier2'; who
   const WALK = 2600;
   const LEAVE_DELAY = 700;
   const beam = useRef<THREE.MeshBasicMaterial>(null);
+  const beamMesh = useRef<THREE.Mesh>(null);
+  const inspectionRoot = useRef<THREE.Group>(null);
+  const torchWorld = useRef<THREE.Vector3 | null>(null);
+  const beamWork = useMemo(() => ({ hand: new THREE.Vector3(), targetWorld: new THREE.Vector3(), target: new THREE.Vector3(...spot), direction: new THREE.Vector3(), up: new THREE.Vector3(0, 1, 0) }), [pier]);
+  const trackTorch = useCallback((world: THREE.Vector3, torch: THREE.Object3D) => {
+    if (!inspectionRoot.current) return;
+    inspectionRoot.current.updateWorldMatrix(true, false);
+    inspectionRoot.current.localToWorld(beamWork.targetWorld.copy(beamWork.target));
+    torch.lookAt(beamWork.targetWorld);
+    torch.updateWorldMatrix(true, true);
+    torch.getObjectByName('inspection-torch-emitter')?.getWorldPosition(world);
+    if (!torchWorld.current) torchWorld.current = new THREE.Vector3();
+    torchWorld.current.copy(world);
+  }, [beamWork]);
   const label = useRef<HTMLDivElement>(null);
   const walker = useRef<THREE.Group>(null);
   const start = useRef(performance.now());
@@ -163,6 +239,14 @@ function Inspection({ pier, who, leave = false }: { pier: 'pier3' | 'pier2'; who
       if (label.current) label.current.style.opacity = '1';
       if (walker.current) walker.current.visible = t < LEAVE_DELAY + WALK;
       return;
+    }
+    if (inspectionRoot.current && torchWorld.current && beamMesh.current) {
+      inspectionRoot.current.updateWorldMatrix(true, false);
+      const hand = inspectionRoot.current.worldToLocal(beamWork.hand.copy(torchWorld.current));
+      beamWork.direction.copy(hand).sub(beamWork.target);
+      beamMesh.current.position.copy(hand).add(beamWork.target).multiplyScalar(.5);
+      beamMesh.current.quaternion.setFromUnitVectors(beamWork.up, beamWork.direction.clone().normalize());
+      beamMesh.current.scale.y = beamWork.direction.length();
     }
     const k = Math.max(0, Math.min(1, (t - WALK - 300) / 600));
     if (beam.current) beam.current.opacity = 0.22 * k;
@@ -179,16 +263,16 @@ function Inspection({ pier, who, leave = false }: { pier: 'pier3' | 'pier2'; who
   }, [pier]);
   const red = pier === 'pier3';
   return (
-    <group name={`inspection-${pier}`}>
+    <group ref={inspectionRoot} name={`inspection-${pier}`}>
       <group ref={walker}>
         {leave ? (
-          <Person who={who} from={to} position={from} walkMs={WALK} delayMs={LEAVE_DELAY} pose="idle" facing={Math.atan2(from[0] - to[0], from[2] - to[2])} height={0.78} />
+          <Person inspection onInspectionTorchPosition={trackTorch} who={who} from={to} position={from} walkMs={WALK} delayMs={LEAVE_DELAY} pose="idle" facing={Math.atan2(from[0] - to[0], from[2] - to[2])} height={0.78} />
         ) : (
-          <Person who={who} from={from} position={to} walkMs={WALK} delayMs={300} pose="interact-right" facing={facing} height={0.78} />
+          <Person inspection onInspectionTorchPosition={trackTorch} who={who} from={from} position={to} walkMs={WALK} delayMs={300} pose="interact-right" facing={facing} height={0.78} />
         )}
       </group>
-      <mesh position={beamPose.mid} quaternion={beamPose.q}>
-        <coneGeometry args={[0.12, beamPose.len, 20, 1, true]} />
+      <mesh ref={beamMesh} position={beamPose.mid} quaternion={beamPose.q} scale={[1, beamPose.len, 1]}>
+        <coneGeometry args={[0.12, 1, 20, 1, true]} />
         <meshBasicMaterial ref={beam} color="#fff0c0" transparent opacity={0} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
       </mesh>
       {/* the finding's name, to the left of the damage (the right of the screen belongs to the panels) */}
