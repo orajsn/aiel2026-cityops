@@ -5,6 +5,7 @@ import { SCENES, pageLabel } from '../src/scenes/index';
 import { SCRIPT_TH } from '../src/content/scriptTh';
 import { STEP_EN, STEP_TH, STEP_PAGES, stepScriptId } from '../src/content/scriptSteps';
 import { MAP_STEPS, stepName } from '../src/content/lab3Map';
+import { senayanThaiScript } from '../src/content/senayanScriptFallback';
 
 const partName: Record<number, string> = { 0: 'Introduction', 3: 'Lab 1 · AI Economics', 1: 'Lab 2 · RAG to Agents', 2: 'Lab 3 · Agent Memory' };
 const pages = SCENES.flatMap((s) => {
@@ -13,8 +14,10 @@ const pages = SCENES.flatMap((s) => {
     label: pageLabel(s.id),
     part: partName[s.chapter] ?? '',
     title: s.title,
+    // The inherited Bangkok screenshots do not represent the Senayan edition.
+    previewAvailable: false,
     en: (s.script ?? '').replace(/!!/g, ''),
-    th: SCRIPT_TH[s.id]?.join('\n\n') ?? '',
+    th: senayanThaiScript(s.id, (s.script ?? '').replace(/!!/g, ''), SCRIPT_TH[s.id]?.join('\n\n') ?? ''),
   };
   // a page with a script per click: one entry per click, 11, 11a, 11b...
   const clicks = STEP_PAGES[s.id] ?? 0;
@@ -24,7 +27,7 @@ const pages = SCENES.flatMap((s) => {
     label: `${page.label}${String.fromCharCode(97 + i)}`,
     title: stepName(MAP_STEPS[i + 1]),
     en: STEP_EN[s.id][i + 1],
-    th: STEP_TH[s.id][i + 1],
+    th: senayanThaiScript(stepScriptId(s.id, i + 1), STEP_EN[s.id][i + 1], STEP_TH[s.id][i + 1]),
   }));
   return [page, ...more];
 });

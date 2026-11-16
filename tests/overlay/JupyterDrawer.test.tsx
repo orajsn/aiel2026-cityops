@@ -140,3 +140,13 @@ test('iPad: the drawer adds no full-screen layer over the page buttons, and its 
   expect(rule('.jd__nb')).toMatch(/touch-action: pan-y/);
   expect(rule('.jd__nb')).toMatch(/overscroll-behavior: contain/);
 });
+
+
+test('the revised scope instruction is guidance, not a claimed printed success', () => {
+  const stop = ALL_STOPS['3.11'];
+  const mark = stop.marks.find(m => m.cell === 63)!;
+  expect(mark.role).toBe('check');
+  expect(mark.expect).toBeUndefined();
+  expect(mark.say).toContain('Run the corrected scope assertion');
+  expect(stop.notebook.cells[63].source).toContain('private_note_sentinel.casefold() not in r.record.content.casefold()');
+});

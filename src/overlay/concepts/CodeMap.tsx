@@ -7,7 +7,7 @@ import mercerPortrait from '../../assets/portraits/mercer.png';
 import vancePortrait from '../../assets/portraits/vance.png';
 import jupyterOpen from '../../assets/lab3/jupyter-open.webp';
 import extractionFigure from '../../assets/lab3/auto-extraction.png';
-import adbLogo from '../../assets/oracle/autonomous-ai-database.png';
+const adbLogo = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2220%22%20fill%3D%22white%22/%3E%3Cpath%20d%3D%22M20%2028v44c0%2018%2060%2018%2060%200V28%22%20fill%3D%22%23e4f1ef%22%20stroke%3D%22%231b8a9c%22%20stroke-width%3D%224%22/%3E%3Cellipse%20cx%3D%2250%22%20cy%3D%2228%22%20rx%3D%2230%22%20ry%3D%2212%22%20fill%3D%22white%22%20stroke%3D%22%231b8a9c%22%20stroke-width%3D%224%22/%3E%3Cpath%20d%3D%22M20%2050c0%2016%2060%2016%2060%200M20%2068c0%2016%2060%2016%2060%200%22%20fill%3D%22none%22%20stroke%3D%22%231b8a9c%22%20stroke-width%3D%224%22/%3E%3C/svg%3E";
 import './codeMap.css';
 
 /**
@@ -186,12 +186,12 @@ function TheMap({ step }: { step: MapStep }) {
         <span>THE AI AGENT · ONE TURN</span>
       </div>
       <div className="cm__lane" style={{ left: 260, top: 486, color: '#14707F' }}>
-        <span>ORACLE AUTONOMOUS AI DATABASE 26ai · ONE CONNECTION</span>
+        <span>ORACLE AI DATABASE 26ai · ONE CONNECTION</span>
         <span className="cm__tag">PART 1</span>
       </div>
       {/* the database logo before the section's title, a white badge straddling the section's top edge */}
       <div data-logo-badge style={{ position: 'absolute', left: 126, top: 412, width: 120, height: 120, borderRadius: 60, background: '#fff', border: '3px solid #1b8a9c', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 12px rgba(31,42,51,0.18)', pointerEvents: 'none' }}>
-        <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ width: 98, height: 98, objectFit: 'contain' }} />
+        <img data-logo="adb" src={adbLogo} alt="Oracle AI Database" style={{ width: 98, height: 98, objectFit: 'contain' }} />
       </div>
       {NODES.map((n) => (
         <MapNodeCard key={n.id} n={n} step={step} />
@@ -399,7 +399,7 @@ export function CodeMap() {
                 <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style={{ flex: 'none', fill: 'none', stroke: '#14707F', strokeWidth: 2.4, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
                   <path d="M5 13l4 4 10-11" />
                 </svg>
-                <span className="mono" data-testid="code-map-see">{step.see}</span>
+                <span className="mono" data-testid="code-map-see">{step.title === 'Who sees what' ? 'Updated scope assertion: run in your lab' : `Captured example: ${step.see}`}</span>
                 <small>YOU SHOULD SEE</small>
               </div>
             </div>

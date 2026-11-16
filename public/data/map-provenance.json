@@ -1,0 +1,231 @@
+{
+  "retrieved_date": "2026-11-16",
+  "source_api": "https://api.openstreetmap.org/api/0.6/map?bbox=106.786,-6.232,106.809,-6.211",
+  "bbox_lonlat": [
+    106.786,
+    -6.232,
+    106.809,
+    -6.211
+  ],
+  "attribution": "© OpenStreetMap contributors",
+  "license": "ODbL 1.0",
+  "license_url": "https://www.openstreetmap.org/copyright",
+  "feature_count": 9274,
+  "building_feature_count": 5134,
+  "height_tag_count_all_features": 36,
+  "landmarks": [
+    {
+      "name": "Senayan City",
+      "osm_id": "way/48036723",
+      "source_url": "https://www.openstreetmap.org/way/48036723",
+      "last_osm_edit": "2026-06-22T07:38:40Z",
+      "geometry_type": "Polygon",
+      "bbox_lonlat": [
+        106.7963789,
+        -6.227979,
+        106.797848,
+        -6.2266665
+      ],
+      "label_anchor_bbox_center_lonlat": [
+        106.79711345,
+        -6.227322750000001
+      ],
+      "height_m_osm": null,
+      "levels_osm": "7",
+      "height_status": "Unknown; any rendered height must be explicitly estimated",
+      "geometry_complete": true
+    },
+    {
+      "name": "Plaza Senayan",
+      "osm_id": "way/119772912",
+      "source_url": "https://www.openstreetmap.org/way/119772912",
+      "last_osm_edit": "2026-06-22T07:38:40Z",
+      "geometry_type": "Polygon",
+      "bbox_lonlat": [
+        106.7987386,
+        -6.2267539,
+        106.8004549,
+        -6.224383
+      ],
+      "label_anchor_bbox_center_lonlat": [
+        106.79959675,
+        -6.225568450000001
+      ],
+      "height_m_osm": "19.4",
+      "levels_osm": "3",
+      "height_status": "OSM tagged, not independently surveyed",
+      "geometry_complete": true
+    },
+    {
+      "name": "Sentral Senayan 2",
+      "osm_id": "way/121870613",
+      "source_url": "https://www.openstreetmap.org/way/121870613",
+      "last_osm_edit": "2024-11-20T21:29:56Z",
+      "geometry_type": "Polygon",
+      "bbox_lonlat": [
+        106.7987435,
+        -6.2237747,
+        106.7992425,
+        -6.223426
+      ],
+      "label_anchor_bbox_center_lonlat": [
+        106.798993,
+        -6.22360035
+      ],
+      "height_m_osm": "116.5",
+      "levels_osm": "28",
+      "height_status": "OSM tagged, not independently surveyed",
+      "geometry_complete": true
+    },
+    {
+      "name": "Sentral Senayan 1",
+      "osm_id": "way/162174048",
+      "source_url": "https://www.openstreetmap.org/way/162174048",
+      "last_osm_edit": "2024-11-20T21:29:56Z",
+      "geometry_type": "Polygon",
+      "bbox_lonlat": [
+        106.7992657,
+        -6.2243229,
+        106.799787,
+        -6.2239507
+      ],
+      "label_anchor_bbox_center_lonlat": [
+        106.79952635000001,
+        -6.2241368
+      ],
+      "height_m_osm": "79.1",
+      "levels_osm": "19",
+      "height_status": "OSM tagged, not independently surveyed",
+      "geometry_complete": true,
+      "official_floors": "18 stories + 1 basement",
+      "official_source": "https://sentralsenayan.com/SS1/",
+      "floor_conflict": "OSM says 19 levels; use official 18 stories for stated floor count. OSM height79.1m remains unverified."
+    },
+    {
+      "name": "Sentral Senayan 3",
+      "osm_id": "way/162174050",
+      "source_url": "https://www.openstreetmap.org/way/162174050",
+      "last_osm_edit": "2024-11-20T21:29:56Z",
+      "geometry_type": "Polygon",
+      "bbox_lonlat": [
+        106.7986792,
+        -6.2272197,
+        106.7993261,
+        -6.2268525
+      ],
+      "label_anchor_bbox_center_lonlat": [
+        106.79900265,
+        -6.227036099999999
+      ],
+      "height_m_osm": null,
+      "levels_osm": "28",
+      "height_status": "Unknown; any rendered height must be explicitly estimated",
+      "geometry_complete": true
+    },
+    {
+      "name": "Stadion Utama Gelora Bung Karno",
+      "osm_id": "way/682984153",
+      "source_url": "https://www.openstreetmap.org/way/682984153",
+      "last_osm_edit": "2026-06-01T01:23:05Z",
+      "geometry_type": "Polygon",
+      "bbox_lonlat": [
+        106.8013974,
+        -6.2200251,
+        106.8038174,
+        -6.2171305
+      ],
+      "label_anchor_bbox_center_lonlat": [
+        106.8026074,
+        -6.2185778
+      ],
+      "height_m_osm": null,
+      "levels_osm": null,
+      "height_status": "Unknown; any rendered height must be explicitly estimated",
+      "geometry_complete": true
+    },
+    {
+      "name": "Senayan Golf Club",
+      "osm_id": "relation/12618369",
+      "source_url": "https://www.openstreetmap.org/relation/12618369",
+      "last_osm_edit": "2026-05-18T11:17:40Z",
+      "geometry_type": "MultiPolygon",
+      "bbox_lonlat": [
+        106.7948382,
+        -6.2277459,
+        106.7981561,
+        -6.2161524
+      ],
+      "label_anchor_bbox_center_lonlat": [
+        106.79649715,
+        -6.22194915
+      ],
+      "height_m_osm": null,
+      "levels_osm": null,
+      "height_status": "Unknown; any rendered height must be explicitly estimated",
+      "geometry_complete": true
+    },
+    {
+      "name": "Fairmont Jakarta",
+      "osm_id": "relation/14717268",
+      "source_url": "https://www.openstreetmap.org/relation/14717268",
+      "last_osm_edit": "2025-07-29T09:30:12Z",
+      "geometry_type": "MultiPolygon",
+      "bbox_lonlat": [
+        106.798409,
+        -6.2227518,
+        106.7993295,
+        -6.2214272
+      ],
+      "label_anchor_bbox_center_lonlat": [
+        106.79886925,
+        -6.2220895
+      ],
+      "height_m_osm": null,
+      "levels_osm": "32",
+      "height_status": "Unknown; any rendered height must be explicitly estimated",
+      "geometry_complete": true
+    }
+  ],
+  "bridge_candidate": {
+    "osm_id": "way/498447364",
+    "source_url": "https://www.openstreetmap.org/way/498447364",
+    "osm_road_name": "Jalan Terusan Hang Lekir V",
+    "river_osm_id": "way/28931504",
+    "river_name": "Kali Grogol",
+    "intersection_lonlat": [
+      106.79572992068474,
+      -6.228184396421049
+    ],
+    "endpoints_lonlat": [
+      [
+        106.7956627,
+        -6.2281634
+      ],
+      [
+        106.7957882,
+        -6.2282026
+      ]
+    ],
+    "mapped_segment_length_m": 14.5576,
+    "width_m_osm": 4,
+    "lanes_osm": 1,
+    "highway_osm": "service",
+    "tag_source": "HOT_InAWARESurvey_2017",
+    "last_osm_edit": "2021-08-18T11:21:01Z",
+    "limits": [
+      "Road name comes from OSM; no separately verified formal bridge name.",
+      "Width and lanes are mapped tags with2017survey provenance, not current field measurements.",
+      "Mapped segment length is calculated from geometry, not an engineering span measurement.",
+      "Identity with the bridge pictured inANTARA2021is not proven.",
+      "Structural details, piers, condition, cracks and corrosion are not established; keep all lab defects fictional."
+    ],
+    "context_article": "https://www.antaranews.com/berita/2541657/pemkot-jaksel-dan-jakpus-berkolaborasi-menata-kali-grogol"
+  },
+  "rendering_guidance": [
+    "Use actual footprints/road and river geometry; clip long OSMways to the requestedbbox.",
+    "Fairmont multipolygon is complete; render its separate footprint components instead of a generic tower footprint.",
+    "Use tagged heights as sourced estimates only; untagged height/facade/roof details need inference labels.",
+    "Do not apply old fictional sixpier harbor bridge dimensions or cargo boats to this small urban canal crossing.",
+    "Current deliverable unchanged; this directory is research only."
+  ]
+}

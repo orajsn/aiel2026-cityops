@@ -12,12 +12,10 @@ import { JumpMenu } from './JumpMenu';
 import { CameraEditor } from './CameraEditor';
 import { TrafficEditor } from './TrafficEditor';
 import { useTrafficStore } from '../engine/traffic';
-import { Rich } from './Rich';
-import { STEP_EN, stepOf } from '../content/scriptSteps';
 import { SettingsPanel } from './SettingsPanel';
 import { pageLabel } from '../scenes';
 import { FollowCard } from './FollowCard';
-import { PAGE_STEPS, focusNext, focusPrev, pagePrev, useDrawerStore, usePresentationStore } from '../engine/presentation';
+import { PAGE_STEPS, focusStepCount, focusNext, focusPrev, pagePrev, useDrawerStore, usePresentationStore } from '../engine/presentation';
 import { FRAME, useGraphicsStore } from '../engine/graphics';
 
 // named for the event's agenda (owner): the intro, then Lab 2 and Lab 3; pages are numbered the same way (0.x, 2.x, 3.x)
@@ -27,7 +25,7 @@ const CHAPTER_LABEL = ['Introduction', 'Lab 2 · RAG to Agents', 'Lab 3 · Agent
 function MapLoading() {
   const { active, progress } = useProgress();
   if (!active) return null;
-  return <div className="map-loading mono">Loading the Bangkok map · {Math.round(progress)}%</div>;
+  return <div className="map-loading mono">Loading the Senayan district · {Math.round(progress)}%</div>;
 }
 
 /** Settings › Graphics › Show frame rate: what the 3D view keeps up, twice a second */
@@ -76,11 +74,15 @@ export function Overlay() {
   const scriptOpen = useUiStore((s) => s.scriptOpen);
   const trafficEditing = useTrafficStore((s) => s.editing);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [hideLesson, setHideLesson] = useState(false);
+  useEffect(() => setHideLesson(false), [scene?.id]);
   const presenting = usePresentationStore((s) => s.on);
-  // the open Jupyter drawer reaches down to the corner buttons: the caption steps aside while it is open
-  const drawerOpen = useDrawerStore((s) => s.open) && !PAGE_STEPS[scene?.id ?? ''];
-  // a page with one script per click (the code map) shows the script of the click it stands on
-  const mapStep = useDrawerStore((s) => stepOf(scene?.id ?? '', s.open, s.focus));
+  const buildFocus = useDrawerStore(s => s.focus);
+  const buildOpen = useDrawerStore(s => s.open);
+  const revealCount = focusStepCount(scene?.id ?? '');
+  const buildIndex = buildOpen ? Math.min(buildFocus, revealCount) : 0;
+  const buildCount = revealCount + 1;
+  const moreBuilds = revealCount > 0 && buildIndex < revealCount;
   const showFps = useGraphicsStore((s) => s.showFps);
   const blank = usePresentationStore((s) => s.blank);
   // while Settings is open nothing hides
@@ -94,7 +96,7 @@ export function Overlay() {
 
   const panelKey = scene.overlayGroup ?? scene.id;
   // Traffic mode clears the page away: only the map, the traffic and its bar stay
-  const showPanel = !trafficEditing && !!scene.overlay && ((settled && !closeIn) || (!!scene.overlayGroup && shownKey.current === panelKey));
+  const showPanel = !hideLesson && !trafficEditing && !!scene.overlay && ((settled && !closeIn) || (!!scene.overlayGroup && shownKey.current === panelKey));
   shownKey.current = showPanel ? panelKey : settled && !closeIn ? null : shownKey.current;
 
   const Comp = scene.overlay ? OVERLAYS[scene.overlay] : null;
@@ -102,7 +104,7 @@ export function Overlay() {
   return (
     <>
       {!trafficEditing && (
-      <div className="strip">
+      <div className="strip" data-scene-id={scene.id} data-build-step={buildIndex + 1} data-build-count={buildCount} data-lesson-hidden={String(hideLesson)} data-scene-ready={String(showPanel || settled)}>
         {/* the Oracle logo shares the strip's white panel (owner: on its own it sat on the city) */}
         <span className="strip__logo" role="img" aria-label="Oracle" />
         <span className="strip__sep" />
@@ -110,6 +112,7 @@ export function Overlay() {
         <span className="strip__sep" />
         <span className="strip__id mono">{pageLabel(scene.id)}</span>
         <span className="strip__sep" />
+        {revealCount > 0 && <span className="strip__build" style={{ flexShrink: 0, padding: '6px 10px', borderRadius: 7, background: '#e7f1eb', color: '#286b64', fontSize: 17, fontWeight: 700 }} aria-label={`Build ${buildIndex + 1} of ${buildCount}`}>Build {buildIndex + 1} of {buildCount}</span>}
         <span className="strip__title">{scene.title}</span>
       </div>
       )}
@@ -143,49 +146,44 @@ export function Overlay() {
       {/* Lab 1: on a hands-on page (lab1HandsOn.ts), the dark Hands-on drawer waits on the same edge */}
       {settled && !trafficEditing && <StepsDrawer key={`hd-${scene.id}`} sceneId={scene.id} />}
 
-      {/* presenter script under the page; CC (or S) hides it */}
-      {scene.script && scriptOpen && !trafficEditing && !drawerOpen && (
-        <div className="script" aria-label="presenter script">
-          <Rich text={STEP_EN[scene.id]?.[mapStep] ?? scene.script} />
-        </div>
-      )}
-
       <FollowCard />
       {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} />}
 
       {/* touch navigation: the iPad has no arrow keys */}
       <nav className={`stepper${idle ? ' is-idle' : ''}`} aria-label="Scene navigation">
+        <button type="button" className="stepper__btn stepper__btn--label" style={{ width: 142 }} aria-label={hideLesson ? 'Show lesson' : 'Hide lesson'} aria-pressed={hideLesson} disabled={!scene.overlay} onClick={() => setHideLesson(v => !v)}>{hideLesson ? 'Show lesson' : 'Hide lesson'}</button>
         <button
           type="button"
-          className={`stepper__btn stepper__btn--text stepper__btn--gear${settingsOpen ? ' is-on' : ''}`}
+          className={`stepper__btn stepper__btn--label${settingsOpen ? ' is-on' : ''}`}
           aria-label="Settings"
           aria-expanded={settingsOpen}
           onClick={() => setSettingsOpen((o) => !o)}
         >
-          ⚙
+          Settings
         </button>
         <button
           type="button"
-          className={`stepper__btn stepper__btn--text${scriptOpen ? ' is-on' : ''}`}
+          className={`stepper__btn stepper__btn--label${scriptOpen ? ' is-on' : ''}`}
           aria-label={scriptOpen ? 'Hide script' : 'Show script'}
           onClick={() => useUiStore.getState().toggleScript()}
         >
-          CC
+          Notes
         </button>
         <button
           type="button"
-          className={`stepper__btn stepper__btn--text${jumpOpen ? ' is-on' : ''}`}
+          className={`stepper__btn stepper__btn--label${jumpOpen ? ' is-on' : ''}`}
           aria-label="All pages"
+          aria-expanded={jumpOpen}
           onClick={() => useUiStore.getState().toggleJump()}
         >
-          ▦
+          Pages
         </button>
         {/* CAM and Traffic live in Settings › Tools (owner, 27 Oct) */}
-        <button type="button" className="stepper__btn" aria-label="Back" disabled={index === 0} onClick={() => focusPrev() || pagePrev()}>
-          ‹
+        <button type="button" className="stepper__btn stepper__btn--label" aria-label="Back" disabled={index === 0} onClick={() => focusPrev() || pagePrev()}>
+          Back
         </button>
-        <button type="button" className="stepper__btn" aria-label="Next" disabled={index >= total - 1} onClick={() => focusNext() || useSceneStore.getState().next()}>
-          ›
+        <button type="button" className="stepper__btn stepper__btn--label" aria-label="Next" style={{ width: moreBuilds ? 146 : 88 }} title={moreBuilds ? 'Reveal the next part of this lesson' : 'Go to the next page'} disabled={index >= total - 1 && !moreBuilds} onClick={() => focusNext() || useSceneStore.getState().next()}>
+          {moreBuilds ? 'Reveal next' : 'Next'}
         </button>
       </nav>
 

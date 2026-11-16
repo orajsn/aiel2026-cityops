@@ -99,3 +99,19 @@ describe('the clicker keys', () => {
     expect(usePresentationStore.getState().blank).toBe(true);
   });
 });
+
+test('rapid reveal clicks during camera travel stay inside the current lesson', () => {
+  useSceneStore.getState().setScenes([
+    {id:'3.5e',chapter:2,title:'Three disciplines',shot:'city'},
+    {id:'after',chapter:2,title:'After',shot:'city'},
+  ]);
+  useSceneStore.getState().setSettled(false);
+  useDrawerStore.getState().reset();
+  for (const expected of [1, 2, 3]) {
+    presentNext();
+    expect(useSceneStore.getState().current().id).toBe('3.5e');
+    expect(useDrawerStore.getState().focus).toBe(expected);
+  }
+  presentNext();
+  expect(useSceneStore.getState().current().id).toBe('after');
+});

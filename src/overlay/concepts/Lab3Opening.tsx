@@ -12,7 +12,7 @@ import { LineIcon } from './icons';
 import { useDrawerStore } from '../../engine/presentation';
 import mercerPortrait from '../../assets/portraits/mercer.png';
 import vancePortrait from '../../assets/portraits/vance.png';
-import adbLogo from '../../assets/oracle/autonomous-ai-database.png';
+const adbLogo = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2220%22%20fill%3D%22white%22/%3E%3Cpath%20d%3D%22M20%2028v44c0%2018%2060%2018%2060%200V28%22%20fill%3D%22%23e4f1ef%22%20stroke%3D%22%231b8a9c%22%20stroke-width%3D%224%22/%3E%3Cellipse%20cx%3D%2250%22%20cy%3D%2228%22%20rx%3D%2230%22%20ry%3D%2212%22%20fill%3D%22white%22%20stroke%3D%22%231b8a9c%22%20stroke-width%3D%224%22/%3E%3Cpath%20d%3D%22M20%2050c0%2016%2060%2016%2060%200M20%2068c0%2016%2060%2016%2060%200%22%20fill%3D%22none%22%20stroke%3D%22%231b8a9c%22%20stroke-width%3D%224%22/%3E%3C/svg%3E";
 
 /**
  * Lab 3's compressed opening (owner, 6 Nov, drafted on the canvas "Lab 3 Opening, Compressed"): the hook (same
@@ -88,7 +88,7 @@ function DbShelf({ height = 84, badge: badgeWanted = 112, size = 30, children }:
   return (
     <div data-db-shelf style={{ position: 'relative', height, borderRadius: 18, background: 'var(--teal)', color: '#fff', display: 'flex', alignItems: 'center', paddingLeft: badge + 30, paddingRight: 24, fontSize: size, fontWeight: 700, lineHeight: 1.15, boxShadow: '0 6px 0 rgba(15,85,98,0.35)' }}>
       <div style={{ position: 'absolute', left: 14, top: (height - badge) / 2, width: badge, height: badge, borderRadius: badge / 2, background: '#fff', border: '4px solid var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 10px rgba(11,14,20,0.25)' }}>
-        <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ width: badge * 0.82, height: badge * 0.82, objectFit: 'contain' }} />
+        <img data-logo="adb" src={adbLogo} alt="Oracle AI Database" style={{ width: badge * 0.82, height: badge * 0.82, objectFit: 'contain' }} />
       </div>
       <div>{children}</div>
     </div>
@@ -137,7 +137,7 @@ export function Hook({ kicker, message }: HookProps) {
         <div data-hook="without" style={{ ...card('grey'), flex: 1, justifyContent: 'space-between' }}>
           {cap('WITHOUT MEMORY')}
           <div style={bubble(false)}>I have no earlier information. What do you see?</div>
-          <div style={{ fontSize: 26, color: 'var(--ink-dim)' }}>Every chat starts from zero.</div>
+          <div style={{ fontSize: 26, color: 'var(--ink-dim)' }}>This example does not retrieve earlier evidence.</div>
         </div>
       </Reveal>
       <Reveal show={L >= 2} testId="with" style={{ flex: 1, display: 'flex' }}>
@@ -238,7 +238,7 @@ const PROBLEMS: { word: string; title: string; text: string; art: ReactNode; par
       </GlassArt>
     ),
     part: 'Part 4',
-    fix: 'the signed finding keeps the 25%',
+    fix: "the original finding keeps the ~25%",
   },
   {
     word: 'Timing',
@@ -283,16 +283,16 @@ export function WhyForgot({ kicker, message }: WhyForgotProps) {
           </Reveal>
         ))}
         <Reveal show={closed} style={{ textAlign: 'center', fontSize: 22, fontWeight: 700, letterSpacing: '0.06em', color: 'var(--ink-dim)', borderTop: '2px dashed var(--line)', paddingTop: 10 }}>
-          SESSION CLOSED · Mercer goes home
+          NEW VISIT · a different inspector and thread
         </Reveal>
       </div>
       <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 34 }}>
-        <VisitNotebook lines={L} cleared={closed} width={270} />
+        <VisitNotebook lines={L} cleared={false} width={270} />
         <div style={{ maxWidth: 440 }}>
           <div style={{ fontSize: 38, fontWeight: 700, lineHeight: 1.15 }}>Visit notebook</div>
           <div style={{ marginTop: 10, fontSize: 26 }}><Hl strong>short-term memory</Hl></div>
           <Reveal show={L >= 3}>
-            <div style={{ fontSize: 26, color: 'var(--ink-dim)', lineHeight: 1.35, marginTop: 10 }}>{closed ? 'The visit is over, so the notebook is cleared. Nothing Mercer said is kept.' : 'This visit’s scribbles: this chat and its context window.'}</div>
+            <div style={{ fontSize: 26, color: 'var(--ink-dim)', lineHeight: 1.35, marginTop: 10 }}>{closed ? 'The visit is over. The next turn needs a retrieval path to earlier records.' : 'This visit’s scribbles: this chat and its context window.'}</div>
           </Reveal>
         </div>
       </div>
@@ -350,12 +350,12 @@ function CabinetStep() {
           <div style={{ maxWidth: 400 }}>
             <div style={{ fontSize: 40, fontWeight: 700, lineHeight: 1.15 }}>Bridge logbook</div>
             <div style={{ marginTop: 10, fontSize: 27 }}><Hl strong>long-term memory</Hl></div>
-            <div style={{ fontSize: 29, color: 'var(--ink)', lineHeight: 1.7, marginTop: 10 }}><Hl strong>permanent</Hl>, found by <Hl>name</Hl> or by <Hl>meaning</Hl></div>
+            <div style={{ fontSize: 29, color: 'var(--ink)', lineHeight: 1.7, marginTop: 10 }}><Hl strong>cross-thread retrieval</Hl>, found by <Hl>name</Hl> or by <Hl>meaning</Hl></div>
           </div>
         </Reveal>
       </div>
       <Reveal show={L >= 2} testId="database" style={{ flex: 'none', paddingTop: 10 }}>
-        <DbShelf height={124} badge={116} size={36}>Oracle Autonomous AI Database 26ai · <span style={{ opacity: 0.9, fontWeight: 600 }}>the logbook lives here</span></DbShelf>
+        <DbShelf height={124} badge={116} size={36}>Oracle AI Database 26ai · <span style={{ opacity: 0.9, fontWeight: 600 }}>the logbook lives here</span></DbShelf>
       </Reveal>
     </div>
   );
@@ -461,7 +461,7 @@ function Pour() {
         <div data-pour="logbook" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, marginBottom: 18 }}>
           <div style={{ width: 200, height: 230, marginBottom: 14 }}><Logbook /></div>
           <div style={{ width: '100%' }}>
-            <DbShelf height={84} badge={104} size={26}>Oracle Autonomous<br />AI Database 26ai</DbShelf>
+            <DbShelf height={84} badge={104} size={26}>Oracle<br />AI Database 26ai</DbShelf>
           </div>
         </div>
       <div>
@@ -486,7 +486,7 @@ function Fixes() {
           <div key={sv.word} data-fixed={solved || undefined} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '14px 8px 18px', borderRadius: 22, background: solved ? 'rgba(27,138,156,0.1)' : 'transparent', border: `2px solid ${solved ? 'var(--teal)' : 'transparent'}`, transition: 'background 0.5s, border-color 0.5s' }}>
             {solved && (
               <motion.span initial={{ opacity: 0, scale: 1.6, rotate: -12 }} animate={{ opacity: 1, scale: 1, rotate: -6 }} transition={{ delay: 1.4, duration: 0.35, ease: EASE }} style={{ position: 'absolute', top: 8, right: 8, padding: '3px 12px', borderRadius: 7, border: '3px solid var(--teal)', color: 'var(--teal)', fontWeight: 800, fontSize: 17, letterSpacing: '0.12em', background: 'var(--panel-strong)' }}>
-                SOLVED
+                CHECK
               </motion.span>
             )}
             {/* the glass is rebuilt on its click: empty before it, the solved drawing of 3.15b after */}
@@ -545,7 +545,7 @@ export function Handover({ kicker, message, notebook }: HandoverProps) {
           <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 48, alignItems: 'stretch' }}>
             <div style={{ flex: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 26, padding: '10px 0' }}>
               <MapPreview width={840} marks={MARKS} shown={shown} />
-              <DbShelf height={88} badge={80} size={26}>Oracle Autonomous AI Database 26ai</DbShelf>
+              <DbShelf height={88} badge={80} size={26}>Oracle AI Database 26ai</DbShelf>
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 18, minWidth: 0 }}>
               {WATCH.map((w, i) => (
@@ -621,7 +621,7 @@ export function Neither({ kicker, message, notebook }: NeitherProps) {
             {sign(1, '+')}
             {col(1, 'THE HISTORY ALONE · LAB 3', false, '“Mercer found about 25%.”', <>But what is the <b>limit</b>?</>, 'Cannot decide.')}
             {sign(2, '=')}
-            {col(2, 'TOGETHER', true, '“Over 25% needs a review, and it is about 25%.”', 'Now the AI agent can decide.', <b style={{ color: 'var(--teal)' }}>Both labs are needed.</b>)}
+            {col(2, 'TOGETHER', true, '“The finding is approximate and near the stated threshold.”', 'Verify the measurement and ask the engineer to review.', <b style={{ color: 'var(--teal)' }}>Use both the rule and the recorded evidence.</b>)}
           </div>
           <Reveal show={L >= 3} testId="call" style={{ flex: 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 22, padding: '16px 28px', borderRadius: 20, background: 'var(--panel-strong)', border: '3px solid var(--teal)' }}>

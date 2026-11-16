@@ -12,12 +12,13 @@ beforeEach(() => {
   useUiStore.setState({ jumpOpen: true });
 });
 
-test('every page appears once, with its preview and its name under it', () => {
+test('every page appears once, with its page label and current title', () => {
   render(<JumpMenu />);
   for (const s of SCENES) {
     // the overview shows each page's running number inside its part, not its id
     const card = screen.getByRole('button', { name: `${CHAPTER_NAME[s.chapter]} ${pageLabel(s.id)} ${s.title}` });
-    expect(within(card).getByRole('img').getAttribute('src')).toBe(`./thumbs/${s.id}.jpg`);
+    expect(within(card).getByText(pageLabel(s.id))).toBeInTheDocument();
+    expect(within(card).queryByRole('img')).toBeNull();
     expect(within(card).getByText(s.title)).toBeInTheDocument();
   }
 });
@@ -49,16 +50,16 @@ test('opening and closing the overview does not crash where scrollIntoView retur
 });
 
 // owner, 4 Nov: in All pages each step of the code map is a page of its own, shown as a sub-page: 19, 19a, 19b ...
-test('the code map shows each of its steps as a sub-page with its own preview', () => {
+test('the code map shows each of its steps as a named sub-page', () => {
   render(<JumpMenu />);
   const n = pageLabel('3.6m');
   const tile = (label: string) => screen.getByRole('button', { name: new RegExp(`^Lab 3 · Agent Memory ${label} `) });
   // the page itself first, then one tile per step, lettered in order
-  expect(within(tile(n)).getByRole('img').getAttribute('src')).toBe('./thumbs/3.6m.jpg');
+  expect(within(tile(n)).getByText(n)).toBeInTheDocument();
   MAP_STEPS.slice(1).forEach((m, k) => {
     const label = `${n}${String.fromCharCode(97 + k)}`;
     const card = tile(label);
-    expect(within(card).getByRole('img').getAttribute('src')).toBe(`./thumbs/3.6m_${k + 1}.jpg`);
+    expect(within(card).getByText(label)).toBeInTheDocument();
     expect(within(card).getByText(stepName(m))).toBeInTheDocument();
   });
   expect(screen.getAllByRole('button', { name: new RegExp(`^Lab 3 · Agent Memory ${pageLabel('3.6m')}[a-z]? `, 'i') }).length).toBe(MAP_STEPS.length);
@@ -88,3 +89,13 @@ test('the sub-page names are all different, so each step can be told apart', () 
   expect(names).toContain('0 · Run the cell.');
 });
 
+
+test('search filters pages and Escape closes the searchable dialog', () => {
+  render(<JumpMenu />);
+  fireEvent.change(screen.getByRole('searchbox', {name: 'Search presentation pages'}), {target: {value: 'no-such-lesson-xyz'}});
+  expect(screen.getByRole('status')).toHaveTextContent('No matching pages');
+  fireEvent.change(screen.getByRole('searchbox'), {target: {value: 'memory'}});
+  expect(screen.queryByRole('status')).toBeNull();
+  fireEvent.keyDown(screen.getByRole('searchbox'), {key: 'Escape'});
+  expect(useUiStore.getState().jumpOpen).toBe(false);
+});

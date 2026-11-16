@@ -3,9 +3,9 @@ import * as THREE from 'three';
 import { useFrame, type RootState } from '@react-three/fiber';
 import { PERF_STEPS, usePerfStore, type PerfId, type PerfResult } from '../engine/perfCheck';
 
-/** each step settles for a second (a shader rebuild, a resize), then is measured for two and a half */
-const WARM = 1.0;
-const MEASURE = 2.5;
+/** Each step settles for two seconds, then measures five seconds of frames. */
+const WARM = 2.0;
+const MEASURE = 5.0;
 
 type Run = { step: number; measuring: boolean; t: number; dts: number[]; undo: () => void };
 
@@ -36,9 +36,10 @@ function apply(id: PerfId, state: RootState): () => void {
       };
     }
     case 'traffic': {
-      const groups = ['cars', 'boats'].map((n) => scene.getObjectByName(n)).filter((o): o is THREE.Object3D => !!o);
-      groups.forEach((g) => (g.visible = false));
-      return () => groups.forEach((g) => (g.visible = true));
+      const groups = ['SenayanTraffic', 'Jakarta road and river traffic', 'cars', 'boats'].map((n) => scene.getObjectByName(n)).filter((o): o is THREE.Object3D => !!o);
+      const previous = groups.map(g => g.visible);
+      groups.forEach(g => { g.visible = false; });
+      return () => groups.forEach((g, i) => { g.visible = previous[i]; });
     }
     case 'empty':
       scene.visible = false;

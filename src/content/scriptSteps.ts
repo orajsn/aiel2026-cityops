@@ -15,29 +15,29 @@ export const stepOf = (page: string, open: boolean, focus: number): number => {
 };
 
 export const STEP_EN: Record<string, string[]> = {
-  '3.6m': [
-  "This one map is everything in today’s notebook. One turn of the AI agent runs along the top, and everything it remembers sits in one database underneath. We will walk it in the order the code runs.",
-  "First, open the notebook. In the file list on the left, open the agent_memory folder and double-click notebook_complete_ollama.ipynb.",
-  "This is where the code lives. Each box is a cell. Click inside one to select it, and the blue bar on its left shows which cell you are on.",
-  "To run a cell, click Run, or press Shift and Enter. The cell runs, and the next one is selected for you. Run them in order and you will follow along with me.",
-  "Part 1. Where does everything live? In **one filing room, not five**. These few settings name the database, the embedding model and the language model.",
-  "Now run the connection cell. **One connection** opens the database. If you see this line, you are in, and everything after this uses the same connection.",
-  "Part 2. How do you search by meaning? The embedder turns text into **384 numbers**, like an address on a map of meaning. Reports that mean the same thing land close together.",
-  "Next, the memory SDK. It sits on that same connection and sets up its own tables, and the embedder we just met does the numbers for it.",
-  "Part 3. Before any memory, the AI agent needs to know what exists. This code reads two data files and finds **26 city assets**, and Harbor Bridge is one of them.",
-  "Now the heart of it. A new message is filed word for word in **CITY_MESSAGE**. Then the extractor reads it, together with the running thread summary and the past memories, and writes two to eight small typed records into **CITY_MEMORY**.",
-  "So how does a report get filed? Two lines do it: build the content string, then call add_messages_async. **Saving the message is also what starts the extractor.**",
-  "Let us open both tables and look inside. A small helper called peek_sdk_tables prints the rows of CITY_MESSAGE and CITY_MEMORY for one thread. Here it is the test thread: one message, **word for word**, and below it the two memory cards the extractor wrote from it.",
-  "Now we try it on more reports. The code samples four reports, a mix of routine, warning and critical, and files each one into the inspect_demo thread with the **same report_event call**. Each is saved word for word, and the extractor writes its cards.",
-  "Part 3c. Why did this search come back empty? Because **a memory belongs to whoever wrote it**. Search with no name and you get nothing. Give the right name, and the cards light up.",
-  "Part 4. What is a finding, if it is not a memory? A memory is what the AI agent noticed. **A finding is what a person signed.** It gets its own table, and its description becomes numbers too.",
-  "Now we search the findings. We want the nearest in meaning, but only for this bridge. One SQL statement does both: the closest in meaning, **inside the walls** of this asset and this category.",
-  "Part 5. Why can Vance not read Mercer’s private note? The notebook proves it with two searches. Mercer saves a personal note, and Vance searches under his own name: **nothing comes back**. Mercer also saves a city-wide guideline, and Vance finds it. And **the database enforces this**, not the AI agent.",
-  "Part 6 is one whole turn. What does the AI agent actually read? Two lines fetch it: its context card and the similar findings. Then it all goes into one prompt: ask, then save.",
-  "Now the story, Day 1. Mercer calls call_copilot for diagnostic help. She types what she sees on Harbor Bridge. The AI agent searches what is already known and reasons about it. Her turn is saved, and the extractor keeps what matters.",
-  "Once Mercer is sure, she signs the finding herself with log_finding. That is a separate path: **one row in the official record**.",
-  "And later, Vance. He only calls call_copilot. His own thread is empty, but the asset’s memory and Mercer’s finding come up the same road. **No human handoff.**",
-],
+  "3.6m": [
+    "This one map is everything in today’s notebook. One turn of the AI agent runs along the top, and everything it remembers sits in one database underneath. We will walk it in the order the code runs.",
+    "First, open the notebook. In the file list on the left, open the agent_memory folder and double-click notebook_complete_ollama.ipynb.",
+    "This is where the code lives. Each box is a cell. Click inside one to select it, and the blue bar on its left shows which cell you are on.",
+    "To run a cell, click Run, or press Shift and Enter. The cell runs, and the next one is selected for you. Run them in order and you will follow along with me.",
+    "Part 1. Where does everything live? In **one filing room, not five**. These few settings name the database, the embedding model and the language model.",
+    "Now run the connection cell. **One connection** opens the database. If you see this line, you are in, and everything after this uses the same connection.",
+    "Part 2. How do you search by meaning? The embedder turns text into **384 numbers**, like an address on a map of meaning. Reports that mean the same thing land close together.",
+    "Next, the memory SDK. It sits on that same connection and sets up its own tables, and the embedder we just met does the numbers for it.",
+    "Part 3. Before any memory, the AI agent needs to know what exists. This code reads two data files and finds **26 city assets**, and Harbor Bridge is one of them.",
+    "Now the heart of it. A new message is filed word for word in **CITY_MESSAGE**. Then the extractor reads it, together with the running thread summary and the past memories, and writes two to eight small typed records into **CITY_MEMORY**.",
+    "So how does a report get filed? Two lines do it: build the content string, then call add_messages_async. **Saving the message is also what starts the extractor.**",
+    "Let us open both tables and look inside. A small helper called peek_sdk_tables prints the rows of CITY_MESSAGE and CITY_MEMORY for one thread. Here it is the test thread: one message, **word for word**, and below it the two memory cards the extractor wrote from it.",
+    "Now we try it on more reports. The code samples four reports, a mix of routine, warning and critical, and files each one into the inspect_demo thread with the **same report_event call**. Each is saved word for word, and the extractor writes its cards.",
+    "Part 3c. The SDK requires a user_id scope. Here it is the inspector identifier; the final copilot uses the asset identifier for shared memory and an inspector-specific thread for context. **Inspect the configured scope and returned records**. A missing identifier is a validation issue.",
+    "Part 4. What is a finding, if it is not a memory? A memory is what the AI agent noticed. **A finding is what a person signed.** It gets its own table, and its description becomes numbers too.",
+    "Now we search the findings. We want the nearest in meaning, but only for this bridge. One SQL statement does both: the closest in meaning, **inside the walls** of this asset and this category.",
+    "Part 5. Compare the private and shared retrieval queries. Run the corrected exact-sentinel assertion and inspect whether the private note is excluded while the shared guideline is returned. **These checks test the configured retrieval policy**; they do not prove authentication or an independent authorization boundary.",
+    "Part 6 is one whole turn. What does the AI agent actually read? Two lines fetch it: its context card and the similar findings. Then it all goes into one prompt: ask, then save.",
+    "Now the story, Day 1. Mercer calls call_copilot for diagnostic help. She types what she sees on Harbor Bridge. The AI agent searches what is already known and reasons about it. Her turn is saved, and the extractor keeps what matters.",
+    "Once Mercer is sure, she signs the finding herself with log_finding. That is a separate path: **one row in the official record**.",
+    "And later, Vance. He only calls call_copilot. His own thread is empty, but the asset’s memory and Mercer’s finding come up the same road. **No human handoff.**"
+  ]
 };
 
 export const STEP_TH: Record<string, string[]> = {

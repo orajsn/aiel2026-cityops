@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import overridesJson from '../content/cameraOverrides.json';
+import overridesJson from '../content/senayanCameraOverrides.json';
 import { SHOTS, type Shot, type Vec3 } from '../world/shots';
 import type { SceneDef } from './types';
 import { at } from './base';
@@ -50,7 +50,7 @@ export function shotForScene(scene: SceneDef, overrides = useCameraStore.getStat
  * this browser when there is no dev server.
  */
 export async function loadOverrides(): Promise<void> {
-  try {
+  if (import.meta.env.DEV) try {
     const r = await fetch(at('__camera-overrides'), { cache: 'no-store' });
     if (r.ok && (r.headers.get('content-type') ?? '').includes('json')) {
       useCameraStore.setState({ overrides: await r.json() });
@@ -60,7 +60,7 @@ export async function loadOverrides(): Promise<void> {
     /* no dev server */
   }
   try {
-    const local = localStorage.getItem('cityops.cameraOverrides');
+    const local = localStorage.getItem('cityops.senayan.cameraOverrides.v1');
     if (local) useCameraStore.setState({ overrides: { ...useCameraStore.getState().overrides, ...JSON.parse(local) } });
   } catch {
     /* storage blocked */
@@ -68,19 +68,19 @@ export async function loadOverrides(): Promise<void> {
 }
 
 /**
- * Store the saved angles in the project (src/content/cameraOverrides.json) through the dev server,
+ * Store the saved angles in the project (src/content/senayanCameraOverrides.json) through the dev server,
  * so a save made on the iPad lands in the repo. Without a dev server (a built copy), keep them in this
  * browser only. Returns where they went.
  */
 export async function persistOverrides(overrides: Record<string, SavedAngle>): Promise<'project' | 'browser'> {
-  try {
+  if (import.meta.env.DEV) try {
     const r = await fetch(at('__camera-overrides'), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(overrides) });
     if (r.ok) return 'project';
   } catch {
     /* no dev server */
   }
   try {
-    localStorage.setItem('cityops.cameraOverrides', JSON.stringify(overrides));
+    localStorage.setItem('cityops.senayan.cameraOverrides.v1', JSON.stringify(overrides));
   } catch {
     /* storage blocked */
   }

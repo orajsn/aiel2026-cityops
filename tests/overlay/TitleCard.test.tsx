@@ -8,7 +8,10 @@ test('the O of CityOps is the Oracle O, and the word still reads CityOps', () =>
   expect(o).not.toBeNull();
   expect(o?.getAttribute('aria-hidden')).toBe('true');
   expect(h.textContent).toBe('Cityps');
-  expect(container.textContent).toContain('Oracle Cloud Engineering Thailand');
+  expect(container.textContent).toContain('Oracle Cloud Engineering Indonesia');
+  expect(container.textContent).toContain('Jakarta, Indonesia');
+  expect(container.textContent).toContain('Real neighbourhood. Fictional inspection scenario.');
+  expect(container.textContent).not.toContain('Bangkok');
 });
 
 test('the card is balanced: the two small lines are the same size, the word about five times that', async () => {

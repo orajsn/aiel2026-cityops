@@ -149,7 +149,7 @@ useTrafficStore.subscribe((s, prev) => {
 
 /** read the saved traffic fresh from the dev server (the file is not watched, so a save never reloads the page), then any unsaved work kept in this browser */
 export async function loadTraffic(): Promise<void> {
-  try {
+  if (import.meta.env.DEV) try {
     const r = await fetch(at('__traffic'), { cache: 'no-store' });
     if (r.ok && (r.headers.get('content-type') ?? '').includes('json')) useTrafficStore.getState().replace(await r.json());
   } catch {
@@ -168,6 +168,7 @@ export async function loadTraffic(): Promise<void> {
 
 /** save to the project; 'failed' if the dev server is not reachable or refused it */
 export async function persistTraffic(): Promise<'project' | 'failed'> {
+  if (!import.meta.env.DEV) return 'failed';
   try {
     const r = await fetch(at('__traffic'), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(useTrafficStore.getState().config) });
     if (r.ok) {

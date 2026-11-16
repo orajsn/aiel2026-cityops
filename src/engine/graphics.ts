@@ -34,22 +34,16 @@ export function fixedDpr(resolution: Resolution, custom: Size): number | null {
 /** the pixels the 3D view draws at this pixel ratio */
 export const drawSize = (dpr: number): Size => ({ w: Math.round(STAGE_W * dpr), h: Math.round(STAGE_H * dpr) });
 
-/**
- * Anti-aliasing (MSAA) draws every pixel about four times over. From 2K up the pixels are too small for jagged
- * edges to show, and at 4K it multiplies the heaviest part of a frame (owner, 28 Oct: 4K felt laggy), so it goes off.
- */
-export function antialiasFor(resolution: Resolution, custom: Size): boolean {
-  const dpr = fixedDpr(resolution, custom);
-  return dpr === null || drawSize(dpr).w < 2560;
-}
+/** Senayan keeps edge smoothing at each resolution; DPR changes resize the renderer. */
+export function antialiasFor(_resolution?: Resolution, _custom?: Size): boolean { return true; }
 
 /** the frame rate the 3D view keeps, measured by FrameMeter (World.tsx), read by the readout */
 export const FRAME = { fps: 0 };
 
-const KEY = 'cityops.resolution';
+const KEY = 'cityops.jakarta.v4.resolution';
 
 function stored(): { resolution: Resolution; custom: Size } {
-  const fallback = { resolution: 'auto' as Resolution, custom: { ...PRESETS['4k'] } };
+  const fallback = { resolution: 'auto' as Resolution, custom: { ...PRESETS['2k'] } };
   try {
     const v = JSON.parse(localStorage.getItem(KEY) ?? 'null');
     if (v && ['auto', 'fhd', '2k', '4k', 'custom'].includes(v.resolution)) return { resolution: v.resolution, custom: v.custom ?? fallback.custom };
@@ -67,7 +61,11 @@ function store(v: { resolution: Resolution; custom?: Size }) {
   }
 }
 
+export interface ActualBuffer extends Size { antialias: boolean }
+
 export interface GraphicsState {
+  actualBuffer: ActualBuffer | null;
+  setActualBuffer(size: ActualBuffer): void;
   resolution: Resolution;
   custom: Size;
   /** a small frame rate readout in the corner, to see what a setting costs on this machine */
@@ -126,6 +124,8 @@ function storedBridge(): 'harbor' | 'bhumibol' {
 
 export const useGraphicsStore = create<GraphicsState>((set, get) => ({
   ...stored(),
+  actualBuffer: null,
+  setActualBuffer: actualBuffer => set({ actualBuffer }),
   bridge: storedBridge(),
   setBridge: (bridge) => {
     try {
@@ -165,11 +165,7 @@ export const useGraphicsStore = create<GraphicsState>((set, get) => ({
   },
 }));
 
-/**
- * Anti-aliasing is fixed when the canvas is made, so it follows the resolution this page loaded with. Making a
- * new canvas to change it throws the old WebGL context away, and Chrome then refuses a new one (seen on the VM,
- * 28 Oct): the change waits for a reload instead (Settings says so).
- */
+/** Kept for callers that inspect the renderer's startup AA configuration. */
 export const LOADED_AA = (() => {
   const { resolution, custom } = useGraphicsStore.getState();
   return antialiasFor(resolution, custom);

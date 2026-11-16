@@ -43,8 +43,10 @@ test('every shot and overlay referenced by chapters 1 and 2 exists', () => {
   }
 });
 
-test('no page says "fictional scenario" (owner: everyone already knows)', () => {
-  expect(JSON.stringify(SCENES)).not.toMatch(/fictional/i);
+test('the Senayan introduction distinguishes the real neighbourhood from the fictional inspection scenario', () => {
+  expect(SCENES.find(s => s.id === '0.1')?.title).toBe('Real neighbourhood. Fictional inspection scenario.');
+  expect(SCENES.find(s => s.id === '0.2')?.script).toContain('do not identify real defects');
+  expect(SCENES).toHaveLength(87);
 });
 
 test('SCENES runs the parts in show order: Introduction, Lab 1 (when in the show), Lab 2, Lab 3', () => {

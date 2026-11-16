@@ -8,12 +8,13 @@ import { createServer } from 'node:http';
 import { randomBytes, randomInt, timingSafeEqual } from 'node:crypto';
 import { readFile, appendFile, mkdir } from 'node:fs/promises';
 import { readFileSync, existsSync } from 'node:fs';
-import { extname, join, normalize } from 'node:path';
+import { extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const PORT = Number(process.env.FOLLOW_PORT ?? 8090);
 const BASE = (process.env.FOLLOW_BASE ?? '/').replace(/\/?$/, '/');
 const ROOT = fileURLToPath(new URL('./public/', import.meta.url));
+const THUMBS = fileURLToPath(new URL('../public/thumbs/', import.meta.url));
 const IDLE = Number(process.env.FOLLOW_IDLE_MS ?? 90 * 60 * 1000); // no page change or presenter call for this long ends the session
 const MAX_AGE = 24 * 3600 * 1000;
 const MAX_SESSIONS = 50;
@@ -31,7 +32,7 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.json': 'application/json',
 // Every save is a version, appended to data/versions.jsonl, and goes live to phones at once. Comments are appended to data/comments.jsonl
 // (add, reply, resolve, delete as events). Both files are the whole truth: the state below is rebuilt from them when the relay starts.
 // Who did it comes from X-Remote-User, which nginx sets from the login on the manager's paths and blanks on the public ones.
-const DATA = fileURLToPath(new URL(process.env.FOLLOW_DATA ? 'file://' + process.env.FOLLOW_DATA + '/' : './data/', import.meta.url));
+const DATA = process.env.FOLLOW_DATA ? resolve(process.env.FOLLOW_DATA) : fileURLToPath(new URL('./data/', import.meta.url));
 const VFILE = join(DATA, 'versions.jsonl');
 const CFILE = join(DATA, 'comments.jsonl');
 /** @type {Map<string, {en: {v: number, text: string, by: string, at: string}, th: {v: number, text: string, by: string, at: string}}>} the live (latest) text per page and language */
@@ -294,9 +295,23 @@ createServer(async (req, res) => {
   // ---- the phone app and its scripts
   if (path === '/api/pages' && req.method === 'GET') return json(res, 200, { pages: merged() });
   if (req.method === 'GET') {
-    const rel = normalize(path === '/' || path === '' ? '/index.html' : path).replace(/^(\.\.[/\\])+/, '');
     try {
-      const file = await readFile(join(ROOT, rel));
+      const rel = decodeURIComponent(path === '/' || path === '' ? '/index.html' : path);
+      const root = resolve(ROOT);
+      const target = resolve(root, '.' + rel);
+      if (!target.startsWith(root + sep)) return json(res, 404, { error: 'not found' });
+      let file;
+      try {
+        file = await readFile(target);
+      } catch (error) {
+        // Windows checkouts can retain the Git symlink as a text file. Serve the
+        // same canonical thumbnails without requiring symlink privileges.
+        if (!rel.startsWith('/thumbs/')) throw error;
+        const thumbRoot = resolve(THUMBS);
+        const thumb = resolve(thumbRoot, rel.slice('/thumbs/'.length));
+        if (!thumb.startsWith(thumbRoot + sep)) throw error;
+        file = await readFile(thumb);
+      }
       res.writeHead(200, { 'content-type': MIME[extname(rel)] ?? 'application/octet-stream', 'cache-control': rel.endsWith('.json') ? 'no-cache' : 'public, max-age=300' });
       return res.end(file);
     } catch {

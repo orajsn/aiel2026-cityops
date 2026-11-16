@@ -602,20 +602,56 @@ function Card({ n, step }: { n: 1 | 2 | 3; step: ThreeLabsProps['step'] }) {
  * steps coming in one after another on the right, while the other two cards wait narrow and dimmed. The crack
  * is the one red thing; everything else is teal and grey.
  */
-export function ThreeLabs({ step, kicker = 'Harbor Bridge', message = 'One bridge, **three labs**.' }: ThreeLabsProps) {
-  return (
-    <WidePanel kicker={kicker} message={message} testId="three-labs" step={step} kickerColor="var(--teal)">
-      <div data-dots style={{ position: 'absolute', right: 30, top: 30, display: 'flex', gap: 8, alignItems: 'center' }}>
-        {[1, 2, 3].map((d) => (
-          <motion.span key={d} data-dot={d} data-on={step === d} initial={false} animate={{ width: step === d ? 34 : 12, backgroundColor: step === d ? '#1b8a9c' : 'rgba(127, 127, 127, 0.35)' }} transition={{ duration: 0.4, ease: EASE }} style={{ height: 12, borderRadius: 6, display: 'block' }} />
-        ))}
+interface LearningLab {
+  n: 1 | 2 | 3;
+  name: string;
+  topic: string;
+  question: string;
+  context: string;
+  steps: string[];
+  proof: string;
+  flow: string[];
+}
+
+const LEARNING_PATH: LearningLab[] = [
+  { n: 1, name: 'Choose the model', topic: 'AI economics', question: 'Which model should answer this request?', context: 'The repair team has specifications, supplier records and a delivery photo.', steps: ['Retrieve the project evidence', 'Route text and image requests', 'Check the answer and guardrails'], proof: 'Explain the selected model. Check answer quality before comparing cost.', flow: ['Request', 'Routing rule', 'Model + evidence'] },
+  { n: 2, name: 'Build the agent', topic: 'RAG to agents', question: 'What evidence does this crack need?', context: 'A useful recommendation draws on more than one lookup.', steps: ['Retrieve relevant records', 'Let the agent choose allowed tools', 'Inspect the trace and recommendation'], proof: 'Trace an answer to its source records and tool calls.', flow: ['Question', 'Tools + retrieval', 'Evidence brief'] },
+  { n: 3, name: 'Add useful memory', topic: 'Agent memory', question: 'What should the next inspector know?', context: 'Mercer records a finding. Vance returns to the same bridge later.', steps: ['Keep the original finding', 'Retrieve within the intended scope', 'Check what reaches the next prompt'], proof: 'Verify recall, provenance and private-versus-shared scope.', flow: ['Finding', 'Scoped memory', 'Next visit'] },
+];
+
+function LearningFlow({ lab }: { lab: LearningLab }) {
+  return <div style={{ display: 'flex', flexDirection: 'column', gap: 16, justifyContent: 'center', alignItems: 'stretch', padding: '20px 32px', borderRadius: 20, background: 'rgba(27,138,156,.07)', border: '1px solid var(--line)' }}>
+    {lab.flow.map((text, i) => <div key={text}>
+      <div style={{ background: i === 1 ? 'var(--teal)' : 'var(--panel-strong)', color: i === 1 ? 'white' : 'var(--ink)', border: '1.5px solid var(--line)', borderRadius: 12, padding: '22px 24px', fontSize: 30, fontWeight: 650, textAlign: 'center' }}>{text}</div>
+      {i < 2 && <div aria-hidden style={{ textAlign: 'center', color: 'var(--teal)', fontSize: 30, lineHeight: 1, marginTop: 16 }}>↓</div>}
+    </div>)}
+  </div>;
+}
+
+/** Senayan edition: one readable detail pane, with the three-lab route always visible. */
+export function ThreeLabs({ step = 0, kicker = 'One bridge · three capabilities', message = 'Build an assistant. Add tools. **Make evidence available next time.**' }: ThreeLabsProps) {
+  const active = LEARNING_PATH[Math.max(0, Math.min(2, step - 1))];
+  return <WidePanel kicker={kicker} message={message} testId="three-labs" step={step} kickerColor="var(--teal)">
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 16, flex: 'none', margin: '6px 0 26px' }}>
+      {LEARNING_PATH.map(lab => <div key={lab.n} data-lab={lab.n} data-mode={step === 0 ? 'mini' : step === lab.n ? 'open' : 'closed'} style={{ padding: '14px 20px', borderRadius: 12, background: step === lab.n ? 'var(--teal)' : 'rgba(127,127,127,.08)', color: step === lab.n ? 'white' : 'var(--ink-dim)', display: 'flex', alignItems: 'center', gap: 16, fontSize: 26, fontWeight: 600 }}>
+        <span style={{ fontFamily: 'JetBrains Mono,monospace', opacity: .7, fontSize: 21 }}>0{lab.n}</span>{lab.name}
+      </div>)}
+    </div>
+    {step === 0 ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 24, flex: 1, minHeight: 0 }}>
+      {LEARNING_PATH.map(lab => <section key={lab.n} style={{ borderTop: '3px solid var(--teal)', padding: '24px 22px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ fontSize: 18, color: 'var(--teal)', textTransform: 'uppercase', letterSpacing: 2 }}>{lab.topic}</div>
+        <h2 style={{ fontSize: 36, lineHeight: 1.18, margin: 0, fontWeight: 650 }}>{lab.question}</h2>
+        <p style={{ fontSize: 26, lineHeight: 1.45, margin: 0, color: 'var(--ink-dim)' }}>{lab.context}</p>
+        <div style={{ marginTop: 'auto', paddingTop: 20, borderTop: '1px solid var(--line)', fontSize: 25, lineHeight: 1.4, color: 'var(--teal)', fontWeight: 600 }}>{lab.proof}</div>
+      </section>)}
+    </div> : <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.5fr) minmax(0,1fr)', gap: 45, flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 22 }}>
+        <h2 style={{ fontSize: 42, lineHeight: 1.15, margin: 0, fontWeight: 650 }}>{active.question}</h2>
+        <p style={{ fontSize: 27, lineHeight: 1.4, color: 'var(--ink-dim)', margin: 0 }}>{active.context}</p>
+        <ol style={{ paddingLeft: 32, margin: '0 0 0 4px', fontSize: 29, lineHeight: 1.55 }}>{active.steps.map(text => <li key={text} style={{ padding: '4px 0 4px 8px' }}>{text}</li>)}</ol>
+        <div style={{ borderLeft: '4px solid var(--teal)', paddingLeft: 20, fontSize: 26, lineHeight: 1.4, color: 'var(--teal)', fontWeight: 600 }}>{active.proof}</div>
       </div>
-      {/* the cards take all the height the panel has (owner, 29 Oct: use the stage) */}
-      <div style={{ display: 'flex', gap: 20, flex: 1, minHeight: 0 }}>
-        {([1, 2, 3] as const).map((n) => (
-          <Card key={n} n={n} step={step} />
-        ))}
-      </div>
-    </WidePanel>
-  );
+      <LearningFlow lab={active} />
+    </div>}
+  </WidePanel>;
 }

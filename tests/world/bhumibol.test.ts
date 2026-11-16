@@ -1,7 +1,8 @@
+// Legacy Bangkok model regressions; these components are not mounted in the Senayan branch.
 import { vi } from 'vitest';
 vi.mock('@react-three/drei', () => ({ useGLTF: Object.assign(() => ({ scene: null }), { preload: () => {} }) }));
 import { BHUMIBOL } from '../../src/world/BhumibolBridge';
-import { BRIDGE } from '../../src/world/bridgeFrame';
+import { BRIDGE } from '../../src/world/legacyBangkokBridgeFrame';
 import { useGraphicsStore } from '../../src/engine/graphics';
 
 // owner, 28 Oct: the Bhumibol Bridge model, scaled evenly so its towers stand where Harbor Bridge's towers stand

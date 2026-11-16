@@ -75,9 +75,11 @@ test('closed by hand mid-way, Next opens it again where it was', () => {
   expect(at()).toBe(`${FOCUS}:${Math.min(2, STEPS)}`);
 });
 
-test('nothing happens to focus before the camera arrives, and on pages without a focus', () => {
+test('focus advances during camera travel without skipping the lesson; pages without focus still return false', () => {
   useSceneStore.setState({ index: 1, settled: false });
-  expect(focusNext()).toBe(false);
+  expect(focusNext()).toBe(true);
+  expect(useSceneStore.getState().current().id).toBe(FOCUS);
+  expect(useDrawerStore.getState()).toMatchObject({ open: true, focus: 1 });
   useSceneStore.setState({ index: 2, settled: true });
   expect(focusNext()).toBe(false);
   expect(focusPrev()).toBe(false);

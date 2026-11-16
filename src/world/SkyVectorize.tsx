@@ -55,7 +55,7 @@ export function PdfBook({ name, size = 1 }: { name?: string; size?: number }) {
   );
 }
 
-/** one text turning into numbers: its icon, an arrow, a row of numbers that scrolls past, and "384 numbers" */
+/** one text turning into numbers: its icon, an arrow, a row of numbers that scrolls past, and "Model-defined dimensions" */
 export function Strip({ t, seed, icon, tone, width = 800 }: { t: number; seed: number; icon: ReactNode; tone: 'teal' | 'red'; width?: number }) {
   const text = vectorNumbers(seed);
   const col = tone === 'teal' ? '#146f7f' : '#C74634';
@@ -67,7 +67,7 @@ export function Strip({ t, seed, icon, tone, width = 800 }: { t: number; seed: n
       <div style={{ flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', fontFamily: 'var(--font-mono, "JetBrains Mono", monospace)', fontSize: 26, fontWeight: 600, color: '#1f2a33', maskImage: 'linear-gradient(to right, transparent, #000 8%, #000 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, #000 8%, #000 80%, transparent)' }}>
         <span style={{ display: 'inline-block', transform: `translateX(${shift}px)` }}>( {text}, … )</span>
       </div>
-      <span style={{ flex: 'none', fontSize: 22, fontWeight: 700, color: col, background: tone === 'teal' ? 'rgba(27,138,156,0.12)' : 'rgba(199,70,52,0.1)', padding: '3px 9px', borderRadius: 999 }}>384 numbers</span>
+      <span style={{ flex: 'none', fontSize: 22, fontWeight: 700, color: col, background: tone === 'teal' ? 'rgba(27,138,156,0.12)' : 'rgba(199,70,52,0.1)', padding: '3px 9px', borderRadius: 999 }}>Model-defined dimensions</span>
     </div>
   );
 }

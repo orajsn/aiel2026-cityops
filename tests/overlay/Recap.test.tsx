@@ -72,7 +72,7 @@ test('3.18 is the last page: a three-step staircase on one teal foundation, the 
   expect([...c.querySelectorAll('[data-stair]')].map((e) => e.getAttribute('data-stair'))).toEqual(['1', '2', '3']);
   for (const w of ['An assistant', 'An agent', 'An agent that remembers', 'the repair plan', 'the crack', 'the rust']) expect(c.textContent).toContain(w);
   expect(c.querySelectorAll('[data-foundation]')).toHaveLength(1);
-  expect(c.querySelector('[data-foundation]')!.textContent).toBe('One Oracle AI Database, ready for AI workloads, under all three');
+  expect(c.querySelector('[data-foundation]')!.textContent).toBe('Shared pattern: evidence → controlled tools → scoped memory');
   expect(c.querySelector('[data-quiz]')).toBeNull();
   expect(c.querySelector('[data-portrait="mercer"]')).not.toBeNull();
   expect(c.querySelector('[data-portrait="vance"]')).not.toBeNull();

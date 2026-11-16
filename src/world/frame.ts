@@ -1,4 +1,4 @@
-import { edgeVisibility } from './BangkokCity';
+import { senayanEdgeVisibility } from './senayanBounds';
 import type { Vec3 } from './shots';
 
 /** The canvas camera: 45 deg vertical field of view on the fixed 16:9 stage (App.tsx). */
@@ -44,7 +44,7 @@ export function frameCorners(pos: Vec3, target: Vec3): ({ x: number; z: number }
 
 /** How much of the city the frame's worst corner sees: 1 = fully inside the map, 0 = sky or haze. */
 export function frameCityScore(pos: Vec3, target: Vec3): number {
-  return Math.min(...frameCorners(pos, target).map((c) => (c ? edgeVisibility(c.x, c.z) : 0)));
+  return Math.min(...frameCorners(pos, target).map((c) => (c ? senayanEdgeVisibility(c.x, c.z) : 0)));
 }
 
 /** Screen position of a world point: x, y in -1..1 (left/bottom negative), and whether it is in front. */

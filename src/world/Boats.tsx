@@ -2,7 +2,7 @@ import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { RIVER_CURVE } from './river';
-import { BRIDGE, fromBridgeLocal, harborBridgeFrame, toBridgeLocal } from './bridgeFrame';
+import { BRIDGE, fromBridgeLocal, harborBridgeFrame, toBridgeLocal } from './legacyBangkokBridgeFrame';
 import { terrainHeight } from './terrain';
 import { speedUnits } from '../content/traffic';
 import { drivableRoutes, useTrafficStore } from '../engine/traffic';

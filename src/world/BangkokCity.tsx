@@ -150,4 +150,4 @@ export function BangkokCity() {
   );
 }
 
-useGLTF.preload?.(URL);
+// Preserved legacy map component; the Senayan branch does not preload this asset.

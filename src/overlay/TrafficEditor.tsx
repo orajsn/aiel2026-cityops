@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { BRIDGE_CARS, LIMITS, type TrafficKind } from '../content/traffic';
 import { persistTraffic, useTrafficStore } from '../engine/traffic';
 import { useCameraStore } from '../engine/camera';
-import { bridgeLanes } from '../world/bridgeFrame';
+// Retained Bangkok authoring tool; Senayan mounts authored traffic and disables this editor.
+import { bridgeLanes } from '../world/legacyBangkokBridgeFrame';
 
 const NAME: Record<TrafficKind, string> = { boats: 'Boats', cars: 'Cars' };
 

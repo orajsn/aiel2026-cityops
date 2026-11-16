@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useUiStore } from '../engine/ui';
 import { useCameraStore } from '../engine/camera';
 import { useTrafficStore } from '../engine/traffic';
-import { antialiasFor, drawSize, fixedDpr, LOADED_AA, TEXT_MAX, TEXT_MIN, useGraphicsStore, type Resolution } from '../engine/graphics';
+import { drawSize, fixedDpr, TEXT_MAX, TEXT_MIN, useGraphicsStore, type Resolution } from '../engine/graphics';
+import { QUALITY, useQualityStore, type Quality } from '../engine/quality';
 import { useRenderDpr } from '../Stage';
 import { setTrafficMode } from './TrafficEditor';
 import { usePresentationStore } from '../engine/presentation';
@@ -13,7 +14,7 @@ import { useFollowStore } from '../engine/follow';
 const RESOLUTIONS: { id: Resolution; label: string }[] = [
   { id: 'auto', label: 'Auto' },
   { id: 'fhd', label: 'FHD' },
-  { id: '2k', label: '2K' },
+  { id: '2k', label: 'QHD' },
   { id: '4k', label: '4K' },
   { id: 'custom', label: 'Custom' },
 ];
@@ -56,7 +57,7 @@ export function SettingsPanel({ onClose }: { onClose(): void }) {
         ))}
       </div>
 
-      <BridgeChoice />
+
 
       <TextSize />
 
@@ -77,36 +78,6 @@ export function SettingsPanel({ onClose }: { onClose(): void }) {
         <i aria-hidden />
       </button>
 
-      <div className="settings__label" id="settings-tools">
-        Tools
-      </div>
-      {/* a mode takes the screen: the panel steps aside, and opening it again offers the way out */}
-      <div className="settings__tools" role="group" aria-labelledby="settings-tools">
-        <button
-          type="button"
-          className={`settings__tool${cameraEditing && !trafficEditing ? ' is-on' : ''}`}
-          aria-label={cameraEditing && !trafficEditing ? 'Leave Camera mode' : 'Camera mode'}
-          onClick={() => {
-            if (trafficEditing) setTrafficMode(false);
-            useCameraStore.getState().setEditing(!(cameraEditing && !trafficEditing));
-            onClose();
-          }}
-        >
-          {cameraEditing && !trafficEditing ? 'Leave Camera mode' : 'Camera mode'}
-          <kbd>C</kbd>
-        </button>
-        <button
-          type="button"
-          className={`settings__tool${trafficEditing ? ' is-on' : ''}`}
-          aria-label={trafficEditing ? 'Leave Traffic mode' : 'Traffic mode'}
-          onClick={() => {
-            setTrafficMode(!trafficEditing);
-            onClose();
-          }}
-        >
-          {trafficEditing ? 'Leave Traffic mode' : 'Traffic mode'}
-        </button>
-      </div>
       <PhoneFollow />
       <div className="settings__label">Scripts</div>
       <a className="settings__tool" href={`${location.pathname}?mode=scripts`} target="_blank" rel="noreferrer">
@@ -159,11 +130,14 @@ function Graphics() {
   const custom = useGraphicsStore((s) => s.custom);
   const showFps = useGraphicsStore((s) => s.showFps);
   const autoDpr = useRenderDpr();
-  const now = drawSize(fixedDpr(resolution, custom) ?? autoDpr);
+  const preset = useQualityStore(s => s.preset);
+  const actual = useGraphicsStore(s => s.actualBuffer);
+  const now = drawSize(fixedDpr(resolution, custom) ?? Math.min(autoDpr, QUALITY[preset].autoCap));
   const [w, setW] = useState(String(custom.w));
   const [h, setH] = useState(String(custom.h));
   return (
     <>
+      <QualityChoices />
       <div className="settings__label" id="settings-res">
         Resolution · 16:9
       </div>
@@ -207,17 +181,9 @@ function Graphics() {
         </form>
       )}
       <div className="settings__now mono">
-        drawing {now.w} × {now.h}
-        {!LOADED_AA && ' · no anti-aliasing'}
+        Requested {now.w} × {now.h}
+        {actual && ` · Drawing ${actual.w} × ${actual.h} · ${actual.antialias ? 'Edge smoothing on' : 'Edge smoothing unavailable'}`}
       </div>
-      {antialiasFor(resolution, custom) !== LOADED_AA && (
-        <div className="settings__reload">
-          Reload the page to turn anti-aliasing {LOADED_AA ? 'off' : 'on'} for this size.{' '}
-          <button type="button" onClick={() => window.location.reload()}>
-            Reload
-          </button>
-        </div>
-      )}
       <label className="settings__check">
         <input type="checkbox" checked={showFps} onChange={(e) => useGraphicsStore.getState().setShowFps(e.target.checked)} />
         Show frame rate
@@ -238,7 +204,7 @@ function PerformanceCheck() {
         </div>
       ) : (
         <button type="button" className="settings__chip settings__perf-btn" onClick={() => usePerfStore.getState().start()}>
-          {status === 'done' ? 'Run the performance check again' : 'Run a performance check (15 s)'}
+          {status === 'done' ? 'Run the performance check again' : 'Compare performance (about 35 s)'}
         </button>
       )}
       {status === 'done' && (
@@ -333,4 +299,19 @@ function BridgeChoice() {
       </div>
     </>
   );
+}
+
+function QualityChoices() {
+  const preset = useQualityStore(s => s.preset);
+  const options: Quality[] = ['balanced', 'high'];
+  return <div>
+    <div className="settings__label" id="settings-quality">Visual quality</div>
+    <div className="settings__res" role="radiogroup" aria-labelledby="settings-quality">
+      {options.map(option => <button key={option} type="button" role="radio" aria-checked={preset === option} aria-label={QUALITY[option].label}
+        className={`settings__chip${preset === option ? ' is-on' : ''}`} onClick={() => useQualityStore.getState().setPreset(option)}>{QUALITY[option].label}</button>)}
+    </div>
+    <p style={{ fontSize: 14, lineHeight: 1.4, margin: '9px 0 16px', color: 'var(--ink-dim)' }}>{preset === 'balanced'
+      ? 'Balanced: softer lighting and detailed shadows. Auto keeps the drawing size at Full HD or below.'
+      : 'High: sharper shadows and more detail in Auto, up to QHD. Uses more graphics power.'}</p>
+  </div>;
 }

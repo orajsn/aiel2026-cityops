@@ -27,14 +27,14 @@ const BEHIND_LOGIN = process.env.CITYOPS_BEHIND_LOGIN === '1';
  * for the next deploy.
  */
 function commitSave(file: string, what: string) {
-  if (process.env.CITYOPS_AUTOCOMMIT !== '1') return;
-  const cwd = fileURLToPath(new URL('.', import.meta.url));
-  spawn('bash', ['-c', `git add -- "$1" && git commit -q -m "$2" -- "$1" && git push -q origin HEAD:main`, 'commit-save', file, `${what} saved by the owner on the VM`], { cwd, stdio: 'ignore' }).on('error', () => {});
+  // Senayan saves stay local. Publishing requires an explicit separate Git action.
+  void file;
+  void what;
 }
 
 /** Camera mode → Save: write the owner's saved angles into the project (dev server only). */
 function cameraOverrides(): Plugin {
-  const file = fileURLToPath(new URL('./src/content/cameraOverrides.json', import.meta.url));
+  const file = fileURLToPath(new URL('./src/content/senayanCameraOverrides.json', import.meta.url));
   return {
     name: 'cityops-camera-overrides',
     configureServer(server) {
@@ -78,8 +78,8 @@ function cameraOverrides(): Plugin {
  * reloads a page someone is presenting from.
  */
 function trafficSaves(): Plugin {
-  const file = fileURLToPath(new URL('./src/content/traffic.json', import.meta.url));
-  const prev = fileURLToPath(new URL('./src/content/traffic.prev.json', import.meta.url));
+  const file = fileURLToPath(new URL('./src/content/senayanTrafficOverrides.json', import.meta.url));
+  const prev = fileURLToPath(new URL('./src/content/senayanTraffic.prev.json', import.meta.url));
   return {
     name: 'cityops-traffic',
     configureServer(server) {
@@ -90,6 +90,7 @@ function trafficSaves(): Plugin {
           return void res.end(JSON.stringify(normalizeTraffic(existsSync(file) ? readFileSync(file, 'utf8') : null)));
         }
         if (req.method !== 'POST') return void res.writeHead(405).end();
+        if (!BEHIND_LOGIN && !canSaveFrom(req.headers)) return void res.writeHead(403).end('view-only');
         let body = '';
         let size = 0;
         req.on('data', (c: Buffer) => {
@@ -264,8 +265,8 @@ export default defineConfig({
   build: { assetsInlineLimit: 0 },
   // the saved-angles file changes while presenting: do not reload the page when it does. Polling: on this
   // machine the file-change events were sometimes missed and the server kept serving stale code.
-  plugins: [react(), cameraOverrides(), trafficSaves(), fullReloadForScene(), viewersCount(), captureGuard(), fastModels()],
-  server: { port: 5174, strictPort: true, watch: { ignored: ['**/src/content/cameraOverrides.json', '**/src/content/traffic.json', '**/src/content/traffic.prev.json', '**/public/**', '**/.claude/**'], usePolling: true, interval: 400 }, allowedHosts: TUNNEL_HOSTS },
+  plugins: [react(), cameraOverrides(), trafficSaves(), fullReloadForScene(), viewersCount(), fastModels()],
+  server: { host: '127.0.0.1', port: 5174, strictPort: true, watch: { ignored: ['**/src/content/cameraOverrides.json', '**/src/content/senayanCameraOverrides.json', '**/src/content/traffic.json', '**/src/content/senayanTrafficOverrides.json', '**/src/content/senayanTraffic.prev.json', '**/public/**', '**/.claude/**'], usePolling: true, interval: 400 }, allowedHosts: TUNNEL_HOSTS },
   test: {
     environment: 'jsdom',
     globals: true,

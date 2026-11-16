@@ -147,7 +147,7 @@ const b24a = atRust('3.4a', 'Memory engineering', 'Discipline', { kicker: '① M
 const b24b = atRust('3.4b', 'Context engineering', 'Discipline', { kicker: '② Context engineering', which: 'context', message: 'For each question, **pour in only what this question needs**.' } satisfies DisciplineProps);
 const b24c = atRust('3.4c', 'Harness engineering', 'Discipline', { kicker: '③ Harness engineering', which: 'harness', message: 'Make it happen **every turn, automatically**.' } satisfies DisciplineProps);
 const b24d = atRust('3.4d', 'Who fixes what', 'WhoFixesWhat', { kicker: 'Three disciplines, four problems', message: 'That is why **Vance gets Mercer’s finding**.' } satisfies WhoFixesWhatProps);
-const b25b = atRust('3.5b', 'One store, any harness', 'MemoryLoop', { kicker: 'The agent loop, with memory wired in', message: 'One store, one memory manager, **any harness**.' } satisfies MemoryLoopProps);
+const b25b = atRust('3.5b', "Connect memory to the agent loop", 'MemoryLoop', { kicker: 'The agent loop, with memory wired in', message: "Connect a memory manager to **your agent loop**." } satisfies MemoryLoopProps);
 
 /**
  * The compressed opening (owner, 6 Nov; drafted on the canvas "Lab 3 Opening, Compressed", payoff first): the hook, why the
@@ -172,7 +172,7 @@ const nForgot1 = atRustWith('3.2f', 'Why the first one forgot', 'pier2-inspect',
 const nWhere1 = atRust('3.3h', 'Where it goes instead', 'WhereItGoes', { kicker: 'Long-term memory', step: 1, message: 'Notes that survive the chat go in the **bridge logbook**.' } satisfies WhereItGoesProps);
 const nWhere2 = atRust('3.3i', 'One report, three cards', 'WhereItGoes', { kicker: 'Long-term memory · what the logbook keeps', step: 2, message: 'One report becomes **three kinds** of memory, and Vance’s questions pull them back.' } satisfies WhereItGoesProps);
 const nPour = atRust('3.3p', 'From the logbook to the glass', 'GlassBridge', { kicker: 'From the logbook to the glass', message: 'The notes are in the logbook. **But the model cannot read the entire logbook.**', mode: 'pour' } satisfies GlassBridgeProps);
-const nFixes = atRust('3.15f', 'The four failures, solved', 'GlassBridge', { kicker: 'Back to the glass', message: 'The four failures from the glass, **solved**, each by a Part of the notebook.', mode: 'fixes' } satisfies GlassBridgeProps);
+const nFixes = atRust('3.15f', "Four checks for useful memory", 'GlassBridge', { kicker: 'Back to the glass', message: "Four memory risks. **A design response and a check for each**.", mode: 'fixes' } satisfies GlassBridgeProps);
 const nHandover = atRust('3.5h', 'Now the code', 'Handover', { kicker: 'Handover to the notebook', message: 'Three things to watch, **on one map**.' } satisfies HandoverProps);
 
 /**
@@ -191,8 +191,8 @@ const atOps = (id: string, title: string, overlay: string, props: object, group?
 });
 
 const b26 = atOps('3.6', 'One connection', 'OneConnection', { kicker: 'Lab 3 · Part 1-2', message: 'The AI agent needs **one connection**: the database.', notebook: `${NB} · Parts 1-2 and TODO 1`, stop: '3.6' } satisfies HandsOnProps);
-const b27 = atOps('3.7', 'The write path', 'WritePath', { kicker: 'Lab 3 · Part 3', message: 'The agent does not store what you said. It stores **what it learned**.', notebook: `${NB} · Part 3, TODO 2 (report_event), peek_sdk_tables`, stop: '3.7' } satisfies HandsOnProps);
-const b28a = atOps('3.8a', 'Scope is the key', 'Scope', { kicker: 'Lab 3 · Part 3, TODO 3', step: 1, message: 'Search the memories with **no user id**: nothing comes back.', notebook: `${NB} · TODO 3` } satisfies ScopeProps, 'scope');
+const b27 = atOps('3.7', 'The write path', 'WritePath', { kicker: 'Lab 3 · Part 3', message: 'Store the original message **and the extracted memory separately**.', notebook: `${NB} · Part 3, TODO 2 (report_event), peek_sdk_tables`, stop: '3.7' } satisfies HandsOnProps);
+const b28a = atOps('3.8a', 'Scope is the key', 'Scope', { kicker: 'Lab 3 · Part 3, TODO 3', step: 1, message: 'Supply the required **user_id scope** before searching.', notebook: `${NB} · TODO 3` } satisfies ScopeProps, 'scope');
 const b28b = atOps('3.8b', 'Scope is the key', 'Scope', { kicker: 'Lab 3 · Part 3, TODO 3', step: 2, message: 'Records inherit the **scope** of the thread that wrote them.', notebook: `${NB} · TODO 3` } satisfies ScopeProps, 'scope');
 const b29 = atOps('3.9', 'The system of record', 'SystemOfRecord', { kicker: 'Lab 3 · Part 4', message: 'Memory is what the agent learns. Findings are what **the city records**.', notebook: `${NB} · Part 4, TODO 4` } satisfies HandsOnProps);
 const b210 = atOps('3.10', 'Vector search with walls', 'VectorWalls', { kicker: 'Lab 3 · Part 4, TODO 5', message: 'Vector similarity and relational filters in **one SQL statement**.', notebook: `${NB} · TODO 5` } satisfies HandsOnProps);
@@ -201,7 +201,7 @@ const b210 = atOps('3.10', 'Vector search with walls', 'VectorWalls', { kicker: 
  * Lab 3 pages 21 to 29 (3.11-3.17), sketches agreed in chat (owner, 25 Oct). 21-23 stay in the Ops room; 24-27 go
  * back to the rust, Day 1 and Day 2 in the chat window from page 2; 28 over the bridge; 29 the takeaways.
  */
-const b211 = atOps('3.11', 'Private doors, shared hall', 'DoorsAndHall', { kicker: 'Lab 3 · Part 5', message: 'This is a **SQL WHERE clause**, not a Python filter.', notebook: `${NB} · Part 5` } satisfies HandsOnProps);
+const b211 = atOps('3.11', 'Private doors, shared hall', 'DoorsAndHall', { kicker: 'Lab 3 · Part 5', message: 'Inspect the **scope filters** and test who can retrieve each record.', notebook: `${NB} · Part 5` } satisfies HandsOnProps);
 const b212a = atOps('3.12a', 'The AI agent turn', 'CopilotTurn', { kicker: 'Lab 3 · Part 6, TODO 6', step: 1, message: 'One copilot turn, **eight steps**.', notebook: `${NB} · Part 6, TODO 6` } satisfies CopilotTurnProps, 'turn');
 const b212b = atOps('3.12b', 'The context card', 'CopilotTurn', { kicker: 'Lab 3 · Part 6, TODO 6', step: 2, message: 'This is **the prompt the model actually receives**.', notebook: `${NB} · Part 6, the context card` } satisfies CopilotTurnProps, 'turn');
 
@@ -213,19 +213,19 @@ const b214a = atRust('3.14a', 'The answer, with its sources', 'Day2', { kicker: 
 
 const b215 = atRust('3.15', 'With and without memory', 'WithWithout', {
   kicker: 'Same question, asked twice',
-  message: 'Same model. Same question. **Only the memory differs.**',
+  message: 'Illustrated comparison: same question, **with earlier evidence retrieved**.',
   question: 'What happened at this pier?',
   without: 'I have no earlier information. What do you see?',
   withMemory: 'Mercer logged corrosion on Day 1: ~25% section loss, grade C, repair within 60 days.',
 } satisfies WithWithoutProps);
-const b215b = atRust('3.15b', 'The four failures, solved', 'FailuresSolved', { kicker: 'Back to the glass', message: 'The four failures from the glass, **solved**.' } satisfies EndingProps);
+const b215b = atRust('3.15b', 'Four checks for useful memory', 'FailuresSolved', { kicker: 'Back to the glass', message: 'Check **volume, relevance, accuracy and timing**.' } satisfies EndingProps);
 // 3.15c · the full memory map, moved from the start of the lab (owner, 28 Oct): after the hands-on its layers mean something (notebook cell 90)
-const b215c = atRust('3.15c', 'What you built', 'MemoryMap', { kicker: 'Kinds of memory', step: 5, built: true, message: 'The full memory map: **what you actually built** today.' } satisfies MemoryMapProps);
+const b215c = atRust('3.15c', 'What you built', 'MemoryMap', { kicker: 'Kinds of memory', step: 5, built: true, message: 'The memory design: **inspect each part in your run**.' } satisfies MemoryMapProps);
 
 // 3.15d · why Oracle AI Database, after 'What you built' (owner, 10 Nov), one reason per Next
 const b215d = atRust('3.15d', 'Why Oracle AI Database', 'WhyOracle', { kicker: 'Why Oracle AI Database', message: 'One database for **everything the agent remembers**.' });
 const b216 = atRust('3.16', 'Where both labs meet', 'Neither', { kicker: 'Where both labs meet', message: 'Neither lab can make the call **alone**.' } satisfies NeitherProps);
-const b216a = atRust('3.16a', 'Together they make the call', 'LabsMeet', { kicker: 'Where both labs meet', step: 2, message: 'Together they **make the call**.' }, 'meet');
+const b216a = atRust('3.16a', 'Together they make the call', 'LabsMeet', { kicker: 'Where both labs meet', step: 2, message: 'Together they **support the engineer’s review**.' }, 'meet');
 
 // 3.17 · the Lab 3 recap (owner approved Flow317V2, 29 Oct); the quiz moved to 3.18
 const b217: SceneDef = {
@@ -237,11 +237,11 @@ const b217: SceneDef = {
   overlay: 'Lab3Recap',
   overlayProps: {
     kicker: 'Lab 3 · What we built',
-    message: 'An agent that **remembers**, and hands over.',
+    message: 'Recall the right evidence **for the next visit**.',
     points: [
-      { title: 'Memory is the foundation', text: 'Not a feature: the agent is only as good as what it can recall.' },
-      { title: 'Context is curation', text: 'The context window is a curation problem: fill it with what this question needs.' },
-      { title: 'One converged store', text: 'One converged store beats four services kept in sync.' },
+      { title: 'Choose what persists', text: 'Keep useful findings with provenance. Decide what to update or remove.' },
+      { title: 'Retrieve for this question', text: 'Select relevant, permitted records and inspect the final model input.' },
+      { title: 'Verify the handoff', text: 'Test recall, access scope and missing evidence in a new inspector’s turn.' },
     ],
     next: '**All three labs on one page:** what we built today, from an assistant to an agent that remembers.',
   } satisfies RecapProps as unknown as Record<string, unknown>,
@@ -260,10 +260,10 @@ const b218: SceneDef = {
     message: 'From an assistant, to an agent, to **an agent that remembers**.',
     steps: [
       { tag: 'Lab 1 · AI Economics', title: 'An assistant', line: '**the right data**, **the right model** (model routing), **guardrails**', where: 'on the bridge: the repair plan' },
-      { tag: 'Lab 2 · RAG to Agents', title: 'An agent', line: '**decides what to look up** across four shapes, and says what to do', where: 'on the bridge: the crack' },
-      { tag: 'Lab 3 · Agent Memory', title: 'An agent that remembers', line: '**how to make an agent remember**: what Mercer learns on Day 1, Vance knows on Day\u00a02', where: 'on the bridge: the rust' },
+      { tag: 'Lab 2 · RAG to Agents', title: 'An agent', line: '**chooses tools**, gathers evidence and drafts a recommendation', where: 'on the bridge: the crack' },
+      { tag: 'Lab 3 · Agent Memory', title: 'An agent that remembers', line: '**retrieves earlier findings** with provenance and access scope', where: 'on the bridge: the rust' },
     ],
-    foundation: 'One Oracle AI Database, ready for AI workloads, under all three',
+    foundation: 'Shared pattern: evidence → controlled tools → scoped memory',
   } satisfies AllLabsProps as unknown as Record<string, unknown>,
 };
 

@@ -2,7 +2,7 @@ import { Component, Suspense, useMemo, type ReactNode } from 'react';
 import * as THREE from 'three';
 import { useGLTF } from '@react-three/drei';
 import url from '../assets/models/bhumibol.glb?url';
-import { BRIDGE, harborBridgeFrame } from './bridgeFrame';
+import { BRIDGE, harborBridgeFrame } from './legacyBangkokBridgeFrame';
 
 /**
  * The Bhumibol Bridge (owner, 28 Oct: from the owner's SketchUp model, converted to glTF, cut down to the

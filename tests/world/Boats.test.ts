@@ -1,6 +1,7 @@
+// Legacy Bangkok model regressions; these components are not mounted in the Senayan branch.
 import { BOATS, BOAT_TOP_Y, boatXZ, riverBoats, type BoatSpec } from '../../src/world/Boats';
 import { LIMITS } from '../../src/content/traffic';
-import { BRIDGE, toBridgeLocal } from '../../src/world/bridgeFrame';
+import { BRIDGE, toBridgeLocal } from '../../src/world/legacyBangkokBridgeFrame';
 
 /** Everything standing in the water under Harbor Bridge, in bridge-local units: [x0, x1, z0, z1]. */
 function obstacles(): [number, number, number, number][] {
@@ -59,7 +60,7 @@ test('boats are river-boat sized, not ships (a Chao Phraya express boat is ~4 m 
 test('Traffic mode: a boat route drawn straight through any pier, platform or tower leg is steered through the open span', async () => {
   const { steerAtBridge } = await import('../../src/world/Boats');
   const { makePath, travel } = await import('../../src/world/trafficPaths');
-  const { fromBridgeLocal } = await import('../../src/world/bridgeFrame');
+  const { fromBridgeLocal } = await import('../../src/world/legacyBangkokBridgeFrame');
   const obs = obstacles();
   const ferry = BOATS.find((b) => b.kind === 'ferry')!;
   const barge = BOATS.find((b) => b.kind === 'barge')!;

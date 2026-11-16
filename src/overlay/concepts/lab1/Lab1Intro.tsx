@@ -125,7 +125,7 @@ export function L1Opening({ kicker, message, notebook }: Lab1Props) {
               Answers with sources. <span style={{ color: TEAL_D }}>The engineer decides</span> on safety.
             </div>
           </motion.div>
-          <div style={{ fontSize: 16, color: DIM, lineHeight: 1.4 }}>Harbor Bridge, Bangkok: the repair project the whole lab works on.</div>
+          <div style={{ fontSize: 16, color: DIM, lineHeight: 1.4 }}>Harbor Bridge: the fictional repair project in our Jakarta training story.</div>
         </div>
       </div>
 

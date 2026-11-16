@@ -1,6 +1,8 @@
 // @ts-nocheck (spawns Node; the project has no @types/node)
 import { spawn, type ChildProcess } from 'node:child_process';
-import { existsSync, readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { once } from 'node:events';
 import { qrPath } from '../src/engine/follow';
 import { SCRIPT_TH } from '../src/content/scriptTh';
 import { SCENES } from '../src/scenes/index';
@@ -10,9 +12,42 @@ import { LAB3_CUT } from '../src/scenes/chapter2';
 let proc: ChildProcess;
 const PORT = 18090 + Math.floor(Math.random() * 500);
 const base = `http://127.0.0.1:${PORT}/f/`;
+const fixtureRoot = resolve('.local', 'follow-tests');
+mkdirSync(fixtureRoot, { recursive: true });
+const fixtures: string[] = [];
+const fixture = () => { const dir = mkdtempSync(join(fixtureRoot, 'relay-')); fixtures.push(dir); return dir; };
+const stop = async (child: ChildProcess) => {
+  if (child.exitCode !== null || child.signalCode !== null) return;
+  const exited = once(child, 'exit');
+  child.kill();
+  await exited;
+};
+async function readUntil(reader: ReadableStreamDefaultReader<Uint8Array>, needle: string): Promise<string> {
+  const decoder = new TextDecoder();
+  let text = '';
+  let timer: ReturnType<typeof setTimeout>;
+  try {
+    return await Promise.race([
+      (async () => {
+        while (!text.includes(needle)) {
+          const chunk = await reader.read();
+          if (chunk.done) throw new Error(`SSE ended before ${needle}`);
+          text += decoder.decode(chunk.value, { stream: true });
+        }
+        return text;
+      })(),
+      new Promise<never>((_resolve, reject) => { timer = setTimeout(() => reject(new Error(`SSE did not deliver ${needle}`)), 3000); }),
+    ]);
+  } catch (error) {
+    await reader.cancel();
+    throw error;
+  } finally {
+    clearTimeout(timer!);
+  }
+}
 
 beforeAll(async () => {
-  proc = spawn(process.execPath, ['follow/server.mjs'], { env: { ...process.env, FOLLOW_PORT: String(PORT), FOLLOW_BASE: '/f/' }, stdio: 'ignore' });
+  proc = spawn(process.execPath, ['follow/server.mjs'], { env: { ...process.env, FOLLOW_PORT: String(PORT), FOLLOW_BASE: '/f/', FOLLOW_DATA: fixture() }, stdio: 'ignore' });
   for (let i = 0; i < 50; i++) {
     try {
       await fetch(base + 'api/s/000000');
@@ -22,7 +57,15 @@ beforeAll(async () => {
     }
   }
 });
-afterAll(() => proc.kill());
+afterAll(async () => {
+  await stop(proc);
+  const root = realpathSync(fixtureRoot);
+  for (const dir of fixtures) {
+    const target = realpathSync(dir);
+    if (dirname(target) !== root) throw new Error('Refusing cleanup outside the relay test fixture directory');
+    rmSync(target, { recursive: true, force: true });
+  }
+});
 
 test('a session has a 6-digit code; only the presenter token can move the page; phones get the state first, then every change', async () => {
   const { code, token } = await (await fetch(base + 'api/create', { method: 'POST' })).json();
@@ -31,13 +74,9 @@ test('a session has a 6-digit code; only the presenter token can move the page; 
   expect((await fetch(`${base}api/s/${code}/state`, { method: 'POST', headers: { 'x-token': token }, body: '{"id":"3.3b"}' })).status).toBe(200);
   const events = await fetch(`${base}api/s/${code}/events`);
   const reader = events.body!.getReader();
-  const read = async () => new TextDecoder().decode((await reader.read()).value);
-  let text = await read();
-  expect(text + (await read())).toContain('"id":"3.3b"');
+  expect(await readUntil(reader, '"id":"3.3b"')).toContain('"id":"3.3b"');
   await fetch(`${base}api/s/${code}/state`, { method: 'POST', headers: { 'x-token': token }, body: '{"id":"3.2b"}' });
-  let more = '';
-  for (let i = 0; i < 5 && !more.includes('"id":"3.2b"'); i++) more += await read();
-  expect(more).toContain('"id":"3.2b"');
+  expect(await readUntil(reader, '"id":"3.2b"')).toContain('"id":"3.2b"');
   await reader.cancel();
   expect((await fetch(base + 'api/s/000000')).status).toBe(404);
   expect((await fetch(`${base}api/s/${code}/end`, { method: 'POST', headers: { 'x-token': token } })).status).toBe(200);
@@ -45,25 +84,23 @@ test('a session has a 6-digit code; only the presenter token can move the page; 
 });
 
 test('a session ends by itself when the presenter goes quiet, and its phones are told; an open phone does not keep it alive', async () => {
-  const quiet = spawn(process.execPath, ['follow/server.mjs'], { env: { ...process.env, FOLLOW_PORT: String(PORT + 1), FOLLOW_BASE: '/f/', FOLLOW_IDLE_MS: '600', FOLLOW_SWEEP_MS: '200' }, stdio: 'ignore' });
+  const quiet = spawn(process.execPath, ['follow/server.mjs'], { env: { ...process.env, FOLLOW_PORT: String(PORT + 1), FOLLOW_BASE: '/f/', FOLLOW_DATA: fixture(), FOLLOW_IDLE_MS: '600', FOLLOW_SWEEP_MS: '200' }, stdio: 'ignore' });
   try {
     const q = `http://127.0.0.1:${PORT + 1}/f/`;
     for (let i = 0; i < 50; i++) { try { await fetch(q + 'api/s/000000'); break; } catch { await new Promise((r) => setTimeout(r, 100)); } }
     const { code } = await (await fetch(q + 'api/create', { method: 'POST' })).json();
     const feed = await fetch(`${q}api/s/${code}/events`);
     const reader = feed.body!.getReader();
-    let seen = '';
-    for (let i = 0; i < 20 && !seen.includes('event: end'); i++) seen += new TextDecoder().decode((await reader.read()).value ?? new Uint8Array());
-    expect(seen).toContain('event: end');
+    expect(await readUntil(reader, 'event: end')).toContain('event: end');
+    await reader.cancel();
     expect((await fetch(`${q}api/s/${code}`)).status).toBe(404);
   } finally {
-    quiet.kill();
+    await stop(quiet);
   }
 });
 
 test('the script manager: a login name is needed, every save is a version that goes live, a stale save is refused, comments thread', async () => {
-  const dir = `/tmp/follow-test-${PORT}`;
-  rmSync(dir, { recursive: true, force: true }); // a folder left by an earlier run with the same port would keep its saved versions
+  const dir = fixture();
   const mp = spawn(process.execPath, ['follow/server.mjs'], { env: { ...process.env, FOLLOW_PORT: String(PORT + 2), FOLLOW_BASE: '/f/', FOLLOW_DATA: dir }, stdio: 'ignore' });
   try {
     const m = `http://127.0.0.1:${PORT + 2}/f/`;
@@ -86,7 +123,7 @@ test('the script manager: a login name is needed, every save is a version that g
     const list = (await (await fetch(m + 'api/m/comments/3.3b', { headers: as('Mali') })).json()).comments;
     expect(list.filter((x: { parent: string | null }) => x.parent === c.cid)).toHaveLength(1);
   } finally {
-    mp.kill();
+    await stop(mp);
   }
 });
 
@@ -108,11 +145,17 @@ test('the QR for a join address is a real code, and every Thai script page is a 
 });
 
 // owner, 4 Nov: the viewer can show the slide's plain preview picture, or not
-test('the phone viewer has a slide-picture switch, and the pictures reach the open phone page', () => {
+test('the phone viewer has a slide-picture switch, and the pictures reach the open phone page', async () => {
   const html = readFileSync('follow/public/index.html', 'utf8');
   expect(html).toContain('id="thumbBtn"');
   expect(html).toContain('thumbs/${encodeURIComponent(p.id.replace(');
-  expect(existsSync('follow/public/thumbs/3.7.jpg')).toBe(true);
+  const picture = await fetch(base + 'thumbs/3.7.jpg');
+  expect(picture.status).toBe(200);
+  expect(picture.headers.get('content-type')).toBe('image/jpeg');
+  const bytes = new Uint8Array(await picture.arrayBuffer());
+  expect(bytes.length).toBeGreaterThan(1000);
+  expect(Array.from(bytes.slice(0, 3))).toEqual([0xff, 0xd8, 0xff]);
+  expect((await fetch(base + 'thumbs/..%2f..%2fserver.mjs')).status).toBe(404);
 });
 
 // owner, 4 Nov: the viewer renders the scripts' markdown, and never as HTML, because colleagues write them

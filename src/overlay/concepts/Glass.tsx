@@ -5,7 +5,7 @@ import { LineIcon, type IconName } from './icons';
 import { Fill, FitBox } from './Fill';
 import vancePortrait from '../../assets/portraits/vance.png';
 import { useDrawerStore } from '../../engine/presentation';
-import adbLogo from '../../assets/oracle/autonomous-ai-database.png';
+const adbLogo = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2220%22%20fill%3D%22white%22/%3E%3Cpath%20d%3D%22M20%2028v44c0%2018%2060%2018%2060%200V28%22%20fill%3D%22%23e4f1ef%22%20stroke%3D%22%231b8a9c%22%20stroke-width%3D%224%22/%3E%3Cellipse%20cx%3D%2250%22%20cy%3D%2228%22%20rx%3D%2230%22%20ry%3D%2212%22%20fill%3D%22white%22%20stroke%3D%22%231b8a9c%22%20stroke-width%3D%224%22/%3E%3Cpath%20d%3D%22M20%2050c0%2016%2060%2016%2060%200M20%2068c0%2016%2060%2016%2060%200%22%20fill%3D%22none%22%20stroke%3D%22%231b8a9c%22%20stroke-width%3D%224%22/%3E%3C/svg%3E";
 
 export interface GlassProps {
   kicker: string;
@@ -439,7 +439,7 @@ function FourGlasses() {
       <div style={{ flex: 'none', position: 'relative', height: 84, marginTop: 14 }}>
       <motion.div data-teaser="glass" initial={false} animate={{ opacity: step >= 4 ? 1 : 0, y: step >= 4 ? 0 : 10 }} transition={{ duration: 0.5, ease: EASE }} style={{ position: 'absolute', inset: 0, borderRadius: 18, background: 'var(--teal)', color: '#fff', display: 'flex', alignItems: 'center', paddingLeft: 110, paddingRight: 24, fontSize: 30, fontWeight: 700, boxShadow: '0 6px 0 rgba(15,85,98,0.35)' }}>
         <span style={{ position: 'absolute', left: 12, top: 4, width: 76, height: 76, borderRadius: '50%', background: '#fff', border: '4px solid var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 10px rgba(11,14,20,0.25)' }}>
-          <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ width: 62, height: 62, objectFit: 'contain' }} />
+          <img data-logo="adb" src={adbLogo} alt="Oracle AI Database" style={{ width: 62, height: 62, objectFit: 'contain' }} />
         </span>
         <span>We will solve <u style={{ textDecorationThickness: 3, textUnderlineOffset: 5 }}>all four</u> with Oracle AI Database, in the lab.</span>
       </motion.div>

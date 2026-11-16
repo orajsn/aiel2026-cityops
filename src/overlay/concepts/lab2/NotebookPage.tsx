@@ -136,7 +136,7 @@ export function NotebookPage({ id, kicker, message, step, notebook, everyday }: 
                               </svg>
                               <span style={{ fontWeight: 600 }}>{s.example.lead}</span>
                             </div>
-                            <div lang="th" data-injection style={{ fontSize: 28, fontWeight: 700, color: TEAL, margin: '4px 0 4px 36px', fontFamily: 'var(--font-thai, "Noto Sans Thai", Inter, sans-serif)' }}>{s.example.quote}</div>
+                            <div lang="en" data-injection style={{ fontSize: 28, fontWeight: 700, color: TEAL, margin: '4px 0 4px 36px', fontFamily: 'var(--font-thai, "Noto Sans Thai", Inter, sans-serif)' }}>{s.example.quote}</div>
                             <div style={{ fontWeight: 700 }}>{s.example.then}</div>
                             <div style={{ fontSize: 20, marginTop: 2, color: on ? 'var(--ink)' : 'var(--ink-dim)' }}>{s.example.note}</div>
                           </div>
@@ -163,7 +163,7 @@ export function NotebookPage({ id, kicker, message, step, notebook, everyday }: 
               <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#e06c5f' }} />
               <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#e0b04f' }} />
               <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#62c46a' }} />
-              <span style={{ marginLeft: 8, fontFamily: 'JetBrains Mono, monospace' }}>the notebook · {cells.map((c) => `cell ${c}`).join(' · ')}</span>
+              <span style={{ marginLeft: 8, fontFamily: 'JetBrains Mono, monospace' }}>Code walkthrough · {cells.map((c) => `cell ${c}`).join(' · ')}</span>
             </div>
             <div ref={codeBox} data-code style={{ flex: 1, minHeight: 0, fontFamily: 'JetBrains Mono, monospace', fontSize: 20, lineHeight: 1.5, overflow: 'hidden' }}>
               <div ref={codeIn} style={{ height: '100%', padding: '12px 0', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -195,7 +195,7 @@ export function NotebookPage({ id, kicker, message, step, notebook, everyday }: 
             </div>
             {out && (
               <motion.div data-code-out initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.85, duration: 0.3, ease: EASE }} style={{ flex: 'none', padding: '12px 18px 14px', background: '#0b1118', borderTop: '2px solid #1b8a9c', fontFamily: 'JetBrains Mono, monospace', fontSize: 19, lineHeight: 1.45, color: '#9bdc9b' }}>
-                <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#7f8c99', marginBottom: 6 }}>It printed</div>
+                <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#7f8c99', marginBottom: 6 }}>Captured example output</div>
                 <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{out}</div>
               </motion.div>
             )}
@@ -206,7 +206,7 @@ export function NotebookPage({ id, kicker, message, step, notebook, everyday }: 
             <svg data-link aria-hidden style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible', pointerEvents: 'none', zIndex: 5 }}>
               <motion.path d={path.d} fill="none" stroke="#1b8a9c" strokeWidth={4} strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.4, ease: EASE }} />
               <motion.circle cx={path.x2} cy={path.y2} r={9} fill="#3fc1d3" initial={{ opacity: 0, scale: 0.2 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.35, duration: 0.2 }} />
-              <motion.circle r={6} fill="#ffffff" stroke="#1b8a9c" strokeWidth={3} initial={{ offsetDistance: '0%', opacity: 1 }} animate={{ offsetDistance: '100%', opacity: [1, 1, 0] }} transition={{ duration: 0.4, ease: EASE }} style={{ offsetPath: `path('${path.d}')` }} />
+              <motion.circle r={6} fill="#ffffff" stroke="#1b8a9c" strokeWidth={3} initial={{ opacity: 1 }} animate={{ opacity: [1, 1, 0] }} transition={{ duration: 0.4, ease: EASE }}><animateMotion path={path.d} dur="0.4s" fill="freeze" /></motion.circle>
             </svg>
           )}
         </div>

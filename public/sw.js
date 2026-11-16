@@ -4,7 +4,7 @@
 // load as usual. Files are stored exactly as received (no change in quality). Bump VERSION if a map file changes.
 // v2 (28 Oct): v1 also cached script requests under a model's path (a '?import&url' module), so a .glb could be
 // served as a script and the app would not start; the new version drops that cache
-const VERSION = 'cityops-models-v2';
+const VERSION = 'senayan-models-v1';
 /** only real model files and their textures are kept; never scripts, whatever their path */
 const MODEL_FILE = /\.(glb|gltf|bin|jpe?g|png|webp|ktx2)$/i;
 
@@ -13,7 +13,7 @@ self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      for (const key of await caches.keys()) if (key.startsWith('cityops-models-') && key !== VERSION) await caches.delete(key);
+      for (const key of await caches.keys()) if (key.startsWith('senayan-models-') && key !== VERSION) await caches.delete(key);
       await self.clients.claim();
     })(),
   );

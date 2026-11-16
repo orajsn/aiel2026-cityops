@@ -1,0 +1,166 @@
+{
+  "source": "\u00a9 OpenStreetMap contributors",
+  "license": "ODbL1.0",
+  "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=106.786,-6.232,106.809,-6.211",
+  "retrieved": "2026-11-16",
+  "units_per_metre": 0.1,
+  "bridge_lonlat": [
+    106.79572992068474,
+    -6.228184396421049
+  ],
+  "world_anchor": [
+    -38.19,
+    -19.57
+  ],
+  "road_axis_EN": [
+    0.954015705528401,
+    -0.2997566239554134
+  ],
+  "world_yaw": -0.23212879051524585,
+  "height_note": "Footprints and alignments sourced; untaged heights, fa\u00e7ades, roofs, river width, and bridge structure are interpreted. Training damage fictional.",
+  "bounds": [
+    -165,
+    -225,
+    115,
+    35
+  ],
+  "counts": {
+    "buildings": 5138,
+    "roads": 2212,
+    "water": 33,
+    "land": 147,
+    "landmarks": 7,
+    "trees": 108
+  },
+  "landmark_anchors": {
+    "way/48036723": {
+      "name": "Senayan City",
+      "center": [
+        -23.50945,
+        -30.14465
+      ],
+      "bounds": [
+        -31.3368,
+        -37.75,
+        -15.6821,
+        -22.5393
+      ]
+    },
+    "way/119772912": {
+      "name": "Plaza Senayan",
+      "center": [
+        2.0107999999999997,
+        -51.56965
+      ],
+      "bounds": [
+        -7.8947,
+        -65.2446,
+        11.9163,
+        -37.8947
+      ]
+    },
+    "way/121870613": {
+      "name": "Sentral Senayan II",
+      "center": [
+        -5.8608,
+        -73.0751
+      ],
+      "bounds": [
+        -8.753,
+        -75.2091,
+        -2.9686,
+        -70.9411
+      ]
+    },
+    "way/162174048": {
+      "name": "Sentral Senayan I",
+      "center": [
+        0.45685,
+        -67.5453
+      ],
+      "bounds": [
+        -2.4599,
+        -69.6634,
+        3.3736,
+        -65.4272
+      ]
+    },
+    "way/162174050": {
+      "name": "Sentral Senayan III",
+      "center": [
+        -3.02955,
+        -34.8873
+      ],
+      "bounds": [
+        -6.7055,
+        -37.1313,
+        0.6464,
+        -32.6433
+      ]
+    },
+    "way/682984153": {
+      "name": "Gelora Bung Karno Stadium",
+      "center": [
+        29.9242,
+        -131.7871
+      ],
+      "bounds": [
+        16.483,
+        -147.8735,
+        43.3654,
+        -115.7007
+      ]
+    },
+    "relation/14717268": {
+      "name": "Fairmont Jakarta",
+      "center": [
+        -8.296,
+        -89.8484
+      ],
+      "bounds": [
+        -13.6129,
+        -97.2947,
+        -2.9791,
+        -82.4021
+      ]
+    }
+  },
+  "height_evidence": [
+    {
+      "id": "way/48036723",
+      "name": "Senayan City",
+      "height_m": 24.5,
+      "height_basis": "Estimated from OSM floor count"
+    },
+    {
+      "id": "way/119772912",
+      "name": "Plaza Senayan",
+      "height_m": 19.4,
+      "height_basis": "OSM height tag"
+    },
+    {
+      "id": "way/121870613",
+      "name": "Sentral Senayan II",
+      "height_m": 116.5,
+      "height_basis": "OSM height tag"
+    },
+    {
+      "id": "way/162174048",
+      "name": "Sentral Senayan I",
+      "height_m": 79.1,
+      "height_basis": "OSM height79.1m; official owner says18stories, OSM19levels differs"
+    },
+    {
+      "id": "way/162174050",
+      "name": "Sentral Senayan III",
+      "height_m": 98.0,
+      "height_basis": "Estimated from OSM floor count"
+    },
+    {
+      "id": "relation/14717268",
+      "name": "Fairmont Jakarta",
+      "height_m": 126,
+      "height_basis": "Estimated 32-floor hotel massing; not surveyed height"
+    }
+  ]
+}

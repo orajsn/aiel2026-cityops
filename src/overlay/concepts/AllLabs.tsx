@@ -6,7 +6,7 @@ import { QuizCard } from './Ending';
 import { ArrowRight, DIM, INK, SHAPES, TEAL, TEAL_D, TINT, fadeIn, pop } from './Recap';
 import { FlowDown, Shield } from './lab1/parts';
 import { Rich } from '../Rich';
-import adbLogo from '../../assets/oracle/autonomous-ai-database.png';
+const adbLogo = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2220%22%20fill%3D%22white%22/%3E%3Cpath%20d%3D%22M20%2028v44c0%2018%2060%2018%2060%200V28%22%20fill%3D%22%23e4f1ef%22%20stroke%3D%22%231b8a9c%22%20stroke-width%3D%224%22/%3E%3Cellipse%20cx%3D%2250%22%20cy%3D%2228%22%20rx%3D%2230%22%20ry%3D%2212%22%20fill%3D%22white%22%20stroke%3D%22%231b8a9c%22%20stroke-width%3D%224%22/%3E%3Cpath%20d%3D%22M20%2050c0%2016%2060%2016%2060%200M20%2068c0%2016%2060%2016%2060%200%22%20fill%3D%22none%22%20stroke%3D%22%231b8a9c%22%20stroke-width%3D%224%22/%3E%3C/svg%3E";
 
 /**
  * 3.18 · Takeaways of all three labs, the last page of the show (owner approved Flow318V3, 29 Oct): a tight
@@ -159,7 +159,7 @@ export function AllLabs({ kicker, message, steps, foundation, quiz }: AllLabsPro
             transition={{ delay: FOUNDATION_AT, duration: 1.1, ease: EASE }}
           >
             <span style={{ width: 72, height: 72, borderRadius: '50%', background: '#fff', border: '3px solid var(--teal)', boxShadow: '0 3px 10px rgba(11,14,20,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
-              <img data-logo="adb" src={adbLogo} alt="Oracle Autonomous AI Database" style={{ width: 66, height: 66, objectFit: 'contain' }} />
+              <img data-logo="adb" src={adbLogo} alt="Oracle AI Database" style={{ width: 66, height: 66, objectFit: 'contain' }} />
             </span>
             {foundation}
           </motion.div>

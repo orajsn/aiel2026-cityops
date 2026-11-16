@@ -30,9 +30,9 @@ test('the memory analogy is Lab 2’s: the visit notebook (short-term) and the b
   build(2);
   expect(shown(c, 'say-')).toEqual(['true', 'true', 'false']);
   expect(c.querySelector('[data-art="visit-notebook"]')!.getAttribute('data-lines')).toBe('2');
-  build(4); // the last click: the chat closes and the notebook is cleared
-  expect(c.querySelector('[data-art="visit-notebook"]')!.getAttribute('data-cleared')).toBe('true');
-  expect(c.textContent).toContain('SESSION CLOSED');
+  build(4); // a new visit does not erase persisted messages
+  expect(c.querySelector('[data-art="visit-notebook"]')!.getAttribute('data-cleared')).toBe('false');
+  expect(c.textContent).toContain('NEW VISIT');
   build(1);
   const lb = render(<WhereItGoes kicker="k" step={1} message="m" />).container;
   expect(lb.textContent).toContain('Bridge logbook');
@@ -66,7 +66,8 @@ test('each click brings one card together with Vance’s question; the glass and
   // version A: the real code map with the three jobs marked on it, one per click
   expect(h.querySelector('[data-map-preview]')).not.toBeNull();
   expect([...h.querySelectorAll('[data-mark]')].map((m) => m.getAttribute('data-mark'))).toEqual(['1', '1', '2', '3']);
-  expect(h.textContent).toContain('Oracle Autonomous AI Database 26ai');
+  expect(h.textContent).toMatch(/Oracle\s*AI Database 26ai/);
+  expect(h.textContent).not.toContain('Autonomous');
   expect(h.textContent).not.toMatch(/engineering|harness/i);
 });
 

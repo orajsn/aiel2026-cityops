@@ -4,7 +4,7 @@ import type { AssetType } from '../content/geo';
 import { City } from './City';
 import { Lighting } from './Lighting';
 import { Effects } from './Effects';
-import { TimeOfDay } from './TimeOfDay';
+import { TimeOfDay } from './TimeOfDayController';
 import { FRAME } from '../engine/graphics';
 import { PerfCheck } from './PerfCheck';
 import { AssetPins } from './AssetPins';

@@ -1,20 +1,20 @@
-export type Quality = 'high' | 'low';
+import { create } from 'zustand';
 
-const KEY = 'cityops.quality';
-
-export function quality(): Quality {
-  try {
-    const v = window.localStorage.getItem(KEY);
-    return v === 'low' ? 'low' : 'high';
-  } catch {
-    return 'high';
-  }
+export type Quality = 'balanced' | 'high';
+interface QualityPreset { label: string; autoCap: number; shadowSize: number; shadowEvery: number }
+export const QUALITY: Record<Quality, QualityPreset> = {
+  balanced: { label: 'Balanced', autoCap: 1, shadowSize: 2048, shadowEvery: 2 },
+  high: { label: 'High', autoCap: 4 / 3, shadowSize: 4096, shadowEvery: 1 },
+};
+const KEY = 'cityops.jakarta.v4.quality';
+function stored(): Quality {
+  try { return localStorage.getItem(KEY) === 'high' ? 'high' : 'balanced'; }
+  catch { return 'balanced'; }
 }
-
-export function setQuality(q: Quality): void {
-  try {
-    window.localStorage.setItem(KEY, q);
-  } catch {
-    /* storage blocked: stay on the default */
-  }
-}
+interface QualityState { preset: Quality; setPreset(preset: Quality): void }
+export const useQualityStore = create<QualityState>(set => ({
+  preset: stored(),
+  setPreset: preset => { try { localStorage.setItem(KEY, preset); } catch { /* optional persistence */ } set({ preset }); },
+}));
+export const quality = (): Quality => useQualityStore.getState().preset;
+export const setQuality = (preset: Quality): void => useQualityStore.getState().setPreset(preset);

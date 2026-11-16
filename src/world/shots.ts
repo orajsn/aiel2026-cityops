@@ -51,10 +51,12 @@ function stageShot(xu: number, yu: number, dist: number, pitch: number, screenX:
 // tests/world/frame.test.ts checks all four corners of every page and every move between pages.
 const OPS = assetPosition('City Operations Control Center');
 const HB = fromBridgeLocal(0, 0);
-const PIER3 = fromBridgeLocal(BRIDGE.platform.x, BRIDGE.platform.z);
 const PIER2 = fromBridgeLocal(BRIDGE.piers[1], 0);
 const CRACK = fromBridgeLocal(BRIDGE.damage.crack.x, BRIDGE.damage.crack.z);
 const RUST = fromBridgeLocal(BRIDGE.damage.corrosion.x, BRIDGE.damage.corrosion.z);
+const CHANNEL_VIEW = fromBridgeLocal(0, 3.4);
+const CRACK_VIEW = fromBridgeLocal(0.05, 1.15);
+const CRACK_APPROACH = fromBridgeLocal(0.10, 2.1);
 
 /** a shot that, once there, pushes in slowly to `close` */
 function withPush(shot: Shot, close: Shot, delayMs: number, durationMs = 2600): Shot {
@@ -84,17 +86,17 @@ export const SHOTS: Record<ShotId, Shot> = {
   'sky-model': northShot([OPS.x + 3.0, 9.3, OPS.z], 10, 22, 0, 2200, -20, -1),
   /** close on the control room over the Ops Center (OpsRoom.tsx, floor at y 2.6): over the operators' shoulders to the video wall */
   ops: northShot([OPS.x, 3.3, OPS.z - 0.4], 9, 36, -0.38, 2200, -8),
-  /** Harbor Bridge whole, low in the frame, the city behind it */
-  bridge: northShot([HB.x, 0.3, HB.z], 14, 42, -0.1, 2200, 0, 2.8),
+  /** The small Senayan canal crossing in context; geometry is an illustrative training interpretation */
+  bridge: {position:[CHANNEL_VIEW.x,3.8,CHANNEL_VIEW.z],target:[HB.x,.10,HB.z],durationMs:2200,ease:"inOut"},
   /** Pier 3 and its maintenance platform: the inspector, the crack (Lab 2); left of the question bubble */
   // arrive on Pier 3, then close in on the crack once the inspector has walked up to it
-  pier3: withPush(northShot([PIER3.x, BRIDGE.platform.y, PIER3.z], 3.8, 42, -0.4, 2200), northShot([CRACK.x - 0.02, BRIDGE.damage.crack.y, CRACK.z], 0.75, 24, -0.32, 0, 10), 900),
+  pier3: withPush({position:[CRACK_APPROACH.x,.9,CRACK_APPROACH.z],target:[CRACK.x,.12,CRACK.z],durationMs:2200,ease:"inOut"},{position:[CRACK_VIEW.x,.42,CRACK_VIEW.z],target:[CRACK.x,.115,CRACK.z],durationMs:0,ease:"inOut"},900),
   /** Pier 2: the corrosion, Mercer and Vance (Lab 3) */
-  pier2: northShot([PIER2.x, 0.2, PIER2.z], 3.8, 42, -0.1, 1800),
+  pier2: northShot([PIER2.x, BRIDGE.damage.corrosion.y, PIER2.z], 2.2, 32, -0.1, 1800),
   /** Pier 2 when someone inspects it: arrive, then close in on the corrosion */
-  'pier2-inspect': withPush(northShot([PIER2.x, 0.2, PIER2.z], 3.8, 42, -0.1, 1800), northShot([RUST.x - 0.02, BRIDGE.damage.corrosion.y, RUST.z], 0.75, 24, -0.32, 0, 10), 1200),
+  "pier2-inspect": withPush(northShot([PIER2.x, BRIDGE.damage.corrosion.y, PIER2.z], 2.2, 32, -0.1, 1800), northShot([RUST.x - 0.02, BRIDGE.damage.corrosion.y, RUST.z], 0.9, 18, -0.32, 0, 10), 1200),
   /** Pier 2 already closed in on the corrosion (where 'pier2-inspect' ends): the pages after it hold here, no pull-back */
-  'pier2-close': northShot([RUST.x - 0.02, BRIDGE.damage.corrosion.y, RUST.z], 0.75, 24, -0.32, 1400, 10),
+  "pier2-close": northShot([RUST.x - 0.02, BRIDGE.damage.corrosion.y, RUST.z], 0.9, 18, -0.32, 1400, 10),
   'core-dive': { position: [30, 60, 560], target: [-20, -96, -10], durationMs: 2500, ease: 'inOut' },
   'core-face-tables': { position: [-250, -120, 270], target: [-270, -180, 0], durationMs: 1400, ease: 'inOut' },
   'core-face-json': { position: [-125, -120, 270], target: [-145, -180, 0], durationMs: 1400, ease: 'inOut' },

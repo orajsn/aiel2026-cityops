@@ -487,7 +487,7 @@ export function StateGraph(p: L2Props) {
 
 const MEMS = [
   { key: 'notebook', t: 'Visit notebook', k: 'short-term · checkpointer', s: 'this visit’s scribbles, kept per thread_id' },
-  { key: 'logbook', t: 'Bridge logbook', k: 'long-term · store', s: 'permanent, found by name or by meaning' },
+  { key: 'logbook', t: 'Bridge logbook', k: 'long-term · store', s: "retained across threads, retrieved by key or meaning" },
 ] as const;
 
 /** step 1's two memories side by side on the database shelf; on step 2 the whole scene steps back to make room */
@@ -834,7 +834,7 @@ export function StoreSaver(p: L2Props) {
     <L2Page testId="l2-storesaver" {...p}>
       <Fill gap={10}>
         <motion.div {...fade(0.1)} style={{ fontSize: 24, lineHeight: 1.45, color: INK }}>
-          Like a records office with <b>one front door and two rooms</b>: today’s working notes in one, the permanent logbook in the other, each new page filed by its meaning as it comes in.
+          Like a records office with <b>one front door and two rooms</b>: today’s working notes in one, the cross-thread logbook in the other, each new page filed by its meaning as it comes in.
         </motion.div>
         <FitBox w={1300} h={590} max={1.1}>
           <svg data-storesaver width={1300} height={590} viewBox="0 0 1300 590" style={{ overflow: 'visible' }}>

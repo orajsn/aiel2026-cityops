@@ -31,9 +31,9 @@ export interface WithWithoutProps extends EndingProps {
 }
 
 /** the deck's comparison rows (slide 14 and the storyline doc's four-row comparison), said plainly */
-export const COMPARE_ROWS = ['knows it is the same bridge', 'cites the real finding', 'gives a specific action', 'never sees private chats'];
+export const COMPARE_ROWS = ['matches the asset', 'shows the recorded finding', 'supports the next review', 'checks access scope'];
 /** a plain line under each row: what it means on this bridge */
-const ROW_NOTES = ['Harbor Bridge, the rust: not any bridge.', 'Mercer’s own finding, with her number.', 'What to do next, not general advice.', 'Only the finding is shared, never her chat.'];
+const ROW_NOTES = ['Check the asset identifier before retrieval.', 'Trace the value to Mercer’s original record.', 'The responsible engineer reviews the advice.', 'Test shared findings and private notes separately.'];
 /** each row's icon, in the same order (owner, 26 Oct: an icon in place of the tick) */
 const ROW_ICONS: IconName[] = ['pin', 'quote', 'wrench', 'lock'];
 
@@ -54,7 +54,7 @@ export function WithWithout({ kicker, message, notebook, question, without, with
               <div style={{ zoom: 1.2, filter: 'grayscale(0.6)' }}>
                 <ChatWindow items={chat(without)} testId="chat-without" />
               </div>
-              <div style={{ marginTop: 26, fontSize: 26, color: 'var(--ink-dim)' }}>Every chat starts from zero.</div>
+              <div style={{ marginTop: 26, fontSize: 26, color: 'var(--ink-dim)' }}>Earlier evidence is not retrieved in this example.</div>
             </div>
           </div>
           <div data-side="with" style={{ padding: '0 24px', borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column' }}>
@@ -101,7 +101,7 @@ export function WithWithout({ kicker, message, notebook, question, without, with
 export const SOLVED = [
   { word: 'Volume', text: 'The summary keeps the window from filling up.' },
   { word: 'Relevance', text: 'Only Mercer’s finding comes in, not the search noise.' },
-  { word: 'Accuracy', text: 'The 25% is kept as a fact of its own, not lost in a summary.' },
+  { word: 'Accuracy', text: "Keep the original ~25% finding and check summaries against it." },
   { word: 'Timing', text: 'Her finding is fetched again when Vance asks.' },
 ];
 
@@ -187,7 +187,7 @@ export function FailuresSolved({ kicker, message, notebook }: EndingProps) {
           {SOLVED.map((s, i) => (
             <motion.div key={s.word} data-solved={s.word} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 + i * 0.1, duration: 0.4 }} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
               <motion.span style={{ position: 'absolute', top: 0, right: 6, padding: '3px 12px', borderRadius: 7, border: '3px solid var(--teal)', color: 'var(--teal)', fontWeight: 800, fontSize: 17, letterSpacing: '0.1em', background: 'var(--panel-strong, #fff)' }} initial={{ opacity: 0, scale: 1.6, rotate: -8 }} animate={{ opacity: 1, scale: 1, rotate: -8 }} transition={{ delay: FIXED_AT + i * 0.3, duration: 0.35, ease: EASE }}>
-                SOLVED
+                CHECK
               </motion.span>
               <MiniGlass word={s.word} t0={0.4 + i * 0.3}>
                 {SOLVED_GLASS[i]}

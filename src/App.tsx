@@ -12,14 +12,17 @@ import { SCENES } from './scenes';
 import { loadOverrides, useCameraStore } from './engine/camera';
 import { loadTraffic, useTrafficStore } from './engine/traffic';
 import { setTrafficMode } from './overlay/TrafficEditor';
-import { fixedDpr, LOADED_AA, useGraphicsStore } from './engine/graphics';
+import { fixedDpr, antialiasFor, useGraphicsStore } from './engine/graphics';
 import { usePresentationStore } from './engine/presentation';
+import { QUALITY, useQualityStore } from './engine/quality';
 
 export default function App() {
   // Settings › Graphics: Auto draws what the screen shows, a fixed resolution draws exactly that
   const autoDpr = useRenderDpr();
   const fixed = useGraphicsStore((s) => fixedDpr(s.resolution, s.custom));
-  const dpr = fixed ?? autoDpr;
+  const preset = useQualityStore(s => s.preset);
+  const dpr = fixed ?? Math.min(autoDpr, QUALITY[preset].autoCap);
+  const aa = antialiasFor();
   useEffect(() => {
     useSceneStore.getState().setScenes(SCENES);
     void loadOverrides();
@@ -33,7 +36,7 @@ export default function App() {
       theme: () => ui.toggleTheme(),
       script: () => ui.toggleScript(),
       camera: () => (useTrafficStore.getState().editing ? setTrafficMode(false) : useCameraStore.getState().setEditing(!useCameraStore.getState().editing)),
-      traffic: () => setTrafficMode(!useTrafficStore.getState().editing),
+      traffic: () => {}, // Senayan traffic follows the authored road network.
       isEditing: () => useCameraStore.getState().editing,
       presenting: () => usePresentationStore.getState().on,
     });
@@ -47,11 +50,12 @@ export default function App() {
     <Stage>
       <div id="app">
         <Canvas
+          key={`renderer-aa-${aa}`}
           shadows
           // the stage is CSS-scaled: Auto draws only the pixels the screen really shows (Stage.tsx)
           dpr={dpr}
-          // anti-aliasing follows the resolution the page loaded with (graphics.ts, LOADED_AA)
-          gl={{ antialias: LOADED_AA, powerPreference: 'high-performance' }}
+          // A changed AA policy recreates the renderer; resolution alone only resizes it.
+          gl={{ antialias: aa, powerPreference: 'high-performance' }}
           // starts at the city shot, close over the city (owner, 2 Nov: no flight in from far away where the map floats); CameraRig then cuts to the page's own camera
           camera={{ position: SHOTS.city.position, fov: 45, near: 0.1, far: 4000 }}
           style={{ position: 'absolute', inset: 0 }}

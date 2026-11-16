@@ -48,21 +48,16 @@ export const usePerfStore = create<PerfState>((set) => ({
   start: () => set({ status: 'running', step: 0, results: [], info: null }),
 }));
 
-/** what the five measurements say, in plain words, most important first */
+/** Report measured differences without attributing them to an unmeasured bottleneck. */
 export function verdict(results: PerfResult[]): string[] {
-  const fps = (id: PerfId) => results.find((r) => r.id === id)?.fps ?? 0;
-  const base = fps('base');
-  if (!base) return [];
-  const gain = (id: PerfId) => fps(id) / base;
-  const out: string[] = [];
-  if (base >= 57) out.push('Already at the screen’s refresh rate (about 60): nothing to fix here.');
-  else if (gain('empty') < 1.15)
-    out.push('It is not the graphics chip: even with nothing drawn it stays slow. The browser or the computer’s CPU is the limit (other tabs, power saving, battery mode).');
-  else {
-    if (gain('pixels') >= 1.25) out.push('The graphics chip is drawing too many pixels: use 2K or Auto on this machine.');
-    if (gain('shadows') >= 1.25) out.push('The live shadows are a large cost on this graphics chip.');
-    if (gain('traffic') >= 1.15) out.push('The cars and boats cost a noticeable share.');
-    if (!out.length) out.push('No single part dominates: the whole scene is heavy for this graphics chip. A stronger GPU, or a lower resolution, helps.');
+  const base = results.find(r => r.id === 'base');
+  if (!base?.fps) return ['No baseline measurement was captured.'];
+  const lines = [`Baseline: ${base.fps} FPS; slow frames (95th percentile): ${base.slowMs} ms.`];
+  for (const result of results) {
+    if (result.id === 'base' || !result.fps) continue;
+    const change = Math.round((result.fps / base.fps - 1) * 100);
+    lines.push(`${result.label}: ${result.fps} FPS (${change >= 0 ? '+' : ''}${change}% versus baseline); slow frames: ${result.slowMs} ms.`);
   }
-  return out;
+  lines.push('This short comparison describes this scene and device. Repeat it on the event display before choosing a preset.');
+  return lines;
 }

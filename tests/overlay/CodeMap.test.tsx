@@ -3,7 +3,7 @@ import { CodeMap } from '../../src/overlay/concepts/CodeMap';
 import { MAP_STEPS, NB_FILE, NB_ROWS, stepLines } from '../../src/content/lab3Map';
 import { focusStepCount, useDrawerStore } from '../../src/engine/presentation';
 import { LAB_STOPS } from '../../src/content/labStops';
-import completeNotebook from '../../src/content/notebooks/lab3_complete.json';
+import completeNotebook from '../../src/content/notebooks/senayan/lab3_complete.json';
 import { chapter2 } from '../../src/scenes/chapter2';
 
 const go = (n: number) => act(() => useDrawerStore.setState(n === 0 ? { open: false, focus: 0 } : { open: true, focus: n }));
@@ -110,7 +110,7 @@ test('Part 0 walks the JupyterLab screen one thing per click, on one button', ()
 });
 
 // owner, 4 Nov: "you did not follow my original notebook": the window is the run notebook, with nothing changed or added
-test('the window is the run notebook: exact code, its line numbers, its counts and its results', () => {
+test('the window matches the declared Senayan notebook variant, including cleared output for its corrected cell', () => {
   expect(NB_FILE).toBe('notebook_complete_ollama.ipynb');
   let r = 0;
   const shown = NB_ROWS;

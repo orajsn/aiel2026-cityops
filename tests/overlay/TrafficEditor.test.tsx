@@ -74,12 +74,13 @@ test('R opens and closes Traffic mode, also while Camera mode has the keys', () 
   off();
 });
 
-test('Bridge lanes adds Harbor Bridge’s two lanes to the car routes in one click', () => {
+test('the retained editor adds legacy bridge lanes without mutating the active Senayan defaults', () => {
+  const defaultsBefore = JSON.stringify(DEFAULT_TRAFFIC.cars.routes);
   act(() => setTrafficMode(true));
   const { getByText } = render(<TrafficEditor />);
   fireEvent.click(getByText('+ Bridge lanes'));
   expect(useTrafficStore.getState().config.cars.routes).toHaveLength(2);
-  expect(DEFAULT_TRAFFIC.cars.routes).toHaveLength(2);
+  expect(JSON.stringify(DEFAULT_TRAFFIC.cars.routes)).toBe(defaultsBefore);
 });
 
 test('a drawn point can be picked, moved and deleted; deleting a route’s last point removes the route', () => {

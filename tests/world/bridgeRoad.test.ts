@@ -1,74 +1,61 @@
-import { BRIDGE_S, DECK_W, bridgeDeckHeight, bridgeLanes, fromBridgeLocal, harborBridgeFrame } from '../../src/world/bridgeFrame';
-import { carScale } from '../../src/world/Cars';
+import { BRIDGE, BRIDGE_S, DECK_T, DECK_Y, DECK_W, bridgeDeckHeight, bridgeLanes, fromBridgeLocal, toBridgeLocal, harborBridgeFrame } from '../../src/world/bridgeFrame';
+import DATA from '../../src/world/senayanData';
 
-const DECK_TOP = (1.6 + 0.36 / 2) * BRIDGE_S;
+const DECK_TOP = (DECK_Y + DECK_T / 2) * BRIDGE_S;
+const heightAt = (lx: number, lz = 0) => { const p = fromBridgeLocal(lx, lz); return bridgeDeckHeight(p.x, p.z); };
 
-test('on Harbor Bridge the road is the deck top, between the banks', () => {
-  const mid = fromBridgeLocal(0, 0);
-  expect(bridgeDeckHeight(mid.x, mid.z)).toBeCloseTo(DECK_TOP, 4);
-  const bank = fromBridgeLocal(0.95, 0.1);
-  expect(bridgeDeckHeight(bank.x, bank.z)).toBeCloseTo(DECK_TOP, 4);
-});
-
-test('on the ramps the road slopes down to the street; off the deck there is no bridge road', () => {
-  const f = harborBridgeFrame();
-  const top = fromBridgeLocal(f.water, 0);
-  const halfway = fromBridgeLocal(f.water + f.ramp / 2, 0);
-  const foot = fromBridgeLocal(f.half - 0.001, 0);
-  const h = (p: { x: number; z: number }) => bridgeDeckHeight(p.x, p.z)!;
-  expect(h(top)).toBeCloseTo(DECK_TOP, 3);
-  expect(h(halfway)).toBeLessThan(h(top));
-  expect(h(foot)).toBeLessThan(0.15);
-  // beside the deck (past its edge) and beyond the ramp foot: the map's ground, not the bridge
-  const beside = fromBridgeLocal(0, (DECK_W * BRIDGE_S) / 2 + 0.05);
-  expect(bridgeDeckHeight(beside.x, beside.z)).toBeNull();
-  const beyond = fromBridgeLocal(f.half + 0.2, 0);
-  expect(bridgeDeckHeight(beyond.x, beyond.z)).toBeNull();
-});
-
-test('bridge lanes: one each way, street to street over the deck, clear of the lamp posts at the sides', () => {
-  const lanes = bridgeLanes();
-  expect(lanes).toHaveLength(2);
-  const f = harborBridgeFrame();
-  const lampZ = (DECK_W / 2 - 0.3) * BRIDGE_S;
-  for (const lane of lanes) {
-    const xs = lane.points.map(([x, z]) => {
-      const c = Math.cos(f.yaw);
-      const s = Math.sin(f.yaw);
-      const dx = x - f.x;
-      const dz = z - f.z;
-      return { lx: dx * c - dz * s, lz: dx * s + dz * c };
-    });
-    expect(Math.min(...xs.map((p) => p.lx))).toBeLessThan(-f.half);
-    expect(Math.max(...xs.map((p) => p.lx))).toBeGreaterThan(f.half);
-    for (const p of xs) {
-      // a car of the default size keeps clear of the lamp posts
-      expect(Math.abs(p.lz) + (1.8 * carScale(2)) / 2).toBeLessThan(lampZ - 0.01);
-    }
+test('the bridge road follows the slab top across the mapped crossing', () => {
+  const frame = harborBridgeFrame();
+  for (const x of [-frame.water + 0.001, 0, frame.water - 0.001]) {
+    for (const z of [-0.14, 0, 0.14]) expect(heightAt(x, z)).toBeCloseTo(DECK_TOP, 6);
   }
-  // the two lanes are on opposite sides of the centre line
-  const side = (lane: (typeof lanes)[0]) => Math.sign(fromBridgeLocalInverse(lane.points[0]).lz);
-  expect(side(lanes[0])).not.toBe(side(lanes[1]));
+  expect(DECK_TOP).toBeGreaterThan(BRIDGE.clearanceY);
 });
 
-function fromBridgeLocalInverse([x, z]: [number, number]) {
-  const f = harborBridgeFrame();
-  const c = Math.cos(f.yaw);
-  const s = Math.sin(f.yaw);
-  return { lx: (x - f.x) * c - (z - f.z) * s, lz: (x - f.x) * s + (z - f.z) * c };
-}
+test('both approaches join the deck continuously and descend to the district street height', () => {
+  const frame = harborBridgeFrame();
+  for (const side of [-1, 1]) {
+    const heights = Array.from({ length: 11 }, (_, i) => heightAt(side * (frame.water + (frame.ramp - 1e-7) * i / 10))!);
+    expect(heights[0]).toBeCloseTo(DECK_TOP, 6);
+    for (let i = 1; i < heights.length; i++) expect(heights[i]).toBeLessThanOrEqual(heights[i - 1]);
+    expect(heights[heights.length - 1]).toBeCloseTo(side < 0 ? BRIDGE.footY.west : BRIDGE.footY.east, 6);
+    expect(Math.abs(heightAt(side * (frame.water - 1e-6))! - heightAt(side * (frame.water + 1e-6))!)).toBeLessThan(1e-6);
+  }
+  expect((DECK_TOP - BRIDGE.footY.west) / frame.ramp).toBeLessThan(0.13);
+});
 
-test('a tap on the bridge puts the point on the deck, not on the water under it', async () => {
+test('only the actual deck and approach corridor overrides the district ground height', () => {
+  const frame = harborBridgeFrame();
+  expect(heightAt(0, DECK_W * BRIDGE_S / 2 + 0.001)).toBeNull();
+  expect(heightAt(0, -DECK_W * BRIDGE_S / 2 - 0.001)).toBeNull();
+  expect(heightAt(frame.half + 0.001)).toBeNull();
+  expect(heightAt(-frame.half - 0.001)).toBeNull();
+});
+
+test('the single-lane centre path crosses each slope boundary and reaches both streets', () => {
+  const [lane, ...extra] = bridgeLanes();
+  expect(extra).toHaveLength(0);
+  const frame = harborBridgeFrame();
+  const local = lane.points.map(([x, z]) => toBridgeLocal(x, z));
+  expect(local[0].lx).toBeCloseTo(-frame.half, 6);
+  expect(local[local.length - 1].lx).toBeCloseTo(frame.half, 6);
+  for (let i = 1; i < local.length; i++) expect(local[i].lx).toBeGreaterThan(local[i - 1].lx);
+  for (const point of local) expect(point.lz).toBeCloseTo(0, 6);
+  for (const boundary of [-frame.water, frame.water]) expect(local.some((point) => Math.abs(point.lx - boundary) < 1e-6)).toBe(true);
+  // A normal1.8m car centred on the crossing fits between its outer rail lines.
+  const carHalfWidth = 1.8 * DATA.meta.units_per_metre / 2;
+  expect(carHalfWidth).toBeLessThan(DECK_W * BRIDGE_S / 2 - 0.03);
+});
+
+test('a map tap on the bridge selects its deck rather than the lower canal or terrain', async () => {
   const THREE = await import('three');
   const { groundPoint } = await import('../../src/world/roadHeight');
   const mid = fromBridgeLocal(0.3, 0);
-  // looking down at the deck from the side, at an angle: the ray meets the deck first
   const origin = new THREE.Vector3(mid.x, 6, mid.z + 8);
   const ray = new THREE.Ray(origin, new THREE.Vector3(mid.x, DECK_TOP, mid.z).sub(origin).normalize());
   const p = groundPoint(ray)!;
   expect(p[0]).toBeCloseTo(mid.x, 3);
   expect(p[1]).toBeCloseTo(mid.z, 3);
-  // away from the bridge the point is on the ground
   const far = new THREE.Ray(new THREE.Vector3(-60, 10, -40), new THREE.Vector3(0, -1, 0));
   expect(groundPoint(far)).toEqual([-60, -40]);
 });

@@ -17,19 +17,19 @@ test('a custom size stays 16:9 and inside 640..7680 wide', () => {
 
 test('the choice is remembered on this device', () => {
   useGraphicsStore.getState().setResolution('4k');
-  expect(JSON.parse(localStorage.getItem('cityops.resolution')!)).toMatchObject({ resolution: '4k' });
+  expect(JSON.parse(localStorage.getItem('cityops.jakarta.v4.resolution')!)).toMatchObject({ resolution: '4k' });
   useGraphicsStore.getState().setCustom({ w: 2880, h: 1620 });
   expect(useGraphicsStore.getState().resolution).toBe('custom');
-  expect(JSON.parse(localStorage.getItem('cityops.resolution')!)).toEqual({ resolution: 'custom', custom: { w: 2880, h: 1620 } });
+  expect(JSON.parse(localStorage.getItem('cityops.jakarta.v4.resolution')!)).toEqual({ resolution: 'custom', custom: { w: 2880, h: 1620 } });
 });
 
-test('anti-aliasing stays on for Auto and FHD, and goes off from 2K up, where the pixels are too small to need it', () => {
+test('anti-aliasing stays enabled across every accepted Senayan resolution', () => {
   const aa = (r: Parameters<typeof antialiasFor>[0], c = { w: 0, h: 0 }) => antialiasFor(r, c);
   expect(aa('auto')).toBe(true);
   expect(aa('fhd')).toBe(true);
-  expect(aa('2k')).toBe(false);
-  expect(aa('4k')).toBe(false);
-  expect(aa('custom', { w: 2880, h: 1620 })).toBe(false);
+  expect(aa('2k')).toBe(true);
+  expect(aa('4k')).toBe(true);
+  expect(aa('custom', { w: 2880, h: 1620 })).toBe(true);
   expect(aa('custom', { w: 1600, h: 900 })).toBe(true);
 });
 
@@ -38,4 +38,16 @@ test('the frame rate readout is a setting remembered on this device', () => {
   expect(useGraphicsStore.getState().showFps).toBe(true);
   expect(localStorage.getItem('cityops.fps')).toBe('on');
   useGraphicsStore.getState().setShowFps(false);
+});
+
+test('Balanced and High keep distinct drawing and shadow budgets with isolated persistence', async () => {
+  const { QUALITY, useQualityStore } = await import('../../src/engine/quality');
+  useQualityStore.getState().setPreset('balanced');
+  expect(QUALITY.balanced.autoCap).toBe(1);
+  expect(QUALITY.balanced.shadowSize).toBe(2048);
+  useQualityStore.getState().setPreset('high');
+  expect(QUALITY.high.autoCap).toBeCloseTo(4 / 3);
+  expect(QUALITY.high.shadowSize).toBe(4096);
+  expect(localStorage.getItem('cityops.jakarta.v4.quality')).toBe('high');
+  useQualityStore.getState().setPreset('balanced');
 });

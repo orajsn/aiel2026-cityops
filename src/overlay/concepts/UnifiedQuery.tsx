@@ -63,7 +63,7 @@ export function UnifiedQuery({ message }: { message?: string }) {
       {/* the page's line, once the script is off: with the script on, the script says these same words */}
       {low && (
         <motion.div className="qb__line is-low" {...fade(5.2)}>
-          <Rich text={message ?? '**One call, four data models, one transaction.** No ETL, no sync jobs, no stale copies.'} />
+          <Rich text={message ?? "**One SQL statement combines four data models** in this lab."} />
         </motion.div>
       )}
     </div>

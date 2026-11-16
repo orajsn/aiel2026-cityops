@@ -47,7 +47,7 @@ export function LabGo({ kicker, lab, url, line, listed, covers, picture }: LabGo
         <div data-lab-listed style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 44 }}>
           <img src={picture} alt={`The LiveLabs page: ${listed}`} style={{ width: 640, flex: 'none', borderRadius: 10, border: '1.5px solid var(--line, rgba(0,0,0,0.16))', boxShadow: '0 6px 22px rgba(0,0,0,0.16)' }} />
           <div>
-            <div style={{ fontSize: 22, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-dim)' }}>On LiveLabs it is called</div>
+            <div style={{ fontSize: 22, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-dim)' }}>Source workshop on LiveLabs</div>
             <div style={{ fontSize: 36, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.25, margin: '6px 0 8px' }}>{listed}</div>
             <div style={{ fontSize: 28, color: 'var(--teal)' }}>That is {covers}</div>
           </div>

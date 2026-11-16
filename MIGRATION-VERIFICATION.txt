@@ -1,0 +1,38 @@
+Senayan native-source migration — 16 November 2026
+
+Upstream: https://github.com/markerxz/aiel2026-cityops
+Baseline: c1c986e59b25ffa413617a3f921fea65c22110e0 (main)
+Local working branch: senayan/local-migration
+Jakarta source publication: https://github.com/orajsn/aiel2026-cityops (main).
+The migration is committed in this edition. VM deployment is in progress;
+public endpoint and production access remain pending verification.
+
+Verification
+- Strict TypeScript check: passed.
+- Full Vitest suite: 410 passed in 83 files.
+- Native Vite production build: passed. Bundle-size advisory remains.
+- Production bundle: representative Senayan world/bridge/inspection, final
+  lesson reveals, quality switching, cutaway and source attribution verified.
+- Isolated phone/script relay: 13 checks passed; relay test file 8/8 passed.
+- Local gateway: manager exposes 107 exported scripts, source files return
+  HTTP 200, foreign Host/Origin requests rejected, live-script phone flow checked.
+- Original cameraOverrides.json, traffic.json and three original notebook
+  JSON files remain byte-identical to the untouched checkout.
+
+Original Windows baseline findings
+- TypeScript found a TimeOfDay.tsx / timeOfDay.ts resolution collision.
+- Upstream tests: 388 passed, 3 failed (SSE chunk assumptions and the Windows
+  thumbnail symlink path). Those portability issues are repaired in this branch.
+
+Limits
+Browser checks used software WebGL; they are not event-laptop FPS benchmarks.
+No external Oracle notebook/database exercise or real phone-network deployment
+was executed. The optional phone slide-picture switch is hidden for this
+edition until fresh Senayan preview images are generated; live scripts work.
+Changed Thai pages use an explicit English fallback pending translation review.
+A cosmetic favicon 404 remains; no application page or asset failure was found.
+
+Local preview: http://127.0.0.1:8767/
+Script manager: http://127.0.0.1:8767/?mode=scripts
+Start: node tools/serve-local.mjs (requires an existing dist build).
+See README-SENAYAN.md for rebuild, data and VM handoff details.

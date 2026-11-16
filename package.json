@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "export:scripts": "vite-node tools/export-follow-scripts.ts",
+    "serve:local": "node tools/serve-local.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",

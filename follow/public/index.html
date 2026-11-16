@@ -54,6 +54,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
 .thumb{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;border:1.5px solid var(--line);background:var(--card);margin:0 0 14px}
 .thumb[hidden]{display:none}
+.chip[hidden]{display:none}
 .chip svg{display:block}
 .script{font-size:var(--size);line-height:1.7;flex:1}
 .script p,.script ul,.script ol,.script blockquote{margin:0 0 1em}
@@ -190,8 +191,9 @@ h2{font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
     $('ttl').textContent = p ? p.title : t.wait;
     const pic = $('thumb');
     $('thumbBtn').setAttribute('aria-pressed', String(showThumb));
+    $('thumbBtn').hidden = p?.previewAvailable === false;
     pic.onerror = () => { pic.hidden = true; };
-    pic.hidden = !(p && showThumb);
+    pic.hidden = !(p && showThumb && p.previewAvailable !== false);
     if (pic.hidden) pic.removeAttribute('src'); else pic.src = `thumbs/${encodeURIComponent(p.id.replace(/^3\.6m\./, '3.6m_'))}.jpg`;
     const box = $('script'); box.className = 'script fade'; box.replaceChildren();
     if (p) {

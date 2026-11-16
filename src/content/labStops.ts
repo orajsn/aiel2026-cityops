@@ -1,5 +1,5 @@
 import lab2 from './notebooks/lab2_rag_to_agents.json';
-import lab3Student from './notebooks/lab3_student.json';
+import lab3Student from './notebooks/senayan/lab3_student.json';
 
 /**
  * The lab guide's stops: on these pages the audience goes to JupyterLab and runs cells. Each stop is a slice of a
@@ -269,7 +269,7 @@ const L3: Record<string, LabStop> = {
     marks: [
       run(61, 'Mercer wrote one personal memory and one city-wide memory.'),
       run(62, undefined, 'Vance searches: 0 hits behind Mercer’s door, at least 1 in the shared hall.'),
-      run(63, 'Multi-tenancy verified: Vance sees city-wide guidelines but NOT Mercer\'s personal notes.'),
+      { cell: 63, role: 'check', say: 'Run the corrected scope assertion: compare the exact personal-note sentinel and shared guideline.', brief: 'Check the configured retrieval scopes' },
     ],
   },
   // page 22 · The copilot turn

@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { Stage } from '../../src/Stage';
 import { Overlay } from '../../src/overlay/Overlay';
 import { useSceneStore } from '../../src/engine/store';
 import { useUiStore } from '../../src/engine/ui';
@@ -41,7 +42,7 @@ test('the presenter script shows under the page and the Script button hides and 
   useUiStore.setState({ scriptOpen: true });
   const { fireEvent } = await import('@testing-library/react');
   useSceneStore.getState().setScenes([{ id: 'a', chapter: 0, title: 'A', shot: 'city-high', script: 'Say this line.' }]);
-  render(<Overlay />);
+  render(<Stage><Overlay /></Stage>);
   expect(screen.getByText('Say this line.')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Hide script' }));
   expect(screen.queryByText('Say this line.')).toBeNull();

@@ -7,3 +7,6 @@ src/content/traffic.prev.json
 follow/data/
 .claude/worktrees/
 .claude/settings.local.json
+.local/
+src/content/senayanTraffic.prev.json
+*.tsbuildinfo

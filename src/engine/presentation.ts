@@ -81,7 +81,8 @@ export const focusStepCount = (id: string): number => (PAGE_STEPS[id] ?? (NO_STE
 /** the focus page on screen now, once its camera has arrived */
 function focusHere(): number {
   const s = useSceneStore.getState();
-  return s.settled ? focusStepCount(s.current().id) : 0;
+  // The lesson owns its reveal count, including while the camera is travelling.
+  return focusStepCount(s.current().id);
 }
 
 /**

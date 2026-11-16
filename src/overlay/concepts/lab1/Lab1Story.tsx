@@ -76,8 +76,8 @@ export const CAPTURE: StoryConfig = {
 export const VECTOR: StoryConfig = {
   steps: [
     { title: 'The specification', sub: 'Three PDFs from Object Storage, synced into the database.', icon: 'doc' },
-    { title: 'Meaning becomes numbers', sub: 'Each PDF becomes rows of 384 numbers: points in space. Similar meaning lands in the same group.', icon: 'points' },
-    { title: 'The question is a point too', sub: 'It becomes 384 numbers the same way, lands in the steel group, and its five nearest points light up.', icon: 'chat' },
+    { title: 'Meaning becomes numbers', sub: 'PDF chunks become embedding vectors. Their dimensions depend on the embedding model.', icon: 'points' },
+    { title: 'The question is a point too', sub: 'The same model embeds the question. Inspect the five passages returned by similarity search.', icon: 'chat' },
     { title: 'The top five go to the model', sub: 'The five nearest points go into an envelope with the question; file_search hands it to the model.', icon: 'target' },
   ],
   pill: 'Nearest by meaning, not by matching words',

@@ -134,8 +134,8 @@ code,
 .strip__logo { width: 110px; height: 24px; background: url('/art/logo.svg') left center / contain no-repeat; }
 .counter { position: absolute; left: 48px; bottom: 28px; font-size: 15px; color: var(--ink-dim); letter-spacing: 0.06em; }
 /* 60px on the 1920 stage is still a finger-sized target when scaled down to an iPad (owner: smaller) */
-/* above every other layer (3D labels, page panels, the Jupyter drawer, Camera mode, the page grid): nothing may
-   cover the buttons the presenter taps on the iPad. tests/overlay/stepperOnTop.test.ts keeps it the highest. */
+/* Above stage content, 3D labels and drawers. The modal page picker intentionally sits above navigation;
+   speaker notes and map attribution occupy their own viewport-level layout outside the scaled stage. */
 .stepper { position: absolute; right: 40px; bottom: 24px; display: flex; gap: 10px; z-index: 60; }
 .stepper__btn {
   width: 60px; height: 60px; border-radius: 50%;
@@ -794,3 +794,45 @@ body.is-idle, body.is-idle * { cursor: none !important; }
 .settings__follow .code { font: 700 30px/1 var(--font-mono); letter-spacing: 0.08em; color: var(--ink); }
 .settings__follow small { color: var(--ink-dim); font: 400 13px/1.35 var(--font-body); }
 a.settings__tool { text-decoration: none; }
+
+/* Jakarta presentation shell: all dimensions below target the shell, not lesson diagrams. */
+.strip { max-width:calc(100% - 96px); box-sizing:border-box; border:1px solid rgba(70,62,51,.15); box-shadow:0 4px 18px rgba(35,31,25,.08); }
+.strip__title { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.counter { color:#344b4a; font-size:20px; background:rgba(255,253,248,.9); padding:8px 12px; border-radius:8px; }
+.stepper { gap:9px; padding:8px; border-radius:18px; background:rgba(255,253,248,.94); box-shadow:0 5px 24px rgba(31,33,28,.16); }
+.stepper__btn { color:#24413e; background:#fffefa; border:1px solid #c5ccc4; backdrop-filter:none; }
+.stepper__btn--label { width:88px; border-radius:11px; font:600 19px/1 var(--font-body); padding:0; }
+.stepper__btn--gear { font-size:28px; }
+.stepper__btn.is-on { color:#fff; background:#267d82; border-color:#267d82; }
+.stepper__btn:disabled { opacity:.38; }
+.stepper__btn:focus-visible,.jump button:focus-visible,.jump input:focus-visible,.settings button:focus-visible { outline:4px solid #c74634; outline-offset:4px; }
+.progress { height:4px; z-index:2; }
+.progress__bar { background:#c74634; }
+.presenter-dock { position:fixed; z-index:70; left:0; right:0; bottom:0; height:var(--notes-height); box-sizing:border-box; background:#182b2c; color:#f7f4ed; border-top:2px solid #518b86; display:grid; grid-template-columns:120px minmax(0,1fr) 38px; gap:18px; padding:16px 24px; font:400 17px/1.5 var(--font-body); }
+.presenter-dock__label { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#a9c7c3; padding-top:4px; }
+.presenter-dock__copy { overflow:auto; min-height:0; overscroll-behavior:contain; }
+.presenter-dock__copy b { color:#98d9d0; }
+.presenter-dock__close { align-self:start; width:34px; height:34px; border:1px solid #637c79; border-radius:8px; color:#f7f4ed; background:transparent; font-size:22px; cursor:pointer; }
+.presenter-dock__close:focus-visible { outline:3px solid #e3b57c; outline-offset:3px; }
+.jump { background:rgba(17,35,35,.76); backdrop-filter:blur(12px); z-index:80; }
+.jump__panel { box-sizing:border-box; width:1792px; height:972px; padding:32px 40px 44px; background:#f8f6f0; color:#243a37; border:1px solid #d5d9d0; box-shadow:0 20px 70px rgba(0,0,0,.3); }
+.jump__top { top:-32px; margin:-2px -4px 12px; padding:12px 4px 20px; gap:24px; background:#f8f6f0; border-bottom:1px solid #d4d9d1; z-index:3; }
+.jump__title { color:#243a37; font-size:30px; font-weight:650; white-space:nowrap; }
+.jump__search { flex:1; min-width:200px; height:54px; box-sizing:border-box; padding:0 18px; border:1px solid #b7c5bb; border-radius:10px; background:#fff; color:#243a37; font:400 22px var(--font-body); }
+.jump__close { color:#243a37; border-color:#b7c5bb; flex:none; }
+.jump__chapter { margin-top:30px; }
+.jump__chapter-name { color:#a84032; font-size:19px; margin-bottom:16px; }
+.jump__section-name { color:#62716b; font-size:20px; }
+.jump__grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+.jump__card { border:1px solid #d6ddd2; border-radius:12px; background:#fffefa; padding:16px 18px; min-height:118px; gap:10px; color:#243a37; transition:border-color .16s,background .16s,transform .16s; }
+.jump__card:hover { border-color:#3d8b84; background:#edf5ee; transform:translateY(-2px); }
+.jump__card.current { border:2px solid #c74634; padding:15px 17px; background:#fff1e9; }
+.jump__card-top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.jump__number { color:#78867c; font:600 19px var(--font-body); }
+.jump__current { color:#a43a2b; font-size:14px; font-weight:700; letter-spacing:.03em; }
+.jump__arrow { color:#579089; font-size:24px; }
+.jump__name { font-size:23px; line-height:1.3; font-weight:550; }
+.jump__empty { padding:70px 0; color:#64746b; font-size:26px; text-align:center; }
+.settings { box-shadow:0 14px 45px rgba(21,35,31,.2); border:1px solid #cad2c8; }
+@media(max-width:600px) { .presenter-dock { grid-template-columns:minmax(0,1fr) 32px; gap:8px; padding:12px 15px; font-size:14px; } .presenter-dock__label { display:none; } }
+@media(prefers-reduced-motion:reduce) { .jump__card,.stepper__btn,.progress__bar { transition:none; } }

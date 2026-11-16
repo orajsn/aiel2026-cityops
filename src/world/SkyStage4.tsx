@@ -296,7 +296,7 @@ function Cloud3D({ show, groups, ask, pick, flyTo, fly }: { show: number; groups
   );
 }
 
-/** a row of numbers scrolling past, with its "384 numbers" tag: a text turned into its vector */
+/** a row of numbers scrolling past, with its "Model-defined dimensions" tag: a text turned into its vector */
 function NumRow({ t, seed, tone, width }: { t: number; seed: number; tone: 'teal' | 'red'; width: number }) {
   const col = tone === 'red' ? '#C74634' : '#146f7f';
   const shift = -((t * 0.09) % 1400);
@@ -305,7 +305,7 @@ function NumRow({ t, seed, tone, width }: { t: number; seed: number; tone: 'teal
       <div style={{ flex: 1, overflow: 'hidden', fontFamily: 'var(--font-mono, "JetBrains Mono", monospace)', fontSize: 24, fontWeight: 600, color: '#1d2733', maskImage: 'linear-gradient(to right, transparent, #000 6%, #000 90%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, #000 6%, #000 90%, transparent)' }}>
         <span style={{ display: 'inline-block', transform: `translateX(${shift}px)` }}>( {vectorNumbers(seed)}, … )</span>
       </div>
-      <span style={{ flex: 'none', fontSize: 20, fontWeight: 700, color: col, background: tone === 'red' ? 'rgba(199,70,52,0.1)' : 'rgba(27,138,156,0.12)', padding: '3px 10px', borderRadius: 999 }}>384 numbers</span>
+      <span style={{ flex: 'none', fontSize: 20, fontWeight: 700, color: col, background: tone === 'red' ? 'rgba(199,70,52,0.1)' : 'rgba(27,138,156,0.12)', padding: '3px 10px', borderRadius: 999 }}>Model-defined dimensions</span>
     </div>
   );
 }

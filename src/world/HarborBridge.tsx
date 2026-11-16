@@ -1,219 +1,60 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, type ReactElement } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
 import { ReadyHtml as Html } from './ReadyHtml';
 import { useUiStore } from '../engine/ui';
-import { useGraphicsStore } from '../engine/graphics';
-import { BRIDGE, BRIDGE_S, DECK_T, DECK_W, DECK_Y, harborBridgeFrame } from './bridgeFrame';
+import { BRIDGE, BRIDGE_S, DECK_T, DECK_Y, harborBridgeFrame } from './bridgeFrame';
 import { Person, type Who } from './Person';
 import type { Vec3 } from './shots';
 
-/** structure scale: the map is real scale (1 unit ~ 108 m); the bridge is drawn a few times larger than life so it reads */
+/** Structure units scale the accepted Senayan training crossing. */
 const S = BRIDGE_S;
-/**
- * Pylon height above the deck, structure units (owner, 29 Oct: the pylons stood ~300 m tall, twice the tallest
- * tower beside the bridge). Now the tops are ~0.92 world units (~100 m) above the water: under the riverside
- * condos (0.3 to 1.4 units on the city model within 4 units of the bridge), so the city still reads taller.
- */
+/** Legacy compatibility value; the Senayan crossing renders no pylons. */
 export const PYLON_H = 2.6;
 
-const CONCRETE = '#d9d4c9';
-const DECK = '#8d93a0';
-const RAIL = '#f1ece2';
-const STEEL = '#e9e2d2';
-
-/**
- * Harbor Bridge, built for close-ups: a straight deck between the banks with ramps down to the
- * streets, kerbs and railings, lamp posts, two pylons with cable fans, piers with caps in the water,
- * inspection platforms on Pier 3 and Pier 2 with the damage on the pier faces, the inspector, and
- * the two incident markers. Always part of the city; `inspect` and `markers` only add the story props.
- */
 export function HarborBridge({ inspect, markers = false }: { inspect?: { pier: 'pier3' | 'pier2'; who: Who; leave?: boolean }; markers?: boolean | 'pier2' }) {
-  const f0 = useMemo(() => harborBridgeFrame(), []);
-  // work in structure units inside a group scaled by S, so spans still match the world
-  const f = useMemo(() => ({ ...f0, water: f0.water / S, ramp: f0.ramp / S }), [f0]);
-  const theme = useUiStore((s) => s.theme);
-  // Bhumibol preview (Settings): its own deck, towers and cables stand here; Pier 3 and Pier 2 keep the story
-  const preview = useGraphicsStore((s) => s.bridge === 'bhumibol');
-
-  // six piers across the water, numbered 1..6 from the west bank; Pier 3 and Pier 2 carry the story.
-  // Layout (world units) lives in BRIDGE so the boats can keep to the open channel.
-  const piers = BRIDGE.piers.map((x) => x / S);
-  const pier3 = piers[2];
-  const pier2 = piers[1];
-  const pylons = BRIDGE.pylonPiers.map((i) => piers[i]);
-
-  const cables = useMemo(() => {
-    const out: [number, number, number][][] = [];
-    for (const px of pylons) {
-      for (let i = 1; i <= 7; i++) {
-        const dx = 0.5 + i * ((f.water * 0.3) / 7);
-        for (const sgn of [-1, 1]) {
-          out.push([
-            // anchors spread down the pylon's upper part: the outermost cable from the top
-            [px, DECK_Y + PYLON_H - 0.25 - (7 - i) * ((PYLON_H * 0.55) / 7), 0],
-            [px + sgn * dx, DECK_Y + DECK_T / 2, 0],
-          ]);
-        }
-      }
-    }
-    return out;
-  }, [f.water]);
-
-  const lamps = useMemo(() => {
-    const out: number[] = [];
-    for (let x = -f.water + 1.5; x < f.water; x += 2.6) out.push(x);
-    return out;
-  }, [f.water]);
-
-  const rampLen = f.ramp;
-  // each ramp's top surface runs from the deck down to the map's ground at its foot
-  const deckTop = DECK_Y + DECK_T / 2;
-  const ramps = ([-1, 1] as const).map((s) => {
-    // flush with the map's road at the foot (a hair above it, so the photo road does not show through)
-    const footTop = (s < 0 ? BRIDGE.footY.west : BRIDGE.footY.east) / S + 0.005;
-    const drop = deckTop - footTop;
-    // two columns carry each ramp where it is still well above the street
-    const columns = [0.3, 0.62].map((k) => ({ x: s * (f.water + k * rampLen), top: deckTop - k * drop - DECK_T, bottom: footTop - 1.2 }));
-    return { s, len: Math.hypot(rampLen, drop), angle: Math.atan2(drop, rampLen), midTop: (deckTop + footTop) / 2, columns };
-  });
-
-  return (
-    <group position={[f.x, 0, f.z]} rotation={[0, f.yaw, 0]} scale={S} name="harbor-bridge">
-      {!preview && (
-        <>
-      {/* deck over water */}
-      <mesh position={[0, DECK_Y, 0]} castShadow receiveShadow>
-        <boxGeometry args={[f.water * 2, DECK_T, DECK_W]} />
-        <meshStandardMaterial color={DECK} roughness={1} />
-      </mesh>
-      {/* kerbs and railings */}
-      {[-1, 1].map((s) => (
-        <group key={s}>
-          <mesh position={[0, DECK_Y + DECK_T / 2 + 0.06, s * (DECK_W / 2 - 0.14)]}>
-            <boxGeometry args={[f.water * 2, 0.12, 0.28]} />
-            <meshStandardMaterial color={CONCRETE} roughness={1} />
-          </mesh>
-          <mesh position={[0, DECK_Y + DECK_T / 2 + 0.5, s * (DECK_W / 2 - 0.08)]}>
-            <boxGeometry args={[f.water * 2, 0.05, 0.05]} />
-            <meshStandardMaterial color={RAIL} roughness={0.8} />
-          </mesh>
-        </group>
-      ))}
-      {/* ramps on both banks, descending to street level */}
-      {ramps.flatMap(({ s, columns }) =>
-        columns.map((c, i) => (
-          <mesh key={`rc${s}${i}`} position={[c.x, (c.top + c.bottom) / 2, 0]} castShadow>
-            <boxGeometry args={[0.5, c.top - c.bottom, DECK_W * 0.55]} />
-            <meshStandardMaterial color={CONCRETE} roughness={1} />
-          </mesh>
-        )),
-      )}
-      {ramps.map(({ s, len, angle, midTop }) => (
-        <group key={`r${s}`} position={[s * (f.water + rampLen / 2), midTop - DECK_T / 2, 0]} rotation={[0, 0, -s * angle]}>
-          <mesh castShadow receiveShadow>
-            <boxGeometry args={[len, DECK_T, DECK_W]} />
-            <meshStandardMaterial color={DECK} roughness={1} />
-          </mesh>
-          {/* kerbs stop short of the foot so the ramp runs out flat onto the street */}
-          {[-1, 1].map((k) => (
-            <mesh key={k} position={[-s * len * 0.12, DECK_T / 2 + 0.06, k * (DECK_W / 2 - 0.14)]}>
-              <boxGeometry args={[len * 0.76, 0.12, 0.28]} />
-              <meshStandardMaterial color={CONCRETE} roughness={1} />
-            </mesh>
-          ))}
-        </group>
-      ))}
-      {/* lamp posts */}
-      {lamps.map((x, i) => (
-        <group key={i} position={[x, DECK_Y + DECK_T / 2, (i % 2 ? 1 : -1) * (DECK_W / 2 - 0.3)]}>
-          <mesh position={[0, 0.55, 0]}>
-            <cylinderGeometry args={[0.03, 0.04, 1.1, 6]} />
-            <meshStandardMaterial color={RAIL} roughness={0.8} />
-          </mesh>
-          <mesh position={[0, 1.1, 0]}>
-            <sphereGeometry args={[0.07, 8, 8]} />
-            <meshBasicMaterial color="#fff2c8" toneMapped={false} />
-          </mesh>
-        </group>
-      ))}
-        </>
-      )}
-      {/* piers: shaft in the water with a cap under the deck */}
-      {piers.map((x, i) => (preview && x !== pier3 && x !== pier2 ? null : (
-        <group key={i} position={[x, 0, 0]}>
-          <mesh position={[0, (DECK_Y - 0.3) / 2 - 0.4, 0]} castShadow>
-            <boxGeometry args={[BRIDGE.pierW / S, DECK_Y - 0.3 + 0.8, BRIDGE.pierD / S]} />
-            <meshStandardMaterial color={CONCRETE} roughness={1} />
-          </mesh>
-          <mesh position={[0, DECK_Y - 0.3, 0]} castShadow>
-            <boxGeometry args={[1.1, 0.24, DECK_W + 0.2]} />
-            <meshStandardMaterial color={CONCRETE} roughness={1} />
-          </mesh>
-        </group>
-      )))}
-      {!preview && (
-        <>
-      {/* pylons: two legs each side of the deck, joined above */}
-      {pylons.map((x, i) => (
-        <group key={`p${i}`} position={[x, 0, 0]}>
-          {[-1, 1].map((s) => (
-            <mesh key={s} position={[0, (DECK_Y + PYLON_H) / 2 - 0.4, s * (DECK_W / 2 + 0.25)]} castShadow>
-              <boxGeometry args={[0.5, DECK_Y + PYLON_H + 0.8, 0.36]} />
-              <meshStandardMaterial color={STEEL} roughness={0.9} />
-            </mesh>
-          ))}
-          <mesh position={[0, DECK_Y + PYLON_H - 0.2, 0]} castShadow>
-            <boxGeometry args={[0.55, 0.5, DECK_W + 0.9]} />
-            <meshStandardMaterial color={STEEL} roughness={0.9} />
-          </mesh>
-        </group>
-      ))}
-      {cables.map((pts, i) => (
-        <Line key={i} points={pts} color="#f3ead6" lineWidth={1} />
-      ))}
-        </>
-      )}
-      {/* inspection platforms bolted to the camera-side faces of Pier 3 and Pier 2, railing on three open sides */}
-      {BRIDGE.platforms.map((p, i) => (
-        <group key={i} position={[p.x / S, p.y / S, p.z / S]}>
-          <mesh castShadow>
-            <boxGeometry args={[p.w / S, 0.08, p.d / S]} />
-            <meshStandardMaterial color="#b9bcc4" roughness={1} />
-          </mesh>
-          {/* an open hip-height rail (posts and a top bar), so the pier face behind stays in view */}
-          {[[-1, 0], [1, 0], [0, 1]].map(([sx, sz], j) => (
-            <mesh key={j} position={[(sx * p.w) / S / 2, 0.27, (sz * p.d) / S / 2]}>
-              <boxGeometry args={[sx === 0 ? p.w / S : 0.025, 0.025, sz === 0 ? p.d / S : 0.025]} />
-              <meshStandardMaterial color="#e2b23a" roughness={0.8} />
-            </mesh>
-          ))}
-          {[[-1, -1], [-1, 1], [1, -1], [1, 1], [0, 1]].map(([sx, sz], j) => (
-            <mesh key={`post${j}`} position={[(sx * p.w) / S / 2, 0.14, (sz * p.d) / S / 2]}>
-              <boxGeometry args={[0.025, 0.27, 0.025]} />
-              <meshStandardMaterial color="#e2b23a" roughness={0.8} />
-            </mesh>
-          ))}
-        </group>
-      ))}
-      {/* the damage is always there; it glows when the story is about it */}
-      <Crack alert={markers === true || inspect?.pier === 'pier3'} />
-      <Corrosion alert={!!markers || inspect?.pier === 'pier2'} />
-      {inspect && <Inspection key={`${inspect.pier}-${inspect.who}${inspect.leave ? '-leave' : ''}`} pier={inspect.pier} who={inspect.who} leave={!!inspect.leave} />}
-      {markers === true && (
-        <>
-          <Marker x={pier3} y={DECK_Y} label="The crack" sub="Lab 2 · this afternoon" color={theme.red} delayMs={1800} labelY={10} />
-          <Marker x={pier2} y={DECK_Y} label="The rust" sub="Lab 3 · next session" color={theme.data} delayMs={3000} labelY={3.2} />
-        </>
-      )}
-      {/* 2.0: only the problem Lab 3 comes back for */}
-      {markers === 'pier2' && <Marker x={pier2} y={DECK_Y} label="The rust" sub="Lab 3 · still open" color={theme.data} delayMs={900} labelY={3.2} />}
-    </group>
+  const theme = useUiStore((state) => state.theme);
+  const f = harborBridgeFrame();
+  const box = (key: string, x: number, y: number, z: number, w: number, h: number, d: number, color: string, rotation?: Vec3): ReactElement => (
+    <mesh key={key} position={[x / S, y / S, z / S]} rotation={rotation} castShadow receiveShadow>
+      <boxGeometry args={[w / S, h / S, d / S]} />
+      <meshStandardMaterial color={color} roughness={0.88} />
+    </mesh>
   );
+  const pieces: ReactElement[] = [];
+  const top = (DECK_Y + DECK_T / 2) * S;
+  pieces.push(box('deck', 0, DECK_Y * S, 0, f.water * 2, DECK_T * S, 0.4, '#666e70'));
+  // The mapped plan is represented by a slab and two bank abutments; elevation is illustrative.
+  for (const side of [-1, 1]) {
+    const x = side * 0.61;
+    pieces.push(box(`abut${side}`, x, -0.015, 0, 0.24, 0.39, 0.5, '#b8b8ae'));
+    pieces.push(box(`cap${side}`, x, 0.18, 0, 0.28, 0.026, 0.48, '#d0d0c5'));
+    pieces.push(box(`bearing${side}`, x, 0.192, 0, 0.15, 0.014, 0.3, '#495357'));
+    const drop = top - 0.04;
+    const len = Math.hypot(f.ramp, drop);
+    pieces.push(box(`approach${side}`, side * (f.water + f.ramp / 2), (top + 0.04) / 2 - 0.014, 0, len, 0.028, 0.4, '#777d7b', [0, 0, -side * Math.atan2(drop, f.ramp)]));
+    for (const edge of [-1, 1]) pieces.push(box(`wing${side}${edge}`, side * 0.86, -0.03, edge * 0.235, 0.28, 0.22, 0.05, '#aeb4a8'));
+  }
+  for (const edge of [-1, 1]) {
+    pieces.push(box(`kerb${edge}`, 0, top + 0.014, edge * 0.185, f.water * 2, 0.028, 0.03, '#d4d0be'));
+    pieces.push(box(`rail${edge}`, 0, top + 0.12, edge * 0.19, f.water * 2, 0.012, 0.012, '#7a8c89'));
+    for (let i = 0; i <= 9; i++) pieces.push(box(`post${edge}${i}`, -0.70 + i * 0.1555, top + 0.072, edge * 0.19, 0.012, 0.115, 0.012, '#7a8c89'));
+  }
+  for (const [i, p] of BRIDGE.platforms.entries()) {
+    pieces.push(box(`training-platform${i}`, p.x, p.y - 0.006, p.z, p.w, 0.012, p.d, '#7f9294'));
+    for (const side of [-1, 1]) pieces.push(box(`platform-side${i}${side}`, p.x + side * p.w / 2, p.y + 0.045, p.z, 0.008, 0.09, p.d, '#d4aa4d'));
+    pieces.push(box(`platform-front${i}`, p.x, p.y + 0.09, p.z + p.d / 2, p.w, 0.008, 0.008, '#d4aa4d'));
+    for (let rung = 0; rung < 4; rung++) pieces.push(box(`rung${i}${rung}`, p.x + 0.15, 0.045 + rung * 0.045, 0.255, 0.055, 0.006, 0.012, '#7e8c89'));
+  }
+  pieces.push(<Crack key="crack" alert={markers === true || inspect?.pier === 'pier3'} />);
+  pieces.push(<Corrosion key="rust" alert={!!markers || inspect?.pier === 'pier2'} />);
+  if (inspect) pieces.push(<Inspection key={`${inspect.pier}-${inspect.who}-${!!inspect.leave}`} {...inspect} />);
+  if (markers === true) pieces.push(<Marker key="crack-marker" x={BRIDGE.damage.crack.x / S} y={top / S} label="Training crack" sub="Fictional inspection · Lab 2" color={theme.red} delayMs={900} labelY={2.8} />);
+  if (markers) pieces.push(<Marker key="rust-marker" x={BRIDGE.damage.corrosion.x / S} y={top / S} label="Training corrosion" sub="Fictional inspection · Lab 3" color={theme.data} delayMs={1300} labelY={2.4} />);
+  return <group position={[f.x, 0, f.z]} rotation={[0, f.yaw, 0]} scale={S} name="senayan-training-crossing">{pieces}</group>;
 }
 
-/** structure-unit position of a piece of damage, a hair in front of the pier face */
 const dmg = (d: { x: number; y: number; z: number }, dz = 0.006): Vec3 => [d.x / S + DAMAGE_SHIFT, d.y / S, d.z / S + dz];
 /** the damage sits a little to the west of the pier's centre line, the inspector stands to the east of it */
 const DAMAGE_SHIFT = -0.1;
@@ -341,9 +182,9 @@ function Inspection({ pier, who, leave = false }: { pier: 'pier3' | 'pier2'; who
     <group name={`inspection-${pier}`}>
       <group ref={walker}>
         {leave ? (
-          <Person who={who} from={to} position={from} walkMs={WALK} delayMs={LEAVE_DELAY} pose="idle" facing={Math.atan2(from[0] - to[0], from[2] - to[2])} height={0.48} />
+          <Person who={who} from={to} position={from} walkMs={WALK} delayMs={LEAVE_DELAY} pose="idle" facing={Math.atan2(from[0] - to[0], from[2] - to[2])} height={0.78} />
         ) : (
-          <Person who={who} from={from} position={to} walkMs={WALK} delayMs={300} pose="interact-right" facing={facing} height={0.48} />
+          <Person who={who} from={from} position={to} walkMs={WALK} delayMs={300} pose="interact-right" facing={facing} height={0.78} />
         )}
       </group>
       <mesh position={beamPose.mid} quaternion={beamPose.q}>
@@ -356,7 +197,7 @@ function Inspection({ pier, who, leave = false }: { pier: 'pier3' | 'pier2'; who
           <div className="marker-label__pier mono" style={{ color: red ? '#e2604c' : '#2bb3c8' }}>
             {red ? 'The crack' : 'The rust'}
           </div>
-          <div className="marker-label__sub">{red ? 'hairline crack · 0.12 mm' : 'surface corrosion · ~25% section loss'}</div>
+          <div className="marker-label__sub">{red ? 'Training crack · 0.12 mm' : 'Training corrosion · ~25% section loss'}</div>
         </div>
       </Html>
     </group>
