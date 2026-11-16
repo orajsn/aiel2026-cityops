@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 /** Names verified in the bundled Kenney Mini Characters GLBs; there are no hand bones. */
 export const INSPECTOR_BONES = ['head', 'torso', 'arm-left', 'arm-right', 'leg-left', 'leg-right'] as const;
@@ -89,12 +90,14 @@ export function addInspectorAppearance(model: THREE.Object3D): InspectorAppearan
   const headSize = headBounds.getSize(new THREE.Vector3());
   const headCenter = headBounds.getCenter(new THREE.Vector3());
   const helmet = attach('head', 'inspection-helmet');
-  const capY = headBounds.max.y - headSize.y * .19;
-  const cap = mesh(helmet, new THREE.SphereGeometry(1, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), helmetMaterial, [headCenter.x, capY, headCenter.z]);
-  cap.scale.set(headSize.x * .54, headSize.y * .26, headSize.z * .55);
+  // The source heads have square upper corners: a flattened hemisphere clips them.
+  const capHeight = headSize.y * .30;
+  const capY = headBounds.max.y + .035 - capHeight;
+  const cap = mesh(helmet, new RoundedBoxGeometry(headSize.x * 1.10, capHeight, headSize.z * 1.12, 3, .02), helmetMaterial, [headCenter.x, capY + capHeight / 2, headCenter.z]);
+  cap.name = 'inspection-helmet-shell';
   const brim = mesh(helmet, new THREE.CylinderGeometry(1, 1, .012, 24), helmetMaterial, [headCenter.x, capY, headCenter.z + .012]);
   brim.scale.set(headSize.x * .61, 1, headSize.z * .60);
-  box(helmet, [.022, headSize.y * .045, headSize.z * .90], helmetMaterial, [headCenter.x, capY + headSize.y * .25, headCenter.z]);
+  box(helmet, [.022, headSize.y * .045, headSize.z * .90], helmetMaterial, [headCenter.x, capY + capHeight, headCenter.z]);
 
   const torso = attach('torso', 'inspection-vest');
   const torsoBounds = regions.get('torso')!;

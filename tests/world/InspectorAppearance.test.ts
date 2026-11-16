@@ -102,3 +102,23 @@ test('unsupported rigs receive no partial equipment or mutations', () => {
   expect(addInspectorAppearance(unsupported)).toBeNull();
   expect(unsupported.children).toHaveLength(0);
 });
+
+test.each(['character-male-b', 'character-male-d', 'character-female-a'])('helmet covers the upper-head corners of %s without changing the rig', async name => {
+  const character = await loadCharacter(name);
+  const model = cloneSkinned(character.scene);
+  const head = model.getObjectByName('head') as THREE.Bone;
+  const bounds = boneRegionBounds(model, head);
+  const appearance = addInspectorAppearance(model)!;
+  model.updateWorldMatrix(true, true);
+  const shell = model.getObjectByName('inspection-helmet-shell')!;
+  for (const x of [bounds.min.x, bounds.max.x]) {
+    for (const z of [bounds.min.z, bounds.max.z]) {
+      const corner = head.localToWorld(new THREE.Vector3(x, bounds.max.y, z));
+      const ray = new THREE.Raycaster(corner.clone().add(new THREE.Vector3(0, .5, 0)), new THREE.Vector3(0, -1, 0));
+      const hits = ray.intersectObject(shell);
+      expect(hits.length, `${name}: upper corner ${x}, ${z}`).toBeGreaterThan(0);
+      expect(hits[0].point.y).toBeGreaterThan(corner.y + .005);
+    }
+  }
+  appearance.dispose();
+});
