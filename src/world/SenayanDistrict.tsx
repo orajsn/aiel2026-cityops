@@ -260,12 +260,13 @@ export function SenayanDistrict() {
     const current = useSceneStore(s => s.scenes[s.index]);
     const id = current?.id;
     const cutaway = current?.shot === 'bridge' || String(current?.shot ?? '').startsWith('pier');
+    const showCutawayLabel = cutaway && current?.overlay !== 'LabGo';
     React.useEffect(() => { setTerrainGrid(null); }, []);
     React.useEffect(() => {
         const context = scene.getObjectByName('Senayan mapped context near inspection');
         if (context)
             context.visible = !cutaway;
-        if (!cutaway)
+        if (!showCutawayLabel)
             return;
         const label = document.createElement('div');
         label.className = 'senayan-inspection-cutaway';
@@ -275,6 +276,6 @@ export function SenayanDistrict() {
         const host = document.getElementById('app') || document.body;
         host.appendChild(label);
         return () => label.remove();
-    }, [scene, cutaway]);
+    }, [scene, cutaway, showCutawayLabel]);
     return React.createElement('group', null, React.createElement('primitive', { object: scene }), ['0.0', '0.1', '0.2'].includes(id) && React.createElement('primitive', { object: labels }));
 }

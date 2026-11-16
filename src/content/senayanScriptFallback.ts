@@ -2,6 +2,10 @@
  * Original scriptTh.ts and STEP_TH remain available as the Bangkok source material.
  */
 export const SENAYAN_CHANGED_SCRIPT_IDS = [
+  "1.0g",
+  "0.4g",
+  "3.0g",
+  "3.5g",
   "0.0",
   "0.1",
   "0.2",
@@ -37,6 +41,10 @@ export const SENAYAN_CHANGED_SCRIPT_IDS = [
 ] as const;
 
 export const SENAYAN_ENGLISH_FALLBACK_IDS: ReadonlySet<string> = new Set([
+  "1.0g",
+  "0.4g",
+  "3.0g",
+  "3.5g",
   "0.0",
   "0.1",
   "0.2",
