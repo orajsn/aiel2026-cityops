@@ -1,0 +1,27 @@
+[Unit]
+Description=CityOps Jakarta phone follow and script manager
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cityops
+Group=cityops
+WorkingDirectory=/var/lib/cityops-jakarta
+ExecStart=/usr/bin/node /srv/cityops-jakarta/current/follow/server.mjs
+Environment=FOLLOW_PORT=8092
+Environment=FOLLOW_BASE=/follow/
+Environment=FOLLOW_DATA=/var/lib/cityops-jakarta/follow-data
+Environment=CITYOPS_AUTOCOMMIT=0
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/cityops-jakarta
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

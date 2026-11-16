@@ -45,8 +45,8 @@ The 87-scene order and original asset identifiers remain. The setting uses OpenS
 
 Reviewed English material is retained. Changed pages use an explicitly marked English fallback on the Thai phone view until translation is reviewed; original Thai source files remain intact.
 
-## VM handoff boundary
+## Verified VM deployment
 
-The Jakarta source edition is published on the `main` branch of https://github.com/orajsn/aiel2026-cityops. VM deployment is in progress; the public endpoint and production authentication are pending verification. The VM uses a production build behind a reviewed web-server configuration and a loopback relay, with authentication at the proxy. Do not use this local preview gateway as a public server.
+The Jakarta source edition is published on the `main` branch of https://github.com/orajsn/aiel2026-cityops. The application is live at **https://168.110.192.223/** and was verified on **16 November 2026**. Application release commit: `ab6510b6305b35752ca092b8a2d99ed8406b0a10`. The VM uses a production build behind Caddy HTTPS and a loopback Node relay, with presenter authentication at the proxy. Credentials were provided privately. See [deployment details and rollback](deploy/jakarta/README.md). Do not use this local preview gateway as a public server.
 
-The upstream VM setup/sync scripts describe the Bangkok owner's existing host and can publish changes or alter services. They are retained as reference, not used for this migration. Hostname, TLS, access policy, server paths and service identity will be set when the target VM is supplied.
+The upstream VM setup/sync scripts describe the Bangkok owner's existing host and can publish changes or alter services. They are retained as reference, not used for this migration. The Jakarta IP-address endpoint, TLS, access policy, release paths and service identity are recorded in `deploy/jakarta/README.md`. Documentation-only publication updates do not change the deployed application release.

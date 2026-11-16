@@ -1,0 +1,41 @@
+168.110.192.223 {
+    tls {
+        issuer acme {
+            dir https://acme-v02.api.letsencrypt.org/directory
+            profile shortlived
+        }
+    }
+    encode zstd gzip
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options SAMEORIGIN
+        Referrer-Policy same-origin
+    }
+    route {
+        @managerUI query mode=scripts
+        basic_auth @managerUI {
+            presenter @PASSWORD_HASH@
+        }
+        @relayAdmin path /follow/api/create /follow/api/m /follow/api/m/*
+        basic_auth @relayAdmin {
+            presenter @PASSWORD_HASH@
+        }
+        redir /follow /follow/ 308
+        handle /follow/* {
+            @foreignOrigin {
+                header Origin *
+                not header Origin https://168.110.192.223
+            }
+            respond @foreignOrigin "Origin is not allowed" 403
+            reverse_proxy 127.0.0.1:8092 {
+                header_up X-Remote-User {http.auth.user.id}
+                header_up -Authorization
+                flush_interval -1
+            }
+        }
+        handle {
+            root * /srv/cityops-jakarta/current/dist
+            file_server
+        }
+    }
+}
